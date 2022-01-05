@@ -1,19 +1,15 @@
 import 'package:asterfox/main.dart';
+import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/drawer.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends BaseScreen {
+  HomeScreen({Key? key}) : super(
+    screen: Container(),
+    appBar: const HomeScreenAppBar(),
+    key: key,
+  );
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: const HomeScreenAppBar(),
-      body: Container(),
-      drawer: const SideMenu(),
-    );
-  }
 }
 
 

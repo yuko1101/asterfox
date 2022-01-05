@@ -1,4 +1,4 @@
-import 'package:asterfox/screen/home_screen.dart';
+import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class AsterfoxApp extends StatelessWidget {
           return MaterialApp(
             title: 'Asterfox',
             theme: themes[value],
-            home: const HomeScreen(),
+            home: HomeScreen(),
           );
         },
         valueListenable: themeNotifier,

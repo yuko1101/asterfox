@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 ThemeData light = ThemeData(
   primarySwatch: getMaterialColor(Colors.white),
   textTheme: TextTheme(
-    headline2: TextStyle(color: getMaterialColor(Colors.black54))
+    headline1: const TextStyle(color: Colors.black), // bright
+
+    headline3: TextStyle(color: getGrey(45)) // middle
   )
 );
 
@@ -15,7 +17,7 @@ ThemeData dark = ThemeData.dark().copyWith(
     scaffoldBackgroundColor: getGrey(20),
     dialogBackgroundColor: getGrey(20),
     textTheme: TextTheme(
-        headline2: TextStyle(color: getMaterialColor(Colors.white54, baseColor: Colors.black))
+        headline3: TextStyle(color: getGrey(200)) // middle
     )
 );
 

@@ -66,10 +66,10 @@ class DrawerListTile extends StatelessWidget {
         child: ListTile(
           onTap: press,
           horizontalTitleGap: 0.0,
-          leading: Icon(icon, color: Theme.of(context).textTheme.headline2!.color),
+          leading: Icon(icon, color: Theme.of(context).textTheme.headline3!.color),
           title: Text(
             title,
-            style: TextStyle(color: Theme.of(context).textTheme.headline2!.color),
+            style: TextStyle(color: Theme.of(context).textTheme.headline3!.color),
           ),
         ),
       ),
