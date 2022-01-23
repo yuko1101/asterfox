@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:audio_service/audio_service.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
   localPath = (await getApplicationDocumentsDirectory()).path;
   init();
   runApp(const AsterfoxApp());
+  // print(await getAudioURL("fWUKNrngFz8"));
 }
 
 void init() async {
