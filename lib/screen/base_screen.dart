@@ -1,3 +1,4 @@
+import 'package:asterfox/util/responsive.dart';
 import 'package:flutter/material.dart';
 
 import 'drawer.dart';
@@ -14,14 +15,23 @@ class BaseScreen extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget screen;
   final StatelessWidget? footer;
-  final PreferredSizeWidget? endDrawer;
+  final StatelessWidget? endDrawer;
 
   @override
   Widget build(BuildContext context) {
+    if (Responsive.isDesktop(context)) {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Row(children: [const SideMenu(), Expanded(child: screen,), endDrawer ?? const SizedBox(width: 0, height: 0)], mainAxisAlignment: MainAxisAlignment.start),
+      );
+    }
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: appBar,
-      body: screen,
+      body: Column(
+        children: footer != null ? [screen, footer!] : [screen],
+        mainAxisAlignment: MainAxisAlignment.end,
+      ),
       drawer: const SideMenu(),
       endDrawer: endDrawer,
     );

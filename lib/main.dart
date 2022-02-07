@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/theme/theme.dart';
+import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +15,14 @@ import 'music/manager/audio_handler.dart';
 import 'music/manager/music_manager.dart';
 
 late final MusicManager musicManager;
-late final String localPath;
+late final String? localPath;
 
 Future<void> main() async {
+
+
   musicManager = MusicManager();
   await musicManager.init();
-  localPath = (await getApplicationDocumentsDirectory()).path;
+  localPath = OS.getOS() == OSType.web ? null : (await getApplicationDocumentsDirectory()).path;
   init();
   runApp(const AsterfoxApp());
   // print(await getAudioURL("fWUKNrngFz8"));
@@ -44,6 +47,7 @@ class AsterfoxApp extends StatelessWidget {
             title: 'Asterfox',
             theme: themes[value],
             home: HomeScreen(),
+            debugShowCheckedModeBanner: false,
           );
         },
         valueListenable: themeNotifier,

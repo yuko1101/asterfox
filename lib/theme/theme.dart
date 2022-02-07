@@ -11,7 +11,9 @@ ThemeData light = ThemeData(
   )
 );
 
-ThemeData dark = ThemeData.dark().copyWith(
+ThemeData dark = ThemeData(
+    brightness: Brightness.dark,
+
     appBarTheme: AppBarTheme(color: getMaterialColor(Colors.black87)),
     backgroundColor: getGrey(20),
     scaffoldBackgroundColor: getGrey(20),

@@ -1,6 +1,6 @@
-import 'package:asterfox/music/music_data.dart';
+import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
@@ -17,7 +17,6 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   final _player = AudioPlayer();
   final _playlist = ConcatenatingAudioSource(children: []);
 
-
   /// Initialise our audio handler.
   AudioPlayerHandler() {
     // So that our clients (the Flutter UI and the system notification) know
@@ -25,36 +24,53 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     // playback state changes as they happen via playbackState...
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
 
+    // _notifyAudioHandlerAboutPlaybackEvents();
+
     // Load the player.
     _player.setAudioSource(_playlist);
 
+    _listenForDurationChanges();
+    _listenForCurrentSongIndexChanges();
+    _listenForSequenceStateChanges();
   }
 
   // In this simple example, we handle only 4 actions: play, pause, seek and
   // stop. Any button press from the Flutter UI, notification, lock screen or
   // headset will be routed through to these 4 methods so that you can handle
   // your audio playback logic in one place.
-  
+
   @override
   Future<void> play() async {
-    print("before play");
+    print("before play()");
     await _player.play();
+    print("after play() playing: ${_player.playing}");
   }
 
   @override
-  Future<void> pause() async => await _player.pause();
+  Future<void> pause() async {
+    await _player.pause();
+  }
 
   @override
-  Future<void> seek(Duration position) async => await _player.seek(position);
+  Future<void> seek(Duration position) async {
+    await _player.seek(position);
+  }
 
   @override
-  Future<void> stop() async => await _player.stop();
+  Future<void> stop() async {
+    await _player.stop();
+    return super.stop();
+  }
 
   @override
-  Future<void> skipToNext() async => await _player.seekToNext();
+  Future<void> skipToNext() async {
+    await _player.seekToNext();
+  }
 
   @override
-  Future<void> skipToPrevious() async => await _player.seekToPrevious();
+  Future<void> skipToPrevious() async {
+    await _player.seekToPrevious();
+  }
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
@@ -69,13 +85,23 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
+    print(3);
+
     // manage Just Audio
     final audioSource = _createAudioSource(mediaItem);
-    await _playlist.add(audioSource);
+    print(3.5);
+
+    OS.getOS() != OSType.windows
+        ? await _playlist.add(audioSource)
+        : _playlist.add(audioSource);
+
+    print(4);
 
     // notify system
     final newQueue = queue.value..add(mediaItem);
     queue.add(newQueue);
+
+    print(5);
   }
 
   @override
@@ -103,7 +129,6 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     );
   }
 
-
   Future<void> move(int currentIndex, int newIndex) async {
     await _playlist.move(currentIndex, newIndex);
     final targetSong = queue.value[currentIndex];
@@ -112,13 +137,39 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     queue.add(newQueue);
   }
 
-
   AudioPlayer getAudioPlayer() {
     return _player;
   }
 
-
-
+  void _notifyAudioHandlerAboutPlaybackEvents() {
+    _player.playbackEventStream.listen((PlaybackEvent event) {
+      final playing = _player.playing;
+      playbackState.add(playbackState.value.copyWith(
+        controls: [
+          MediaControl.skipToPrevious,
+          if (playing) MediaControl.pause else MediaControl.play,
+          MediaControl.stop,
+          MediaControl.skipToNext,
+        ],
+        systemActions: const {
+          MediaAction.seek,
+        },
+        androidCompactActionIndices: const [0, 1, 3],
+        processingState: const {
+          ProcessingState.idle: AudioProcessingState.idle,
+          ProcessingState.loading: AudioProcessingState.loading,
+          ProcessingState.buffering: AudioProcessingState.buffering,
+          ProcessingState.ready: AudioProcessingState.ready,
+          ProcessingState.completed: AudioProcessingState.completed,
+        }[_player.processingState]!,
+        playing: playing,
+        updatePosition: _player.position,
+        bufferedPosition: _player.bufferedPosition,
+        speed: _player.speed,
+        queueIndex: event.currentIndex,
+      ));
+    });
+  }
 
   /// Transform a just_audio event into an audio_service state.
   ///
@@ -152,5 +203,41 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       speed: _player.speed,
       queueIndex: event.currentIndex,
     );
+  }
+
+  void _listenForDurationChanges() {
+    _player.durationStream.listen((duration) {
+      var index = _player.currentIndex;
+      final newQueue = queue.value;
+      if (index == null || newQueue.isEmpty) return;
+      if (_player.shuffleModeEnabled) {
+        index = _player.shuffleIndices![index];
+      }
+      final oldMediaItem = newQueue[index];
+      final newMediaItem = oldMediaItem.copyWith(duration: duration);
+      newQueue[index] = newMediaItem;
+      queue.add(newQueue);
+      mediaItem.add(newMediaItem);
+    });
+  }
+
+  void _listenForCurrentSongIndexChanges() {
+    _player.currentIndexStream.listen((index) {
+      final playlist = queue.value;
+      if (index == null || playlist.isEmpty) return;
+      if (_player.shuffleModeEnabled) {
+        index = _player.shuffleIndices![index];
+      }
+      mediaItem.add(playlist[index]);
+    });
+  }
+
+  void _listenForSequenceStateChanges() {
+    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
+      final sequence = sequenceState?.effectiveSequence;
+      if (sequence == null || sequence.isEmpty) return;
+      final items = sequence.map((source) => source.asMusicData().getMediaItem());
+      queue.add(items.toList());
+    });
   }
 }

@@ -1,8 +1,10 @@
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/music_data.dart';
-import 'package:asterfox/music/music_detail.dart';
+import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/youtube_audio.dart';
+import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/drawer.dart';
+import 'package:asterfox/widget/music_footer.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends BaseScreen {
@@ -12,28 +14,27 @@ class HomeScreen extends BaseScreen {
         onPressed: () async {
           debugPrint("pressed");
           await musicManager.add(
-              MusicData(
-                  url: "https://cdn.discordapp.com/attachments/513142781502423050/928884270041301052/PIKASONIC__Tatsunoshin_-_Lockdown_ft.NEONA_KOTONOHOUSE_Remix.mp3",
-                audioType: AudioType.remote,
-                detail: MusicDetail(
-                  title: "LockDown",
-                  description: "",
-                  author: "PIKASONIC",
-                  authorId: "",
-                  playedCount: 0,
-                  videoId: "",
-                  timestamp: DateTime.now().millisecondsSinceEpoch
-                )
-              )
+              // YouTubeAudio(
+              //     url: "https://cdn.discordapp.com/attachments/513142781502423050/928884270041301052/PIKASONIC__Tatsunoshin_-_Lockdown_ft.NEONA_KOTONOHOUSE_Remix.mp3",
+              //     title: "LockDown",
+              //     description: "",
+              //     author: "PIKASONIC",
+              //     authorId: "",
+              //     id: "",
+              //   duration: 0,
+              //   isLocal: false,
+              // )
+            (await getYouTubeAudio("j_dj8uHvePE"))!
           );
           debugPrint("added");
           await musicManager.play();
           debugPrint("played");
         },
-        child: const Text("a"),
+        child: const Text("play", style: TextStyle(color: Colors.grey),),
       )
     ),
     appBar: const HomeScreenAppBar(),
+    footer: const MusicFooter(),
     key: key,
   );
 

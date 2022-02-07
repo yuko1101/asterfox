@@ -16,7 +16,9 @@ class SideMenu extends StatelessWidget {
                   child: Container(
                     color: Theme.of(context).scaffoldBackgroundColor,
             child: SingleChildScrollView(
-              child: Column(
+              child: ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   DrawerHeader(
                       child: Center(

@@ -1,4 +1,4 @@
-import 'package:asterfox/music/music_data.dart';
+import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:flutter/material.dart';
 
 class MusicCardWidget extends StatelessWidget {
@@ -7,14 +7,14 @@ class MusicCardWidget extends StatelessWidget {
     Key? key
   }) : super(key: key);
 
-  final MusicData song;
+  final AudioBase song;
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(key: Key(song.uuid), child:
+    return Dismissible(key: Key(song.getKey()), child:
       Card(
         child: ListTile(
-          title: Text(song.detail.title),
+          title: Text(song.title),
           onTap: () {},
         ),
       ),

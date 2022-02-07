@@ -1,4 +1,4 @@
-import 'package:asterfox/music/music_data.dart';
+import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/widget/music_card.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +9,7 @@ class QueueWidget extends StatefulWidget {
     Key? key
   }) : super(key: key);
 
-  final List<MusicData> songs;
+  final List<AudioBase> songs;
 
   @override
   _QueueWidgetState createState() => _QueueWidgetState();
