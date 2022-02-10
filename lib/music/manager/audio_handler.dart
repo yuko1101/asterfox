@@ -1,3 +1,4 @@
+import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
@@ -73,35 +74,29 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
-  Future<void> addQueueItems(List<MediaItem> mediaItems) async {
-    // manage Just Audio
-    final audioSource = mediaItems.map(_createAudioSource);
-    await _playlist.addAll(audioSource.toList());
-
-    // notify system
-    final newQueue = queue.value..addAll(mediaItems);
-    queue.add(newQueue);
-  }
-
-  @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
-    print(3);
-
     // manage Just Audio
     final audioSource = _createAudioSource(mediaItem);
-    print(3.5);
 
     OS.getOS() != OSType.windows
         ? await _playlist.add(audioSource)
         : _playlist.add(audioSource);
 
-    print(4);
+    // // notify system
+    // final newQueue = queue.value..add(mediaItem);
+    // queue.add(newQueue);
 
-    // notify system
-    final newQueue = queue.value..add(mediaItem);
-    queue.add(newQueue);
+  }
 
-    print(5);
+  @override
+  Future<void> addQueueItems(List<MediaItem> mediaItems) async {
+    // manage Just Audio
+    final audioSource = mediaItems.map(_createAudioSource);
+    await _playlist.addAll(audioSource.toList());
+
+    // // notify system
+    // final newQueue = queue.value..addAll(mediaItems);
+    // queue.add(newQueue);
   }
 
   @override
@@ -109,10 +104,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     // manage Just Audio
     await _playlist.removeAt(index);
 
-    // notify system
-    final newQueue = queue.value..removeAt(index);
-    queue.add(newQueue);
+    // // notify system
+    // final newQueue = queue.value..removeAt(index);
+    // queue.add(newQueue);
   }
+
 
   @override
   Future customAction(String name, [Map<String, dynamic>? extras]) async {
@@ -131,45 +127,16 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> move(int currentIndex, int newIndex) async {
     await _playlist.move(currentIndex, newIndex);
-    final targetSong = queue.value[currentIndex];
-    final newQueue = queue.value..removeAt(currentIndex);
-    newQueue.insert(newIndex, targetSong);
-    queue.add(newQueue);
+    // final targetSong = queue.value[currentIndex];
+    // final newQueue = queue.value..removeAt(currentIndex);
+    // newQueue.insert(newIndex, targetSong);
+    // queue.add(newQueue);
   }
 
   AudioPlayer getAudioPlayer() {
     return _player;
   }
 
-  void _notifyAudioHandlerAboutPlaybackEvents() {
-    _player.playbackEventStream.listen((PlaybackEvent event) {
-      final playing = _player.playing;
-      playbackState.add(playbackState.value.copyWith(
-        controls: [
-          MediaControl.skipToPrevious,
-          if (playing) MediaControl.pause else MediaControl.play,
-          MediaControl.stop,
-          MediaControl.skipToNext,
-        ],
-        systemActions: const {
-          MediaAction.seek,
-        },
-        androidCompactActionIndices: const [0, 1, 3],
-        processingState: const {
-          ProcessingState.idle: AudioProcessingState.idle,
-          ProcessingState.loading: AudioProcessingState.loading,
-          ProcessingState.buffering: AudioProcessingState.buffering,
-          ProcessingState.ready: AudioProcessingState.ready,
-          ProcessingState.completed: AudioProcessingState.completed,
-        }[_player.processingState]!,
-        playing: playing,
-        updatePosition: _player.position,
-        bufferedPosition: _player.bufferedPosition,
-        speed: _player.speed,
-        queueIndex: event.currentIndex,
-      ));
-    });
-  }
 
   /// Transform a just_audio event into an audio_service state.
   ///
@@ -234,10 +201,20 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   void _listenForSequenceStateChanges() {
     _player.sequenceStateStream.listen((SequenceState? sequenceState) {
-      final sequence = sequenceState?.effectiveSequence;
-      if (sequence == null || sequence.isEmpty) return;
+      // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
+      var sequence = sequenceState?.effectiveSequence;
+      if (sequence == null || sequence.isEmpty) sequence = [];
       final items = sequence.map((source) => source.asMusicData().getMediaItem());
-      queue.add(items.toList());
+      // print(items.length.toString() + " added songs");
+      setQueueItems(items.toList());
     });
   }
+
+  Future<void> setQueueItems(List<MediaItem> songs) async {
+    // notify system
+    final newQueue = queue.value..clear()..addAll(songs.toSet().toList());
+    queue.add(newQueue);
+    // print("set to ${queue.valueOrNull?.length ?? 0} songs");
+  }
+
 }

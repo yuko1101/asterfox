@@ -8,8 +8,8 @@ class MediaAudio extends AudioBase {
     required String description,
     required String author,
     required int duration,
-    required bool isLocal
-  }) : super(url: url, imageUrl: imageUrl, title: title, description: description, author: author, duration: duration, isLocal: isLocal);
+    required bool isLocal, String? key
+  }) : super(url: url, imageUrl: imageUrl, title: title, description: description, author: author, duration: duration, isLocal: isLocal, key: key);
 
   String getMediaURL() {
     return url;

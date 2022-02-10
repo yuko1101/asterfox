@@ -70,9 +70,7 @@ class MusicManager {
   }
 
   Future<void> add(AudioBase song) async {
-    print(1);
     windowsMode ? await _windowsAudioHandler.addQueueItem(song.getMediaItem()) : await _audioHandler.addQueueItem(song.getMediaItem());
-    print(2);
 
   }
   Future<void> addAll(List<AudioBase> songs) async {
@@ -82,7 +80,7 @@ class MusicManager {
   
   Future<void> move(int currentIndex, int newIndex) async {
     windowsMode ? await _windowsAudioHandler.move(currentIndex, newIndex)
-        : await _audioHandler.customAction("move", {"currentIndex": currentIndex, "newIndex": newIndex});
+        : await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
   }
 
   void stop() {
@@ -91,7 +89,7 @@ class MusicManager {
 
   // if position is less than 2 sec, skip previous. if not, replay the current song
   Future<void> playback() async {
-    if (progressNotifier.value.current.inMilliseconds < 2000) {
+    if (progressNotifier.value.current.inMilliseconds < 5000) {
       await previous();
     } else {
       await seekSync(Duration.zero);

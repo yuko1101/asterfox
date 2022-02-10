@@ -21,8 +21,13 @@ class MusicListener {
 
   void _playlistChange() {
     _audioHandler.queue.listen((playlist) {
+      playlist;
+      print(playlist.length.toString() + " songs");
       _musicManager.playlistNotifier.value = playlist.map((e) => e.asMusicData()).toList();
       print("playlist: " + _musicManager.playlistNotifier.value.map((e) => e.toString()).toString());
+
+
+
       _updateHasNextNotifier();
     });
   }
@@ -77,13 +82,13 @@ class MusicListener {
 
   void _totalDurationChange() {
     _audioHandler.mediaItem.listen((mediaItem) {
-      print("duration: " + (mediaItem?.duration!.inMilliseconds.toString() ?? ""));
-      print(mediaItem);
+      print("duration: " + (mediaItem?.duration?.inMilliseconds.toString() ?? ""));
+      // print(mediaItem);
       final oldState = _musicManager.progressNotifier.value;
       _musicManager.progressNotifier.value = ProgressBarState(
         current: oldState.current,
         buffered: oldState.buffered,
-        total: mediaItem?.duration ?? Duration.zero,
+        total: mediaItem?.duration ?? Duration(milliseconds: mediaItem?.asMusicData().duration ?? 0),
       );
     });
   }

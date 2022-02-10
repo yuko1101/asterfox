@@ -1,6 +1,7 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:asterfox/util/responsive.dart';
+import 'package:asterfox/widget/theme_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'music_widgets/audio_progress_bar.dart';
@@ -54,59 +55,65 @@ class MusicFooter extends StatelessWidget with PreferredSizeWidget {
         ),
       );
     }
-    return ValueListenableBuilder<String>(
-      valueListenable: themeNotifier,
-      builder: (_, value, __) => Container(
-          decoration: BoxDecoration(
+    return const MobileMusicFooter();
+  }
+}
+
+class MobileMusicFooter extends ThemeWidget {
+  const MobileMusicFooter({Key? key}) : super(key: key);
+
+  @override
+  Widget widget(BuildContext context, ThemeData theme) {
+    return Container(
+        decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: themes[value]!.shadowColor.withOpacity(0.5),
+                color: theme.shadowColor.withOpacity(0.5),
                 spreadRadius:   5,
                 blurRadius: 7,
                 offset: const Offset(0, 3),
               )
             ],
-            color: themes[value]!.backgroundColor
-            ),
-          height: 170,
-          child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Row(children: [
-              const SizedBox(width: 10),
-              const MusicThumbnail(),
-              const SizedBox(width: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [CurrentSongTitle(), CurrentSongAuthor()],
-              )
-            ]),
-            Row(
-              children: [
-                const SizedBox(width: 30),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: const [TimeText()],
-                        mainAxisAlignment: MainAxisAlignment.end,
-                      ),
-                      const AudioProgressBar()
-                    ],
-                  ),
+            color: theme.backgroundColor
+        ),
+        height: 170,
+        child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+          Row(children: [
+            const SizedBox(width: 10),
+            const MusicThumbnail(),
+            const SizedBox(width: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [CurrentSongTitle(), CurrentSongAuthor()],
+            )
+          ]),
+          Row(
+            children: [
+              const SizedBox(width: 30),
+              Expanded(
+                child: Column(
+                  children: [
+                    Row(
+                      children: const [TimeText()],
+                      mainAxisAlignment: MainAxisAlignment.end,
+                    ),
+                    const AudioProgressBar()
+                  ],
                 ),
-                const SizedBox(width: 30)
-              ],
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              // ShuffleButton(),
-              // RepeatButton(),
-              const PreviousSongButton(),
-              const PlayButton(),
-              const NextSongButton(),
-              // DownloadButton(),
-              // OptionButton(),
-            ])
-          ])),
-    );
+              ),
+              const SizedBox(width: 30)
+            ],
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
+            // ShuffleButton(),
+            // RepeatButton(),
+            PreviousSongButton(),
+            PlayButton(),
+            NextSongButton(),
+            // DownloadButton(),
+            // OptionButton(),
+          ])
+        ]));
   }
 }

@@ -5,33 +5,18 @@ import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/drawer.dart';
 import 'package:asterfox/widget/music_footer.dart';
+import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends BaseScreen {
   HomeScreen({Key? key}) : super(
-    screen: Center(
-      child: TextButton(
-        onPressed: () async {
-          debugPrint("pressed");
-          await musicManager.add(
-              // YouTubeAudio(
-              //     url: "https://cdn.discordapp.com/attachments/513142781502423050/928884270041301052/PIKASONIC__Tatsunoshin_-_Lockdown_ft.NEONA_KOTONOHOUSE_Remix.mp3",
-              //     title: "LockDown",
-              //     description: "",
-              //     author: "PIKASONIC",
-              //     authorId: "",
-              //     id: "",
-              //   duration: 0,
-              //   isLocal: false,
-              // )
-            (await getYouTubeAudio("j_dj8uHvePE"))!
-          );
-          debugPrint("added");
-          await musicManager.play();
-          debugPrint("played");
-        },
-        child: const Text("play", style: TextStyle(color: Colors.grey),),
-      )
+    screen: ValueListenableBuilder<List<AudioBase>>(
+      valueListenable: musicManager.playlistNotifier,
+      builder: (_, songs, __) => PlaylistWidget(
+        songs: songs,
+        playing: musicManager.currentSongNotifier.value,
+        linked: true,
+      ),
     ),
     appBar: const HomeScreenAppBar(),
     footer: const MusicFooter(),
@@ -52,9 +37,45 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text("Asterfox"),
+      title: Row(
+        children: [
+          SizedBox(
+            height: 35,
+            width: 35,
+            child: FittedBox(
+              child: Image.asset("assets/images/asterfox.png"),
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 5),
+          const Text("Asterfox")
+        ],
+        mainAxisAlignment: MainAxisAlignment.start,
+      ),
       actions: [
-        IconButton(onPressed: () => openSearch(context), icon: const Icon(Icons.search))
+        IconButton(onPressed: () => openSearch(context), icon: const Icon(Icons.search)),
+        IconButton(
+          onPressed: () async {
+            debugPrint("pressed");
+            await musicManager.add(
+              // YouTubeAudio(
+              //     url: "https://cdn.discordapp.com/attachments/513142781502423050/928884270041301052/PIKASONIC__Tatsunoshin_-_Lockdown_ft.NEONA_KOTONOHOUSE_Remix.mp3",
+              //     title: "LockDown",
+              //     description: "",
+              //     author: "PIKASONIC",
+              //     authorId: "",
+              //     id: "",
+              //   duration: 0,
+              //   isLocal: false,
+              // )
+                (await getYouTubeAudio("j_dj8uHvePE"))!
+            );
+            debugPrint("added");
+            // await musicManager.play();
+            // debugPrint("played");
+          },
+          icon: const Icon(Icons.add),
+        )
       ],
       leading: IconButton(onPressed: () => DrawerController(context).openDrawer(), icon: const Icon(Icons.menu)),
     );

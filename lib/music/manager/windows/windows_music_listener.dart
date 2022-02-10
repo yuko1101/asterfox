@@ -28,7 +28,7 @@ class WindowsMusicListener {
       final List<AudioBase> playlist = list == null ? [] : list.map((indexedAudioSource) => indexedAudioSource.asMusicData()).toList();
       _musicManager.playlistNotifier.value = playlist;
       print("playlist: " + _musicManager.playlistNotifier.value.map((e) => e.toString()).toString());
-      _updateHasNextNotifier();
+      _updateHasNextNotifier(null, playlist.length);
 
       print("song changed!");
       final int? currentIndex = _windowsAudioHandler.getAudioPlayer().currentIndex;
@@ -103,14 +103,14 @@ class WindowsMusicListener {
       if (_musicManager.currentIndexNotifier.value != index) {
         print("index changed!");
         _musicManager.currentIndexNotifier.value = index;
-        _updateHasNextNotifier();
+        _updateHasNextNotifier(index, null);
       }
     });
   }
 
-  void _updateHasNextNotifier() {
-    final max = _musicManager.playlistNotifier.value.length;
-    final current = _musicManager.currentIndexNotifier.value;
+  void _updateHasNextNotifier(int? current, int? max) {
+    max ??= _musicManager.playlistNotifier.value.length;
+    current ??= _musicManager.currentIndexNotifier.value;
     // final repeatMode =
     if (current == null) {
       _musicManager.hasNextNotifier.value = false;

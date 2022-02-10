@@ -11,8 +11,9 @@ class YouTubeAudio extends MediaAudio {
     required String author,
     required this.authorId,
     required int duration,
-    required bool isLocal
-  }) : super(url: url, imageUrl: isLocal ? "$localPath/images/$id.png" : "https://img.youtube.com/vi/$id/maxresdefault.jpg", title: title, description: description, author: author, duration: duration, isLocal: isLocal);
+    required bool isLocal,
+    String? key
+  }) : super(url: url, imageUrl: isLocal ? "$localPath/images/$id.png" : "https://img.youtube.com/vi/$id/maxresdefault.jpg", title: title, description: description, author: author, duration: duration, isLocal: isLocal, key: key);
   final String id;
   final String authorId;
 
@@ -34,7 +35,7 @@ class YouTubeAudio extends MediaAudio {
       'author': author,
       'authorId': authorId,
       'duration': duration,
-      'id': id
+      'id': id,
     };
   }
 
@@ -63,7 +64,8 @@ class YouTubeAudio extends MediaAudio {
       'authorId': authorId,
       'duration': duration,
       'isLocal': isLocal,
-      'id': id
+      'id': id,
+      'key': key
     };
   }
 
@@ -76,7 +78,8 @@ class YouTubeAudio extends MediaAudio {
         author: json['author'] as String,
         authorId: json['authorId'] as String,
         duration: json['duration'] as int,
-        isLocal: json['isLocal'] as bool
+        isLocal: json['isLocal'] as bool,
+        key: json['key'] as String?
     );
   }
 }
