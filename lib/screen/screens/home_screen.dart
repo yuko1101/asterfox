@@ -4,19 +4,28 @@ import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/drawer.dart';
+import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
+import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/widget/music_footer.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
+final homeNotification = InAppNotification();
+
 class HomeScreen extends BaseScreen {
   HomeScreen({Key? key}) : super(
-    screen: ValueListenableBuilder<List<AudioBase>>(
-      valueListenable: musicManager.playlistNotifier,
-      builder: (_, songs, __) => PlaylistWidget(
-        songs: songs,
-        playing: musicManager.currentSongNotifier.value,
-        linked: true,
-      ),
+    screen: Stack(
+      children: [
+        ValueListenableBuilder<List<AudioBase>>(
+          valueListenable: musicManager.playlistNotifier,
+          builder: (_, songs, __) => PlaylistWidget(
+            songs: songs,
+            playing: musicManager.currentSongNotifier.value,
+            linked: true,
+          ),
+        ),
+        homeNotification
+      ]
     ),
     appBar: const HomeScreenAppBar(),
     footer: const MusicFooter(),
@@ -57,6 +66,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
         IconButton(
           onPressed: () async {
             debugPrint("pressed");
+            homeNotification.pushNotification(NotificationData(title: "aa"));
             await musicManager.add(
               // YouTubeAudio(
               //     url: "https://cdn.discordapp.com/attachments/513142781502423050/928884270041301052/PIKASONIC__Tatsunoshin_-_Lockdown_ft.NEONA_KOTONOHOUSE_Remix.mp3",

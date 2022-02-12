@@ -23,27 +23,27 @@ class PlaylistWidget extends StatefulWidget {
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return SizedBox(
       child: SingleChildScrollView(
-          child: ReorderableListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => MusicCardWidget(song: widget.songs[index], playing: widget.songs[index].getKey() == widget.playing?.getKey(), key: Key(widget.songs[index].getKey())),
-              itemCount: widget.songs.length,
-              onReorder: (oldIndex, newIndex) {
-                if (oldIndex < newIndex) newIndex -= 1;
+        child: ReorderableListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => MusicCardWidget(song: widget.songs[index], playing: widget.songs[index].key! == widget.playing?.key!, key: Key(widget.songs[index].key!)),
+          itemCount: widget.songs.length,
+          onReorder: (oldIndex, newIndex) {
+            if (oldIndex < newIndex) newIndex -= 1;
 
-                print("oldIndex: $oldIndex, newIndex: $newIndex");
+            print("oldIndex: $oldIndex, newIndex: $newIndex");
 
-                final song = widget.songs.removeAt(oldIndex);
+            final song = widget.songs.removeAt(oldIndex);
 
 
-                if (widget.linked) musicManager.move(oldIndex, newIndex);
+            if (widget.linked) musicManager.move(oldIndex, newIndex);
 
-                setState(() {
-                  widget.songs.insert(newIndex, song);
-                });
-              }
+            setState(() {
+              widget.songs.insert(newIndex, song);
+            });
+          }
         ),
       ),
     );

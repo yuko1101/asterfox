@@ -38,6 +38,8 @@ class MusicManager {
             androidNotificationChannelId: 'net.asterium.asterfox.channel.audio',
             androidNotificationChannelName: 'Asterfox Music',
             androidNotificationOngoing: true,
+            androidStopForegroundOnPause: true,
+            androidShowNotificationBadge: true,
           )
       );
       MusicListener(this, _audioHandler).init();
@@ -76,6 +78,14 @@ class MusicManager {
   Future<void> addAll(List<AudioBase> songs) async {
     windowsMode ? await _windowsAudioHandler.addQueueItems(songs.map((e) => e.getMediaItem()).toList())
         : await _audioHandler.addQueueItems(songs.map((e) => e.getMediaItem()).toList());
+  }
+
+  Future<void> remove(String key) async {
+    final int index = playlistNotifier.value.indexWhere((song) => song.key == key);
+    if (index != -1) {
+      windowsMode ? await _windowsAudioHandler.removeQueueItemAt(index)
+          : await _audioHandler.removeQueueItemAt(index);
+    }
   }
   
   Future<void> move(int currentIndex, int newIndex) async {

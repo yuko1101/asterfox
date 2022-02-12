@@ -15,7 +15,10 @@ class AudioBase {
     required this.isLocal,
     this.key
 
-  });
+  }) {
+    key ??= const Uuid().v4();
+  }
+
   final String url;
   final String imageUrl;
   final String title;
@@ -25,16 +28,11 @@ class AudioBase {
   bool isLocal;
   String? key;
 
-  String getKey() {
-    key ??= const Uuid().v4();
-    return key!;
-  }
-
   String classId() => "audio";
 
   MediaItem getMediaItem() {
     return MediaItem(
-        id: getKey(),
+        id: url,
         title: title,
         // duration: Duration(milliseconds: duration),
         extras: {

@@ -29,7 +29,7 @@ class BaseScreen extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       appBar: appBar,
       body: Column(
-        children: footer != null ? [screen, footer!] : [screen],
+        children: footer != null ? [Expanded(child: screen), footer!] : [Expanded(child: screen)],
         mainAxisAlignment: MainAxisAlignment.end,
       ),
       drawer: const SideMenu(),
