@@ -1,12 +1,14 @@
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_manager.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
+import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:audio_service/audio_service.dart';
 
 class MusicListener {
   MusicListener(this._musicManager, this._audioHandler);
   final MusicManager _musicManager;
   final AudioHandler _audioHandler;
+
   void init() {
     _playlistChange();
     _currentSongChange();
@@ -15,7 +17,6 @@ class MusicListener {
     _bufferedPositionChange();
     _totalDurationChange();
     _currentIndexChange();
-
 
   }
 
@@ -30,8 +31,8 @@ class MusicListener {
         _musicManager.currentSongNotifier.value = null;
         _setDuration(null);
       }
-
-        _updateHasNextNotifier();
+      _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
+      _updateHasNextNotifier();
       }
     );
   }
@@ -40,6 +41,8 @@ class MusicListener {
     _audioHandler.mediaItem.listen((mediaItem) {
       print("song changed!");
       _musicManager.currentSongNotifier.value = mediaItem?.asMusicData();
+      _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
+      _updateHasNextNotifier();
     });
 
   }
@@ -101,24 +104,40 @@ class MusicListener {
     );
   }
 
+
+
   void _currentIndexChange() {
     _audioHandler.playbackState.listen((playbackState) {
 
       if (_musicManager.currentIndexNotifier.value != playbackState.queueIndex) {
-        print("index changed!");
-        _musicManager.currentIndexNotifier.value = playbackState.queueIndex;
-        _updateHasNextNotifier();
+        _updateIndex(playbackState.queueIndex);
       }
     });
   }
 
+  void _updateIndex(int? index) {
+    print("index changed! $index (shuffled: ${_musicManager.getShuffledIndex()})");
+    _musicManager.currentIndexNotifier.value = index;
+    _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
+    _updateHasNextNotifier();
+  }
+
   void _updateHasNextNotifier() {
     final max = _musicManager.playlistNotifier.value.length;
-    final current = _musicManager.currentIndexNotifier.value;
-    // final repeatMode =
+    final current = _musicManager.currentShuffledIndexNotifier.value;
+    if (max == 0) {
+      _musicManager.hasNextNotifier.value = false;
+      return;
+    }
     if (current == null) {
       _musicManager.hasNextNotifier.value = false;
     } else {
+
+      if ([RepeatState.one, RepeatState.all].contains(_musicManager.repeatModeNotifier.value)) {
+        _musicManager.hasNextNotifier.value = true;
+        return;
+      }
+
       _musicManager.hasNextNotifier.value = current != max - 1;
     }
   }

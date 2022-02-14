@@ -5,6 +5,7 @@ import 'package:asterfox/music/manager/windows/windows_music_listener.dart';
 import 'package:asterfox/notifiers/progress_notifier.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
+import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
@@ -24,9 +25,12 @@ class MusicManager {
   final playlistNotifier = ValueNotifier<List<AudioBase>>([]);
   final currentSongNotifier = ValueNotifier<AudioBase?>(null);
   final playingNotifier = ValueNotifier<PlayingState>(PlayingState.disabled);
-  final currentIndexNotifier = ValueNotifier<int?>(null);
+  final currentIndexNotifier = ValueNotifier<int?>(null); // シャッフルない状態でのindex
+  final currentShuffledIndexNotifier = ValueNotifier<int?>(null); // シャッフル対応index
 
   final hasNextNotifier = ValueNotifier<bool>(false);
+  final repeatModeNotifier = RepeatModeNotifier();
+  final shuffleModeNotifier = ValueNotifier<bool>(false);
 
 
 
@@ -104,5 +108,42 @@ class MusicManager {
     } else {
       await seekSync(Duration.zero);
     }
+  }
+
+  Future<void> nextRepeatMode() async {
+    repeatModeNotifier.nextState();
+    final repeatMode = repeatModeNotifier.value;
+    switch (repeatMode) {
+      case RepeatState.none:
+        windowsMode ? await _windowsAudioHandler.setRepeatMode(AudioServiceRepeatMode.none)
+            : _audioHandler.setRepeatMode(AudioServiceRepeatMode.none);
+        break;
+      case RepeatState.one:
+        windowsMode ? await _windowsAudioHandler.setRepeatMode(AudioServiceRepeatMode.one)
+            : _audioHandler.setRepeatMode(AudioServiceRepeatMode.one);
+        break;
+      case RepeatState.all:
+        windowsMode ? await _windowsAudioHandler.setRepeatMode(AudioServiceRepeatMode.all)
+            : _audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
+        break;
+    }
+  }
+
+  Future<void> toggleShuffle() async {
+    final enable = !shuffleModeNotifier.value;
+    shuffleModeNotifier.value = enable;
+    if (enable) {
+      windowsMode ? await _windowsAudioHandler.setShuffleMode(AudioServiceShuffleMode.all)
+          : _audioHandler.setShuffleMode(AudioServiceShuffleMode.all);
+    } else {
+      windowsMode ? await _windowsAudioHandler.setShuffleMode(AudioServiceShuffleMode.none)
+          : _audioHandler.setShuffleMode(AudioServiceShuffleMode.none);
+    }
+  }
+
+  int? getShuffledIndex() {
+    final int index = currentSongNotifier.value != null ? playlistNotifier.value.indexWhere((song) => song.key! == currentSongNotifier.value!.key!) : -1;
+    return (index == -1 ? null : index);
+
   }
 }

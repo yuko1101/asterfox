@@ -100,6 +100,31 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     // queue.add(newQueue);
   }
 
+  @override
+  Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
+    switch (repeatMode) {
+      case AudioServiceRepeatMode.none:
+        await _player.setLoopMode(LoopMode.off);
+        break;
+      case AudioServiceRepeatMode.one:
+        await _player.setLoopMode(LoopMode.one);
+        break;
+      case AudioServiceRepeatMode.group:
+      case AudioServiceRepeatMode.all:
+        await _player.setLoopMode(LoopMode.all);
+        break;
+    }
+  }
+
+  @override
+  Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
+    if (shuffleMode == AudioServiceShuffleMode.none) {
+      await _player.setShuffleModeEnabled(false);
+    } else {
+      await _player.shuffle();
+      await _player.setShuffleModeEnabled(true);
+    }
+  }
 
   @override
   Future customAction(String name, [Map<String, dynamic>? extras]) async {

@@ -56,7 +56,7 @@ Future<YouTubeAudio?> getYouTubeAudio(String videoId) async {
     // オンライン上から取得
 
     // インターネット接続確認
-    if (!await networkAccessible()) {
+    if (!await networkAccessibleSync()) {
       await showNetworkAccessDeniedMessage();
       return null;
     }
