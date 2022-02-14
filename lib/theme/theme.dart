@@ -7,7 +7,7 @@ ThemeData light = ThemeData(
   textTheme: TextTheme(
     headline1: const TextStyle(color: Colors.black), // bright
 
-    headline3: TextStyle(color: getGrey(45)) // middle
+    headline3: TextStyle(color: getGrey(45)), // middle
   )
 );
 
@@ -19,7 +19,8 @@ ThemeData dark = ThemeData(
     scaffoldBackgroundColor: getGrey(20),
     dialogBackgroundColor: getGrey(20),
     textTheme: TextTheme(
-        headline3: TextStyle(color: getGrey(200)) // middle
+        headline3: TextStyle(color: getGrey(200)), // middle
+        headline4: TextStyle(color: getGrey(100))
     )
 );
 
