@@ -1,15 +1,18 @@
 import 'package:fluttertoast/fluttertoast.dart';
 
-Future<bool> networkConnected() async {
+Future<bool> networkConnectedSync() async {
   return true;
 }
 
-Future<bool> networkAccessible() async {
+Future<bool> networkAccessibleSync() async {
+  return true;
+}
+bool networkAccessible() {
   return true;
 }
 
 Future<void> showNetworkAccessDeniedMessage() async {
-  if (!await networkConnected()) Fluttertoast.showToast(msg: "インターネットに接続できませんでした");
-  if (!await networkAccessible()) Fluttertoast.showToast(msg: "インターネット接続方法が制限されています");
+  if (!await networkConnectedSync()) Fluttertoast.showToast(msg: "インターネットに接続できませんでした");
+  if (!await networkAccessibleSync()) Fluttertoast.showToast(msg: "インターネット接続方法が制限されています");
 }
 
