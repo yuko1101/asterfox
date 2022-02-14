@@ -18,11 +18,9 @@ class InAppNotification extends StatelessWidget {
           children: [
             const Spacer(),
             SizedBox(
-              width: MediaQuery.of(context).size.width / 3,
+              width: MediaQuery.of(context).size.width / 2.5,
               child: ConstrainedBox(
                 constraints: const BoxConstraints.expand(),
-                child: Container(
-                  color: Colors.red,
                       child: SingleChildScrollView(
                         reverse: true,
                         child: Column(
@@ -31,7 +29,6 @@ class InAppNotification extends StatelessWidget {
                             NotificationList(context)
                           ],
                         ),
-                      ),
                     ),
               )
             ),
@@ -42,12 +39,17 @@ class InAppNotification extends StatelessWidget {
   }
 
 
-  void pushNotification(NotificationData notification, {Duration? duration}) {
+  Future<void> pushNotification(NotificationData notification, {Duration? duration}) async {
     notifications.add(notification);
     _listKey.currentState?.insertItem(notifications.length - 1);
-    Future.delayed(duration ?? const Duration(milliseconds: 100000), () {
+    if (notification.progress == null) {
+      Future.delayed(duration ?? const Duration(milliseconds: 2000), () {
+        deleteNotification(notification.id);
+      });
+    } else {
+      await notification.progress!.call();
       deleteNotification(notification.id);
-    });
+    }
   }
 
 
@@ -95,7 +97,7 @@ class _NotificationListState extends State<NotificationList> {
         return SlideTransition(
           child: NotificationWidget(notification: (widget.parentContext.widget as InAppNotification).notifications[index]),
           position: animation.drive(_offset),
-                
+
         );
       }
     );

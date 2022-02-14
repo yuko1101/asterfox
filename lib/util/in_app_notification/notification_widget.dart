@@ -11,14 +11,27 @@ class NotificationWidget extends ThemeWidget {
   final NotificationData notification;
 
   @override
-  Widget widget(BuildContext context, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: theme.backgroundColor
-      ),
-      child: Text(notification.title),
+  Widget themeBuild(BuildContext context, ThemeData theme) {
+    return Column(
+      children: [
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: theme.textTheme.headline3?.color,
+                  boxShadow: const [
+                    BoxShadow() //TODO: Lightテーマは影と付けて見やすくする。Darkテーマは色を灰色にする
+                  ]
+              ),
+              child: notification.title,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
