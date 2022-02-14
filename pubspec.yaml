@@ -48,6 +48,10 @@ dependencies:
 
   audio_video_progress_bar: ^0.7.0
 
+  receive_sharing_intent: ^1.4.5
+
+  flutter_spinkit: ^5.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
