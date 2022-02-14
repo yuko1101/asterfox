@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'music_widgets/audio_progress_bar.dart';
 import 'music_widgets/music_buttons.dart';
 import 'music_widgets/music_thumbnail.dart';
+import 'music_widgets/repeat_button.dart';
 import 'music_widgets/song_text.dart';
 import 'music_widgets/time_text.dart';
 
@@ -45,8 +46,8 @@ class MusicFooter extends StatelessWidget with PreferredSizeWidget {
                   ],
                 ),
                 const Spacer(),
-                // RepeatButton(),
-                // ShuffleButton(),
+                const RepeatButton(),
+                const ShuffleButton(),
                 // DownloadButton(),
                 // OptionButton(),
               ],
@@ -63,31 +64,38 @@ class MobileMusicFooter extends ThemeWidget {
   const MobileMusicFooter({Key? key}) : super(key: key);
 
   @override
-  Widget widget(BuildContext context, ThemeData theme) {
+  Widget themeBuild(BuildContext context, ThemeData theme) {
     return Container(
-        decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: theme.shadowColor.withOpacity(0.5),
-                spreadRadius:   5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              )
-            ],
-            color: theme.backgroundColor
-        ),
-        height: 170,
-        child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-          Row(children: [
-            const SizedBox(width: 10),
-            const MusicThumbnail(),
-            const SizedBox(width: 20),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [CurrentSongTitle(), CurrentSongAuthor()],
+      decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: theme.shadowColor.withOpacity(0.5),
+              spreadRadius:   5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
             )
-          ]),
+          ],
+          color: theme.backgroundColor
+      ),
+      height: 170,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Row(
+            children: [
+              const SizedBox(width: 10),
+              const MusicThumbnail(),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [CurrentSongTitle(), CurrentSongAuthor()],
+                ),
+              ),
+              const SizedBox(width: 10)
+            ]
+          ),
           Row(
             children: [
               const SizedBox(width: 30),
@@ -105,15 +113,20 @@ class MobileMusicFooter extends ThemeWidget {
               const SizedBox(width: 30)
             ],
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-            // ShuffleButton(),
-            // RepeatButton(),
-            PreviousSongButton(),
-            PlayButton(),
-            NextSongButton(),
-            // DownloadButton(),
-            // OptionButton(),
-          ])
-        ]));
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              ShuffleButton(),
+              RepeatButton(),
+              PreviousSongButton(),
+              PlayButton(),
+              NextSongButton(),
+              // DownloadButton(),
+              // OptionButton(),
+            ]
+          )
+        ]
+      )
+    );
   }
 }
