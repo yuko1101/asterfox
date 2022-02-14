@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
+import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
@@ -30,6 +31,7 @@ Future<void> main() async {
 
 void init() async {
   debugPrint("localPath: $localPath");
+  SharingIntent.init();
 }
 
 ValueNotifier<String> themeNotifier = ValueNotifier<String>("light");
