@@ -4,7 +4,6 @@ import 'package:asterfox/music/manager/windows/windows_audio_handler.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:dart_vlc/dart_vlc.dart';
 
 import '../music_listener.dart';
 
@@ -52,7 +51,7 @@ class WindowsMusicListener {
       _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
       _updateHasNextNotifier();
 
-      if (audio != null) {
+      if (audio != null && _musicManager.playlistNotifier.value.isEmpty) {
         _musicManager.playingNotifier.value = PlayingState.paused;
       } else {
         _musicManager.playingNotifier.value = PlayingState.disabled;
