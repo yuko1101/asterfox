@@ -1,11 +1,19 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:flutter/material.dart';
+
+import '../../../main.dart';
 
 class WindowsAudioHandler {
-  final _player = AudioPlayer(handleInterruptions: false);
-  final _playlist = ConcatenatingAudioSource(children: []);
+  final _player = Player(
+    id: 69420,
+    commandlineArguments: ['--no-video']
+  );
 
   /// Initialise our audio handler.
   WindowsAudioHandler() {
@@ -13,7 +21,7 @@ class WindowsAudioHandler {
     // _notifyAudioHandlerAboutPlaybackEvents();
 
     // Load the player.
-    _player.setAudioSource(_playlist);
+    _player.open(const Playlist(medias: []));
   }
 
   // In this simple example, we handle only 4 actions: play, pause, seek and
@@ -24,33 +32,34 @@ class WindowsAudioHandler {
   Future<void> play() async {
     print("before play()");
     _player.play();
-    print("after play() playing: ${_player.playing}");
+    print("after play() playing: ${_player.playback.isPlaying}");
   }
 
   Future<void> pause() async {
-    await _player.pause();
+    _player.pause();
   }
 
   Future<void> seek(Duration position) async {
-    await _player.seek(position);
+    _player.seek(position);
   }
 
   Future<void> stop() async {
-    await _player.stop();
+    _player.stop();
   }
 
   Future<void> skipToNext() async {
-    await _player.seekToNext();
+    _player.next();
   }
 
   Future<void> skipToPrevious() async {
-    await _player.seekToPrevious();
+    _player.back();
   }
 
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     // manage Just Audio
-    final audioSource = mediaItems.map(_createAudioSource);
-    _playlist.addAll(audioSource.toList());
+    for (final mediaItem in mediaItems) {
+      addQueueItem(mediaItem);
+    }
 
   }
 
@@ -58,59 +67,75 @@ class WindowsAudioHandler {
     print(3);
 
     // manage Just Audio
-    final audioSource = _createAudioSource(mediaItem);
+    final media = _createMedia(mediaItem);
     print(3.5);
 
-    _playlist.add(audioSource);
+    _player.add(media);
+    musicManager.playlistNotifier.value = [...musicManager.playlistNotifier.value, mediaItem.asMusicData()];
     print(4);
 
   }
 
   Future<void> removeQueueItemAt(int index) async {
-    // manage Just Audio
-    await _playlist.removeAt(index);
+    _player.remove(index);
+    final playlist = musicManager.playlistNotifier.value;
+    playlist.removeAt(index);
+    musicManager.playlistNotifier.value = playlist;
 
+    // dart_vlcでは0曲になったときの処理ができないためここで代わりに処理をする
+    if (playlist.isEmpty) {
+      print("no songs!");
+      musicManager.currentSongNotifier.value = null;
+    }
   }
 
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
     switch (repeatMode) {
       case AudioServiceRepeatMode.none:
-        _player.setLoopMode(LoopMode.off);
+        _player.setPlaylistMode(PlaylistMode.single);
         break;
       case AudioServiceRepeatMode.one:
-        _player.setLoopMode(LoopMode.one);
+        _player.setPlaylistMode(PlaylistMode.repeat);
         break;
       case AudioServiceRepeatMode.group:
       case AudioServiceRepeatMode.all:
-        _player.setLoopMode(LoopMode.all);
+        _player.setPlaylistMode(PlaylistMode.loop);
         break;
     }
   }
 
 
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
-    if (shuffleMode == AudioServiceShuffleMode.none) {
-      _player.setShuffleModeEnabled(false);
-    } else {
-      await _player.shuffle();
-      _player.setShuffleModeEnabled(true);
-    }
+    // if (shuffleMode == AudioServiceShuffleMode.none) {
+    //   _player.setShuffleModeEnabled(false);
+    // } else {
+    //   await _player.shuffle();
+    //   _player.setShuffleModeEnabled(true);
+    // }
   }
 
 
-  UriAudioSource _createAudioSource(MediaItem mediaItem) {
+  Media _createMedia(MediaItem mediaItem) {
     // print(mediaItem.asMusicData());
-    return AudioSource.uri(
-      Uri.parse(mediaItem.extras!['url']),
-      tag: mediaItem.asMusicData(), // MusicData
+    if (mediaItem.extras!["tag"]["isLocal"]) {
+      return Media.file(File(mediaItem.extras!["url"]), extras: mediaItem.asMusicData().toMap());
+    }
+    return Media.network(
+      Uri.parse(mediaItem.extras!["url"]),
+      extras: mediaItem.asMusicData().toMap(), // MusicData
     );
   }
 
   Future<void> move(int currentIndex, int newIndex) async {
-    await _playlist.move(currentIndex, newIndex);
+    _player.move(currentIndex, newIndex);
+    final newPlaylist = musicManager.playlistNotifier.value;
+    final removed = newPlaylist.removeAt(currentIndex);
+    final insertIndex = currentIndex < newIndex ? newIndex - 1 : newIndex;
+    newPlaylist.insert(insertIndex, removed);
+    musicManager.playlistNotifier.value = newPlaylist;
   }
 
-  AudioPlayer getAudioPlayer() {
+  Player getAudioPlayer() {
     return _player;
   }
 }

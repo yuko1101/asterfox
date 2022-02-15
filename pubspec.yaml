@@ -42,15 +42,20 @@ dependencies:
 
   audio_service: ^0.18.3
   just_audio: ^0.9.18
-  just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
+#  just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
+
+  # use this instead of just_audio on microsoft windows
+  dart_vlc:
+    path: "C:/Users/seo won seok2/Desktop/dart_vlc"
 
   youtube_explode_dart: ^1.10.4
 
-  audio_video_progress_bar: ^0.7.0
+  audio_video_progress_bar: ^0.10.0
 
   receive_sharing_intent: ^1.4.5
 
   flutter_spinkit: ^5.1.0
+
 
 dev_dependencies:
   flutter_test:

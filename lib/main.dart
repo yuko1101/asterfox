@@ -6,7 +6,7 @@ import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/foundation.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,7 +19,9 @@ late final MusicManager musicManager;
 late final String? localPath;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
+  if (OS.getOS() == OSType.windows) DartVLC.initialize();
 
   musicManager = MusicManager();
   await musicManager.init();
@@ -31,7 +33,7 @@ Future<void> main() async {
 
 void init() async {
   debugPrint("localPath: $localPath");
-  SharingIntent.init();
+  if (OS.getOS() != OSType.windows) SharingIntent.init();
 }
 
 ValueNotifier<String> themeNotifier = ValueNotifier<String>("light");

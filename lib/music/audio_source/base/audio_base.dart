@@ -1,5 +1,6 @@
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';
@@ -102,6 +103,12 @@ class AudioBase {
 extension ParseMusicData on MediaItem {
   AudioBase asMusicData() {
     return parse(extras!["tag"]);
+  }
+}
+
+extension MediaParseMusicData on Media {
+  AudioBase asMusicData() {
+    return parse(extras!);
   }
 }
 

@@ -1,6 +1,7 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
+import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
@@ -17,12 +18,15 @@ class HomeScreen extends BaseScreen {
   HomeScreen({Key? key}) : super(
     screen: Stack(
       children: [
-        ValueListenableBuilder<List<AudioBase>>(
-          valueListenable: musicManager.playlistNotifier,
-          builder: (_, songs, __) => PlaylistWidget(
-            songs: songs,
-            playing: musicManager.currentSongNotifier.value,
-            linked: true,
+        ValueListenableBuilder<PlayingState>(
+          valueListenable: musicManager.playingNotifier,
+          builder: (_, __, ___) => ValueListenableBuilder<List<AudioBase>>(
+            valueListenable: musicManager.playlistNotifier,
+            builder: (_, songs, __) => PlaylistWidget(
+              songs: songs,
+              playing: musicManager.currentSongNotifier.value,
+              linked: true,
+            ),
           ),
         ),
         homeNotification

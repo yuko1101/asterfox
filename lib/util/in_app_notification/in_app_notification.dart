@@ -19,17 +19,19 @@ class InAppNotification extends StatelessWidget {
             const Spacer(),
             SizedBox(
               width: MediaQuery.of(context).size.width / 2.5,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints.expand(),
-                      child: SingleChildScrollView(
-                        reverse: true,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            NotificationList(context)
-                          ],
-                        ),
-                    ),
+              child: IgnorePointer(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints.expand(),
+                        child: SingleChildScrollView(
+                          reverse: true,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              NotificationList(context)
+                            ],
+                          ),
+                      ),
+                ),
               )
             ),
             const SizedBox(width: 10)
