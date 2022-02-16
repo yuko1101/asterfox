@@ -45,8 +45,7 @@ dependencies:
 #  just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
 
   # use this instead of just_audio on microsoft windows
-  dart_vlc:
-    path: "C:/Users/seo won seok2/Desktop/dart_vlc"
+  dart_vlc: ^0.1.8
 
   youtube_explode_dart: ^1.10.4
 
@@ -67,7 +66,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
-
+  msix: ^3.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -113,3 +112,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+msix_config:
+  display_name: Asterox
+  publisher_display_name: asterium.net
+#  publisher: C = JP, ST = Hokkaido, L = Sapporo, O = Asterium Corp., OU = System Management Division, DC = asterium, DC = net, CN = asterium.net
+  identity_name: net.asterium.asterfox
+  msix_version: 1.0.0.0
+  logo_path: C:\Users\Public\workspace\asterfox\assets\images\asterfox.png
+  capabilities: "internetClient"

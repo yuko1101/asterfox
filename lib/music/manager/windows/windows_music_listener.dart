@@ -46,14 +46,18 @@ class WindowsMusicListener {
   void _currentSongChange() {
     _audioHandler.getAudioPlayer().currentStream.listen((currentState) {
       final AudioBase? audio = _getSongAt(currentState.index);
+      if (audio == _musicManager.currentSongNotifier.value) {
+        print("song not changed");
+        return;
+      }
       print("song changed!");
       _musicManager.currentSongNotifier.value = audio;
       _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
       _updateHasNextNotifier();
 
-      if (audio != null && _musicManager.playlistNotifier.value.isEmpty) {
+      if (audio != null) {
         _musicManager.playingNotifier.value = PlayingState.paused;
-      } else {
+      } else if (_musicManager.playlistNotifier.value.isEmpty) {
         _musicManager.playingNotifier.value = PlayingState.disabled;
       }
     });

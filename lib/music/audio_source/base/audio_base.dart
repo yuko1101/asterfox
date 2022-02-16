@@ -106,12 +106,6 @@ extension ParseMusicData on MediaItem {
   }
 }
 
-extension MediaParseMusicData on Media {
-  AudioBase asMusicData() {
-    return parse(extras!);
-  }
-}
-
 extension AudioSourceParseMusicData on IndexedAudioSource {
   AudioBase asMusicData() {
     if (tag is AudioBase) return tag as AudioBase;

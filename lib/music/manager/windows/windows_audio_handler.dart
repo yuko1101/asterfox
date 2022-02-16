@@ -118,11 +118,10 @@ class WindowsAudioHandler {
   Media _createMedia(MediaItem mediaItem) {
     // print(mediaItem.asMusicData());
     if (mediaItem.extras!["tag"]["isLocal"]) {
-      return Media.file(File(mediaItem.extras!["url"]), extras: mediaItem.asMusicData().toMap());
+      return Media.file(File(mediaItem.extras!["url"]));
     }
     return Media.network(
-      Uri.parse(mediaItem.extras!["url"]),
-      extras: mediaItem.asMusicData().toMap(), // MusicData
+      Uri.parse(mediaItem.extras!["url"])// MusicData
     );
   }
 
