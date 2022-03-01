@@ -1,6 +1,5 @@
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
-import 'package:asterfox/widget/theme_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
@@ -15,7 +14,7 @@ class ShuffleButton extends StatelessWidget {
         return IconButton(
           icon: (isEnabled)
               ? const Icon(Icons.shuffle)
-              : ThemeWidget(builder: (_, theme) => Icon(Icons.shuffle, color: theme.disabledColor)),
+              : Icon(Icons.shuffle, color: Theme.of(context).disabledColor),
           onPressed: () {
             musicManager.toggleShuffle();
           },
@@ -34,7 +33,7 @@ class PreviousSongButton extends StatelessWidget {
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, song, __) => IconButton(
         icon: song != null ? const Icon(Icons.skip_previous)
-            : ThemeWidget(builder: (_, theme) => Icon(Icons.skip_previous, color: theme.disabledColor)),
+            : Icon(Icons.skip_previous, color: Theme.of(context).disabledColor),
         onPressed: () async => await musicManager.playback(),
         tooltip: "一つ前の曲を再生",
       ),

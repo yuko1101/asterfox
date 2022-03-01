@@ -1,4 +1,4 @@
-import 'package:asterfox/widget/theme_widget.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
@@ -12,12 +12,10 @@ class RepeatButton extends StatelessWidget {
       builder: (context, value, child) {
         switch (value) {
           case RepeatState.none:
-            return ThemeWidget(
-              builder: (_, theme) => IconButton(
-                icon: Icon(Icons.repeat, color: theme.disabledColor),
-                onPressed: musicManager.nextRepeatMode,
-                tooltip: "リピート: OFF",
-              ),
+            return IconButton(
+              icon: Icon(Icons.repeat, color: Theme.of(context).disabledColor),
+              onPressed: musicManager.nextRepeatMode,
+              tooltip: "リピート: OFF",
             );
           case RepeatState.all:
             return IconButton(
