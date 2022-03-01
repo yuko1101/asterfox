@@ -8,7 +8,7 @@ import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/widget/music_footer.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
-import 'package:asterfox/widget/theme_widget.dart';
+import 'package:asterfox/widget/youtube_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -74,9 +74,12 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
             homeNotification.pushNotification(
               NotificationData(
                 title: Row(
-                  children: const [
-                    ProgressGrid(),
-                    Text("1曲を読み込み中"),
+                  children: [
+                      SpinKitCubeGrid(
+                      size: 10,
+                      color: Theme.of(context).textTheme.bodyText1?.color,
+                    ),
+                    const Text("1曲を読み込み中"),
                   ],
                 ),
                 progress: () async {
@@ -110,13 +113,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
     );
   }
   openSearch(BuildContext context) {
-    if (themeNotifier.value != "dark") {
-
-      themeNotifier.value = "dark";
-    } else {
-      themeNotifier.value = "light";
-    // showSearch(context: context, delegate: delegate);
-    }
+    showSearch(context: context, delegate: YouTubeSearch());
   }
 }
 
@@ -138,19 +135,5 @@ class DrawerController {
       FocusScope.of(context).requestFocus(FocusNode());
       scaffoldState.openEndDrawer();
     }
-  }
-}
-
-
-class ProgressGrid extends ThemeWidget {
-  const ProgressGrid({
-   Key? key
-  }) : super(key: key);
-  @override
-  Widget themeBuild(BuildContext context, ThemeData theme) {
-    return SpinKitCubeGrid(
-      size: 10,
-      color: theme.textTheme.bodyText1?.color,
-    );
   }
 }
