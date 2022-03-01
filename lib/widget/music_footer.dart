@@ -1,10 +1,10 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:asterfox/util/responsive.dart';
-import 'package:asterfox/widget/theme_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'music_widgets/audio_progress_bar.dart';
+import 'music_widgets/download_button.dart';
 import 'music_widgets/music_buttons.dart';
 import 'music_widgets/music_thumbnail.dart';
 import 'music_widgets/repeat_button.dart';
@@ -48,7 +48,7 @@ class MusicFooter extends StatelessWidget with PreferredSizeWidget {
                 const Spacer(),
                 const RepeatButton(),
                 const ShuffleButton(),
-                // DownloadButton(),
+                const DownloadButton(),
                 // OptionButton(),
               ],
             ),
@@ -60,22 +60,22 @@ class MusicFooter extends StatelessWidget with PreferredSizeWidget {
   }
 }
 
-class MobileMusicFooter extends ThemeWidget {
+class MobileMusicFooter extends StatelessWidget {
   const MobileMusicFooter({Key? key}) : super(key: key);
 
   @override
-  Widget themeBuild(BuildContext context, ThemeData theme) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.5),
+              color: Theme.of(context).shadowColor.withOpacity(0.5),
               spreadRadius:   5,
               blurRadius: 7,
               offset: const Offset(0, 3),
             )
           ],
-          color: theme.backgroundColor
+          color: Theme.of(context).backgroundColor
       ),
       height: 170,
       child: Column(
@@ -121,7 +121,7 @@ class MobileMusicFooter extends ThemeWidget {
               PreviousSongButton(),
               PlayButton(),
               NextSongButton(),
-              // DownloadButton(),
+              DownloadButton(),
               // OptionButton(),
             ]
           )
