@@ -1,4 +1,5 @@
 import 'package:asterfox/music/audio_source/base/media_audio.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../main.dart';
 
@@ -30,6 +31,7 @@ class YouTubeAudio extends MediaAudio {
   Map<String, dynamic> toJson() {
     return {
       'type': classId(),
+      'url': url,
       'title': title,
       'description': description,
       'author': author,
@@ -42,7 +44,7 @@ class YouTubeAudio extends MediaAudio {
   // from json
   factory YouTubeAudio.fromJson(Map<String, dynamic> json, {bool local = true}) {
     return YouTubeAudio(
-      url: "",
+      url: json['url'] as String,
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
@@ -81,6 +83,22 @@ class YouTubeAudio extends MediaAudio {
         isLocal: json['isLocal'] as bool,
         key: json['key'] as String?
     );
+  }
+
+  @override
+  YouTubeAudio copyAsLocal() {
+    return YouTubeAudio(
+      url: '$localPath/music/yt-$id.mp3',
+      id: id,
+      title: title,
+      description: description,
+      author: author,
+      authorId: authorId,
+      duration: duration,
+      isLocal: true,
+      key: const Uuid().v4()
+    );
+
   }
 }
 

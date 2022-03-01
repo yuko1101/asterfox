@@ -1,3 +1,4 @@
+import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:dart_vlc/dart_vlc.dart';
@@ -33,7 +34,7 @@ class AudioBase {
 
   MediaItem getMediaItem() {
     return MediaItem(
-        id: url,
+        id: key!,
         title: title,
         // duration: Duration(milliseconds: duration),
         extras: {
@@ -53,7 +54,6 @@ class AudioBase {
       'author': author,
       'duration': duration,
       'isLocal': isLocal,
-      'key': key,
     };
   }
 
@@ -68,8 +68,6 @@ class AudioBase {
       isLocal: local,
     );
   }
-
-
 
 
   Map<String, dynamic> toMap() {
@@ -98,6 +96,19 @@ class AudioBase {
     );
   }
 
+  AudioBase copyAsLocal() {
+    final newKey = const Uuid().v4();
+    return AudioBase(
+      url: '$localPath/base-$newKey.mp3',
+      imageUrl: imageUrl,
+      title: title,
+      description: description,
+      author: author,
+      duration: duration,
+      isLocal: true,
+      key: newKey,
+    );
+  }
 }
 
 extension ParseMusicData on MediaItem {
@@ -119,4 +130,13 @@ AudioBase parse(Map<String, dynamic> tag) {
     case "youtube": return YouTubeAudio.fromMap(tag);
   }
   return AudioBase.fromMap(tag);
+}
+
+
+AudioBase loadFromJson(Map<String, dynamic> json, {bool local = true}) {
+  final String type = json["type"];
+  switch (type) {
+    case "youtube": return YouTubeAudio.fromJson(json, local: local);
+  }
+  return AudioBase.fromJson(json, local);
 }

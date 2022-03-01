@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/system/sharing_intent.dart';
@@ -16,7 +17,7 @@ import 'music/manager/audio_handler.dart';
 import 'music/manager/music_manager.dart';
 
 late final MusicManager musicManager;
-late final String? localPath;
+late final String localPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,9 @@ Future<void> main() async {
 
   musicManager = MusicManager();
   await musicManager.init();
-  localPath = OS.getOS() == OSType.web ? null : (await getApplicationDocumentsDirectory()).path;
+  if (OS.getOS() != OSType.web) localPath = (await getApplicationDocumentsDirectory()).path;
+  await LocalMusicsData.init();
+
   init();
   runApp(const AsterfoxApp());
   // print(await getAudioURL("fWUKNrngFz8"));

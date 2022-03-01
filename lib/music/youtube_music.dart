@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:asterfox/util/config_file.dart';
 import 'package:asterfox/util/logger.dart';
@@ -13,13 +14,13 @@ Future<String?> getAudioURL(String videoId) async {
   // 曲が保存されているかどうか
   bool local = await isLocal(videoId);
   if (local) {
-    ConfigFile config = await ConfigFile(await getFile(videoId), {}).load();
+    ConfigFile config = await ConfigFile(await getFile(""), {}).load(); //TODO: use getMusicDataFile() instead of getFile(id)
     return config.get([videoId]).getValue("url") as String;
   } else {
     // オンライン上から取得
 
     // インターネット接続確認
-    if (!await networkAccessible()) {
+    if (!await networkAccessibleSync()) {
       await showNetworkAccessDeniedMessage();
       return null;
     }
@@ -50,8 +51,7 @@ Future<YouTubeAudio?> getYouTubeAudio(String videoId) async {
   // 曲が保存されているかどうか
   bool local = await isLocal(videoId);
   if (local) {
-    ConfigFile config = await ConfigFile(await getFile(videoId), {}).load();
-    return YouTubeAudio.fromJson(config.getValue(videoId) as Map<String, dynamic>, local: true);
+    return await LocalMusicsData.getByID(videoId) as YouTubeAudio?;
   } else {
     // オンライン上から取得
 
@@ -106,7 +106,6 @@ Future<File> getFile(String id) async {
 }
 
 Future<bool> isLocal(String id) async {
-  if (localPath == null) return false;
   try {
     final file = await getFile(id);
     log("file: " + file.existsSync().toString());

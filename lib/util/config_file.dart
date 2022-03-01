@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 class ConfigFile {
-  ConfigFile(this.file, this.defaultValue, {this.route = const []});
+  ConfigFile(this.file, this.defaultValue, {this.route = const []}) {
+    data = defaultValue;
+  }
   final File file;
   final Map<String, dynamic> defaultValue;
   final List<String> route;
