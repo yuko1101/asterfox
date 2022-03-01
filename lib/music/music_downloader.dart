@@ -11,11 +11,9 @@ import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:dio/dio.dart';
 
 final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
 final Map<String, ValueNotifier<int>> downloadProgress = {};
-final dio = Dio();
 
 class MusicDownloader {
   static Future<void> download(AudioBase? song) async {
