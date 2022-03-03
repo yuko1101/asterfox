@@ -2,7 +2,6 @@ import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/music/manager/windows/windows_audio_handler.dart';
 import 'package:asterfox/music/manager/windows/windows_music_listener.dart';
-import 'package:asterfox/notifiers/progress_notifier.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';

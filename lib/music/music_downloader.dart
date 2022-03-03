@@ -22,7 +22,8 @@ class MusicDownloader {
 
     if (downloading.value.contains(song.key!)) return;
 
-    downloading.value.add(song.key!);
+    downloadProgress[song.key!] ??= ValueNotifier<int>(0);
+    downloading.value = [...downloading.value, song.key!];
 
     print("a");
 
@@ -35,7 +36,12 @@ class MusicDownloader {
 
     await LocalMusicsData.save(song);
 
-    downloading.value.remove(song.key!);
+    print("finished!");
+
+    downloadProgress.remove(song.key!);
+    final List<String> preDownloading = [...downloading.value]; // immutable
+    preDownloading.remove(song.key!);
+    downloading.value = preDownloading;
   }
 
   static Future<void> _downloadFromYouTube(YouTubeAudio song) async {
@@ -48,7 +54,6 @@ class MusicDownloader {
   static Future<String> _downloadMp3(String url, String downloadPath, String key) async {
     var completer = Completer<String>();
 
-    downloadProgress[key] = ValueNotifier<int>(0);
 
     final request = Request('GET', Uri.parse(url));
     final StreamedResponse response = await Client().send(request);
