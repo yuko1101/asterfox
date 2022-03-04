@@ -94,6 +94,12 @@ Future<YouTubeAudio?> getYouTubeAudio(String videoId) async {
   }
 }
 
+Future<List<Video>> searchYouTubeVideo(String query) async {
+  final YoutubeExplode yt = YoutubeExplode();
+  final results = await yt.search.getVideos(query);
+  yt.close();
+  return results.toList();
+}
 
 
 Future<String> getFilePath(String id) async {

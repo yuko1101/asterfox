@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
@@ -8,7 +10,7 @@ import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/widget/music_footer.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
-import 'package:asterfox/widget/youtube_search.dart';
+import 'package:asterfox/widget/song_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -71,38 +73,9 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
           onPressed: () async {
             debugPrint("pressed");
             homeNotification.pushNotification(NotificationData(title: const Text("a")));
-            homeNotification.pushNotification(
-              NotificationData(
-                title: Row(
-                  children: [
-                      SpinKitCubeGrid(
-                      size: 10,
-                      color: Theme.of(context).textTheme.bodyText1?.color,
-                    ),
-                    const Text("1曲を読み込み中"),
-                  ],
-                ),
-                progress: () async {
-                  final YouTubeAudio song = (await getYouTubeAudio("j_dj8uHvePE"))!;
-                  await musicManager.add(
-                    // YouTubeAudio(
-                    //     url: "https://cdn.discordapp.com/attachments/513142781502423050/928884270041301052/PIKASONIC__Tatsunoshin_-_Lockdown_ft.NEONA_KOTONOHOUSE_Remix.mp3",
-                    //     title: "LockDown",
-                    //     description: "",
-                    //     author: "PIKASONIC",
-                    //     authorId: "",
-                    //     id: "",
-                    //   duration: 0,
-                    //   isLocal: false,
-                    // )
-                      song
-                  );
-                }
-              )
-            );
+            await addSongByID("j_dj8uHvePE");
 
-
-            debugPrint("added");
+            debugPrint("added from home_screen");
             // await musicManager.play();
             // debugPrint("played");
           },
@@ -113,7 +86,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
     );
   }
   openSearch(BuildContext context) {
-    showSearch(context: context, delegate: YouTubeSearch());
+    showSearch(context: context, delegate: SongSearch());
   }
 }
 
@@ -136,4 +109,31 @@ class DrawerController {
       scaffoldState.openEndDrawer();
     }
   }
+}
+
+Future<void> addSongByID(String id) async {
+  final completer = Completer();
+  homeNotification.pushNotification(
+      NotificationData(
+          title: Row(
+            children: [
+              SpinKitCubeGrid(
+                size: 10,
+                color: Theme.of(context).textTheme.bodyText1?.color, // TODO: get theme
+              ),
+              const Text("1曲を読み込み中"),
+            ],
+          ),
+          progress: () async {
+            final YouTubeAudio song = (await getYouTubeAudio(id))!;
+            await musicManager.add(song);
+            completer.complete();
+          }
+      )
+  );
+  return completer.future;
+}
+Future<void> addSongBySearch(String query) async {
+  final list = await searchYouTubeVideo(query);
+  await addSongByID(list.first.id.value, context);
 }

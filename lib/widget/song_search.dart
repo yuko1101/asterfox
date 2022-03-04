@@ -3,9 +3,14 @@ import 'dart:async';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-class YouTubeSearch extends SearchDelegate<String> {
+import '../music/audio_source/youtube_audio.dart';
+import '../screen/screens/home_screen.dart';
+import '../util/in_app_notification/notification_data.dart';
+
+class SongSearch extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -22,7 +27,7 @@ class YouTubeSearch extends SearchDelegate<String> {
         tooltip: "検索",
       onPressed: () {
           if (query.isEmpty || query == "") return;
-          search(context);
+          search(context, query);
         }
       )
     ];
@@ -70,8 +75,9 @@ class YouTubeSearch extends SearchDelegate<String> {
     );
   }
 
-  void search(context) {
-
+  void search(BuildContext context, String text) async {
+    close(context, "");
+    await addSongBySearch(text);
   }
 
   void loadSuggestions() {
