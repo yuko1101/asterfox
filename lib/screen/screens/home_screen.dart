@@ -11,6 +11,7 @@ import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/widget/music_footer.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:asterfox/widget/song_search.dart';
+import 'package:asterfox/widget/theme_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -117,9 +118,11 @@ Future<void> addSongByID(String id) async {
       NotificationData(
           title: Row(
             children: [
-              SpinKitCubeGrid(
-                size: 10,
-                color: Theme.of(context).textTheme.bodyText1?.color, // TODO: get theme
+              ThemeWidget(
+                builder: (_, theme) => SpinKitCubeGrid(
+                  size: 10,
+                  color: theme.textTheme.bodyText1?.color,
+                ),
               ),
               const Text("1曲を読み込み中"),
             ],
@@ -135,5 +138,5 @@ Future<void> addSongByID(String id) async {
 }
 Future<void> addSongBySearch(String query) async {
   final list = await searchYouTubeVideo(query);
-  await addSongByID(list.first.id.value, context);
+  await addSongByID(list.first.id.value);
 }
