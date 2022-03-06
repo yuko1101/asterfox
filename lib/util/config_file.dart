@@ -44,6 +44,7 @@ class ConfigFile {
 
   dynamic getValue(String? key) {
     if (key == null) {
+      if (route.isEmpty) return data;
       return getPreObjectFromPath()[route.last];
     } else {
       return getObjectFromPath()[key];
@@ -61,6 +62,7 @@ class ConfigFile {
   }
 
   bool exists() {
+    if (route.isEmpty) return true;
     return getPreObjectFromPath().containsKey(route.last);
   }
 

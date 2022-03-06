@@ -51,7 +51,7 @@ Future<YouTubeAudio?> getYouTubeAudio(String videoId) async {
   // 曲が保存されているかどうか
   bool local = await isLocal(videoId);
   if (local) {
-    return await LocalMusicsData.getByID(videoId) as YouTubeAudio?;
+    return await LocalMusicsData.getById(videoId) as YouTubeAudio?;
   } else {
     // オンライン上から取得
 
@@ -101,6 +101,12 @@ Future<List<Video>> searchYouTubeVideo(String query) async {
   return results.toList();
 }
 
+Future<List<String>> searchWords(String query) async {
+  final YoutubeExplode yt = YoutubeExplode();
+  final results = await yt.search.getQuerySuggestions(query);
+  yt.close();
+  return results.toList();
+}
 
 Future<String> getFilePath(String id) async {
   final path = localPath;

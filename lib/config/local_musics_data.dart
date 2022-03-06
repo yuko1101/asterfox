@@ -16,7 +16,7 @@ class LocalMusicsData {
   static Future<void> save(AudioBase song) async {
 
     if (!song.isLocal) {
-      await localMusicData.set(key: getSongID(song), value: song.copyAsLocal().toJson()).save();
+      await localMusicData.set(key: getSongId(song), value: song.copyAsLocal().toJson()).save();
 
     }
   }
@@ -25,8 +25,13 @@ class LocalMusicsData {
     final data = localMusicData.getValue(null) as Map<String, dynamic>;
     return data.values.map((e) => loadFromJson(e, local: true)).toList();
   }
+  
+  static List<String> getYouTubeIds() {
+    final data = localMusicData.getValue(null) as Map<String, dynamic>;
+    return data.values.where((element) => element["type"] == YouTubeAudio.classId()).map((e) => e["id"] as String).toList();
+  }
 
-  static Future<AudioBase?> getByID(String id) async {
+  static Future<AudioBase?> getById(String id) async {
     if (!localMusicData.has(id)) return null;
     final data = localMusicData.getValue(id) as Map<String, dynamic>;
     return loadFromJson(data, local: true);
@@ -35,7 +40,7 @@ class LocalMusicsData {
 
 }
 
-String getSongID(AudioBase song) {
+String getSongId(AudioBase song) {
   if (song is YouTubeAudio) return song.id;
   return const Uuid().v4().toString();
 }

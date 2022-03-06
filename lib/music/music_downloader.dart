@@ -94,7 +94,7 @@ class MusicDownloader {
 
   static Future<void> _saveImage(AudioBase song) async {
     final imageRes = await http.get(Uri.parse(song.imageUrl));
-    final imageFile = File("$localPath/images/${getSongID(song)}.png");
+    final imageFile = File("$localPath/images/${getSongId(song)}.png");
     if (!imageFile.parent.existsSync()) imageFile.parent.createSync(recursive: true);
     imageFile.writeAsBytesSync(imageRes.bodyBytes);
     print("Download Complete!");

@@ -24,8 +24,7 @@ class YouTubeAudio extends MediaAudio {
     return "https://www.youtube.com/watch?v=$id";
   }
 
-  @override
-  String classId() => "youtube";
+  static String classId() => "youtube";
 
   @override
   Map<String, dynamic> toJson() {

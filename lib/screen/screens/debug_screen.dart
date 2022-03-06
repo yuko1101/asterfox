@@ -17,18 +17,20 @@ class DebugMainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        IconButton(onPressed: () {
-            if (themeNotifier.value != "dark") {
+    return SafeArea(
+      child: Column(
+        children: [
+          IconButton(onPressed: () {
+              if (themeNotifier.value != "dark") {
 
-              themeNotifier.value = "dark";
-            } else {
-              themeNotifier.value = "light";
-              // showSearch(context: context, delegate: delegate);
-            }
-          }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode))
-      ],
+                themeNotifier.value = "dark";
+              } else {
+                themeNotifier.value = "light";
+                // showSearch(context: context, delegate: delegate);
+              }
+            }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode))
+        ],
+      ),
     );
   }
 

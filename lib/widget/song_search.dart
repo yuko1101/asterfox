@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:flutter/material.dart';
@@ -60,16 +61,21 @@ class SongSearch extends SearchDelegate<String> {
   Widget buildSuggestions(BuildContext context) {
     if (lastQuery != query) {
       if (timer != null && timer!.isActive) timer!.cancel();
-      timer = Timer(const Duration(milliseconds: 500), () {
-        loadSuggestions();
-        print("loading suggestions");
-      });
+      if (query.isEmpty) {
+        loadOfflineSongs();
+      } else {
+        timer = Timer(const Duration(milliseconds: 500), () {
+          loadSuggestions(query);
+          print("loading suggestions");
+        });
+      }
+
       lastQuery = query;
     }
     return ValueListenableBuilder<List<_Suggestion>>(
       valueListenable: suggestions,
       builder: (_, value, __) => ListView.builder(
-        itemBuilder: (context, index) => _SearchTile(value[index]),
+        itemBuilder: (context, index) => _SearchTile(value[index], setQuery, () => close(context, "")),
         itemCount: value.length,
       )
     );
@@ -80,27 +86,54 @@ class SongSearch extends SearchDelegate<String> {
     await addSongBySearch(text);
   }
 
-  void loadSuggestions() {
+  void loadSuggestions(String text) async {
+    final List<_Suggestion> list = [];
+    final List<_Suggestion> sorted = [];
 
+    final List<Video> videos = await searchYouTubeVideo(text);
+    final List<String> localIds = LocalMusicsData.getYouTubeIds();
+
+    list.addAll(videos.map((e) => _Suggestion(tags: [_Tag.youtube, localIds.contains(e.id.value) ? _Tag.local : _Tag.remote], name: e.title, value: e.id.value)));
+
+    final List<String> words = await searchWords(text);
+    list.addAll(words.map((e) => _Suggestion(tags: [_Tag.word], name: e, value: e)));
+
+    sorted.addAll(list); // TODO: sort suggestions
+
+    suggestions.value = sorted;
+    
   }
+
+  void loadOfflineSongs() {
+    // TODO: load list of local songs
+  }
+
+  void setQuery(newQuery) => query = newQuery;
 }
 
 class _SearchTile extends StatelessWidget {
   const _SearchTile(
       this.suggestion,
+      this.setQuery,
+      this.close,
       {Key? key}) : super(key: key);
 
   final _Suggestion suggestion;
+  final void Function(String) setQuery;
+  final VoidCallback close;
+
 
   @override
   Widget build(BuildContext context) {
     late IconData iconData;
-    if (suggestion.tags.contains(_Tag.local)) {
+
+    // TODO: custom colored icons
+    if (suggestion.tags.contains(_Tag.word)) {
+      iconData = Icons.search;
+    } else if (suggestion.tags.contains(_Tag.local)) {
       iconData = Icons.offline_pin_outlined;
     } else if (suggestion.tags.contains(_Tag.remote)) {
       iconData = Icons.library_music_outlined;
-    } else if (suggestion.tags.contains(_Tag.word)) {
-      iconData = Icons.search;
     } else {
       iconData = Icons.question_mark;
     }
@@ -108,11 +141,11 @@ class _SearchTile extends StatelessWidget {
       leading: Icon(iconData),
       title: Text(suggestion.name),
       onTap: () async {
-        if (suggestion.tags.contains(_Tag.youtube)) {
-          final song = await getYouTubeAudio(VideoId(suggestion.url).value);
-          if (song != null) {
-            await musicManager.add(song);
-          }
+        if (suggestion.tags.contains(_Tag.word)) {
+          setQuery(suggestion.value);
+        } else if (suggestion.tags.contains(_Tag.youtube)) {
+          close();
+          addSongByID(suggestion.value);
         }
       },
     );
@@ -123,11 +156,11 @@ class _Suggestion {
   _Suggestion({
     required this.tags,
     required this.name,
-    required this.url
+    required this.value
   });
   final List<_Tag> tags;
   final String name;
-  final String url;
+  final String value;
 }
 
 enum _Tag {

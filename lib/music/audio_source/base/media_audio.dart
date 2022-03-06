@@ -18,8 +18,7 @@ class MediaAudio extends AudioBase {
     return url;
   }
 
-  @override
-  String classId() => "media";
+  static String classId() => "media";
 
   @override
   MediaAudio copyAsLocal() {

@@ -30,7 +30,7 @@ class AudioBase {
   bool isLocal;
   String? key;
 
-  String classId() => "audio";
+  static String classId() => "audio";
 
   MediaItem getMediaItem() {
     return MediaItem(
