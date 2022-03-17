@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/music/youtube_music.dart';
+import 'package:asterfox/screen/base_screen.dart';
+import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
+import 'package:asterfox/screen/screens/main_screen.dart';
 import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:asterfox/util/os.dart';
@@ -40,6 +43,7 @@ void init() async {
 }
 
 ValueNotifier<String> themeNotifier = ValueNotifier<String>("light");
+List<BaseScreen> pages = [];
 
 class AsterfoxApp extends StatelessWidget {
   const AsterfoxApp({Key? key}) : super(key: key);
@@ -48,16 +52,18 @@ class AsterfoxApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
-        builder: (context, value, child) {
-
-          return MaterialApp(
-            title: 'Asterfox',
-            theme: themes[value],
-            home: HomeScreen(),
-            debugShowCheckedModeBanner: false,
-          );
-        },
-        valueListenable: themeNotifier,
+      builder: (context, value, child) {
+        return MaterialApp(
+          title: 'Asterfox',
+          theme: themes[value],
+          home: WillPopScope(
+            onWillPop: () async => goBack(context),
+            child: const MainScreen()
+          ),
+          debugShowCheckedModeBanner: false,
+        );
+      },
+      valueListenable: themeNotifier,
     );
   }
 }

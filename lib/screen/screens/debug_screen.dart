@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import '../../main.dart';
 
 class DebugScreen extends BaseScreen {
-  const DebugScreen({Key? key}) : super(
+  const DebugScreen() : super(
       screen: const DebugMainScreen(),
-      key: key
   );
 }
 

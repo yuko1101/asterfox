@@ -18,7 +18,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 final homeNotification = InAppNotification();
 
 class HomeScreen extends BaseScreen {
-  HomeScreen({Key? key}) : super(
+  HomeScreen() : super(
     screen: Stack(
       children: [
         ValueListenableBuilder<PlayingState>(
@@ -37,7 +37,6 @@ class HomeScreen extends BaseScreen {
     ),
     appBar: const HomeScreenAppBar(),
     footer: const MusicFooter(),
-    key: key,
   );
 }
 

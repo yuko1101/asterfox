@@ -1,3 +1,4 @@
+import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/debug_screen.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -60,13 +61,7 @@ class SideMenu extends StatelessWidget {
                           title: "Debug",
                           icon: Icons.bug_report,
                           onPressed: () {
-                            // close drawer
-                            Navigator.pop(context);
-
-                            //open the debug page
-                            Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const DebugScreen())
-                            );
+                            pushPage(context, const DebugScreen(), close: true);
                           }
                         )
                       ]
