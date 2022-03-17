@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
+import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/youtube_music.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -90,6 +91,7 @@ class SongSearch extends SearchDelegate<String> {
     final List<_Suggestion> list = [];
     final List<_Suggestion> sorted = [];
 
+    // TODO: offline search
     final List<Video> videos = await searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
@@ -105,7 +107,19 @@ class SongSearch extends SearchDelegate<String> {
   }
 
   void loadOfflineSongs() {
-    // TODO: load list of local songs
+    final List<_Suggestion> list = [];
+    final List<_Suggestion> sorted = [];
+
+    final List<AudioBase> locals = LocalMusicsData.getAll();
+    list.addAll(locals.map((e) {
+      final List<_Tag> tags = [_Tag.local];
+      if (e is YouTubeAudio) tags.add(_Tag.youtube);
+      return _Suggestion(tags: tags, name: e.title, value: e is YouTubeAudio ? e.id : e.url);
+    }));
+
+    sorted.addAll(list); // TODO: sort suggestions
+
+    suggestions.value = sorted;
   }
 
   void setQuery(newQuery) => query = newQuery;
