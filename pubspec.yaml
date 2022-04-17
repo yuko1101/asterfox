@@ -41,8 +41,8 @@ dependencies:
   fluttertoast: ^8.0.8
 
   audio_service: ^0.18.3
-  just_audio: ^0.9.18
-#  just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
+  just_audio: ^0.9.20
+  just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
 
   # use this instead of just_audio on microsoft windows
   dart_vlc: ^0.1.8
@@ -55,6 +55,8 @@ dependencies:
 
   flutter_spinkit: ^5.1.0
   percent_indicator: ^4.0.0
+
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:
@@ -117,7 +119,7 @@ msix_config:
   display_name: Asterox
   publisher_display_name: asterium.net
 #  publisher: C = JP, ST = Hokkaido, L = Sapporo, O = Asterium Corp., OU = System Management Division, DC = asterium, DC = net, CN = asterium.net
-  identity_name: net.asterium.asterfox
+  identity_name: net.asterfox.app
   msix_version: 1.0.0.0
   logo_path: C:\Users\Public\workspace\asterfox\assets\images\asterfox.png
   capabilities: "internetClient"

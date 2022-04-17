@@ -21,7 +21,7 @@ bool goBack(BuildContext context) {
   return false;
 }
 
-void pushPage(BuildContext context, BaseScreen page, {close = true}) {
+void pushPage(BuildContext context, BaseScreen page, {close = false}) {
   if (close) Navigator.pop(context); //close SideMenu
   screenNotifier.value = page;
 }

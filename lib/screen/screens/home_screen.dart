@@ -4,7 +4,8 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
-import 'package:asterfox/music/youtube_music.dart';
+import 'package:asterfox/system/home_screen_music_manager.dart';
+import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
@@ -26,6 +27,7 @@ class HomeScreen extends BaseScreen {
           builder: (_, __, ___) => ValueListenableBuilder<List<AudioBase>>(
             valueListenable: musicManager.playlistNotifier,
             builder: (_, songs, __) => PlaylistWidget(
+              padding: const EdgeInsets.only(top: 15),
               songs: songs,
               playing: musicManager.currentSongNotifier.value,
               linked: true,
@@ -73,7 +75,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
           onPressed: () async {
             debugPrint("pressed");
             homeNotification.pushNotification(NotificationData(title: const Text("a")));
-            await addSongByID("j_dj8uHvePE");
+            await HomeScreenMusicManager.addSongByID("j_dj8uHvePE");
 
             debugPrint("added from home_screen");
             // await musicManager.play();
@@ -111,31 +113,3 @@ class DrawerController {
   }
 }
 
-Future<void> addSongByID(String id) async {
-  final completer = Completer();
-  homeNotification.pushNotification(
-      NotificationData(
-          title: Row(
-            children: [
-              ThemeWidget(
-                builder: (_, theme) => SpinKitCubeGrid(
-                  size: 10,
-                  color: theme.textTheme.bodyText1?.color,
-                ),
-              ),
-              const Text("1曲を読み込み中"),
-            ],
-          ),
-          progress: () async {
-            final YouTubeAudio song = (await getYouTubeAudio(id))!;
-            await musicManager.add(song);
-            completer.complete();
-          }
-      )
-  );
-  return completer.future;
-}
-Future<void> addSongBySearch(String query) async {
-  final list = await searchYouTubeVideo(query);
-  await addSongByID(list.first.id.value);
-}

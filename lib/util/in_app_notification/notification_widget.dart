@@ -1,3 +1,4 @@
+import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
 
@@ -21,10 +22,8 @@ class NotificationWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Theme.of(context).textTheme.headline3?.color,
-                  boxShadow: const [
-                    BoxShadow() //TODO: Lightテーマは影と付けて見やすくする。Darkテーマは色を灰色にする
-                  ]
+                  border: Border.all(color: CustomColors.getColor("accent")),
+                  color: Theme.of(context).backgroundColor,
               ),
               child: notification.title,
             ),

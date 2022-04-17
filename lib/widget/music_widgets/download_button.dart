@@ -19,7 +19,7 @@ class DownloadButton extends StatelessWidget {
           valueListenable: downloading,
           builder: (_, downloadingSongs, __) {
             print("download changed!");
-            final downloadable = song != null;
+            final downloadable = song != null && !song.isLocal;
             final isDownloading = downloadingSongs.contains(song?.key);
             if (isDownloading) {
               return ValueListenableBuilder<int>(

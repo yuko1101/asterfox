@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
-import 'package:asterfox/music/youtube_music.dart';
+import 'package:asterfox/system/home_screen_music_manager.dart';
+import 'package:asterfox/util/youtube_music_utils.dart';
+import 'package:asterfox/util/network_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -62,13 +64,18 @@ class SongSearch extends SearchDelegate<String> {
   Widget buildSuggestions(BuildContext context) {
     if (lastQuery != query) {
       if (timer != null && timer!.isActive) timer!.cancel();
-      if (query.isEmpty) {
-        loadOfflineSongs();
+
+      if (networkAccessible()) {
+        if (query.isEmpty) {
+          loadOfflineSongs(query);
+        } else {
+          timer = Timer(const Duration(milliseconds: 500), () {
+            loadSuggestions(query);
+            print("loading suggestions");
+          });
+        }
       } else {
-        timer = Timer(const Duration(milliseconds: 500), () {
-          loadSuggestions(query);
-          print("loading suggestions");
-        });
+        loadOfflineSongs(query);
       }
 
       lastQuery = query;
@@ -84,20 +91,19 @@ class SongSearch extends SearchDelegate<String> {
 
   void search(BuildContext context, String text) async {
     close(context, "");
-    await addSongBySearch(text);
+    await HomeScreenMusicManager.addSongBySearch(text);
   }
 
   void loadSuggestions(String text) async {
     final List<_Suggestion> list = [];
     final List<_Suggestion> sorted = [];
 
-    // TODO: offline search
-    final List<Video> videos = await searchYouTubeVideo(text);
+    final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
     list.addAll(videos.map((e) => _Suggestion(tags: [_Tag.youtube, localIds.contains(e.id.value) ? _Tag.local : _Tag.remote], name: e.title, value: e.id.value)));
 
-    final List<String> words = await searchWords(text);
+    final List<String> words = await YouTubeMusicUtils.searchWords(text);
     list.addAll(words.map((e) => _Suggestion(tags: [_Tag.word], name: e, value: e)));
 
     sorted.addAll(list); // TODO: sort suggestions
@@ -106,7 +112,10 @@ class SongSearch extends SearchDelegate<String> {
     
   }
 
-  void loadOfflineSongs() {
+  void loadOfflineSongs(String text) {
+
+    // TODO: offline search
+
     final List<_Suggestion> list = [];
     final List<_Suggestion> sorted = [];
 
@@ -159,7 +168,7 @@ class _SearchTile extends StatelessWidget {
           setQuery(suggestion.value);
         } else if (suggestion.tags.contains(_Tag.youtube)) {
           close();
-          addSongByID(suggestion.value);
+          HomeScreenMusicManager.addSongByID(suggestion.value);
         }
       },
     );

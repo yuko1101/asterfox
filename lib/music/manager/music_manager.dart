@@ -38,7 +38,7 @@ class MusicManager {
       _audioHandler = await AudioService.init(
           builder: () => AudioPlayerHandler(),
           config: const AudioServiceConfig(
-            androidNotificationChannelId: 'net.asterium.asterfox.channel.audio',
+            androidNotificationChannelId: 'net.asterfox.app.channel.audio',
             androidNotificationChannelName: 'Asterfox Music',
             androidNotificationOngoing: true,
             androidStopForegroundOnPause: true,

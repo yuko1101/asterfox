@@ -1,4 +1,4 @@
-package net.asterium.asterfox.asterfox
+package net.asterfox.app
 
 import io.flutter.embedding.android.FlutterActivity
 

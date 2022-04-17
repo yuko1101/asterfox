@@ -1,3 +1,4 @@
+import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/util/responsive.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,12 @@ class AudioProgressBar extends StatelessWidget {
       valueListenable: musicManager.progressNotifier,
       builder: (_, value, __) {
         // print( "current: "+ value.current.inMilliseconds.toString());
+        final Color color = CustomColors.getColor("accent");
         return ProgressBar(
-          // progressBarColor: settings.primaryColor,
-          // thumbColor: settings.primaryColor,
-          // bufferedBarColor: settings.primaryColor.withOpacity(0.35),
-          // baseBarColor: settings.primaryColor.withOpacity(0.175),
+          progressBarColor: color,
+          thumbColor: color,
+          bufferedBarColor: color.withOpacity(0.35),
+          baseBarColor: color.withOpacity(0.175),
           thumbRadius: Responsive.isMobile(context) ? 10 : 5,
           progress: value.current,
           buffered: value.buffered,

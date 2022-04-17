@@ -1,5 +1,6 @@
 import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/debug_screen.dart';
+import 'package:asterfox/screen/screens/settings/settings_screen.dart';
 import 'package:asterfox/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +56,9 @@ class SideMenu extends StatelessWidget {
                         DrawerListTile(
                           title: "Settings",
                           icon: Icons.settings,
-                          onPressed: () {}
+                          onPressed: () {
+                            pushPage(context, const SettingsScreen(), close: true);
+                          }
                         ),
                         DrawerListTile(
                           title: "Debug",

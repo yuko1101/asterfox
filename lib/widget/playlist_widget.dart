@@ -9,12 +9,14 @@ class PlaylistWidget extends StatefulWidget {
     required this.songs,
     this.playing,
     this.linked = false,
+    this.padding,
     Key? key
   }) : super(key: key);
 
   final List<AudioBase> songs;
   final AudioBase? playing;
   final bool linked;
+  final EdgeInsetsGeometry? padding;
 
   @override
   _PlaylistWidgetState createState() => _PlaylistWidgetState();
@@ -25,6 +27,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   Widget build(BuildContext context) {
     return SizedBox(
       child: SingleChildScrollView(
+        padding: widget.padding,
         child: ReorderableListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

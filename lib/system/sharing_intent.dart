@@ -1,5 +1,5 @@
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/youtube_music.dart';
+import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -16,7 +16,7 @@ class SharingIntent {
         Fluttertoast.showToast(msg: "無効なURLです");
         return;
       }
-      final YouTubeAudio? song = await getYouTubeAudio(id.value);
+      final YouTubeAudio? song = await YouTubeMusicUtils.getYouTubeAudio(id.value);
       if (song == null) return;
       await musicManager.add(song);
     });

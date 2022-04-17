@@ -3,30 +3,42 @@ import 'package:flutter/material.dart';
 
 
 ThemeData light = ThemeData(
-  primarySwatch: getMaterialColor(Colors.white),
+  brightness: Brightness.light,
+  appBarTheme: const AppBarTheme(color: Colors.white, foregroundColor: Colors.black),
+  backgroundColor: Colors.white,
   textTheme: TextTheme(
     headline1: const TextStyle(color: Colors.black), // bright
 
     headline3: TextStyle(color: getGrey(45)), // middle
+    headline5: TextStyle(color: getGrey(255))
   )
 );
 
 ThemeData dark = ThemeData(
-    brightness: Brightness.dark,
+  brightness: Brightness.dark,
 
-    appBarTheme: AppBarTheme(color: getMaterialColor(Colors.black87)),
-    backgroundColor: getGrey(20),
-    scaffoldBackgroundColor: getGrey(20),
-    dialogBackgroundColor: getGrey(20),
-    textTheme: TextTheme(
-        headline3: TextStyle(color: getGrey(200)), // middle
-        headline4: TextStyle(color: getGrey(100))
-    )
+  appBarTheme: AppBarTheme(color: getMaterialColor(Colors.black87)),
+  backgroundColor: getGrey(20),
+  scaffoldBackgroundColor: getGrey(20),
+  dialogBackgroundColor: getGrey(20),
+  textTheme: TextTheme(
+    headline3: TextStyle(color: getGrey(200)), // middle
+    headline4: TextStyle(color: getGrey(100)),
+    headline5: TextStyle(color: getGrey(30))
+  ),
+  focusColor: Colors.orange,
+
+
 );
 
 Map<String, ThemeData> themes = {
   "light": light,
   "dark": dark
+};
+
+Map<String, String> themeNames = {
+  "light": "ライト",
+  "dark": "ダーク"
 };
 
 // ThemeColor backgroundColor = ThemeColor(

@@ -29,7 +29,7 @@ class TimeText extends StatelessWidget {
       builder: (_, value, __) {
         return Text(
           "${getProgress(value.current, value.total)} / ${getTotal(value.total)}",
-          style: const TextStyle(color: Colors.white54)
+          style: TextStyle(color: Theme.of(context).textTheme.headline3?.color)
         );
       }
     );
