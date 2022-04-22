@@ -1,20 +1,15 @@
-import 'dart:async';
-
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
-import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
-import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/widget/music_footer.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:asterfox/widget/song_search.dart';
-import 'package:asterfox/widget/theme_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+
 
 final homeNotification = InAppNotification();
 
@@ -84,7 +79,11 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
           icon: const Icon(Icons.add),
         )
       ],
-      leading: IconButton(onPressed: () => DrawerController(context).openDrawer(), icon: const Icon(Icons.menu)),
+      leading: IconButton(
+        onPressed: () => DrawerController(context).openDrawer(),
+        icon: const Icon(Icons.menu),
+        tooltip: "メニュー",
+      ),
     );
   }
   openSearch(BuildContext context) {

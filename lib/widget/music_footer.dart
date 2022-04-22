@@ -1,5 +1,3 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/theme/theme.dart';
 import 'package:asterfox/util/responsive.dart';
 import 'package:flutter/material.dart';
 

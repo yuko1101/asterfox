@@ -1,5 +1,4 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/theme/theme.dart';
+import 'package:asterfox/system/theme/theme.dart';
 import 'package:flutter/material.dart';
 class ThemeWidget extends StatelessWidget {
   const ThemeWidget({this.builder, Key? key}) : super(key: key);
@@ -7,8 +6,8 @@ class ThemeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
-        valueListenable: themeNotifier,
-        builder: (_, theme, __) => builder?.call(context, themes[theme]!) ?? themeBuild(context, themes[theme]!)
+        valueListenable: AppTheme.themeNotifier,
+        builder: (_, theme, __) => builder?.call(context, AppTheme.themes[theme]!) ?? themeBuild(context, AppTheme.themes[theme]!)
     );
   }
 

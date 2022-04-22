@@ -1,15 +1,19 @@
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/settings/theme_settings_screen.dart';
-import 'package:asterfox/theme/theme.dart';
+import 'package:asterfox/system/languages.dart';
+import 'package:asterfox/system/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../../main.dart';
 
 class SettingsScreen extends BaseScreen {
-  const SettingsScreen() : super(
+  SettingsScreen() : super(
     screen: const _MainSettingsScreen(),
+    appBar: AppBar(
+      title: Text(Language.getText("settings")),
+    ),
   );
 }
 
@@ -28,7 +32,7 @@ class _MainSettingsScreen extends StatelessWidget {
             tiles: [
               SettingsTile.navigation(
                 title: const Text("テーマ"),
-                description: Text(themeNames.values.join("、")),
+                description: Text(AppTheme.themeNames.values.join("、")),
                 onPressed: (context) {
                   pushPage(context, ThemeSettingsScreen());
                 },

@@ -1,15 +1,15 @@
 import 'package:asterfox/config/custom_colors.dart';
-import 'package:asterfox/main.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/screens/settings/settings_screen.dart';
-import 'package:asterfox/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
+
+import 'package:asterfox/system/theme/theme.dart';
 
 class ThemeSettingsScreen extends BaseScreen {
   ThemeSettingsScreen() : super(
     screen: const _ThemeChoice(),
-    previousPage: const SettingsScreen()
+    previousPage: SettingsScreen()
   );
 }
 
@@ -28,15 +28,15 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
       sections: [
         SettingsSection(
             title: const Text("テーマ"),
-            tiles: themes.keys.map((key) =>
+            tiles: AppTheme.themes.keys.map((key) =>
                 RadioListTile(
-                  title: Text(themeNames[key]!),
+                  title: Text(AppTheme.themeNames[key]!),
                   value: key,
-                  groupValue: themeNotifier.value,
+                  groupValue: AppTheme.themeNotifier.value,
                   activeColor: Color(CustomColors.data.getValue("accent") as int),
                   onChanged: (value) {
                     setState(() {
-                      themeNotifier.value = value as String;
+                      AppTheme.setTheme(value as String);
                     });
                   }
                 )

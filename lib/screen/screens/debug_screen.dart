@@ -1,7 +1,6 @@
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:flutter/material.dart';
-
-import '../../main.dart';
+import 'package:asterfox/system/theme/theme.dart';
 
 class DebugScreen extends BaseScreen {
   const DebugScreen() : super(
@@ -20,11 +19,11 @@ class DebugMainScreen extends StatelessWidget {
       child: Column(
         children: [
           IconButton(onPressed: () {
-              if (themeNotifier.value != "dark") {
+              if (AppTheme.themeNotifier.value != "dark") {
 
-                themeNotifier.value = "dark";
+                AppTheme.setTheme("dark");
               } else {
-                themeNotifier.value = "light";
+                AppTheme.setTheme("light");
                 // showSearch(context: context, delegate: delegate);
               }
             }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode))

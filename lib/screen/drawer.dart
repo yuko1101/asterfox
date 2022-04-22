@@ -1,7 +1,8 @@
 import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/debug_screen.dart';
+import 'package:asterfox/screen/screens/home_screen.dart';
+import 'package:asterfox/screen/screens/main_screen.dart';
 import 'package:asterfox/screen/screens/settings/settings_screen.dart';
-import 'package:asterfox/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class SideMenu extends StatelessWidget {
@@ -41,7 +42,10 @@ class SideMenu extends StatelessWidget {
                         DrawerListTile(
                           title: "Home",
                           icon: Icons.home,
-                          onPressed: () {}
+                          onPressed: () {
+                            if (screenNotifier.value is HomeScreen) return;
+                            pushPage(context, HomeScreen(), close: true);
+                          }
                         ),
                         DrawerListTile(
                           title: "Playlist",
@@ -57,13 +61,15 @@ class SideMenu extends StatelessWidget {
                           title: "Settings",
                           icon: Icons.settings,
                           onPressed: () {
-                            pushPage(context, const SettingsScreen(), close: true);
+                            if (screenNotifier.value is SettingsScreen) return;
+                            pushPage(context, SettingsScreen(), close: true);
                           }
                         ),
                         DrawerListTile(
                           title: "Debug",
                           icon: Icons.bug_report,
                           onPressed: () {
+                            if (screenNotifier.value is DebugScreen) return;
                             pushPage(context, const DebugScreen(), close: true);
                           }
                         )

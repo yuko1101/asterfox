@@ -6,8 +6,9 @@ import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/main_screen.dart';
+import 'package:asterfox/system/languages.dart';
 import 'package:asterfox/system/sharing_intent.dart';
-import 'package:asterfox/theme/theme.dart';
+import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +27,10 @@ Future<void> main() async {
   await musicManager.init();
   if (OS.getOS() != OSType.web) localPath = (await getApplicationDocumentsDirectory()).path;
   await SettingsData.init();
+  SettingsData.applySettings();
   await LocalMusicsData.init();
   await CustomColors.load();
+  await Language.init();
 
   init();
   runApp(const AsterfoxApp());
@@ -38,7 +41,6 @@ void init() async {
   if (OS.getOS() != OSType.windows) SharingIntent.init();
 }
 
-ValueNotifier<String> themeNotifier = ValueNotifier<String>("light");
 List<BaseScreen> pages = [];
 
 class AsterfoxApp extends StatelessWidget {
@@ -51,7 +53,7 @@ class AsterfoxApp extends StatelessWidget {
       builder: (context, value, child) {
         return MaterialApp(
           title: 'Asterfox',
-          theme: themes[value],
+          theme: AppTheme.themes[value],
           home: WillPopScope(
             onWillPop: () async => goBack(context),
             child: const MainScreen()
@@ -59,7 +61,7 @@ class AsterfoxApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
         );
       },
-      valueListenable: themeNotifier,
+      valueListenable: AppTheme.themeNotifier,
     );
   }
 }
