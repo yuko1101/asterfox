@@ -23,7 +23,7 @@ class MusicListener {
   void _playlistChange() {
     _audioHandler.queue.listen((playlist) {
       print(playlist.length.toString() + " songs");
-      _musicManager.playlistNotifier.value = playlist.map((e) => e.asMusicData()).toList();
+      _musicManager.playlistNotifier.value = playlist.map((e) => e.asAudioBase()).toList();
       print("playlist: " + _musicManager.playlistNotifier.value.map((e) => e.toString()).toString());
 
       if (playlist.isEmpty) {
@@ -40,7 +40,7 @@ class MusicListener {
   void _currentSongChange() {
     _audioHandler.mediaItem.listen((mediaItem) {
       print("song changed!");
-      _musicManager.currentSongNotifier.value = mediaItem?.asMusicData();
+      _musicManager.currentSongNotifier.value = mediaItem?.asAudioBase();
       _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
       _updateHasNextNotifier();
     });
@@ -100,7 +100,7 @@ class MusicListener {
     _musicManager.progressNotifier.value = ProgressBarState(
       current: oldState.current,
       buffered: oldState.buffered,
-      total: mediaItem?.duration ?? Duration(milliseconds: mediaItem?.asMusicData().duration ?? 0),
+      total: mediaItem?.duration ?? Duration(milliseconds: mediaItem?.asAudioBase().duration ?? 0),
     );
   }
 

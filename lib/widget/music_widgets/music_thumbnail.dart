@@ -21,7 +21,7 @@ class MusicThumbnail extends StatelessWidget {
               : Image.network(
               song.imageUrl,
               errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                if (song is YouTubeAudio && networkAccessible()) {
+                if (song is YouTubeAudio && NetworkUtils.networkAccessible()) {
                   return Image.network(
                     "https://img.youtube.com/vi/${song.id}/hqdefault.jpg",
                     errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) => defaultImage

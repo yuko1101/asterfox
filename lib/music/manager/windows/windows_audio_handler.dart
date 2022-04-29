@@ -71,7 +71,7 @@ class WindowsAudioHandler {
     print(3.5);
 
     _player.add(media);
-    musicManager.playlistNotifier.value = [...musicManager.playlistNotifier.value, mediaItem.asMusicData()];
+    musicManager.playlistNotifier.value = [...musicManager.playlistNotifier.value, mediaItem.asAudioBase()];
     print(4);
 
   }

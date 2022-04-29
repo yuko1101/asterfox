@@ -9,6 +9,7 @@ import 'package:asterfox/screen/screens/main_screen.dart';
 import 'package:asterfox/system/languages.dart';
 import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/system/theme/theme.dart';
+import 'package:asterfox/util/network_util.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ late final String localPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  NetworkUtils.init();
 
   if (OS.getOS() == OSType.windows) DartVLC.initialize();
 

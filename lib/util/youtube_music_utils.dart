@@ -15,14 +15,13 @@ class YouTubeMusicUtils {
     // 曲が保存されているかどうか
     bool local = await isLocal(videoId);
     if (local) {
-      ConfigFile config = await ConfigFile(await getFile(""), {}).load(); //TODO: use getMusicDataFile() instead of getFile(id)
-      return config.get([videoId]).getValue("url") as String;
+      return await getFilePath(videoId);
     } else {
       // オンライン上から取得
 
       // インターネット接続確認
-      if (!await networkAccessibleSync()) {
-        await showNetworkAccessDeniedMessage();
+      if (!NetworkUtils.networkAccessible()) {
+        NetworkUtils.showNetworkAccessDeniedMessage();
         return null;
       }
 
@@ -57,8 +56,8 @@ class YouTubeMusicUtils {
       // オンライン上から取得
 
       // インターネット接続確認
-      if (!await networkAccessibleSync()) {
-        await showNetworkAccessDeniedMessage();
+      if (!NetworkUtils.networkAccessible()) {
+        NetworkUtils.showNetworkAccessDeniedMessage();
         return null;
       }
 
@@ -90,7 +89,9 @@ class YouTubeMusicUtils {
           author: video.author,
           authorId: video.channelId.value,
           duration: video.duration?.inMilliseconds ?? 0,
-          isLocal: false);
+          isLocal: false,
+          keywords: video.keywords,
+      );
 
     }
   }

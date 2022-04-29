@@ -110,7 +110,7 @@ class WindowsMusicListener {
     _musicManager.progressNotifier.value = ProgressBarState(
       current: oldState.current,
       buffered: oldState.buffered,
-      total: mediaItem?.duration ?? Duration(milliseconds: mediaItem?.asMusicData().duration ?? 0),
+      total: mediaItem?.duration ?? Duration(milliseconds: mediaItem?.asAudioBase().duration ?? 0),
     );
   }
 

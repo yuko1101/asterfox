@@ -67,16 +67,20 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
     // manage Just Audio
-    final audioSource = _createAudioSource(mediaItem);
+    final AudioSource audioSource = _createAudioSource(mediaItem);
 
     OS.getOS() != OSType.windows
-        ? await _playlist.add(audioSource)
-        : _playlist.add(audioSource);
+        ? await _add(audioSource)
+        : _add(audioSource);
 
     // // notify system
     // final newQueue = queue.value..add(mediaItem);
     // queue.add(newQueue);
 
+  }
+
+  Future<void> _add(AudioSource audioSource) async {
+    await _playlist.add(audioSource);
   }
 
   @override
@@ -137,7 +141,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     // print(mediaItem.asMusicData());
     return AudioSource.uri(
       Uri.parse(mediaItem.extras!['url']),
-      tag: mediaItem.asMusicData(), // MusicData
+      tag: mediaItem.asAudioBase(), // MusicData
     );
   }
 
@@ -221,7 +225,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
       // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
       var sequence = sequenceState?.effectiveSequence;
       if (sequence == null || sequence.isEmpty) sequence = [];
-      final items = sequence.map((source) => source.asMusicData().getMediaItem());
+      final items = sequence.map((source) => source.asAudioBase().getMediaItem());
       // print(items.length.toString() + " added songs");
       setQueueItems(items.toList());
     });

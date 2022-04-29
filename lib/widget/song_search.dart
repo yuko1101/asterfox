@@ -65,7 +65,7 @@ class SongSearch extends SearchDelegate<String> {
     if (lastQuery != query) {
       if (timer != null && timer!.isActive) timer!.cancel();
 
-      if (networkAccessible()) {
+      if (NetworkUtils.networkAccessible()) {
         if (query.isEmpty) {
           loadOfflineSongs(query);
         } else {
@@ -95,40 +95,46 @@ class SongSearch extends SearchDelegate<String> {
   }
 
   void loadSuggestions(String text) async {
-    final List<_Suggestion> list = [];
-    final List<_Suggestion> sorted = [];
-
     final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
-    list.addAll(videos.map((e) => _Suggestion(tags: [_Tag.youtube, localIds.contains(e.id.value) ? _Tag.local : _Tag.remote], name: e.title, value: e.id.value)));
+    final videoSuggestions = videos.map((e) => _Suggestion(tags: [_Tag.youtube, localIds.contains(e.id.value) ? _Tag.local : _Tag.remote], name: e.title, value: e.id.value, keywords: e.keywords)).toList();
 
     final List<String> words = await YouTubeMusicUtils.searchWords(text);
-    list.addAll(words.map((e) => _Suggestion(tags: [_Tag.word], name: e, value: e)));
+    final wordsSuggestions = words.map((e) => _Suggestion(tags: [_Tag.word], name: e, value: e, keywords: [])).toList();
 
-    sorted.addAll(list); // TODO: sort suggestions
+    final videoResult = filterAndSort(videoSuggestions);
+    final wordResult = filterAndSort(wordsSuggestions);
 
-    suggestions.value = sorted;
+    final result = [...videoResult, ...wordResult];
+
+    suggestions.value = result;
     
   }
 
   void loadOfflineSongs(String text) {
-
-    // TODO: offline search
-
+    print("loading offline songs");
     final List<_Suggestion> list = [];
-    final List<_Suggestion> sorted = [];
 
     final List<AudioBase> locals = LocalMusicsData.getAll();
     list.addAll(locals.map((e) {
       final List<_Tag> tags = [_Tag.local];
       if (e is YouTubeAudio) tags.add(_Tag.youtube);
-      return _Suggestion(tags: tags, name: e.title, value: e is YouTubeAudio ? e.id : e.url);
+      return _Suggestion(tags: tags, name: e.title, value: e is YouTubeAudio ? e.id : e.url, keywords: e.keywords);
     }));
 
-    sorted.addAll(list); // TODO: sort suggestions
+    final List<_Suggestion> result = filterAndSort(list, filterSortingList: [_RelatedFilter(text), _RelevanceSorting(text)]);
+    suggestions.value = result;
 
-    suggestions.value = sorted;
+  }
+
+  List<_Suggestion> filterAndSort(List<_Suggestion> list, {List<_FilterSorting>? filterSortingList}) {
+    if (filterSortingList == null) return list;
+    List<_Suggestion> result = list;
+    for (final filterSorting in filterSortingList) {
+      result = filterSorting.apply(result);
+    }
+    return result;
   }
 
   void setQuery(newQuery) => query = newQuery;
@@ -179,11 +185,13 @@ class _Suggestion {
   _Suggestion({
     required this.tags,
     required this.name,
-    required this.value
+    required this.value,
+    required this.keywords
   });
   final List<_Tag> tags;
   final String name;
   final String value;
+  final List<String> keywords;
 }
 
 enum _Tag {
@@ -191,4 +199,56 @@ enum _Tag {
   remote,
   youtube,
   word
+}
+
+class _FilterSorting {
+  List<_Suggestion> apply(List<_Suggestion> list) {
+    return list;
+  }
+}
+
+class _YouTubeFilter extends _FilterSorting {
+  @override
+  List<_Suggestion> apply(List<_Suggestion> list) {
+    return list.where((element) => element.tags.contains(_Tag.youtube)).toList();
+  }
+}
+
+class _LocalFilter extends _FilterSorting {
+  @override
+  List<_Suggestion> apply(List<_Suggestion> list) {
+    return list.where((element) => element.tags.contains(_Tag.local)).toList();
+  }
+}
+
+class _RelatedFilter extends _FilterSorting {
+  _RelatedFilter(this.query);
+  final String query;
+  @override
+  List<_Suggestion> apply(List<_Suggestion> list) {
+    if (query.isEmpty) return list;
+    return list.where((element) => _getScore(element, query) > 0).toList();
+  }
+}
+
+class _RelevanceSorting extends _FilterSorting {
+  _RelevanceSorting(this.query);
+  final String query;
+  @override
+  List<_Suggestion> apply(List<_Suggestion> list) {
+    if (query.isEmpty) return list;
+    list.sort((a, b) {
+      final aScore = _getScore(a, query);
+      final bScore = _getScore(b, query);
+      return bScore.compareTo(aScore);
+    });
+    return list;
+  }
+}
+
+int _getScore(_Suggestion suggestion, String query) {
+  int score = 0;
+  if (suggestion.name.toLowerCase().contains(query.toLowerCase())) score += 1;
+  if (suggestion.keywords.any((e) => e.toLowerCase().contains(query.toLowerCase()))) score += 1;
+  return score;
 }

@@ -15,6 +15,7 @@ class AudioBase {
     required this.author,
     required this.duration,
     required this.isLocal,
+    required this.keywords,
     this.key
 
   }) {
@@ -28,6 +29,7 @@ class AudioBase {
   final String author;
   final int duration;
   bool isLocal;
+  final List<String> keywords;
   String? key;
 
   static String classId() => "audio";
@@ -54,6 +56,7 @@ class AudioBase {
       'author': author,
       'duration': duration,
       'isLocal': isLocal,
+      'keywords': keywords,
     };
   }
 
@@ -66,6 +69,7 @@ class AudioBase {
       author: json['author'] as String,
       duration: json['duration'] as int,
       isLocal: local,
+      keywords: (json['keywords'] as List).map((e) => e as String).toList(),
     );
   }
 
@@ -80,6 +84,7 @@ class AudioBase {
       'author': author,
       'duration': duration,
       'isLocal': isLocal,
+      'keywords': keywords,
       'key': key,
     };
   }
@@ -92,7 +97,8 @@ class AudioBase {
       description: json['description'] as String,
       author: json['author'] as String,
       duration: json['duration'] as int,
-      isLocal: json['isLocal'] as bool
+      isLocal: json['isLocal'] as bool,
+      keywords: (json['keywords'] as List).map((e) => e as String).toList(),
     );
   }
 
@@ -106,19 +112,20 @@ class AudioBase {
       author: author,
       duration: duration,
       isLocal: true,
+      keywords: keywords,
       key: newKey,
     );
   }
 }
 
 extension ParseMusicData on MediaItem {
-  AudioBase asMusicData() {
+  AudioBase asAudioBase() {
     return parse(extras!["tag"]);
   }
 }
 
 extension AudioSourceParseMusicData on IndexedAudioSource {
-  AudioBase asMusicData() {
+  AudioBase asAudioBase() {
     if (tag is AudioBase) return tag as AudioBase;
     return parse(tag);
   }
