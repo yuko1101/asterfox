@@ -1,10 +1,10 @@
+import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 
 
 class DownloadButton extends StatelessWidget {
@@ -24,17 +24,14 @@ class DownloadButton extends StatelessWidget {
             if (isDownloading) {
               return ValueListenableBuilder<int>(
                   valueListenable: downloadProgress[song!.key!]!,
-                  builder: (_, percentage, __) => SizedBox(
-                    height: 32,
-                    width: 32,
-                    child: SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: Tooltip(
-                        child: const CircularProgressIndicator(),
-                        message: "ローカルに保存中: $percentage%",
-                      ),
-                    ),
+                  builder: (_, percentage, __) => Container(
+                    height: 24,
+                    width: 24,
+                    margin: const EdgeInsets.only(right: 12, left: 12),
+                    child: Tooltip(
+                      child: const CircularProgressIndicator(),
+                      message: "ローカルに保存中: $percentage%",
+                    )
                   )
               );
             }
@@ -43,16 +40,19 @@ class DownloadButton extends StatelessWidget {
                   downloadProgress[song!.key!] = ValueNotifier<int>(0);
                   homeNotification.pushNotification(
                     NotificationData(
-                      title: ValueListenableBuilder<int>(
+                      child: ValueListenableBuilder<int>(
                         valueListenable: downloadProgress[song.key!]!,
                         builder: (_, percentage, __) => Column(
                           children: [
                             const Text("ダウンロード中"),
-                            LinearPercentIndicator(
-                              width: 100.0,
-                              lineHeight: 8.0,
-                              percent: percentage / 100,
-                              progressColor: Colors.orange,
+                            SizedBox(
+                              width: 100,
+                              child: LinearProgressIndicator(
+                                minHeight: 8,
+                                value: percentage / 100,
+                                color: CustomColors.getColor("accent"),
+                                backgroundColor: CustomColors.getColor("accent").withOpacity(0.1),
+                              ),
                             ),
                           ],
                         ),
