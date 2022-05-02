@@ -32,9 +32,8 @@ class PreviousSongButton extends StatelessWidget {
     return ValueListenableBuilder<AudioBase?>(
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, song, __) => IconButton(
-        icon: song != null ? const Icon(Icons.skip_previous)
-            : Icon(Icons.skip_previous, color: Theme.of(context).disabledColor),
-        onPressed: () async => await musicManager.playback(),
+        icon: const Icon(Icons.skip_previous),
+        onPressed: song == null ? null : () async => await musicManager.playback(),
         tooltip: "一つ前の曲を再生",
       ),
     );
