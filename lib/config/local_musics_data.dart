@@ -33,15 +33,15 @@ class LocalMusicsData {
     return data.values.where((element) => element["type"] == YouTubeAudio.classId()).map((e) => e["id"] as String).toList();
   }
 
-  static Future<AudioBase?> getById(String id) async {
-    if (!musicData.has(id)) return null;
+  static AudioBase? getById(String? id) {
+    if (id == null || !musicData.has(id)) return null;
     final data = musicData.getValue(id) as Map<String, dynamic>;
     return loadFromJson(data, local: true);
   }
 
   static String getSongId(AudioBase song) {
     if (song is YouTubeAudio) return song.id;
-    return const Uuid().v4().toString();
+    return song.key!;
   }
 }
 
