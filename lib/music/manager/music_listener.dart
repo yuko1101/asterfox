@@ -55,6 +55,10 @@ class MusicListener {
           processingState == AudioProcessingState.buffering) {
         _musicManager.playingNotifier.value = PlayingState.loading;
       } else if (!isPlaying) {
+        if (_musicManager.currentSongNotifier.value == null) {
+          _musicManager.playingNotifier.value = PlayingState.disabled;
+          return;
+        }
         _musicManager.playingNotifier.value = PlayingState.paused;
       } else if (processingState != AudioProcessingState.completed) {
         _musicManager.playingNotifier.value = PlayingState.playing;
