@@ -1,4 +1,5 @@
 import 'package:asterfox/config/custom_colors.dart';
+import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/music_downloader.dart';
@@ -21,6 +22,7 @@ class DownloadButton extends StatelessWidget {
             print("download changed!");
             final downloadable = song != null && !song.isLocal;
             final isDownloading = downloadingSongs.contains(song?.key);
+            final isDownloaded = song != null && LocalMusicsData.getById(LocalMusicsData.getSongId(song)) != null && !song.isLocal;
             if (isDownloading) {
               return ValueListenableBuilder<int>(
                   valueListenable: downloadProgress[song!.key!]!,
@@ -33,6 +35,14 @@ class DownloadButton extends StatelessWidget {
                       message: "ローカルに保存中: $percentage%",
                     )
                   )
+              );
+            }
+            if (isDownloaded) {
+              return IconButton(
+                icon: const Icon(Icons.file_download_done),
+                onPressed: () {
+                  // TODO: refresh to local
+                },
               );
             }
             return IconButton(
