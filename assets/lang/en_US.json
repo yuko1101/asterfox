@@ -1,3 +1,8 @@
 {
-  "settings": "Settings"
+  "settings": "Settings",
+  "share": "Share",
+  "theme": "Theme",
+  "launch_url_error": "The URL is not valid.",
+  "export_as_mp3": "Export as MP3",
+  "open_in_youtube": "Open in YouTube"
 }

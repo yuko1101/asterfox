@@ -1,3 +1,8 @@
 {
-  "settings": "設定"
+  "settings": "設定",
+  "share": "共有",
+  "theme": "テーマ",
+  "launch_url_error": "指定されたURLを開くことが出来ませんでした",
+  "export_as_mp3": "MP3としてエクスポート",
+  "open_in_youtube": "YouTubeで開く"
 }
