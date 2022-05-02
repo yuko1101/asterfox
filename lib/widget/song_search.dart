@@ -1,18 +1,14 @@
 import 'dart:async';
 
 import 'package:asterfox/config/local_musics_data.dart';
-import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:asterfox/util/network_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../music/audio_source/youtube_audio.dart';
-import '../screen/screens/home_screen.dart';
-import '../util/in_app_notification/notification_data.dart';
 
 class SongSearch extends SearchDelegate<String> {
   @override
@@ -59,18 +55,25 @@ class SongSearch extends SearchDelegate<String> {
   String? lastQuery;
 
   Timer? timer;
+  int searchedAt = 0;
 
   @override
   Widget buildSuggestions(BuildContext context) {
     if (lastQuery != query) {
-      if (timer != null && timer!.isActive) timer!.cancel();
+      searchedAt = DateTime.now().millisecondsSinceEpoch;
+      if (timer != null && timer!.isActive) {
+        print("timer.cancel");
+        timer!.cancel();
+
+      }
 
       if (NetworkUtils.networkAccessible()) {
         if (query.isEmpty) {
           loadOfflineSongs(query);
         } else {
+          final time = DateTime.now().millisecondsSinceEpoch;
           timer = Timer(const Duration(milliseconds: 500), () {
-            loadSuggestions(query);
+            loadSuggestions(query, time: time);
             print("loading suggestions");
           });
         }
@@ -94,7 +97,7 @@ class SongSearch extends SearchDelegate<String> {
     await HomeScreenMusicManager.addSongBySearch(text);
   }
 
-  void loadSuggestions(String text) async {
+  void loadSuggestions(String text, {int? time}) async {
     final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
@@ -108,7 +111,10 @@ class SongSearch extends SearchDelegate<String> {
 
     final result = [...videoResult, ...wordResult];
 
-    suggestions.value = result;
+    // ignore the warning
+    if (time == null || (time != null && time >= searchedAt)) {
+      suggestions.value = result;
+    }
     
   }
 
@@ -154,20 +160,20 @@ class _SearchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late IconData iconData;
+    late Icon icon;
 
     // TODO: custom colored icons
     if (suggestion.tags.contains(_Tag.word)) {
-      iconData = Icons.search;
+      icon = const Icon(Icons.tag, color: Colors.grey);
     } else if (suggestion.tags.contains(_Tag.local)) {
-      iconData = Icons.offline_pin_outlined;
+      icon = const Icon(Icons.offline_pin_outlined, color: Colors.green);
     } else if (suggestion.tags.contains(_Tag.remote)) {
-      iconData = Icons.library_music_outlined;
+      icon = const Icon(Icons.library_music_outlined, color: Colors.blue);
     } else {
-      iconData = Icons.question_mark;
+      icon = const Icon(Icons.question_mark);
     }
     return ListTile(
-      leading: Icon(iconData),
+      leading: icon,
       title: Text(suggestion.name),
       onTap: () async {
         if (suggestion.tags.contains(_Tag.word)) {
