@@ -69,7 +69,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
         IconButton(
           onPressed: () async {
             debugPrint("pressed");
-            homeNotification.pushNotification(NotificationData(title: const Text("a")));
+            homeNotification.pushNotification(NotificationData(child: const Text("a")));
             await HomeScreenMusicManager.addSongByID("j_dj8uHvePE");
 
             debugPrint("added from home_screen");
