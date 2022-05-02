@@ -44,7 +44,7 @@ class SideMenu extends StatelessWidget {
                           icon: Icons.home,
                           onPressed: () {
                             if (screenNotifier.value is HomeScreen) return;
-                            pushPage(context, HomeScreen(), close: true);
+                            PageManager.pushPage(context, HomeScreen(), close: true);
                           }
                         ),
                         DrawerListTile(
@@ -62,7 +62,7 @@ class SideMenu extends StatelessWidget {
                           icon: Icons.settings,
                           onPressed: () {
                             if (screenNotifier.value is SettingsScreen) return;
-                            pushPage(context, SettingsScreen(), close: true);
+                            PageManager.pushPage(context, SettingsScreen(), close: true);
                           }
                         ),
                         DrawerListTile(
@@ -70,7 +70,7 @@ class SideMenu extends StatelessWidget {
                           icon: Icons.bug_report,
                           onPressed: () {
                             if (screenNotifier.value is DebugScreen) return;
-                            pushPage(context, const DebugScreen(), close: true);
+                            PageManager.pushPage(context, const DebugScreen(), close: true);
                           }
                         )
                       ]
