@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/config/settings_data.dart';
-import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/main_screen.dart';
 import 'package:asterfox/system/languages.dart';
@@ -43,7 +42,6 @@ void init() async {
   if (OS.getOS() != OSType.windows) SharingIntent.init();
 }
 
-List<BaseScreen> pages = [];
 
 class AsterfoxApp extends StatelessWidget {
   const AsterfoxApp({Key? key}) : super(key: key);
@@ -57,7 +55,7 @@ class AsterfoxApp extends StatelessWidget {
           title: 'Asterfox',
           theme: AppTheme.themes[value],
           home: WillPopScope(
-            onWillPop: () async => goBack(context),
+            onWillPop: () async => PageManager.goBack(context),
             child: const MainScreen()
           ),
           debugShowCheckedModeBanner: false,
