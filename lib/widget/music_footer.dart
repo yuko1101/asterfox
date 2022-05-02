@@ -1,4 +1,5 @@
 import 'package:asterfox/util/responsive.dart';
+import 'package:asterfox/widget/music_widgets/more_actions_button.dart';
 import 'package:flutter/material.dart';
 
 import 'music_widgets/audio_progress_bar.dart';
@@ -47,7 +48,7 @@ class MusicFooter extends StatelessWidget with PreferredSizeWidget {
                 const RepeatButton(),
                 const ShuffleButton(),
                 const DownloadButton(),
-                // OptionButton(),
+                const MoreActionsButton(),
               ],
             ),
           ],
@@ -113,14 +114,28 @@ class MobileMusicFooter extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              ShuffleButton(),
-              RepeatButton(),
-              PreviousSongButton(),
-              PlayButton(),
-              NextSongButton(),
-              DownloadButton(),
-              // OptionButton(),
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: const [
+                    ShuffleButton(),
+                    RepeatButton(),
+                    PreviousSongButton(),
+                  ],
+                ),
+              ),
+              const PlayButton(),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: const [
+                    NextSongButton(),
+                    DownloadButton(),
+                    MoreActionsButton(),
+                  ],
+                ),
+              ),
             ]
           )
         ]
