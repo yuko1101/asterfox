@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 class NotificationData {
   NotificationData({
-    required this.title,
+    required this.child,
     this.progress
   });
-  final Widget title;
+  final Widget child;
   final Future<void> Function()? progress;
 
   final String id = const Uuid().v4();

@@ -25,7 +25,7 @@ class NotificationWidget extends StatelessWidget {
                   border: Border.all(color: CustomColors.getColor("accent")),
                   color: Theme.of(context).backgroundColor,
               ),
-              child: notification.title,
+              child: notification.child,
             ),
           ],
         ),

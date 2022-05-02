@@ -14,28 +14,15 @@ class InAppNotification extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Row(
-          children: [
-            const Spacer(),
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 2.5,
-              child: IgnorePointer(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints.expand(),
-                        child: SingleChildScrollView(
-                          reverse: true,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              NotificationList(context)
-                            ],
-                          ),
-                      ),
-                ),
-              )
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 10, right: 2),
+            child: SingleChildScrollView(
+              reverse: true,
+              child: NotificationList(context),
             ),
-            const SizedBox(width: 10)
-          ]
+          ),
         )
     );
   }
