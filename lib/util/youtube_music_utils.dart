@@ -51,7 +51,7 @@ class YouTubeMusicUtils {
     // 曲が保存されているかどうか
     bool local = await isLocal(videoId);
     if (local) {
-      return await LocalMusicsData.getById(videoId) as YouTubeAudio?;
+      return LocalMusicsData.getById(videoId) as YouTubeAudio?;
     } else {
       // オンライン上から取得
 
