@@ -80,7 +80,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
         )
       ],
       leading: IconButton(
-        onPressed: () => DrawerController(context).openDrawer(),
+        onPressed: () => AppDrawerController(context).openDrawer(),
         icon: const Icon(Icons.menu),
         tooltip: "メニュー",
       ),
@@ -91,8 +91,8 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
   }
 }
 
-class DrawerController {
-  DrawerController(this.context);
+class AppDrawerController {
+  AppDrawerController(this.context);
   final BuildContext context;
 
   void openDrawer() {
