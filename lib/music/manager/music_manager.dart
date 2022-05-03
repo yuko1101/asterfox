@@ -14,7 +14,7 @@ import 'audio_handler.dart';
 class MusicManager {
   late final AudioHandler _audioHandler;
 
-  bool windowsMode = OS.getOS() == OSType.windows;
+  static bool windowsMode = OS.getOS() == OSType.windows;
 
   late final WindowsAudioHandler _windowsAudioHandler;
 

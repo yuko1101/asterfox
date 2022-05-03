@@ -60,6 +60,8 @@ dependencies:
 
   settings_ui: ^2.0.2
 
+  hotkey_manager: ^0.1.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

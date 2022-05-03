@@ -12,6 +12,7 @@ import 'package:asterfox/util/network_util.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'music/manager/music_manager.dart';
 
@@ -20,9 +21,10 @@ late final String localPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await hotKeyManager.unregisterAll();
   NetworkUtils.init();
 
-  if (OS.getOS() == OSType.windows) DartVLC.initialize();
+  if (MusicManager.windowsMode) DartVLC.initialize();
 
   musicManager = MusicManager();
   await musicManager.init();

@@ -8,13 +8,19 @@
 
 #include <connectivity_plus_windows/connectivity_plus_windows_plugin.h>
 #include <dart_vlc/dart_vlc_plugin.h>
+#include <hotkey_manager/hotkey_manager_plugin.h>
 #include <libwinmedia/libwinmedia_plugin.h>
+#include <url_launcher_windows/url_launcher_windows.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   ConnectivityPlusWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ConnectivityPlusWindowsPlugin"));
   DartVlcPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DartVlcPlugin"));
+  HotkeyManagerPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("HotkeyManagerPlugin"));
   LibwinmediaPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("LibwinmediaPlugin"));
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
 }
