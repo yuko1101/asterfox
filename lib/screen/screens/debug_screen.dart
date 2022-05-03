@@ -1,3 +1,4 @@
+import 'package:asterfox/main.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:asterfox/system/theme/theme.dart';
@@ -26,7 +27,9 @@ class DebugMainScreen extends StatelessWidget {
                 AppTheme.setTheme("light");
                 // showSearch(context: context, delegate: delegate);
               }
-            }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode))
+            }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode)),
+          IconButton(onPressed: musicManager.play, icon: const Icon(Icons.play_arrow)),
+          IconButton(onPressed: musicManager.pause, icon: const Icon(Icons.pause)),
         ],
       ),
     );

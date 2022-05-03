@@ -40,9 +40,9 @@ dependencies:
 
   fluttertoast: ^8.0.8
 
-  audio_service: ^0.18.3
   just_audio: ^0.9.20
   just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
+  just_audio_background: ^0.0.1-beta.5
 
   # use this instead of just_audio on microsoft windows
   dart_vlc: ^0.1.8

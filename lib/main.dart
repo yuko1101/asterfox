@@ -21,10 +21,9 @@ late final String localPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await hotKeyManager.unregisterAll();
   NetworkUtils.init();
 
-  if (MusicManager.windowsMode) DartVLC.initialize();
+  if (MusicManager.windowsMode) await hotKeyManager.unregisterAll();
 
   musicManager = MusicManager();
   await musicManager.init();

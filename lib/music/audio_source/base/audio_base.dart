@@ -1,6 +1,5 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
-import 'package:audio_service/audio_service.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -34,17 +33,13 @@ class AudioBase {
 
   static String classId() => "audio";
 
-  MediaItem getMediaItem() {
-    return MediaItem(
-        id: key!,
-        title: title,
-        // duration: Duration(milliseconds: duration),
-        extras: {
-          "tag": toMap(),
-          "url": url
-        }
+  AudioSource getAudioSource() {
+    return AudioSource.uri(
+      Uri.parse(url),
+      tag: toMap(), // MusicData
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -118,11 +113,6 @@ class AudioBase {
   }
 }
 
-extension ParseMusicData on MediaItem {
-  AudioBase asAudioBase() {
-    return parse(extras!["tag"]);
-  }
-}
 
 extension AudioSourceParseMusicData on IndexedAudioSource {
   AudioBase asAudioBase() {
