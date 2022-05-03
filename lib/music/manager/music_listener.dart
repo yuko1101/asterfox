@@ -16,7 +16,7 @@ class MusicListener {
       _updatePlaylist(sequence ?? []);
     });
     _audioHandler.getAudioPlayer().currentIndexStream.listen((index) {
-      _updateCurrentIndex(_audioHandler.getPlaylist().length == 0 ? null : index);
+      _updateCurrentIndex(_musicManager.playlistNotifier.value.isEmpty ? null : index);
     });
     _audioHandler.getAudioPlayer().playerStateStream.listen((playbackState) {
       _updatePlaybackState(playbackState);
@@ -27,6 +27,9 @@ class MusicListener {
     });
     _audioHandler.getAudioPlayer().bufferedPositionStream.listen((buffered) {
       _updateProgress(buffered: buffered);
+    });
+    _audioHandler.getAudioPlayer().loopModeStream.listen((loopMode) {
+      _updateLoopMode(loopMode);
     });
   }
 
@@ -41,7 +44,7 @@ class MusicListener {
     final currentSong = playlist.isEmpty || currentIndex == null ? null : playlist[currentIndex];
     _musicManager.playlistNotifier.value = playlist.map((e) => e.asAudioBase()).toList();
     _updateHasNextNotifier();
-    _updateCurrentSong(currentSong);
+    _updateCurrentSong(currentSong?.asAudioBase());
     // test
     _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
   }
@@ -53,13 +56,13 @@ class MusicListener {
     _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
 
     print("index changed! $index (shuffled: ${_audioHandler.getPlaylist().shuffleIndices})");
-    _updateCurrentSong(index == null ? null : _audioHandler.getPlaylist().sequence[index]);
+    _updateCurrentSong(index == null || _audioHandler.getAudioPlayer().sequence == null ? null : _audioHandler.getAudioPlayer().sequence![index].asAudioBase());
     _updateHasNextNotifier();
   }
 
-  void _updateCurrentSong(IndexedAudioSource? song) {
-    _musicManager.currentSongNotifier.value = song?.asAudioBase();
-    _updateProgress(total: song?.duration);
+  void _updateCurrentSong(AudioBase? song) {
+    _musicManager.currentSongNotifier.value = song;
+    _updateProgress(total: song == null ? null : Duration(milliseconds: song.duration));
   }
 
   void _updatePlaybackState(PlayerState playbackState) {
@@ -90,8 +93,13 @@ class MusicListener {
     _musicManager.progressNotifier.value = newState;
   }
 
+  void _updateLoopMode(LoopMode loopMode) {
+    _musicManager.repeatModeNotifier.value = loopModeToRepeatState(loopMode);
+    _updateHasNextNotifier();
+  }
+
   void _updateHasNextNotifier() {
-    final max = _audioHandler.getPlaylist().length;
+    final max = _audioHandler.getAudioPlayer().sequence?.length ?? 0;
     final current = _audioHandler.getAudioPlayer().currentIndex;
     if (max == 0) {
       _musicManager.hasNextNotifier.value = false;

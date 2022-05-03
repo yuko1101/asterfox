@@ -49,22 +49,18 @@ class AudioPlayerHandler {
     await _playlist.add(audioSource);
   }
 
-  @override
   Future<void> addQueueItems(List<AudioSource> audioSourceList) async {
     await _playlist.addAll(audioSourceList);
   }
 
-  @override
   Future<void> removeQueueItemAt(int index) async {
     await _playlist.removeAt(index);
   }
 
-  @override
   Future<void> setRepeatMode(LoopMode repeatMode) async {
     await _player.setLoopMode(repeatMode);
   }
 
-  @override
   Future<void> setShuffleMode(bool shuffleMode) async {
     if (!shuffleMode) {
       await _player.setShuffleModeEnabled(false);

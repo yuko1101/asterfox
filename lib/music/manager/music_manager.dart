@@ -25,7 +25,7 @@ class MusicManager {
   final currentShuffledIndexNotifier = ValueNotifier<int?>(null); // シャッフル対応index
 
   final hasNextNotifier = ValueNotifier<bool>(false);
-  final repeatModeNotifier = RepeatModeNotifier();
+  final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
   final shuffleModeNotifier = ValueNotifier<bool>(false);
 
 
@@ -96,20 +96,19 @@ class MusicManager {
     }
   }
 
+  final repeatModes = [
+    RepeatState.none,
+    RepeatState.all,
+    RepeatState.one,
+  ];
   Future<void> nextRepeatMode() async {
-    repeatModeNotifier.nextState();
     final repeatMode = repeatModeNotifier.value;
-    switch (repeatMode) {
-      case RepeatState.none:
-        _audioHandler.setRepeatMode(LoopMode.all);
-        break;
-      case RepeatState.one:
-        _audioHandler.setRepeatMode(LoopMode.one);
-        break;
-      case RepeatState.all:
-        _audioHandler.setRepeatMode(LoopMode.all);
-        break;
+    final index = repeatModes.indexOf(repeatMode);
+    if (index == -1) {
+      return;
     }
+    final nextIndex = (index + 1) % repeatModes.length;
+    _audioHandler.setRepeatMode(repeatStateToLoopMode(repeatModes[nextIndex]));
   }
 
   Future<void> toggleShuffle() async {
