@@ -1,7 +1,7 @@
+import 'dart:io';
+
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
-import 'package:dart_vlc/dart_vlc.dart';
-import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';
 
@@ -100,7 +100,7 @@ class AudioBase {
   AudioBase copyAsLocal() {
     final newKey = const Uuid().v4();
     return AudioBase(
-      url: '$localPath/base-$newKey.mp3',
+      url: '$localPath${Platform.pathSeparator}base-$newKey.mp3',
       imageUrl: imageUrl,
       title: title,
       description: description,

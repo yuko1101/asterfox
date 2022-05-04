@@ -115,7 +115,7 @@ class YouTubeMusicUtils {
 
 Future<String> getFilePath(String id) async {
   final path = localPath;
-  return '$path/music/yt-$id.mp3';
+  return '$path${Platform.pathSeparator}music${Platform.pathSeparator}yt-$id.mp3';
 }
 
 Future<File> getFile(String id) async {

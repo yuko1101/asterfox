@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:asterfox/music/audio_source/base/media_audio.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,7 +17,7 @@ class YouTubeAudio extends MediaAudio {
     required bool isLocal,
     required List<String> keywords,
     String? key
-  }) : super(url: url, imageUrl: isLocal ? "$localPath/images/$id.png" : "https://img.youtube.com/vi/$id/maxresdefault.jpg", title: title, description: description, author: author, duration: duration, isLocal: isLocal, keywords: keywords, key: key);
+  }) : super(url: url, imageUrl: isLocal ? "$localPath${Platform.pathSeparator}images${Platform.pathSeparator}$id.png" : "https://img.youtube.com/vi/$id/maxresdefault.jpg", title: title, description: description, author: author, duration: duration, isLocal: isLocal, keywords: keywords, key: key);
   final String id;
   final String authorId;
 
@@ -92,7 +94,7 @@ class YouTubeAudio extends MediaAudio {
   @override
   YouTubeAudio copyAsLocal() {
     return YouTubeAudio(
-      url: '$localPath/music/yt-$id.mp3',
+      url: '$localPath${Platform.pathSeparator}music${Platform.pathSeparator}yt-$id.mp3',
       id: id,
       title: title,
       description: description,
