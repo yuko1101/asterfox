@@ -31,8 +31,8 @@ class MusicManager {
 
 
   Future<void> init() async {
-      _audioHandler = AudioPlayerHandler();
-      MusicListener(this, _audioHandler).init();
+    _audioHandler = AudioPlayerHandler();
+    MusicListener(this, _audioHandler).init();
     if (!windowsMode) {
       await JustAudioBackground.init(
         androidNotificationChannelId: 'net.asterfox.app.channel.audio',
