@@ -1,5 +1,5 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'dart:io';
+
 import 'package:asterfox/util/os.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -8,8 +8,11 @@ class AudioPlayerHandler {
   final _player = AudioPlayer();
   final _playlist = ConcatenatingAudioSource(children: []);
 
+  // fix that the audio player is not working when the empty playlist is added
+  final fix = OS.getOS() == OSType.windows;
+
   AudioPlayerHandler() {
-    _player.setAudioSource(_playlist);
+     if (!fix) _player.setAudioSource(_playlist);
 
   }
 
@@ -40,13 +43,15 @@ class AudioPlayerHandler {
   }
 
   Future<void> addQueueItem(AudioSource audioSource) async {
-    OS.getOS() != OSType.windows
-        ? await _add(audioSource)
-        : _add(audioSource);
+    await _add(audioSource);
   }
 
   Future<void> _add(AudioSource audioSource) async {
+    final wasEmpty = (_player.sequence ?? []).isEmpty;
     await _playlist.add(audioSource);
+    if (wasEmpty && fix) {
+      await _player.setAudioSource(_playlist);
+    }
   }
 
   Future<void> addQueueItems(List<AudioSource> audioSourceList) async {
