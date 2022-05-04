@@ -30,6 +30,8 @@ class DebugMainScreen extends StatelessWidget {
             }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode)),
           IconButton(onPressed: musicManager.play, icon: const Icon(Icons.play_arrow)),
           IconButton(onPressed: musicManager.pause, icon: const Icon(Icons.pause)),
+          IconButton(onPressed: musicManager.next, icon: const Icon(Icons.skip_next)),
+          IconButton(onPressed: musicManager.previous, icon: const Icon(Icons.skip_previous)),
         ],
       ),
     );
