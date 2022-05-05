@@ -69,18 +69,18 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
       ),
       actions: [
         IconButton(onPressed: () => openSearch(context), icon: const Icon(Icons.search)),
-        IconButton(
-          onPressed: () async {
-            debugPrint("pressed");
-            homeNotification.pushNotification(NotificationData(child: const Text("a")));
-            await HomeScreenMusicManager.addSongByID("j_dj8uHvePE");
-
-            debugPrint("added from home_screen");
-            // await musicManager.play();
-            // debugPrint("played");
-          },
-          icon: const Icon(Icons.add),
-        )
+        // IconButton(
+        //   onPressed: () async {
+        //     debugPrint("pressed");
+        //     homeNotification.pushNotification(NotificationData(child: const Text("a")));
+        //     await HomeScreenMusicManager.addSongByID("j_dj8uHvePE");
+        //
+        //     debugPrint("added from home_screen");
+        //     // await musicManager.play();
+        //     // debugPrint("played");
+        //   },
+        //   icon: const Icon(Icons.add),
+        // )
       ],
       leading: IconButton(
         onPressed: () => AppDrawerController(context).openDrawer(),
