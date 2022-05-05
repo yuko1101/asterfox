@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../main.dart';
 
@@ -35,16 +36,6 @@ class RepeatButton extends StatelessWidget {
   }
 }
 
-class RepeatModeNotifier extends ValueNotifier<RepeatState> {
-  RepeatModeNotifier() : super(_initialValue);
-  static const _initialValue = RepeatState.none;
-
-  void nextState() {
-    final next = (value.index + 1) % RepeatState.values.length;
-    value = RepeatState.values[next];
-  }
-}
-
 repeatStateFromString(String value) {
   switch (value) {
     case "off":
@@ -64,6 +55,28 @@ repeatStateToString(RepeatState value) {
       return "all";
     case RepeatState.one:
       return "one";
+  }
+}
+
+repeatStateToLoopMode(RepeatState value) {
+  switch (value) {
+    case RepeatState.none:
+      return LoopMode.off;
+    case RepeatState.all:
+      return LoopMode.all;
+    case RepeatState.one:
+      return LoopMode.one;
+  }
+}
+
+loopModeToRepeatState(LoopMode value) {
+  switch (value) {
+    case LoopMode.off:
+      return RepeatState.none;
+    case LoopMode.all:
+      return RepeatState.all;
+    case LoopMode.one:
+      return RepeatState.one;
   }
 }
 

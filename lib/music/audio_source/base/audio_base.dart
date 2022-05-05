@@ -1,9 +1,9 @@
+import 'dart:io';
+
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
-import 'package:audio_service/audio_service.dart';
-import 'package:dart_vlc/dart_vlc.dart';
-import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:uuid/uuid.dart';
 
 class AudioBase {
@@ -34,17 +34,19 @@ class AudioBase {
 
   static String classId() => "audio";
 
-  MediaItem getMediaItem() {
-    return MediaItem(
+  AudioSource getAudioSource() {
+    return AudioSource.uri(
+      Uri.parse(url),
+      tag: MediaItem(
         id: key!,
         title: title,
-        // duration: Duration(milliseconds: duration),
-        extras: {
-          "tag": toMap(),
-          "url": url
-        }
+        duration: Duration(milliseconds: duration),
+        artist: author,
+        extras: toMap(),
+      ), // MusicData
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -105,7 +107,7 @@ class AudioBase {
   AudioBase copyAsLocal() {
     final newKey = const Uuid().v4();
     return AudioBase(
-      url: '$localPath/base-$newKey.mp3',
+      url: '$localPath${Platform.pathSeparator}base-$newKey.mp3',
       imageUrl: imageUrl,
       title: title,
       description: description,
@@ -118,15 +120,16 @@ class AudioBase {
   }
 }
 
-extension ParseMusicData on MediaItem {
-  AudioBase asAudioBase() {
-    return parse(extras!["tag"]);
-  }
-}
 
 extension AudioSourceParseMusicData on IndexedAudioSource {
   AudioBase asAudioBase() {
     if (tag is AudioBase) return tag as AudioBase;
+    if (tag is MediaItem) {
+      final mediaItem = tag as MediaItem;
+      if (mediaItem.extras != null) {
+        return parse(mediaItem.extras!);
+      }
+    }
     return parse(tag);
   }
 }

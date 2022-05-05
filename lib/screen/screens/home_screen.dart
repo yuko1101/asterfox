@@ -21,11 +21,14 @@ class HomeScreen extends BaseScreen {
           valueListenable: musicManager.playingNotifier,
           builder: (_, __, ___) => ValueListenableBuilder<List<AudioBase>>(
             valueListenable: musicManager.playlistNotifier,
-            builder: (_, songs, __) => PlaylistWidget(
-              padding: const EdgeInsets.only(top: 15),
-              songs: songs,
-              playing: musicManager.currentSongNotifier.value,
-              linked: true,
+            builder: (_, songs, __) => ValueListenableBuilder<AudioBase?>(
+              valueListenable: musicManager.currentSongNotifier,
+              builder: (_, currentSong, __) => PlaylistWidget(
+                padding: const EdgeInsets.only(top: 15),
+                songs: songs,
+                playing: currentSong,
+                linked: true,
+              ),
             ),
           ),
         ),

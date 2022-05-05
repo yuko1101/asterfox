@@ -10,9 +10,9 @@ import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/util/network_util.dart';
 import 'package:asterfox/util/os.dart';
-import 'package:dart_vlc/dart_vlc.dart';
+import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'music/manager/music_manager.dart';
 
@@ -21,16 +21,13 @@ late final String localPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await hotKeyManager.unregisterAll();
-  NetworkUtils.init();
-
-  if (MusicManager.windowsMode) DartVLC.initialize();
-
-  musicManager = MusicManager();
-  await musicManager.init();
   if (OS.getOS() != OSType.web) localPath = (await getApplicationDocumentsDirectory()).path;
   await SettingsData.init();
   SettingsData.applySettings();
+  NetworkUtils.init();
+
+  musicManager = MusicManager(true);
+  await musicManager.init();
   await LocalMusicsData.init();
   await CustomColors.load();
   await Language.init();

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:uuid/uuid.dart';
 
@@ -26,7 +28,7 @@ class MediaAudio extends AudioBase {
   MediaAudio copyAsLocal() {
     final newKey = const Uuid().v4();
     return MediaAudio(
-      url: '$localPath/media-$newKey.mp3',
+      url: '$localPath${Platform.pathSeparator}media-$newKey.mp3',
       imageUrl: imageUrl,
       title: title,
       description: description,
