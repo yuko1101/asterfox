@@ -9,7 +9,7 @@ import 'package:asterfox/music/audio_source/base/audio_base.dart';
 class MusicListener {
   MusicListener(this._musicManager, this._audioHandler);
   final MusicManager _musicManager;
-  final AudioPlayerHandler _audioHandler;
+  final SessionAudioHandler _audioHandler;
 
   void init() {
     _audioHandler.getAudioPlayer().sequenceStream.listen((sequence) {
@@ -56,7 +56,7 @@ class MusicListener {
     // test
     _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
 
-    print("index changed! $index (shuffled: ${_audioHandler.getPlaylist().shuffleIndices})");
+    print("index changed! $index (shuffled: ${_musicManager.getShuffledIndex()})");
     _updateCurrentSong(index == null || _audioHandler.getAudioPlayer().sequence == null ? null : _audioHandler.getAudioPlayer().sequence![index].asAudioBase());
     _updateHasNextNotifier();
   }
