@@ -16,7 +16,7 @@ class MusicListener {
       _updatePlaylist(sequence ?? []);
     });
     _audioHandler.getAudioPlayer().currentIndexStream.listen((index) {
-      _updateCurrentIndex(_musicManager.playlistNotifier.value.isEmpty ? null : index);
+      _updateCurrentIndex((_audioHandler.getAudioPlayer().sequence ?? []).isEmpty ? null : index);
     });
     _audioHandler.getAudioPlayer().playerStateStream.listen((playbackState) {
       _updatePlaybackState(playbackState);
@@ -37,8 +37,9 @@ class MusicListener {
     if (playlist.isNotEmpty && _musicManager.currentIndexNotifier.value == null) {
       _updateCurrentIndex(0);
     }
+    // if index is bigger than playlist size, set to last index
     if (_musicManager.currentIndexNotifier.value != null && playlist.length - 1 < _musicManager.currentIndexNotifier.value!) {
-      _updateCurrentIndex(playlist.length - 1);
+      _updateCurrentIndex(playlist.isEmpty ? null : playlist.length - 1);
     }
     final currentIndex = _musicManager.currentIndexNotifier.value;
     final currentSong = playlist.isEmpty || currentIndex == null ? null : playlist[currentIndex];

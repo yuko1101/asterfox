@@ -1,9 +1,10 @@
+import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
-import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -12,7 +13,14 @@ import 'audio_handler.dart';
 
 class MusicManager {
 
+  MusicManager(this.showNotification) {
+    useAudioSession = SettingsData.getValue(key: "useAudioSession") as bool;
+  }
+  final bool showNotification;
+  late final bool useAudioSession;
+
   late final AudioPlayerHandler _audioHandler;
+  late final AudioSession _audioSession;
 
   static bool windowsMode = OS.getOS() == OSType.windows;
   
@@ -31,15 +39,29 @@ class MusicManager {
 
 
   Future<void> init() async {
-    _audioHandler = AudioPlayerHandler();
-    MusicListener(this, _audioHandler).init();
-    if (!windowsMode) {
+    if (!windowsMode && showNotification) {
       await JustAudioBackground.init(
         androidNotificationChannelId: 'net.asterfox.app.channel.audio',
         androidNotificationChannelName: 'Asterfox Music',
         androidNotificationOngoing: true,
+        androidBrowsableRootExtras: {
+
+        },
+        fastForwardInterval: const Duration(seconds: 10),
+        rewindInterval: const Duration(seconds: 10),
       );
+      if (useAudioSession) {
+        _audioSession = await AudioSession.instance;
+        await _audioSession.configure(const AudioSessionConfiguration.music());
+        if (await _audioSession.setActive(true)) {
+          print('AudioSession activated');
+        } else {
+          print('AudioSession activation failed');
+        }
+      }
     }
+    _audioHandler = AudioPlayerHandler();
+    MusicListener(this, _audioHandler).init();
   }
 
   Future<void> play() async {
@@ -122,4 +144,7 @@ class MusicManager {
     return (index == -1 ? null : index);
 
   }
+
+  AudioPlayerHandler get audioHandler => _audioHandler;
+  AudioSession get audioSession => _audioSession;
 }

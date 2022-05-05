@@ -44,8 +44,7 @@ dependencies:
   just_audio_libwinmedia: ^0.0.4 # For Microsoft Windows
   just_audio_background: ^0.0.1-beta.5
 
-  # use this instead of just_audio on microsoft windows
-  dart_vlc: ^0.1.8
+  audio_session: ^0.1.6+1
 
   youtube_explode_dart: ^1.10.4
 
@@ -71,6 +70,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
   msix: ^3.1.0
+  flutter_launcher_icons: ^0.9.2
+  flutter_native_splash: ^2.1.6
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -126,3 +127,15 @@ msix_config:
   msix_version: 1.0.0.0
   logo_path: C:\Users\Public\workspace\asterfox\assets\images\asterfox.png
   capabilities: "internetClient"
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path: "assets/images/asterfox-icon.png"
+  adaptive_icon_background: "assets/images/background.png"
+  adaptive_icon_foreground: "assets/images/asterfox-icon.png"
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  image: "assets/images/asterfox-icon.png"
+  color: "212332"

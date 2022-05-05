@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:uuid/uuid.dart';
 
 class AudioBase {
@@ -36,7 +37,13 @@ class AudioBase {
   AudioSource getAudioSource() {
     return AudioSource.uri(
       Uri.parse(url),
-      tag: toMap(), // MusicData
+      tag: MediaItem(
+        id: key!,
+        title: title,
+        duration: Duration(milliseconds: duration),
+        artist: author,
+        extras: toMap(),
+      ), // MusicData
     );
   }
 
@@ -117,6 +124,12 @@ class AudioBase {
 extension AudioSourceParseMusicData on IndexedAudioSource {
   AudioBase asAudioBase() {
     if (tag is AudioBase) return tag as AudioBase;
+    if (tag is MediaItem) {
+      final mediaItem = tag as MediaItem;
+      if (mediaItem.extras != null) {
+        return parse(mediaItem.extras!);
+      }
+    }
     return parse(tag);
   }
 }

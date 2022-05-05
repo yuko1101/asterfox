@@ -4,8 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus_windows
-  dart_vlc
-  hotkey_manager
   libwinmedia
   url_launcher_windows
 )
