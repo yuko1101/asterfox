@@ -1,4 +1,5 @@
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -36,7 +37,7 @@ class RepeatButton extends StatelessWidget {
   }
 }
 
-repeatStateFromString(String value) {
+RepeatState repeatStateFromString(String value) {
   switch (value) {
     case "off":
       return RepeatState.none;
@@ -44,10 +45,12 @@ repeatStateFromString(String value) {
       return RepeatState.all;
     case "one":
       return RepeatState.one;
+    default:
+      return RepeatState.none;
   }
 }
 
-repeatStateToString(RepeatState value) {
+String repeatStateToString(RepeatState value) {
   switch (value) {
     case RepeatState.none:
       return "off";
@@ -58,7 +61,7 @@ repeatStateToString(RepeatState value) {
   }
 }
 
-repeatStateToLoopMode(RepeatState value) {
+LoopMode repeatStateToLoopMode(RepeatState value) {
   switch (value) {
     case RepeatState.none:
       return LoopMode.off;
@@ -69,7 +72,7 @@ repeatStateToLoopMode(RepeatState value) {
   }
 }
 
-loopModeToRepeatState(LoopMode value) {
+RepeatState loopModeToRepeatState(LoopMode value) {
   switch (value) {
     case LoopMode.off:
       return RepeatState.none;
@@ -77,6 +80,17 @@ loopModeToRepeatState(LoopMode value) {
       return RepeatState.all;
     case LoopMode.one:
       return RepeatState.one;
+  }
+}
+
+AudioServiceRepeatMode repeatStateToAudioServiceRepeatMode(RepeatState value) {
+  switch (value) {
+    case RepeatState.none:
+      return AudioServiceRepeatMode.none;
+    case RepeatState.all:
+      return AudioServiceRepeatMode.all;
+    case RepeatState.one:
+      return AudioServiceRepeatMode.one;
   }
 }
 

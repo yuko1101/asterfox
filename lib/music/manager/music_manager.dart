@@ -132,7 +132,7 @@ class MusicManager {
       return;
     }
     final nextIndex = (index + 1) % repeatModes.length;
-    _audioHandler.setRepeatMode(repeatStateToLoopMode(repeatModes[nextIndex]));
+    _audioHandler.setRepeatMode(repeatStateToAudioServiceRepeatMode(repeatModes[nextIndex]));
   }
 
   Future<void> toggleShuffle() async {
