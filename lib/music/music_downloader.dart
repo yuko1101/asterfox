@@ -11,6 +11,7 @@ import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
 final Map<String, ValueNotifier<int>> downloadProgress = {};
@@ -30,6 +31,8 @@ class MusicDownloader {
     if (song is YouTubeAudio) {
       print("b");
       await _downloadFromYouTube(song);
+    } else {
+      await _downloadMp3(song.url, song.copyAsLocal().url, song.key!);
     }
 
     await _saveImage(song);
@@ -45,8 +48,34 @@ class MusicDownloader {
   }
 
   static Future<void> _downloadFromYouTube(YouTubeAudio song) async {
+    final String id = song.id;
+    final String downloadPath = song.copyAsLocal().url;
+    final String key = song.key!;
 
-    await _downloadMp3(song.url, song.copyAsLocal().url, song.key!);
+    final File file = File(downloadPath);
+    if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
+
+    final YoutubeExplode yt = YoutubeExplode();
+    final manifest = await yt.videos.streamsClient.getManifest(id);
+    final streams = manifest.audioOnly.isEmpty ? manifest.audio : manifest.audioOnly;
+    final audio = streams.first;
+    final audioStream = yt.videos.streamsClient.get(audio);
+    final output = file.openWrite(mode: FileMode.writeOnlyAppend);
+
+    var len = audio.size.totalBytes;
+    var count = 0;
+
+    var msg = "Downloading ${song.title}";
+    stdout.writeln(msg);
+    await for (final data in audioStream) {
+      count += data.length;
+      var progress = ((count / len) * 100).ceil();
+      downloadProgress[key]!.value = progress;
+      output.add(data);
+    }
+    await output.close();
+
+    yt.close();
   }
 
 
@@ -72,7 +101,7 @@ class MusicDownloader {
           (List<int> newBytes) {
         bytes.addAll(newBytes);
         final downloadedLength = bytes.length;
-        final percentage = (downloadedLength / contentLength! * 100).round();
+        final percentage = (downloadedLength / contentLength! * 100).ceil();
         downloadProgress[key]!.value = percentage;
         print(percentage);
       },
