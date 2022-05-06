@@ -19,32 +19,46 @@ class MoreActionsButton extends StatelessWidget {
       id: "share",
       icon: Icons.share,
       title: Language.getText("share"),
-      songFilter: (AudioBase? song) => song != null && song is MediaAudio,
-      onTap: () async {
+      onTap: (context) async {
         final MediaAudio song =
             musicManager.currentSongNotifier.value as MediaAudio;
         Share.share(song.getMediaURL(), subject: song.title);
-      }
+        Navigator.pop(context);
+      },
+      songFilter: (AudioBase? song) => song != null && song is MediaAudio,
     ),
     _Action(
         id: "youtube",
         icon: Icons.open_in_new,
         title: Language.getText("open_in_youtube"),
-        songFilter: (AudioBase? song) => song != null && song is YouTubeAudio,
-        onTap: () async {
-          final launched = await launchUrl(Uri.parse((musicManager.currentSongNotifier.value as MediaAudio).getMediaURL()));
+        onTap: (context) async {
+          final launched = await launchUrl(Uri.parse((musicManager.currentSongNotifier.value as MediaAudio).getMediaURL()), mode: LaunchMode.externalNonBrowserApplication);
           if (!launched) {
             Fluttertoast.showToast(msg: Language.getText("launch_url_error"));
           }
-        }
+          Navigator.pop(context);
+        },
+        songFilter: (AudioBase? song) => song != null && song is YouTubeAudio,
     ),
     _Action(
       id: "export",
       icon: Icons.file_download,
       title: Language.getText("export_as_mp3"),
+      onTap: (context) {
+        Navigator.pop(context);
+      },
       songFilter: (AudioBase? song) => song != null,
-      onTap: () {}
     ),
+    _Action(
+        id: "refresh_all",
+        icon: Icons.refresh,
+        title: Language.getText("refresh_all"),
+        onTap: (context) {
+          musicManager.refreshSongs();
+          Navigator.pop(context);
+        },
+        songFilter: (AudioBase? song) => song != null,
+    )
   ];
 
   @override
@@ -100,7 +114,7 @@ class _Action extends StatelessWidget {
   final String id;
   final IconData icon;
   final String title;
-  final VoidCallback onTap;
+  final void Function(BuildContext) onTap;
   final bool Function(AudioBase?) songFilter;
 
   @override
@@ -108,7 +122,7 @@ class _Action extends StatelessWidget {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
-      onTap: onTap,
+      onTap: () => onTap(context)
     );
   }
 }
