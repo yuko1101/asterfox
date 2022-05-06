@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/util/os.dart';
@@ -86,10 +88,17 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
+  // TODO: support windows (probably called abort() in this method)
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     final audioSource = mediaItems.map(_createAudioSource);
     await _playlist.addAll(audioSource.toList());
+  }
+
+  @override
+  Future<void> insertQueueItem(int index, MediaItem mediaItem) async {
+    final audioSource = _createAudioSource(mediaItem);
+    await _playlist.insert(index, audioSource);
   }
 
   @override
@@ -134,10 +143,11 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     await _playlist.move(currentIndex, newIndex);
   }
 
-  AudioPlayer getAudioPlayer() {
-    return _player;
+  Future<void> clear() async {
+    await _playlist.clear();
   }
 
+  AudioPlayer get audioPlayer => _player;
 
   /// Transform a just_audio event into an audio_service state.
   ///
