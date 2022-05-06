@@ -43,5 +43,19 @@ class LocalMusicsData {
     if (song is YouTubeAudio) return song.id;
     return song.key!;
   }
+
+  static Future<void> removeFromLocal(AudioBase song) async {
+    if (!song.isLocal) return;
+    final file = File(song.url);
+    final imageFile = File(song.imageUrl);
+    musicData.delete(key: getSongId(song));
+    final futures = [file.delete(), imageFile.delete()];
+    await Future.wait(futures);
+  }
+
+  static Future<void> removeAllFromLocal(List<AudioBase> songs) async {
+    final futures = songs.map((e) => removeFromLocal(e));
+    await Future.wait(futures);
+  }
 }
 
