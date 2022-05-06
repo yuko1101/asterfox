@@ -4,5 +4,6 @@
   "theme": "テーマ",
   "launch_url_error": "指定されたURLを開くことが出来ませんでした",
   "export_as_mp3": "MP3としてエクスポート",
-  "open_in_youtube": "YouTubeで開く"
+  "open_in_youtube": "YouTubeで開く",
+  "refresh_all": "キューの再読み込み"
 }

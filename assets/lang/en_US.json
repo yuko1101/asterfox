@@ -4,5 +4,6 @@
   "theme": "Theme",
   "launch_url_error": "The URL is not valid.",
   "export_as_mp3": "Export as MP3",
-  "open_in_youtube": "Open in YouTube"
+  "open_in_youtube": "Open in YouTube",
+  "refresh_all": "Refresh all songs"
 }
