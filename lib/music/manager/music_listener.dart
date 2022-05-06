@@ -12,23 +12,23 @@ class MusicListener {
   final SessionAudioHandler _audioHandler;
 
   void init() {
-    _audioHandler.getAudioPlayer().sequenceStream.listen((sequence) {
+    _audioHandler.audioPlayer.sequenceStream.listen((sequence) {
       _updatePlaylist(sequence ?? []);
     });
-    _audioHandler.getAudioPlayer().currentIndexStream.listen((index) {
-      _updateCurrentIndex((_audioHandler.getAudioPlayer().sequence ?? []).isEmpty ? null : index);
+    _audioHandler.audioPlayer.currentIndexStream.listen((index) {
+      _updateCurrentIndex((_audioHandler.audioPlayer.sequence ?? []).isEmpty ? null : index);
     });
-    _audioHandler.getAudioPlayer().playerStateStream.listen((playbackState) {
+    _audioHandler.audioPlayer.playerStateStream.listen((playbackState) {
       _updatePlaybackState(playbackState);
     });
 
-    _audioHandler.getAudioPlayer().positionStream.listen((position) {
+    _audioHandler.audioPlayer.positionStream.listen((position) {
       _updateProgress(current: position);
     });
-    _audioHandler.getAudioPlayer().bufferedPositionStream.listen((buffered) {
+    _audioHandler.audioPlayer.bufferedPositionStream.listen((buffered) {
       _updateProgress(buffered: buffered);
     });
-    _audioHandler.getAudioPlayer().loopModeStream.listen((loopMode) {
+    _audioHandler.audioPlayer.loopModeStream.listen((loopMode) {
       _updateLoopMode(loopMode);
     });
   }
@@ -57,23 +57,27 @@ class MusicListener {
     _musicManager.currentShuffledIndexNotifier.value = _musicManager.getShuffledIndex();
 
     print("index changed! $index (shuffled: ${_musicManager.getShuffledIndex()})");
-    _updateCurrentSong(index == null || _audioHandler.getAudioPlayer().sequence == null ? null : _audioHandler.getAudioPlayer().sequence![index].asAudioBase());
+    _updateCurrentSong(index == null || _audioHandler.audioPlayer.sequence == null ? null : _audioHandler.audioPlayer.sequence![index].asAudioBase());
     _updateHasNextNotifier();
   }
 
   void _updateCurrentSong(AudioBase? song) {
     _musicManager.currentSongNotifier.value = song;
-    _updateProgress(total: song == null ? null : Duration(milliseconds: song.duration));
+    _updateProgress(total: song == null ? Duration.zero : Duration(milliseconds: song.duration));
   }
 
   void _updatePlaybackState(PlayerState playbackState) {
-    _audioHandler.getAudioPlayer().playerStateStream.listen((playbackState) {
+    _audioHandler.audioPlayer.playerStateStream.listen((playbackState) {
       final isPlaying = playbackState.playing;
       final processingState = playbackState.processingState;
       if (processingState == ProcessingState.loading ||
           processingState == ProcessingState.buffering) {
         _musicManager.playingNotifier.value = PlayingState.loading;
       } else if (!isPlaying) {
+        if ((_audioHandler.audioPlayer.sequence ?? []).isEmpty) {
+          _musicManager.playingNotifier.value = PlayingState.disabled;
+          return;
+        }
         _musicManager.playingNotifier.value = PlayingState.paused;
       } else if (processingState != ProcessingState.completed) {
         _musicManager.playingNotifier.value = PlayingState.playing;
@@ -100,8 +104,8 @@ class MusicListener {
   }
 
   void _updateHasNextNotifier() {
-    final max = _audioHandler.getAudioPlayer().sequence?.length ?? 0;
-    final current = _audioHandler.getAudioPlayer().currentIndex;
+    final max = _audioHandler.audioPlayer.sequence?.length ?? 0;
+    final current = _audioHandler.audioPlayer.currentIndex;
     if (max == 0) {
       _musicManager.hasNextNotifier.value = false;
       return;
