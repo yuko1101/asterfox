@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:asterfox/music/audio_source/base/media_audio.dart';
+import 'package:asterfox/util/youtube_music_utils.dart' show YouTubeMusicUtils;
 import 'package:uuid/uuid.dart';
 
 import '../../main.dart';
@@ -106,6 +107,11 @@ class YouTubeAudio extends MediaAudio {
       key: const Uuid().v4()
     );
 
+  }
+
+  @override
+  Future<MediaAudio> refresh() async {
+    return (await YouTubeMusicUtils.getYouTubeAudio(id))!;
   }
 }
 

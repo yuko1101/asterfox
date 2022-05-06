@@ -39,4 +39,20 @@ class MediaAudio extends AudioBase {
       key: newKey
     );
   }
+
+  @override
+  Future<MediaAudio> refresh() async {
+    final newKey = const Uuid().v4();
+    return MediaAudio(
+        url: url,
+        imageUrl: imageUrl,
+        title: title,
+        description: description,
+        author: author,
+        duration: duration,
+        isLocal: isLocal,
+        keywords: keywords,
+        key: newKey
+    );
+  }
 }

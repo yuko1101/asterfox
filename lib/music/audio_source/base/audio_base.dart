@@ -114,6 +114,21 @@ class AudioBase {
       key: newKey,
     );
   }
+
+  Future<AudioBase> refresh() async {
+    final newKey = const Uuid().v4();
+    return AudioBase(
+      url: url,
+      imageUrl: imageUrl,
+      title: title,
+      description: description,
+      author: author,
+      duration: duration,
+      isLocal: isLocal,
+      keywords: keywords,
+      key: newKey,
+    );
+  }
 }
 
 
