@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
@@ -73,11 +75,8 @@ class MusicManager {
     await _audioHandler.pause();
   }
 
-  void seek(Duration position) {
-    _audioHandler.seek(position);
-  }
-  Future<void> seekSync(Duration position) async {
-    await _audioHandler.seek(position);
+  Future<void> seek(Duration position, {int? index}) async {
+    await _audioHandler.audioPlayer.seek(position, index: index);
   }
 
   Future<void> previous() async {
@@ -101,6 +100,10 @@ class MusicManager {
       await _audioHandler.removeQueueItemAt(index);
     }
   }
+
+  Future<void> clear() async {
+    await _audioHandler.clear();
+  }
   
   Future<void> move(int currentIndex, int newIndex) async {
    // await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
@@ -116,7 +119,7 @@ class MusicManager {
     if (progressNotifier.value.current.inMilliseconds < 5000) {
       await previous();
     } else {
-      await seekSync(Duration.zero);
+      await seek(Duration.zero);
     }
   }
 
@@ -140,6 +143,59 @@ class MusicManager {
     _audioHandler.setShuffleMode(enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
     shuffleModeNotifier.value = enable;
   }
+
+  Future<void> refreshSongs([int index = -1]) async {
+    // if index is -1, refresh all songs
+    final currentIndex = currentIndexNotifier.value;
+    final currentPosition = progressNotifier.value.current;
+    final wasPlaying = playingNotifier.value == PlayingState.playing;
+    if (index == -1) {
+
+      final List<AudioBase> songs = playlistNotifier.value;
+
+      // while clearing the playlist, refresh the songs.
+      final completer = Completer();
+      (() async {
+        await clear();
+        completer.complete();
+      })();
+
+      // refresh the songs
+      final List<AudioBase> refreshed = await Future.wait(songs.map((song) async {
+        return await song.refresh();
+      }));
+
+      // if clearing is not finished, wait for it to finish
+      if (!completer.isCompleted) await completer.future;
+
+      await addAll(refreshed);
+
+      // TODO: fix the index out of range issue
+
+    } else {
+      final AudioBase song = playlistNotifier.value[index];
+
+      // while removing the song, refresh the song.
+      final completer = Completer();
+      (() async {
+        await _audioHandler.removeQueueItemAt(index);
+        completer.complete();
+      })();
+
+      // refresh the song
+      final AudioBase refresh = await song.refresh();
+
+      // if removing is not finished, wait for it to finish
+      if (!completer.isCompleted) await completer.future;
+
+      await _audioHandler.insertQueueItem(index, refresh.getMediaItem());
+    }
+    await seek(currentPosition, index: index == -1 || currentIndex == index ? currentIndex : null);
+    if (wasPlaying) {
+      await play();
+    }
+  }
+
 
   int? getShuffledIndex() {
     final int index = currentSongNotifier.value != null ? playlistNotifier.value.indexWhere((song) => song.key! == currentSongNotifier.value!.key!) : -1;
