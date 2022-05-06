@@ -1,3 +1,4 @@
+import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,10 @@ class DebugMainScreen extends StatelessWidget {
           IconButton(onPressed: musicManager.pause, icon: const Icon(Icons.pause)),
           IconButton(onPressed: musicManager.next, icon: const Icon(Icons.skip_next)),
           IconButton(onPressed: musicManager.previous, icon: const Icon(Icons.skip_previous)),
+          IconButton(onPressed: () {
+            LocalMusicsData.removeAllFromLocal(LocalMusicsData.getAll());
+            LocalMusicsData.musicData.save();
+          }, icon: const Icon(Icons.delete)),
         ],
       ),
     );
