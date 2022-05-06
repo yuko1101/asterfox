@@ -9,11 +9,13 @@ class MusicCardWidget extends StatelessWidget {
   const MusicCardWidget({
     required this.song,
     this.playing = false,
+    this.linked = false,
     Key? key
   }) : super(key: key);
 
   final AudioBase song;
   final bool playing;
+  final bool linked;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class MusicCardWidget extends StatelessWidget {
         ),
       ),
       onDismissed: (DismissDirection dismissDirection) {
-        musicManager.remove(song.key!);
+        if (linked) musicManager.remove(song.key!);
       },
     );
   }

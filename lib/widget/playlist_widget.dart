@@ -31,7 +31,12 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         child: ReorderableListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => MusicCardWidget(song: widget.songs[index], playing: widget.songs[index].key! == widget.playing?.key!, key: Key(widget.songs[index].key!)),
+          itemBuilder: (context, index) => MusicCardWidget(
+              song: widget.songs[index],
+              playing: widget.songs[index].key! == widget.playing?.key!,
+              key: Key(widget.songs[index].key!),
+              linked: widget.linked
+          ),
           itemCount: widget.songs.length,
           onReorder: (oldIndex, newIndex) {
             if (oldIndex < newIndex) newIndex -= 1;
