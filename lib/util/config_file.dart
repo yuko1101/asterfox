@@ -42,6 +42,16 @@ class ConfigFile {
     return this;
   }
 
+  ConfigFile delete({String? key}) {
+    if (key == null) {
+      if (route.isEmpty) return this;
+      getPreObjectFromPath().remove(route.last);
+      return this;
+    }
+    getObjectFromPath().remove(key);
+    return this;
+  }
+
   dynamic getValue(String? key) {
     if (key == null) {
       if (route.isEmpty) return data;
