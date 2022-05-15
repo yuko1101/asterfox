@@ -39,7 +39,7 @@ class RepeatButton extends StatelessWidget {
 
 RepeatState repeatStateFromString(String value) {
   switch (value) {
-    case "off":
+    case "none":
       return RepeatState.none;
     case "all":
       return RepeatState.all;
@@ -53,7 +53,7 @@ RepeatState repeatStateFromString(String value) {
 String repeatStateToString(RepeatState value) {
   switch (value) {
     case RepeatState.none:
-      return "off";
+      return "none";
     case RepeatState.all:
       return "all";
     case RepeatState.one:

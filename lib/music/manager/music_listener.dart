@@ -1,3 +1,4 @@
+import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:just_audio/just_audio.dart';
@@ -101,6 +102,8 @@ class MusicListener {
   void _updateLoopMode(LoopMode loopMode) {
     _musicManager.repeatModeNotifier.value = loopModeToRepeatState(loopMode);
     _updateHasNextNotifier();
+
+    SettingsData.settings.set(key: "repeatMode", value: repeatStateToString(loopModeToRepeatState(loopMode))).save();
   }
 
   void _updateHasNextNotifier() {

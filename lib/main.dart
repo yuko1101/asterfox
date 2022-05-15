@@ -28,6 +28,7 @@ Future<void> main() async {
 
   musicManager = MusicManager(true);
   await musicManager.init();
+  await SettingsData.applyMusicManagerSettings();
   await LocalMusicsData.init();
   await CustomColors.load();
   await Language.init();

@@ -128,6 +128,11 @@ class MusicManager {
     RepeatState.all,
     RepeatState.one,
   ];
+
+  Future<void> setRepeatMode(RepeatState mode) async {
+    await _audioHandler.setRepeatMode(repeatStateToAudioServiceRepeatMode(mode));
+  }
+
   Future<void> nextRepeatMode() async {
     final repeatMode = repeatModeNotifier.value;
     final index = repeatModes.indexOf(repeatMode);
@@ -135,7 +140,7 @@ class MusicManager {
       return;
     }
     final nextIndex = (index + 1) % repeatModes.length;
-    _audioHandler.setRepeatMode(repeatStateToAudioServiceRepeatMode(repeatModes[nextIndex]));
+    await setRepeatMode(repeatModes[nextIndex]);
   }
 
   Future<void> toggleShuffle() async {
