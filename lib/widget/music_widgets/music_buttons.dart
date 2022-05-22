@@ -33,7 +33,7 @@ class PreviousSongButton extends StatelessWidget {
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, song, __) => IconButton(
         icon: const Icon(Icons.skip_previous),
-        onPressed: song == null ? null : () async => await musicManager.playback(),
+        onPressed: song == null ? null : () async => await musicManager.playback(true),
         tooltip: "一つ前の曲を再生",
       ),
     );
@@ -91,7 +91,7 @@ class NextSongButton extends StatelessWidget {
       builder: (_, hasNext, __) {
         return IconButton(
           icon: const Icon(Icons.skip_next),
-          onPressed: (hasNext) ? musicManager.next : null,
+          onPressed: (hasNext) ? () => musicManager.next(true) : null,
           tooltip: "次の曲を再生",
         );
       },

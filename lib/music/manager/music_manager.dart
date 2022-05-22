@@ -79,11 +79,19 @@ class MusicManager {
     await _audioHandler.audioPlayer.seek(position, index: index);
   }
 
-  Future<void> previous() async {
-    await _audioHandler.skipToPrevious();
+  Future<void> previous([bool force = false]) async {
+    if (force) {
+      await _audioHandler.skipToPrevious();
+    } else {
+      await _audioHandler.skipToPreviousUnforced();
+    }
   }
-  Future<void> next() async {
-    await _audioHandler.skipToNext();
+  Future<void> next([bool force = false]) async {
+    if (force) {
+      await _audioHandler.skipToNext();
+    } else {
+      await _audioHandler.skipToNextUnforced();
+    }
   }
 
   Future<void> add(AudioBase song) async {
@@ -114,14 +122,14 @@ class MusicManager {
     _audioHandler.stop();
   }
 
-  Future<void> playback() async {
+  Future<void> playback([bool force = false]) async {
     // if current progress is less than 5 sec, skip previous. if not, replay the current song.
     if (progressNotifier.value.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.
       if (repeatModeNotifier.value == RepeatState.none && currentIndexNotifier.value == 0) {
         await seek(Duration.zero);
       } else {
-        await previous();
+        await previous(force);
       }
     } else {
       await seek(Duration.zero);

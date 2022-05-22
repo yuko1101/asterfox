@@ -63,15 +63,40 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     return super.stop();
   }
 
+  // forced skip
   @override
   Future<void> skipToNext() async {
+    if (_player.loopMode == LoopMode.one) {
+      final int? currentIndex = _player.currentIndex;
+      if (currentIndex == null) return;
+      final int nextIndex = (currentIndex + 1) % (_player.sequence ?? []).length;
+      await _player.seek(Duration.zero, index: nextIndex);
+    } else {
+      await _player.seekToNext();
+    }
+  }
+
+  // non-forced skip
+  Future<void> skipToNextUnforced() async {
     await _player.seekToNext();
   }
 
   @override
   Future<void> skipToPrevious() async {
+    if (_player.loopMode == LoopMode.one) {
+      final int? currentIndex = _player.currentIndex;
+      if (currentIndex == null) return;
+      final int previousIndex = (currentIndex - 1) % (_player.sequence ?? []).length;
+      await _player.seek(Duration.zero, index: previousIndex);
+    } else {
+      await _player.seekToPrevious();
+    }
+  }
+
+  Future<void> skipToPreviousUnforced() async {
     await _player.seekToPrevious();
   }
+
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
