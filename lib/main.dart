@@ -39,7 +39,9 @@ Future<void> main() async {
 
 void init() async {
   debugPrint("localPath: $localPath");
-  if (OS.getOS() != OSType.windows) SharingIntent.init();
+  if (OS.getOS() != OSType.windows) {
+    SharingIntent.init();
+  }
 }
 
 
