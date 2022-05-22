@@ -114,10 +114,15 @@ class MusicManager {
     _audioHandler.stop();
   }
 
-  // if position is less than 2 sec, skip previous. if not, replay the current song
   Future<void> playback() async {
+    // if current progress is less than 5 sec, skip previous. if not, replay the current song.
     if (progressNotifier.value.current.inMilliseconds < 5000) {
-      await previous();
+      // if current index is 0 and repeat mode is none, replay the current song.
+      if (repeatModeNotifier.value == RepeatState.none && currentIndexNotifier.value == 0) {
+        await seek(Duration.zero);
+      } else {
+        await previous();
+      }
     } else {
       await seek(Duration.zero);
     }
