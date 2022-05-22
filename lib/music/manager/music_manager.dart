@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
+import 'package:asterfox/music/manager/notifiers/nullable_integer_notifier.dart';
+import 'package:asterfox/music/manager/notifiers/playlist_notifier.dart';
+import 'package:asterfox/music/manager/notifiers/song_notifier.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
@@ -10,6 +13,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'audio_data_manager.dart';
 import 'audio_handler.dart';
 
 class MusicManager {
@@ -27,11 +31,12 @@ class MusicManager {
   
   //notifiers
   final progressNotifier = ProgressNotifier();
-  final playlistNotifier = ValueNotifier<List<AudioBase>>([]);
-  final currentSongNotifier = ValueNotifier<AudioBase?>(null);
-  final playingNotifier = ValueNotifier<PlayingState>(PlayingState.disabled);
-  final currentIndexNotifier = ValueNotifier<int?>(null); // シャッフルない状態でのindex
-  final currentShuffledIndexNotifier = ValueNotifier<int?>(null); // シャッフル対応index
+  final playlistNotifier = PlaylistNotifier([]);
+  final shuffledPlaylistNotifier = PlaylistNotifier([]);
+  final currentSongNotifier = SongNotifier(null);
+  final playingStateNotifier = ValueNotifier<PlayingState>(PlayingState.disabled);
+  final currentIndexNotifier = NullableIntegerNotifier(null); // シャッフルない状態でのindex
+  final currentShuffledIndexNotifier = NullableIntegerNotifier(null); // シャッフル対応index
 
   final hasNextNotifier = ValueNotifier<bool>(false);
   final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
@@ -166,7 +171,7 @@ class MusicManager {
     // if index is -1, refresh all songs
     final currentIndex = currentIndexNotifier.value;
     final currentPosition = progressNotifier.value.current;
-    final wasPlaying = playingNotifier.value == PlayingState.playing;
+    final wasPlaying = playingStateNotifier.value == PlayingState.playing;
     if (index == -1) {
 
       final List<AudioBase> songs = playlistNotifier.value;
