@@ -15,7 +15,8 @@ class AudioDataManager {
   PlayingState get playingState => getPlayingState(audioPlayer.playerState, audioPlayer.sequence);
   ProgressBarState get progress => getProgress(audioPlayer.position, audioPlayer.bufferedPosition, audioPlayer.duration ?? Duration.zero);
   RepeatState get repeatState => getRepeatState(audioPlayer.loopMode);
-  bool get hasNext => getHasNext(audioPlayer.currentIndex, audioPlayer.sequence, audioPlayer.loopMode);
+  bool get shuffle => audioPlayer.shuffleModeEnabled;
+  bool get hasNext => getHasNext(audioPlayer.currentIndex, audioPlayer.sequence, audioPlayer.loopMode, audioPlayer.shuffleModeEnabled, audioPlayer.shuffleIndices);
 
 
 
@@ -50,7 +51,7 @@ class AudioDataManager {
     if (!shuffle) return currentIndex;
     if (indices == null) return currentIndex;
     if (currentIndex == null) return null;
-    return indices[currentIndex];
+    return !indices.contains(currentIndex) ? null : indices.indexOf(currentIndex);
   }
 
   static AudioBase? getCurrentSong(int? index, List<IndexedAudioSource>? sequence) {
@@ -87,9 +88,9 @@ class AudioDataManager {
   }
 
   // TODO: support shuffle mode
-  static bool getHasNext(int? index, List<IndexedAudioSource>? sequence, LoopMode loopMode) {
+  static bool getHasNext(int? index, List<IndexedAudioSource>? sequence, LoopMode loopMode, bool shuffle, List<int>? indices) {
     final max = sequence?.length ?? 0;
-    final current = getCurrentIndex(index, sequence);
+    final current = getCurrentShuffledIndex(index, sequence, shuffle, indices);
     final repeat = getRepeatState(loopMode);
     if (max == 0) {
       return false;
@@ -98,6 +99,7 @@ class AudioDataManager {
     } else if ([RepeatState.one, RepeatState.all].contains(repeat)) {
       return true;
     }
+    print('hasNext: $current, $max, $indices, ${getCurrentIndex(index, sequence)}');
     return current < max - 1;
   }
 

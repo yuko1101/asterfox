@@ -54,6 +54,7 @@ class MusicListener {
     _musicManager.currentIndexNotifier.value = currentIndex;
     _musicManager.currentShuffledIndexNotifier.value = AudioDataManager.getCurrentShuffledIndex(sequenceState?.currentIndex, sequence, sequenceState?.shuffleModeEnabled ?? false, sequenceState?.shuffleIndices);
     _musicManager.currentSongNotifier.value = playlist.isNotEmpty ? playlist[currentIndex!] : null;
+    _musicManager.shuffleModeNotifier.value = sequenceState?.shuffleModeEnabled ?? false;
 
     _updateHasNextNotifier();
     _updateProgress();
@@ -64,6 +65,7 @@ class MusicListener {
     _musicManager.currentIndexNotifier.notify();
     _musicManager.currentShuffledIndexNotifier.notify();
     _musicManager.currentSongNotifier.notify();
+    _musicManager.shuffleModeNotifier.notify();
 
 
   }

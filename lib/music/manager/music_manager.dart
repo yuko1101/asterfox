@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/music/audio_source/base/audio_base.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
-import 'package:asterfox/music/manager/notifiers/nullable_integer_notifier.dart';
+import 'package:asterfox/music/manager/notifiers/data_notifier.dart';
 import 'package:asterfox/music/manager/notifiers/playlist_notifier.dart';
 import 'package:asterfox/music/manager/notifiers/song_notifier.dart';
 import 'package:asterfox/util/os.dart';
@@ -26,6 +26,7 @@ class MusicManager {
 
   late final SessionAudioHandler _audioHandler;
   late final AudioSession _audioSession;
+  late final AudioDataManager audioDataManager;
 
   static bool windowsMode = OS.getOS() == OSType.windows;
   
@@ -35,12 +36,12 @@ class MusicManager {
   final shuffledPlaylistNotifier = PlaylistNotifier([]);
   final currentSongNotifier = SongNotifier(null);
   final playingStateNotifier = ValueNotifier<PlayingState>(PlayingState.disabled);
-  final currentIndexNotifier = NullableIntegerNotifier(null); // シャッフルない状態でのindex
-  final currentShuffledIndexNotifier = NullableIntegerNotifier(null); // シャッフル対応index
+  final currentIndexNotifier = DataNotifier<int?>(null); // シャッフルない状態でのindex
+  final currentShuffledIndexNotifier = DataNotifier<int?>(null); // シャッフル対応index
 
   final hasNextNotifier = ValueNotifier<bool>(false);
   final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
-  final shuffleModeNotifier = ValueNotifier<bool>(false);
+  final shuffleModeNotifier = DataNotifier<bool>(false);
 
 
 
@@ -70,10 +71,11 @@ class MusicManager {
       _audioHandler = SessionAudioHandler(false);
     }
     MusicListener(this, _audioHandler).init();
+    audioDataManager = AudioDataManager(_audioHandler.audioPlayer);
   }
 
   Future<void> play() async {
-    print("Played a playlist: " + playlistNotifier.value.length.toString() + " songs");
+    print("Played a playlist: " + audioDataManager.playlist.length.toString() + " songs");
     await _audioHandler.play();
   }
   Future<void> pause() async {
@@ -108,7 +110,7 @@ class MusicManager {
   }
 
   Future<void> remove(String key) async {
-    final int index = playlistNotifier.value.indexWhere((song) => song.key == key);
+    final int index = audioDataManager.playlist.indexWhere((song) => song.key == key);
     if (index != -1) {
       await _audioHandler.removeQueueItemAt(index);
     }
@@ -129,9 +131,9 @@ class MusicManager {
 
   Future<void> playback([bool force = false]) async {
     // if current progress is less than 5 sec, skip previous. if not, replay the current song.
-    if (progressNotifier.value.current.inMilliseconds < 5000) {
+    if (audioDataManager.progress.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.
-      if (repeatModeNotifier.value == RepeatState.none && currentIndexNotifier.value == 0) {
+      if (audioDataManager.repeatState == RepeatState.none && audioDataManager.currentShuffledIndex == 0) {
         await seek(Duration.zero);
       } else {
         await previous(force);
@@ -152,7 +154,7 @@ class MusicManager {
   }
 
   Future<void> nextRepeatMode() async {
-    final repeatMode = repeatModeNotifier.value;
+    final repeatMode = audioDataManager.repeatState;
     final index = repeatModes.indexOf(repeatMode);
     if (index == -1) {
       return;
@@ -162,19 +164,18 @@ class MusicManager {
   }
 
   Future<void> toggleShuffle() async {
-    final enable = !shuffleModeNotifier.value;
+    final enable = !audioDataManager.shuffle;
     _audioHandler.setShuffleMode(enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
-    shuffleModeNotifier.value = enable;
   }
 
   Future<void> refreshSongs([int index = -1]) async {
     // if index is -1, refresh all songs
-    final currentIndex = currentIndexNotifier.value;
-    final currentPosition = progressNotifier.value.current;
-    final wasPlaying = playingStateNotifier.value == PlayingState.playing;
+    final currentIndex = audioDataManager.currentIndex;
+    final currentPosition = audioDataManager.progress.current;
+    final wasPlaying = audioDataManager.playingState == PlayingState.playing;
     if (index == -1) {
 
-      final List<AudioBase> songs = playlistNotifier.value;
+      final List<AudioBase> songs = audioDataManager.playlist;
 
       // while clearing the playlist, refresh the songs.
       final completer = Completer();
@@ -196,7 +197,7 @@ class MusicManager {
       // TODO: fix the index out of range issue
 
     } else {
-      final AudioBase song = playlistNotifier.value[index];
+      final AudioBase song = audioDataManager.playlist[index];
 
       // while removing the song, refresh the song.
       final completer = Completer();
@@ -217,13 +218,6 @@ class MusicManager {
     if (wasPlaying) {
       await play();
     }
-  }
-
-
-  int? getShuffledIndex() {
-    final int index = currentSongNotifier.value != null ? playlistNotifier.value.indexWhere((song) => song.key! == currentSongNotifier.value!.key!) : -1;
-    return (index == -1 ? null : index);
-
   }
 
   SessionAudioHandler get audioHandler => _audioHandler;
