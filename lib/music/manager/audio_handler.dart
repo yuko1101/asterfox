@@ -161,6 +161,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       tag: {
         "key": mediaItem.id,
         "url": mediaItem.extras!['url'],
+        "duration": mediaItem.duration?.inMilliseconds ?? 0,
       }, // MusicData
     );
   }
