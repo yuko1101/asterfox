@@ -17,8 +17,9 @@ class YouTubeAudio extends MediaAudio {
     required int duration,
     required bool isLocal,
     required List<String> keywords,
+    required double volume,
     String? key
-  }) : super(url: url, imageUrl: isLocal ? "$localPath${Platform.pathSeparator}images${Platform.pathSeparator}$id.png" : "https://img.youtube.com/vi/$id/maxresdefault.jpg", title: title, description: description, author: author, duration: duration, isLocal: isLocal, keywords: keywords, key: key);
+  }) : super(url: url, imageUrl: isLocal ? "$localPath${Platform.pathSeparator}images${Platform.pathSeparator}$id.png" : "https://img.youtube.com/vi/$id/maxresdefault.jpg", title: title, description: description, author: author, duration: duration, isLocal: isLocal, keywords: keywords, volume: volume, key: key);
   final String id;
   final String authorId;
 
@@ -57,6 +58,7 @@ class YouTubeAudio extends MediaAudio {
       duration: json['duration'] as int,
       isLocal: local,
       keywords: (json['keywords'] as List).map((e) => e as String).toList(),
+      volume: json['volume'] as double,
     );
   }
 
@@ -73,6 +75,7 @@ class YouTubeAudio extends MediaAudio {
       'isLocal': isLocal,
       'id': id,
       'keywords': keywords,
+      'volume': volume,
       'key': key
     };
   }
@@ -88,6 +91,7 @@ class YouTubeAudio extends MediaAudio {
         duration: json['duration'] as int,
         isLocal: json['isLocal'] as bool,
         keywords: (json['keywords'] as List).map((e) => e as String).toList(),
+        volume: json['volume'] as double,
         key: json['key'] as String?
     );
   }
@@ -104,6 +108,7 @@ class YouTubeAudio extends MediaAudio {
       duration: duration,
       isLocal: true,
       keywords: keywords,
+      volume: volume,
       key: const Uuid().v4()
     );
 

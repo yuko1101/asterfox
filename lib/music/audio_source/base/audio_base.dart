@@ -16,6 +16,7 @@ class AudioBase {
     required this.duration,
     required this.isLocal,
     required this.keywords,
+    required this.volume,
     this.key
 
   }) {
@@ -30,6 +31,7 @@ class AudioBase {
   final int duration;
   bool isLocal;
   final List<String> keywords;
+  double volume;
   String? key;
 
   static String classId() => "audio";
@@ -44,6 +46,10 @@ class AudioBase {
     );
   }
 
+  void setVolume(double volume) {
+    this.volume = volume;
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'type': classId(),
@@ -55,6 +61,7 @@ class AudioBase {
       'duration': duration,
       'isLocal': isLocal,
       'keywords': keywords,
+      'volume': volume,
     };
   }
 
@@ -68,6 +75,7 @@ class AudioBase {
       duration: json['duration'] as int,
       isLocal: local,
       keywords: (json['keywords'] as List).map((e) => e as String).toList(),
+      volume: json['volume'] as double,
     );
   }
 
@@ -83,6 +91,7 @@ class AudioBase {
       'duration': duration,
       'isLocal': isLocal,
       'keywords': keywords,
+      'volume': volume,
       'key': key,
     };
   }
@@ -97,6 +106,7 @@ class AudioBase {
       duration: json['duration'] as int,
       isLocal: json['isLocal'] as bool,
       keywords: (json['keywords'] as List).map((e) => e as String).toList(),
+      volume: json['volume'] as double,
     );
   }
 
@@ -111,6 +121,7 @@ class AudioBase {
       duration: duration,
       isLocal: true,
       keywords: keywords,
+      volume: volume,
       key: newKey,
     );
   }
@@ -126,6 +137,7 @@ class AudioBase {
       duration: duration,
       isLocal: isLocal,
       keywords: keywords,
+      volume: volume,
       key: newKey,
     );
   }

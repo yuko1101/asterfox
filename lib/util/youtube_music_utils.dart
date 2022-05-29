@@ -91,6 +91,7 @@ class YouTubeMusicUtils {
           duration: video.duration?.inMilliseconds ?? 0,
           isLocal: false,
           keywords: video.keywords,
+          volume: 1.0,
       );
 
     }

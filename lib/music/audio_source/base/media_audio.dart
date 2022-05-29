@@ -15,8 +15,9 @@ class MediaAudio extends AudioBase {
     required int duration,
     required bool isLocal,
     required List<String> keywords,
+    required double volume,
     String? key
-  }) : super(url: url, imageUrl: imageUrl, title: title, description: description, author: author, duration: duration, isLocal: isLocal, keywords: keywords, key: key);
+  }) : super(url: url, imageUrl: imageUrl, title: title, description: description, author: author, duration: duration, isLocal: isLocal, keywords: keywords, volume: volume, key: key);
 
   String getMediaURL() {
     return url;
@@ -36,6 +37,7 @@ class MediaAudio extends AudioBase {
       duration: duration,
       isLocal: true,
       keywords: keywords,
+      volume: volume,
       key: newKey
     );
   }
@@ -52,6 +54,7 @@ class MediaAudio extends AudioBase {
         duration: duration,
         isLocal: isLocal,
         keywords: keywords,
+        volume: volume,
         key: newKey
     );
   }
