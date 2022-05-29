@@ -1,13 +1,12 @@
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/main.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:flutter/material.dart';
-
-import '../../main.dart';
 
 class CurrentSongTitle extends StatelessWidget {
   const CurrentSongTitle({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<AudioBase?>(
+    return ValueListenableBuilder<MusicData?>(
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, musicData, __) {
         return Padding(
@@ -26,7 +25,7 @@ class CurrentSongAuthor extends StatelessWidget {
   const CurrentSongAuthor({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<AudioBase?>(
+    return ValueListenableBuilder<MusicData?>(
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, musicData, __) {
         return Padding(

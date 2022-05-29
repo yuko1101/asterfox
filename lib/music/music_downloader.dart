@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:asterfox/main.dart';
 import 'package:http/http.dart';
 import 'package:flutter/foundation.dart';
-
 import 'package:asterfox/config/local_musics_data.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
-import 'package:asterfox/music/audio_source/youtube_audio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -17,40 +15,44 @@ final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
 final Map<String, ValueNotifier<int>> downloadProgress = {};
 
 class MusicDownloader {
-  static Future<void> download(AudioBase? song) async {
+  static Future<void> download(MusicData? song) async {
     if (song == null) return;
     if (song.isLocal) return;
 
-    if (downloading.value.contains(song.key!)) return;
+    if (downloading.value.contains(song.key)) return;
 
-    downloadProgress[song.key!] ??= ValueNotifier<int>(0);
-    downloading.value = [...downloading.value, song.key!];
+    downloadProgress[song.key] ??= ValueNotifier<int>(0);
+    downloading.value = [...downloading.value, song.key];
 
     print("a");
 
-    if (song is YouTubeAudio) {
+    if (song is YouTubeMusicData) {
       print("b");
       await _downloadFromYouTube(song);
     } else {
-      await _downloadMp3(song.url, song.copyAsLocal().url, song.key!);
+      await _downloadMp3(song.url, song.savePath, song.key);
     }
+    song.url = song.savePath;
 
-    await _saveImage(song);
+    final imagePath = "$localPath/images/${LocalMusicsData.getSongId(song)}.png";
+    await _saveImage(song, imagePath);
+
+    song.imageUrls = [imagePath];
 
     await LocalMusicsData.save(song);
 
     print("finished!");
 
-    downloadProgress.remove(song.key!);
+    downloadProgress.remove(song.key);
     final List<String> preDownloading = [...downloading.value]; // immutable
-    preDownloading.remove(song.key!);
+    preDownloading.remove(song.key);
     downloading.value = preDownloading;
   }
 
-  static Future<void> _downloadFromYouTube(YouTubeAudio song) async {
+  static Future<void> _downloadFromYouTube(YouTubeMusicData song) async {
     final String id = song.id;
-    final String downloadPath = song.copyAsLocal().url;
-    final String key = song.key!;
+    final String downloadPath = song.savePath;
+    final String key = song.key;
 
     final File file = File(downloadPath);
     if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
@@ -121,9 +123,14 @@ class MusicDownloader {
 
   }
 
-  static Future<void> _saveImage(AudioBase song) async {
-    final imageRes = await http.get(Uri.parse(song.imageUrl));
-    final imageFile = File("$localPath/images/${LocalMusicsData.getSongId(song)}.png");
+  static Future<void> _saveImage(MusicData song, String path) async {
+    final available = await song.getAvailableImage();
+    if (available == null) {
+      print("no image available");
+      return;
+    }
+    final http.Response imageRes = available["response"];
+    final imageFile = File(path);
     if (!imageFile.parent.existsSync()) imageFile.parent.createSync(recursive: true);
     imageFile.writeAsBytesSync(imageRes.bodyBytes);
     print("Download Complete!");

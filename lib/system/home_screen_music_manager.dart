@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'package:asterfox/main.dart';
+import 'package:asterfox/music/audio_source/youtube_music_data.dart';
+import 'package:asterfox/screen/screens/home_screen.dart';
+import 'package:asterfox/util/in_app_notification/notification_data.dart';
+import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
-import '../music/audio_source/youtube_audio.dart';
-import '../screen/screens/home_screen.dart';
-import '../util/in_app_notification/notification_data.dart';
-import '../util/youtube_music_utils.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSongByID(String id) async {
@@ -23,7 +23,7 @@ class HomeScreenMusicManager {
               ],
             ),
             progress: () async {
-              final YouTubeAudio song = (await YouTubeMusicUtils.getYouTubeAudio(id))!;
+              final YouTubeMusicData song = (await YouTubeMusicUtils.getYouTubeAudio(id))!;
               await musicManager.add(song);
               completer.complete();
             }

@@ -1,9 +1,8 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/screen/base_screen.dart';
+import 'package:asterfox/screen/drawer.dart';
+import 'package:asterfox/util/responsive.dart';
 import 'package:flutter/material.dart';
-
-import '../../util/responsive.dart';
-import '../drawer.dart';
 import 'home_screen.dart';
 
 ValueNotifier<BaseScreen> screenNotifier = ValueNotifier<BaseScreen>(HomeScreen());

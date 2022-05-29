@@ -1,11 +1,12 @@
 import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 
 class DownloadButton extends StatelessWidget {
@@ -13,7 +14,9 @@ class DownloadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<AudioBase?>(
+    final _httpRegex = RegExp(r'^https?:\/\/.+$');
+
+    return ValueListenableBuilder<MusicData?>(
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, song, __) {
         return ValueListenableBuilder<List<String>>(
@@ -22,10 +25,15 @@ class DownloadButton extends StatelessWidget {
             print("download changed!");
             final downloadable = song != null && !song.isLocal;
             final isDownloading = downloadingSongs.contains(song?.key);
-            final isDownloaded = song != null && LocalMusicsData.getById(LocalMusicsData.getSongId(song)) != null && !song.isLocal;
+
+            final List<IndexedAudioSource?> songs = musicManager.audioHandler.audioPlayer.sequence ?? [];
+            final audioSourceIndex = songs.indexWhere((element) => element != null && element.tag["key"] == song?.key);
+            final IndexedAudioSource? audioSource = audioSourceIndex != -1 ? songs[audioSourceIndex] : null;
+            final isDownloaded = song != null && audioSource != null && LocalMusicsData.getById(LocalMusicsData.getSongId(song)) != null && _httpRegex.hasMatch(audioSource.tag["url"]);
+
             if (isDownloading) {
               return ValueListenableBuilder<int>(
-                  valueListenable: downloadProgress[song!.key!]!,
+                  valueListenable: downloadProgress[song!.key]!,
                   builder: (_, percentage, __) => Container(
                     height: 24,
                     width: 24,
@@ -41,18 +49,18 @@ class DownloadButton extends StatelessWidget {
               return IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () {
-                  musicManager.refreshSongs(musicManager.currentIndexNotifier.value!);
+                  musicManager.refreshSongs(musicManager.audioDataManager.currentIndex!);
                 },
               );
             }
             if (downloadable) {
               return IconButton(
                   onPressed: () {
-                    downloadProgress[song!.key!] = ValueNotifier<int>(0);
+                    downloadProgress[song!.key] = ValueNotifier<int>(0);
                     homeNotification.pushNotification(
                       NotificationData(
                           child: ValueListenableBuilder<int>(
-                            valueListenable: downloadProgress[song.key!]!,
+                            valueListenable: downloadProgress[song.key]!,
                             builder: (_, percentage, __) => Column(
                               children: [
                                 const Text("ダウンロード中"),

@@ -1,7 +1,6 @@
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
-import 'package:asterfox/music/audio_source/base/media_audio.dart';
-import 'package:asterfox/music/audio_source/youtube_audio.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/system/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -20,25 +19,25 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.share,
       title: Language.getText("share"),
       onTap: (context) async {
-        final MediaAudio song =
-            musicManager.currentSongNotifier.value as MediaAudio;
-        Share.share(song.getMediaURL(), subject: song.title);
+        final MusicData song =
+          musicManager.audioDataManager.currentSong!;
+        Share.share(song.mediaURL, subject: song.title);
         Navigator.pop(context);
       },
-      songFilter: (AudioBase? song) => song != null && song is MediaAudio,
+      songFilter: (MusicData? song) => song != null,
     ),
     _Action(
         id: "youtube",
         icon: Icons.open_in_new,
         title: Language.getText("open_in_youtube"),
         onTap: (context) async {
-          final launched = await launchUrl(Uri.parse((musicManager.currentSongNotifier.value as MediaAudio).getMediaURL()), mode: LaunchMode.externalNonBrowserApplication);
+          final launched = await launchUrl(Uri.parse(musicManager.audioDataManager.currentSong!.mediaURL), mode: LaunchMode.externalNonBrowserApplication);
           if (!launched) {
             Fluttertoast.showToast(msg: Language.getText("launch_url_error"));
           }
           Navigator.pop(context);
         },
-        songFilter: (AudioBase? song) => song != null && song is YouTubeAudio,
+        songFilter: (MusicData? song) => song != null && song is YouTubeMusicData,
     ),
     _Action(
       id: "export",
@@ -47,7 +46,7 @@ class MoreActionsButton extends StatelessWidget {
       onTap: (context) {
         Navigator.pop(context);
       },
-      songFilter: (AudioBase? song) => song != null,
+      songFilter: (MusicData? song) => song != null,
     ),
     _Action(
         id: "refresh_all",
@@ -57,13 +56,13 @@ class MoreActionsButton extends StatelessWidget {
           musicManager.refreshSongs();
           Navigator.pop(context);
         },
-        songFilter: (AudioBase? song) => song != null,
+        songFilter: (MusicData? song) => song != null,
     )
   ];
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<AudioBase?>(
+    return ValueListenableBuilder<MusicData?>(
         valueListenable: musicManager.currentSongNotifier,
         builder: (context, song, child) {
           return IconButton(
@@ -115,7 +114,7 @@ class _Action extends StatelessWidget {
   final IconData icon;
   final String title;
   final void Function(BuildContext) onTap;
-  final bool Function(AudioBase?) songFilter;
+  final bool Function(MusicData?) songFilter;
 
   @override
   Widget build(BuildContext context) {

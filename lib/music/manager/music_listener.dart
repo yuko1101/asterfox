@@ -1,14 +1,10 @@
 import 'dart:math';
 
 import 'package:asterfox/config/settings_data.dart';
-import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:just_audio/just_audio.dart';
-
 import 'package:asterfox/music/manager/audio_handler.dart';
 import 'package:asterfox/music/manager/music_manager.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
-
 import 'audio_data_manager.dart';
 
 class MusicListener {
@@ -84,11 +80,11 @@ class MusicListener {
   }
 
   void _updateLoopMode(LoopMode loopMode) {
-    final preRepeatMode = _musicManager.repeatModeNotifier.value;
+    final preRepeatMode = _audioDataManager.repeatState;
     _musicManager.repeatModeNotifier.value = AudioDataManager.getRepeatState(loopMode);
     _updateHasNextNotifier();
 
-    if (preRepeatMode != _musicManager.repeatModeNotifier.value) SettingsData.settings.set(key: "repeatMode", value: repeatStateToString(loopModeToRepeatState(loopMode))).save();
+    if (preRepeatMode != AudioDataManager.getRepeatState(loopMode)) SettingsData.settings.set(key: "repeatMode", value: repeatStateToString(loopModeToRepeatState(loopMode))).save();
   }
 
   void _updateHasNextNotifier() {
