@@ -1,16 +1,12 @@
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
-import 'package:asterfox/music/manager/music_listener.dart';
-import 'package:asterfox/system/home_screen_music_manager.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/util/in_app_notification/in_app_notification.dart';
-import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/widget/music_footer.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:asterfox/widget/song_search.dart';
 import 'package:flutter/material.dart';
-
-import '../../music/manager/audio_data_manager.dart';
 
 
 final homeNotification = InAppNotification();
@@ -21,9 +17,9 @@ class HomeScreen extends BaseScreen {
       children: [
         ValueListenableBuilder<PlayingState>(
           valueListenable: musicManager.playingStateNotifier,
-          builder: (_, __, ___) => ValueListenableBuilder<List<AudioBase>>(
+          builder: (_, __, ___) => ValueListenableBuilder<List<MusicData>>(
             valueListenable: musicManager.shuffledPlaylistNotifier,
-            builder: (_, songs, __) => ValueListenableBuilder<AudioBase?>(
+            builder: (_, songs, __) => ValueListenableBuilder<MusicData?>(
               valueListenable: musicManager.currentSongNotifier,
               builder: (_, currentSong, __) => PlaylistWidget(
                 padding: const EdgeInsets.only(top: 15),

@@ -1,9 +1,8 @@
 import 'dart:io';
 
+import 'package:asterfox/main.dart';
 import 'package:asterfox/util/config_file.dart';
 import 'package:flutter/material.dart';
-
-import '../main.dart';
 
 
 

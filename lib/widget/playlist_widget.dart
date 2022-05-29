@@ -1,5 +1,5 @@
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/widget/music_card.dart';
 import 'package:flutter/material.dart';
 
@@ -13,8 +13,8 @@ class PlaylistWidget extends StatefulWidget {
     Key? key
   }) : super(key: key);
 
-  final List<AudioBase> songs;
-  final AudioBase? playing;
+  final List<MusicData> songs;
+  final MusicData? playing;
   final bool linked;
   final EdgeInsetsGeometry? padding;
 
@@ -33,8 +33,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => MusicCardWidget(
               song: widget.songs[index],
-              playing: widget.songs[index].key! == widget.playing?.key!,
-              key: Key(widget.songs[index].key!),
+              playing: widget.songs[index].key == widget.playing?.key,
+              key: Key(widget.songs[index].key),
               linked: widget.linked
           ),
           itemCount: widget.songs.length,

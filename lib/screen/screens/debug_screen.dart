@@ -35,7 +35,7 @@ class DebugMainScreen extends StatelessWidget {
           IconButton(onPressed: musicManager.previous, icon: const Icon(Icons.skip_previous)),
           IconButton(onPressed: () {
             LocalMusicsData.removeAllFromLocal(LocalMusicsData.getAll());
-            LocalMusicsData.musicData.save();
+            LocalMusicsData.saveData();
           }, icon: const Icon(Icons.delete)),
         ],
       ),

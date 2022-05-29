@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:asterfox/config/local_musics_data.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:asterfox/util/network_util.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-
-import '../music/audio_source/youtube_audio.dart';
 
 class SongSearch extends SearchDelegate<String> {
   @override
@@ -122,11 +121,11 @@ class SongSearch extends SearchDelegate<String> {
     print("loading offline songs");
     final List<_Suggestion> list = [];
 
-    final List<AudioBase> locals = LocalMusicsData.getAll();
+    final List<MusicData> locals = LocalMusicsData.getAll();
     list.addAll(locals.map((e) {
       final List<_Tag> tags = [_Tag.local];
-      if (e is YouTubeAudio) tags.add(_Tag.youtube);
-      return _Suggestion(tags: tags, name: e.title, value: e is YouTubeAudio ? e.id : e.url, keywords: e.keywords);
+      if (e is YouTubeMusicData) tags.add(_Tag.youtube);
+      return _Suggestion(tags: tags, name: e.title, value: e is YouTubeMusicData ? e.id : e.url, keywords: e.keywords);
     }));
 
     final List<_Suggestion> result = filterAndSort(list, filterSortingList: [_RelatedFilter(text), _RelevanceSorting(text)]);

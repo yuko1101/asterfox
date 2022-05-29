@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:asterfox/config/settings_data.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/music/manager/notifiers/data_notifier.dart';
 import 'package:asterfox/music/manager/notifiers/playlist_notifier.dart';
@@ -101,12 +101,12 @@ class MusicManager {
     }
   }
 
-  Future<void> add(AudioBase song) async {
-    await _audioHandler.addQueueItem(song.getMediaItem());
+  Future<void> add(MusicData song) async {
+    await _audioHandler.addQueueItem(song.toMediaItem());
 
   }
-  Future<void> addAll(List<AudioBase> songs) async {
-    await _audioHandler.addQueueItems(songs.map((e) => e.getMediaItem()).toList());
+  Future<void> addAll(List<MusicData> songs) async {
+    await _audioHandler.addQueueItems(songs.map((e) => e.toMediaItem()).toList());
   }
 
   Future<void> remove(String key) async {
@@ -168,36 +168,21 @@ class MusicManager {
     _audioHandler.setShuffleMode(enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }
 
+  Future<void> setSongs(List<MusicData> songs) async {
+    await _audioHandler.setSongs(songs);
+  }
+
+  /// `index` is not shuffled index.
   Future<void> refreshSongs([int index = -1]) async {
     // if index is -1, refresh all songs
     final currentIndex = audioDataManager.currentIndex;
     final currentPosition = audioDataManager.progress.current;
     final wasPlaying = audioDataManager.playingState == PlayingState.playing;
     if (index == -1) {
-
-      final List<AudioBase> songs = audioDataManager.playlist;
-
-      // while clearing the playlist, refresh the songs.
-      final completer = Completer();
-      (() async {
-        await clear();
-        completer.complete();
-      })();
-
-      // refresh the songs
-      final List<AudioBase> refreshed = await Future.wait(songs.map((song) async {
-        return await song.refresh();
-      }));
-
-      // if clearing is not finished, wait for it to finish
-      if (!completer.isCompleted) await completer.future;
-
-      await addAll(refreshed);
-
-      // TODO: fix the index out of range issue
+      await _audioHandler.setSongs(audioDataManager.playlist);
 
     } else {
-      final AudioBase song = audioDataManager.playlist[index];
+      final MusicData song = audioDataManager.playlist[index];
 
       // while removing the song, refresh the song.
       final completer = Completer();
@@ -206,13 +191,10 @@ class MusicManager {
         completer.complete();
       })();
 
-      // refresh the song
-      final AudioBase refresh = await song.refresh();
-
       // if removing is not finished, wait for it to finish
       if (!completer.isCompleted) await completer.future;
 
-      await _audioHandler.insertQueueItem(index, refresh.getMediaItem());
+      await _audioHandler.insertQueueItem(index, song.toMediaItem());
     }
     await seek(currentPosition, index: index == -1 || currentIndex == index ? currentIndex : null);
     if (wasPlaying) {

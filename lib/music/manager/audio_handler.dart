@@ -1,7 +1,4 @@
-import 'dart:math';
-
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/util/os.dart';
 import 'package:audio_service/audio_service.dart';
@@ -10,7 +7,7 @@ import 'package:just_audio/just_audio.dart';
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   final _player = AudioPlayer();
-  final _playlist = ConcatenatingAudioSource(children: []);
+  var _playlist = ConcatenatingAudioSource(children: []);
 
   // fix that the audio player is not working when the empty playlist is added
   final fix = OS.getOS() == OSType.windows;
@@ -161,7 +158,10 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
     return AudioSource.uri(
       Uri.parse(mediaItem.extras!['url']),
-      tag: mediaItem.asAudioBase(), // MusicData
+      tag: {
+        "key": mediaItem.id,
+        "url": mediaItem.extras!['url'],
+      }, // MusicData
     );
   }
 
@@ -171,6 +171,11 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> clear() async {
     await _playlist.clear();
+  }
+
+  Future<void> setSongs(List<MusicData> songs) async {
+    _playlist = ConcatenatingAudioSource(children: songs.map((e) => e.toMediaItem()).map(_createAudioSource).toList());
+    await _player.setAudioSource(_playlist);
   }
 
   AudioPlayer get audioPlayer => _player;
@@ -242,8 +247,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
       var sequence = sequenceState?.sequence;
       if (sequence == null || sequence.isEmpty) sequence = [];
-      final List<AudioBase> playlist = AudioDataManager.getShuffledPlaylist(sequence, sequenceState?.shuffleModeEnabled ?? false, sequenceState?.shuffleIndices);
-      final items = playlist.map((song) => (song.getMediaItem()));
+      final List<MusicData> playlist = AudioDataManager.getShuffledPlaylist(sequence, sequenceState?.shuffleModeEnabled ?? false, sequenceState?.shuffleIndices);
+      final items = playlist.map((song) => (song.toMediaItem()));
       // print(items.length.toString() + " added songs");
       setQueueItems(items.toList());
     });

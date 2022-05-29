@@ -16,7 +16,7 @@ class ConfigFile {
     if (compact) {
       await file.writeAsString(jsonEncode(data));
     } else {
-      await file.writeAsString(jsonEncode(data));
+      await file.writeAsString(const JsonEncoder.withIndent("  ").convert(data));
     }
     return this;
   }

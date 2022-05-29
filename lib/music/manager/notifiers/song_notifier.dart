@@ -1,10 +1,10 @@
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:flutter/foundation.dart';
 
-class SongNotifier extends ChangeNotifier implements ValueListenable<AudioBase?> {
+class SongNotifier extends ChangeNotifier implements ValueListenable<MusicData?> {
   SongNotifier(this.value);
   @override
-  AudioBase? value;
+  MusicData? value;
 
   void notify() {
     notifyListeners();

@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
-import 'package:asterfox/music/audio_source/youtube_audio.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/util/config_file.dart';
 import 'package:uuid/uuid.dart';
 
@@ -11,49 +11,63 @@ import 'package:uuid/uuid.dart';
 class LocalMusicsData {
   static late ConfigFile musicData;
 
+  static const bool _compact = false;
+
   static Future<void> init() async {
     musicData = await ConfigFile(File("$localPath/music.json"), {}).load();
   }
 
-  static Future<void> save(AudioBase song) async {
+  static Future<void> saveData() async {
+    await musicData.save(compact: _compact);
+  }
+
+  static Future<void> save(MusicData song) async {
 
     if (!song.isLocal) {
-      await musicData.set(key: getSongId(song), value: song.copyAsLocal().toJson()).save();
-
+      song.isLocal = true;
+      await musicData.set(key: getSongId(song), value: song.toJson()).save(compact: _compact);
     }
   }
 
-  static List<AudioBase> getAll() {
+  static List<MusicData> getAll() {
     final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values.map((e) => loadFromJson(e, local: true)).toList();
+    return data.values.map((e) => MusicData.fromJson(e, true)).toList();
   }
   
   static List<String> getYouTubeIds() {
     final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values.where((element) => element["type"] == YouTubeAudio.classId()).map((e) => e["id"] as String).toList();
+    return data.values.where((element) => element["type"] == MusicType.youtube.name).map((e) => e["id"] as String).toList();
   }
 
-  static AudioBase? getById(String? id) {
+  static MusicData? getById(String? id) {
     if (id == null || !musicData.has(id)) return null;
     final data = musicData.getValue(id) as Map<String, dynamic>;
-    return loadFromJson(data, local: true);
+    return MusicData.fromJson(data, true);
   }
 
-  static String getSongId(AudioBase song) {
-    if (song is YouTubeAudio) return song.id;
-    return song.key!;
+  static String getSongId(MusicData song) {
+    if (song is YouTubeMusicData) return song.id;
+    return song.key;
   }
 
-  static Future<void> removeFromLocal(AudioBase song) async {
+  static final _httpRegex = RegExp(r'^https?:\/\/.+$');
+
+  static Future<void> removeFromLocal(MusicData song) async {
     if (!song.isLocal) return;
-    final file = File(song.url);
-    final imageFile = File(song.imageUrl);
+    final file = File(song.savePath);
+    final imageDelete = () async {
+      String url = song.imageUrls.firstWhere((element) => !_httpRegex.hasMatch(element), orElse: () => "");
+      if (url.isNotEmpty) {
+        final file = File(url);
+        if (file.existsSync()) await file.delete();
+      }
+    }();
     musicData.delete(key: getSongId(song));
-    final futures = [file.delete(), imageFile.delete()];
+    final futures = [file.delete(), imageDelete, saveData()];
     await Future.wait(futures);
   }
 
-  static Future<void> removeAllFromLocal(List<AudioBase> songs) async {
+  static Future<void> removeAllFromLocal(List<MusicData> songs) async {
     final futures = songs.map((e) => removeFromLocal(e));
     await Future.wait(futures);
   }

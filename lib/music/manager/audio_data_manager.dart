@@ -1,4 +1,4 @@
-import 'package:asterfox/music/audio_source/base/audio_base.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:just_audio/just_audio.dart';
@@ -7,11 +7,11 @@ class AudioDataManager {
   AudioDataManager(this.audioPlayer);
   final AudioPlayer audioPlayer;
 
-  List<AudioBase> get playlist => AudioDataManager.getPlaylist(audioPlayer.sequence);
-  List<AudioBase> get shuffledPlaylist => AudioDataManager.getShuffledPlaylist(audioPlayer.sequence, audioPlayer.shuffleModeEnabled, audioPlayer.shuffleIndices);
+  List<MusicData> get playlist => AudioDataManager.getPlaylist(audioPlayer.sequence);
+  List<MusicData> get shuffledPlaylist => AudioDataManager.getShuffledPlaylist(audioPlayer.sequence, audioPlayer.shuffleModeEnabled, audioPlayer.shuffleIndices);
   int? get currentIndex => getCurrentIndex(audioPlayer.currentIndex, audioPlayer.sequence);
   int? get currentShuffledIndex => getCurrentShuffledIndex(audioPlayer.currentIndex, audioPlayer.sequence, audioPlayer.shuffleModeEnabled, audioPlayer.shuffleIndices);
-  AudioBase? get currentSong => getCurrentSong(audioPlayer.currentIndex, audioPlayer.sequence);
+  MusicData? get currentSong => getCurrentSong(audioPlayer.currentIndex, audioPlayer.sequence);
   PlayingState get playingState => getPlayingState(audioPlayer.playerState, audioPlayer.sequence);
   ProgressBarState get progress => getProgress(audioPlayer.position, audioPlayer.bufferedPosition, audioPlayer.duration ?? Duration.zero);
   RepeatState get repeatState => getRepeatState(audioPlayer.loopMode);
@@ -20,12 +20,12 @@ class AudioDataManager {
 
 
 
-  static List<AudioBase> getPlaylist(List<IndexedAudioSource>? sequence) {
+  static List<MusicData> getPlaylist(List<IndexedAudioSource>? sequence) {
     final playlist = sequence ?? [];
-    return playlist.map((audioSource) => audioSource.asAudioBase()).toList();
+    return playlist.map((audioSource) => audioSource.toMusicData()).toList();
   }
 
-  static List<AudioBase> getShuffledPlaylist(List<IndexedAudioSource>? sequence, bool shuffle, List<int>? indices) {
+  static List<MusicData> getShuffledPlaylist(List<IndexedAudioSource>? sequence, bool shuffle, List<int>? indices) {
     final playlist = getPlaylist(sequence);
     if (!shuffle) {
       return playlist;
@@ -37,7 +37,7 @@ class AudioDataManager {
       // print("shuffled: ${indices.map((index) => index >= playlist.length ? null : playlist[index].title).where((element) => element != null).map((e) => e as String).toList()}");
 
       // avoid out of range error on delete song (the delay in the shuffled indices causes the error)
-      return indices.map((index) => index >= playlist.length ? null : playlist[index]).where((element) => element != null).map((e) => e as AudioBase).toList();
+      return indices.map((index) => index >= playlist.length ? null : playlist[index]).where((element) => element != null).map((e) => e as MusicData).toList();
     }
   }
 
@@ -54,7 +54,7 @@ class AudioDataManager {
     return !indices.contains(currentIndex) ? null : indices.indexOf(currentIndex);
   }
 
-  static AudioBase? getCurrentSong(int? index, List<IndexedAudioSource>? sequence) {
+  static MusicData? getCurrentSong(int? index, List<IndexedAudioSource>? sequence) {
     if (index == null) return null;
     final playlist = getPlaylist(sequence);
     if (index >= playlist.length || index < 0) return null;
