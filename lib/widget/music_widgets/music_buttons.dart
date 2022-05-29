@@ -3,6 +3,7 @@ import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
+import '../../music/manager/audio_data_manager.dart';
 
 class ShuffleButton extends StatelessWidget {
   const ShuffleButton({Key? key}) : super(key: key);
@@ -45,7 +46,7 @@ class PlayButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<PlayingState>(
-      valueListenable: musicManager.playingNotifier,
+      valueListenable: musicManager.playingStateNotifier,
       builder: (_, value, __) {
         switch (value) {
           case PlayingState.disabled:
@@ -75,6 +76,13 @@ class PlayButton extends StatelessWidget {
               iconSize: 32.0,
               onPressed: musicManager.pause,
               tooltip: "一時停止",
+            );
+          case PlayingState.unknown:
+            return const IconButton(
+              icon: Icon(Icons.play_arrow),
+              iconSize: 32.0,
+              onPressed: null,
+              tooltip: "再生",
             );
         }
       },
