@@ -107,7 +107,7 @@ class MusicData {
   }
 
   Future<void> save() async {
-    MusicDownloader.download(this);
+    await MusicDownloader.download(this);
   }
 
   final _httpRegex = RegExp(r'^https?:\/\/.+$');

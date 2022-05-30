@@ -4,6 +4,7 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
+import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -56,29 +57,7 @@ class DownloadButton extends StatelessWidget {
             if (downloadable) {
               return IconButton(
                   onPressed: () {
-                    downloadProgress[song!.key] = ValueNotifier<int>(0);
-                    homeNotification.pushNotification(
-                      NotificationData(
-                          child: ValueListenableBuilder<int>(
-                            valueListenable: downloadProgress[song.key]!,
-                            builder: (_, percentage, __) => Column(
-                              children: [
-                                const Text("ダウンロード中"),
-                                SizedBox(
-                                  width: 100,
-                                  child: LinearProgressIndicator(
-                                    minHeight: 8,
-                                    value: percentage / 100,
-                                    color: CustomColors.getColor("accent"),
-                                    backgroundColor: CustomColors.getColor("accent").withOpacity(0.1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          progress: () async => await MusicDownloader.download(song)
-                      ),
-                    );
+                    HomeScreenMusicManager.download(song!);
                   },
                   icon: const Icon(Icons.file_download)
               );

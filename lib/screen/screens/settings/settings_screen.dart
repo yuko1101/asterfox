@@ -1,3 +1,5 @@
+import 'package:asterfox/config/custom_colors.dart';
+import 'package:asterfox/config/settings_data.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/page_manager.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
@@ -35,33 +37,51 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget {
   }
 }
 
-class _MainSettingsScreen extends StatelessWidget {
-  const _MainSettingsScreen({
-    Key? key,
-  }) : super(key: key);
+class _MainSettingsScreen extends StatefulWidget {
+  const _MainSettingsScreen({Key? key}) : super(key: key);
 
+  @override
+  State<_MainSettingsScreen> createState() => _MainSettingsScreenState();
+}
+
+class _MainSettingsScreenState extends State<_MainSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: const Text("基本設定"),
+              title: Text(Language.getText("general_settings")),
+              tiles: [
+                SettingsTile.navigation(
+                  title: Text(Language.getText("theme")),
+                  description: Text(AppTheme.themeNames.values.join("、")),
+                  onPressed: (context) {
+                    PageManager.pushPage(context, ThemeSettingsScreen());
+                  },
+                  trailing: const Icon(Icons.keyboard_arrow_right),
+                )
+              ]
+          ),
+          SettingsSection(
+            title: Text(Language.getText("useful_functions")),
             tiles: [
-              SettingsTile.navigation(
-                title: const Text("テーマ"),
-                description: Text(AppTheme.themeNames.values.join("、")),
-                onPressed: (context) {
-                  PageManager.pushPage(context, ThemeSettingsScreen());
+              SettingsTile.switchTile(
+                initialValue: SettingsData.getValue(key: "auto_download"),
+                onToggle: (value) {
+                  setState(() {
+                    SettingsData.settings.set(key: "auto_download", value: value);
+                    SettingsData.save();
+                  });
                 },
-                trailing: const Icon(Icons.keyboard_arrow_right),
+                title: Text(Language.getText("auto_download")),
+                activeSwitchColor: CustomColors.getColor("accent"),
+                description: Text(Language.getText("auto_download_description")),
               )
-            ]
+            ],
           )
         ],
       ),
     );
   }
-
-
 }

@@ -11,13 +11,14 @@ class SettingsData {
     "theme": "light",
     "useAudioSession": true,
     "repeatMode": "none",
+    "auto_download": false,
   };
   static Future<void> init() async {
     settings = await ConfigFile(File("$localPath/settings.json"), defaultData).load();
   }
 
   static Future<void> save() async {
-    settings.save();
+    await settings.save();
   }
 
   static Future<void> applySettings() async {

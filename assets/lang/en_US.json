@@ -5,5 +5,9 @@
   "launch_url_error": "The URL is not valid.",
   "export_as_mp3": "Export as MP3",
   "open_in_youtube": "Open in YouTube",
-  "refresh_all": "Refresh all songs"
+  "refresh_all": "Refresh all songs",
+  "useful_functions": "Useful Functions",
+  "general_settings": "General Settings",
+  "auto_download": "Auto Download",
+  "auto_download_description": "Download songs automatically when you add them to the queue."
 }

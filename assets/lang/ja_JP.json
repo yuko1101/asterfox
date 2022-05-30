@@ -5,5 +5,9 @@
   "launch_url_error": "指定されたURLを開くことが出来ませんでした",
   "export_as_mp3": "MP3としてエクスポート",
   "open_in_youtube": "YouTubeで開く",
-  "refresh_all": "キューの再読み込み"
+  "refresh_all": "キューの再読み込み",
+  "useful_functions": "便利機能",
+  "general_settings": "基本設定",
+  "auto_download": "自動ダウンロード",
+  "auto_download_description": "曲の追加時に自動的にダウンロードします"
 }
