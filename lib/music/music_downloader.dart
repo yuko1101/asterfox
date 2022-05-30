@@ -24,17 +24,14 @@ class MusicDownloader {
     downloadProgress[song.key] ??= ValueNotifier<int>(0);
     downloading.value = [...downloading.value, song.key];
 
-    print("a");
-
     if (song is YouTubeMusicData) {
-      print("b");
       await _downloadFromYouTube(song);
     } else {
       await _downloadMp3(song.url, song.savePath, song.key);
     }
     song.url = song.savePath;
 
-    final imagePath = "$localPath/images/${LocalMusicsData.getSongId(song)}.png";
+    final imagePath = "$localPath/images/${song.audioId}.png";
     await _saveImage(song, imagePath);
 
     song.imageUrls = [imagePath];

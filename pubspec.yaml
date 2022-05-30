@@ -60,6 +60,10 @@ dependencies:
 
   settings_ui: ^2.0.2
 
+
+  # Below are the dependencies for debugging, and don't need to be included in the release.
+  colored_json: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

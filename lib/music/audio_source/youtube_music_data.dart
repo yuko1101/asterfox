@@ -22,6 +22,7 @@ class YouTubeMusicData extends MusicData {
             author: author,
             keywords: keywords,
             url: url,
+            audioId: id,
             duration: duration,
             isLocal: isLocal,
             volume: volume);

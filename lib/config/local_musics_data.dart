@@ -25,7 +25,7 @@ class LocalMusicsData {
 
     if (!song.isLocal) {
       song.isLocal = true;
-      await musicData.set(key: getSongId(song), value: song.toJson()).save(compact: _compact);
+      await musicData.set(key: song.audioId, value: song.toJson()).save(compact: _compact);
     }
   }
 
@@ -45,9 +45,9 @@ class LocalMusicsData {
     return MusicData.fromJson(data, true);
   }
 
-  static String getSongId(MusicData song) {
-    if (song is YouTubeMusicData) return song.id;
-    return song.key;
+  static bool isSaved({MusicData? song, String? audioId}) {
+    if (song == null && audioId == null) throw ArgumentError("song or audioId must be not null");
+    return musicData.has(song?.audioId ?? audioId!);
   }
 
   static final _httpRegex = RegExp(r'^https?:\/\/.+$');
@@ -62,7 +62,7 @@ class LocalMusicsData {
         if (file.existsSync()) await file.delete();
       }
     }();
-    musicData.delete(key: getSongId(song));
+    musicData.delete(key: song.audioId);
     final futures = [file.delete(), imageDelete, saveData()];
     await Future.wait(futures);
   }

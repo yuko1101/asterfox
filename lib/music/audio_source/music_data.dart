@@ -16,6 +16,7 @@ class MusicData {
     required this.author,
     required this.keywords,
     required this.url,
+    required this.audioId,
     required this.duration,
     required this.isLocal,
     required this.volume,
@@ -30,6 +31,7 @@ class MusicData {
   final String author;
   final List<String> keywords;
   String url; // can be changed if the url is expired (especially for YouTube), or the song saved locally.
+  late String audioId;
   Duration duration; // can be changed on clip-cut
   bool isLocal; // can be changed on save to local
   double volume; // can be changed on volume change
@@ -69,6 +71,7 @@ class MusicData {
       'title': title,
       'description': description,
       'author': author,
+      'audioId': audioId,
       'duration': duration.inMilliseconds,
       'keywords': keywords,
       'volume': volume,
@@ -94,6 +97,7 @@ class MusicData {
           title: json['title'] as String,
           description: json['description'] as String,
           author: json['author'] as String,
+          audioId: json['audioId'] as String,
           duration: Duration(milliseconds: json['duration'] as int),
           isLocal: local,
           keywords: (json['keywords'] as List).map((e) => e as String).toList(),
