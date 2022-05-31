@@ -9,9 +9,46 @@ import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/util/in_app_notification/notification_data.dart';
 import 'package:asterfox/util/youtube_music_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSongByID(String id) async {
+    if (SettingsData.getValue(key: "auto_download")) {
+      final completer = Completer();
+      final songKey = const Uuid().v4();
+      downloadProgress[songKey] = ValueNotifier<int>(0);
+      homeNotification.pushNotification(
+        NotificationData(
+            child: ValueListenableBuilder<int>(
+              valueListenable: downloadProgress[songKey]!,
+              builder: (_, percentage, __) => Column(
+                children: [
+                  const Text("自動ダウンロード中"),
+                  SizedBox(
+                    width: 100,
+                    child: LinearProgressIndicator(
+                      minHeight: 8,
+                      value: percentage / 100,
+                      color: CustomColors.getColor("accent"),
+                      backgroundColor: CustomColors.getColor("accent").withOpacity(0.1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            progress: () async {
+              final YouTubeMusicData song = (await YouTubeMusicUtils.getYouTubeAudio(id, key: songKey))!;
+              await song.save();
+              await musicManager.add(song);
+              completer.complete();
+            }
+        ),
+      );
+      return completer.future;
+    }
+
+    // <normal add>
+
     final completer = Completer();
     homeNotification.pushNotification(
         NotificationData(
@@ -28,9 +65,6 @@ class HomeScreenMusicManager {
             ),
             progress: () async {
               final YouTubeMusicData song = (await YouTubeMusicUtils.getYouTubeAudio(id))!;
-              if (SettingsData.getValue(key: "auto_download")) {
-                await download(song);
-              }
               await musicManager.add(song);
               completer.complete();
             }
@@ -44,7 +78,7 @@ class HomeScreenMusicManager {
   }
 
   /// Download a song with progress indicator notification
-  static Future<void> download(MusicData song) async {
+  static Future<void> download(MusicData song, ) async {
     final completer = Completer();
     downloadProgress[song.key] = ValueNotifier<int>(0);
     homeNotification.pushNotification(

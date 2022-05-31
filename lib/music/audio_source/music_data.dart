@@ -20,8 +20,9 @@ class MusicData {
     required this.duration,
     required this.isLocal,
     required this.volume,
+    String? key,
   }) {
-    key = const Uuid().v4();
+    this.key = key ?? const Uuid().v4();
     _created.add(this);
 }
   final MusicType type;

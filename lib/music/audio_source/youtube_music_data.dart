@@ -13,7 +13,8 @@ class YouTubeMusicData extends MusicData {
       required String url,
       required Duration duration,
       required bool isLocal,
-      required double volume})
+      required double volume,
+      String? key})
       : super(
             type: MusicType.youtube,
             imageUrls: imageUrls,
@@ -25,7 +26,8 @@ class YouTubeMusicData extends MusicData {
             audioId: id,
             duration: duration,
             isLocal: isLocal,
-            volume: volume);
+            volume: volume,
+            key: key);
 
   final String id;
   final String authorId;

@@ -44,7 +44,7 @@ class YouTubeMusicUtils {
     }
   }
 
-  static Future<YouTubeMusicData?> getYouTubeAudio(String videoId) async {
+  static Future<YouTubeMusicData?> getYouTubeAudio(String videoId, {String? key}) async {
     // 曲が保存されているかどうか
     bool local = await isLocal(videoId);
     if (local) {
@@ -90,6 +90,7 @@ class YouTubeMusicUtils {
           keywords: video.keywords,
           volume: 1.0,
           imageUrls: [video.thumbnails.maxResUrl, video.thumbnails.highResUrl],
+          key: key
       );
 
     }
