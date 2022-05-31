@@ -72,13 +72,16 @@ class MoreActionsButton extends StatelessWidget {
                   context: context,
                   backgroundColor: Colors.transparent,
                   enableDrag: true,
-                  builder: (context) => SingleChildScrollView(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          color: Theme.of(context).backgroundColor),
-                      margin: const EdgeInsets.only(left: 10, right: 10),
+                  builder: (context) => Container(
+                    margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                    child: Material(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      // 一番下のListTileの角が丸まらないのを直す
+                      clipBehavior: Clip.antiAlias,
+                      color: Theme.of(context).backgroundColor,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             decoration: BoxDecoration(
@@ -89,7 +92,13 @@ class MoreActionsButton extends StatelessWidget {
                             height: 5,
                             width: 40,
                           ),
-                          ..._actions.where((action) => action.songFilter(song))
+                          SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: Column(
+                              children: _actions.where((action) => action.songFilter(song)).toList(),
+
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -118,10 +127,15 @@ class _Action extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      onTap: () => onTap(context)
+    return InkWell(
+      onTap: () {},
+      autofocus: true,
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        onTap: () => onTap(context),
+        tileColor: Theme.of(context).backgroundColor,
+      ),
     );
   }
 }
