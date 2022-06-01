@@ -3,6 +3,7 @@ import 'package:asterfox/screen/screens/debug_screen.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/screen/screens/main_screen.dart';
 import 'package:asterfox/screen/screens/settings/settings_screen.dart';
+import 'package:asterfox/system/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class SideMenu extends StatelessWidget {
@@ -102,10 +103,10 @@ class DrawerListTile extends StatelessWidget {
         child: ListTile(
           onTap: onPressed,
           horizontalTitleGap: 0.0,
-          leading: Icon(icon, color: Theme.of(context).textTheme.headline3!.color),
+          leading: Icon(icon, color: Theme.of(context).extraColors.secondary),
           title: Text(
             title,
-            style: TextStyle(color: Theme.of(context).textTheme.headline3!.color),
+            style: TextStyle(color: Theme.of(context).extraColors.secondary),
           ),
         ),
       ),

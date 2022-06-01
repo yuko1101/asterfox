@@ -25,6 +25,7 @@ class PlaylistWidget extends StatefulWidget {
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   @override
   Widget build(BuildContext context) {
+
     return SizedBox(
       child: SingleChildScrollView(
         padding: widget.padding,
@@ -35,7 +36,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               song: widget.songs[index],
               playing: widget.songs[index].key == widget.playing?.key,
               key: Key(widget.songs[index].key),
-              linked: widget.linked
+              linked: widget.linked,
+              cardIndex: index,
           ),
           itemCount: widget.songs.length,
           onReorder: (oldIndex, newIndex) {

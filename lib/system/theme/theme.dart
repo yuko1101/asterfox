@@ -1,4 +1,6 @@
 import 'package:asterfox/config/settings_data.dart';
+import 'package:asterfox/system/theme/extra_colors.dart';
+import 'package:asterfox/system/theme/theme_options.dart';
 import 'package:asterfox/util/color_util.dart';
 import 'package:flutter/material.dart';
 
@@ -10,12 +12,17 @@ class AppTheme {
     brightness: Brightness.light,
     appBarTheme: const AppBarTheme(color: Colors.white, foregroundColor: Colors.black),
     backgroundColor: Colors.white,
-    textTheme: TextTheme(
-      headline1: const TextStyle(color: Colors.black), // bright
 
-      headline3: TextStyle(color: getGrey(45)), // middle
-      headline5: TextStyle(color: getGrey(255))
-    )
+    extensions: <ThemeExtension<dynamic>>[
+      ExtraColors(
+          primary: getGrey(0),
+          secondary: getGrey(45),
+          tertiary: getGrey(100),
+          quaternary: getGrey(150),
+          themeColor: getGrey(255)
+      ),
+      ThemeOptions(isShadowed: ShadowLevel.high)
+    ]
   );
 
   static ThemeData dark = ThemeData(
@@ -25,13 +32,18 @@ class AppTheme {
     backgroundColor: getGrey(20),
     scaffoldBackgroundColor: getGrey(20),
     dialogBackgroundColor: getGrey(20),
-    textTheme: TextTheme(
-      headline3: TextStyle(color: getGrey(200)), // middle
-      headline4: TextStyle(color: getGrey(100)),
-      headline5: TextStyle(color: getGrey(30))
-    ),
     focusColor: Colors.orange,
 
+    extensions: <ThemeExtension<dynamic>>[
+      ExtraColors(
+        primary: getGrey(255),
+        secondary: getGrey(200),
+        tertiary: getGrey(100),
+        quaternary: getGrey(30),
+        themeColor: getGrey(0),
+      ),
+      ThemeOptions(isShadowed: ShadowLevel.low)
+    ]
 
   );
 
@@ -50,4 +62,9 @@ class AppTheme {
     themeNotifier.value = theme;
     await SettingsData.settings.set(key: "theme", value: theme).save();
   }
+}
+
+extension ThemeExtensionGetter on ThemeData {
+  ExtraColors get extraColors => extensions.values.firstWhere((e) => e is ExtraColors) as ExtraColors;
+  ThemeOptions get themeOptions => extensions.values.firstWhere((e) => e is ThemeOptions) as ThemeOptions;
 }
