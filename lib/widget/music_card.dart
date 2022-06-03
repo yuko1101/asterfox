@@ -1,6 +1,7 @@
 import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/system/theme/theme_options.dart';
 import 'package:asterfox/util/color_util.dart';
@@ -70,7 +71,13 @@ class MusicCardWidget extends StatelessWidget {
             child: ListTile(
               title: Text(song.title),
               onTap: onTap,
-              trailing: playing ? const Icon(Icons.play_arrow_outlined) : null,
+              trailing: playing ? SizedBox(width: 20, height: 20, child: ValueListenableBuilder<PlayingState>(
+                valueListenable: musicManager.playingStateNotifier,
+                builder: (context, value, child) {
+                  return value == PlayingState.playing ? const Image(image: AssetImage("assets/images/playing.gif"), fit: BoxFit.cover)
+                    : const Icon(Icons.pause);
+                }
+              )) : null,
               tileColor: Theme.of(context).extraColors.quaternary,
 
             ),
