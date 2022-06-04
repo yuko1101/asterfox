@@ -15,15 +15,22 @@ class MainScreen extends StatelessWidget {
           if (Responsive.isDesktop(context)) {
             return Scaffold(
               resizeToAvoidBottomInset: false,
-              body: Row(children: [const SideMenu(), Expanded(child: baseScreen.screen,), baseScreen.endDrawer ?? const SizedBox(width: 0, height: 0)], mainAxisAlignment: MainAxisAlignment.start),
+              body: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SideMenu(),
+                    Expanded(child: baseScreen.screen),
+                    baseScreen.endDrawer ?? const SizedBox(width: 0, height: 0)
+                  ],
+              ),
             );
           }
           return Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: baseScreen.appBar,
             body: Column(
-              children: baseScreen.footer != null ? [Expanded(child: baseScreen.screen), baseScreen.footer!] : [Expanded(child: baseScreen.screen)],
               mainAxisAlignment: MainAxisAlignment.end,
+              children: baseScreen.footer != null ? [Expanded(child: baseScreen.screen), baseScreen.footer!] : [Expanded(child: baseScreen.screen)],
             ),
             drawer: const SideMenu(),
             endDrawer: baseScreen.endDrawer,
