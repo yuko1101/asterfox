@@ -1,11 +1,11 @@
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
-import 'package:asterfox/screen/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
 class PageManager {
 
   static List<BaseScreen> pages = [];
+  static ValueNotifier<BaseScreen> screenNotifier = ValueNotifier<BaseScreen>(HomeScreen());
 
   static bool goBack(BuildContext context) {
     if (screenNotifier.value is HomeScreen) return false;

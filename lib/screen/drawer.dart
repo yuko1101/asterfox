@@ -44,7 +44,7 @@ class SideMenu extends StatelessWidget {
                           title: "Home",
                           icon: Icons.home,
                           onPressed: () {
-                            if (screenNotifier.value is HomeScreen) return;
+                            if (PageManager.screenNotifier.value is HomeScreen) return;
                             PageManager.pushPage(context, HomeScreen(), close: true);
                           }
                         ),
@@ -62,7 +62,7 @@ class SideMenu extends StatelessWidget {
                           title: "Settings",
                           icon: Icons.settings,
                           onPressed: () {
-                            if (screenNotifier.value is SettingsScreen) return;
+                            if (PageManager.screenNotifier.value is SettingsScreen) return;
                             PageManager.pushPage(context, SettingsScreen(), close: true);
                           }
                         ),
@@ -70,7 +70,7 @@ class SideMenu extends StatelessWidget {
                           title: "Debug",
                           icon: Icons.bug_report,
                           onPressed: () {
-                            if (screenNotifier.value is DebugScreen) return;
+                            if (PageManager.screenNotifier.value is DebugScreen) return;
                             PageManager.pushPage(context, const DebugScreen(), close: true);
                           }
                         )

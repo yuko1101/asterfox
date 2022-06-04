@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
-import 'package:asterfox/util/config_file.dart';
+import 'package:asterfox/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
 
 

@@ -1,4 +1,4 @@
-import 'package:asterfox/util/responsive.dart';
+import 'package:asterfox/utils/responsive.dart';
 import 'package:asterfox/widget/music_widgets/more_actions_button.dart';
 import 'package:flutter/material.dart';
 

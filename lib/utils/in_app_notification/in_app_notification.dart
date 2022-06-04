@@ -1,4 +1,4 @@
-import 'package:asterfox/util/in_app_notification/notification_widget.dart';
+import 'package:asterfox/utils/in_app_notification/notification_widget.dart';
 import 'package:flutter/material.dart';
 import 'notification_data.dart';
 

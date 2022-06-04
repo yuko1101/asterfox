@@ -1,6 +1,6 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
-import 'package:asterfox/util/youtube_music_utils.dart';
+import 'package:asterfox/utils/youtube_music_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';

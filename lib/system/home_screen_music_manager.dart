@@ -6,8 +6,8 @@ import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
-import 'package:asterfox/util/in_app_notification/notification_data.dart';
-import 'package:asterfox/util/youtube_music_utils.dart';
+import 'package:asterfox/utils/in_app_notification/notification_data.dart';
+import 'package:asterfox/utils/youtube_music_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 

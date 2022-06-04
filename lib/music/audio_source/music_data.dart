@@ -1,7 +1,7 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
-import 'package:asterfox/util/network_util.dart';
+import 'package:asterfox/utils/network_util.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';

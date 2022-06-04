@@ -4,7 +4,7 @@ import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/system/theme/theme_options.dart';
-import 'package:asterfox/util/color_util.dart';
+import 'package:asterfox/utils/color_util.dart';
 import 'package:flutter/material.dart';
 
 class MusicCardWidget extends StatelessWidget {

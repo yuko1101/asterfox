@@ -1,5 +1,5 @@
 import 'package:asterfox/config/custom_colors.dart';
-import 'package:asterfox/util/in_app_notification/notification_data.dart';
+import 'package:asterfox/utils/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
 
 class NotificationWidget extends StatelessWidget {

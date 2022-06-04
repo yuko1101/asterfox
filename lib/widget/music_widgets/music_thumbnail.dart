@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/util/network_util.dart';
+import 'package:asterfox/utils/network_util.dart';
 import 'package:flutter/material.dart';
 
 final Image defaultImage = Image.asset("assets/images/asterfox.png");

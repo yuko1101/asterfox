@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
-import 'package:asterfox/util/logger.dart';
-import 'package:asterfox/util/network_util.dart';
+import 'package:asterfox/utils/logger.dart';
+import 'package:asterfox/utils/network_util.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 class YouTubeMusicUtils {

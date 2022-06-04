@@ -1,11 +1,8 @@
-import 'package:asterfox/main.dart';
 import 'package:asterfox/screen/base_screen.dart';
 import 'package:asterfox/screen/drawer.dart';
-import 'package:asterfox/util/responsive.dart';
+import 'package:asterfox/screen/page_manager.dart';
+import 'package:asterfox/utils/responsive.dart';
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-
-ValueNotifier<BaseScreen> screenNotifier = ValueNotifier<BaseScreen>(HomeScreen());
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -13,7 +10,7 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<BaseScreen>(
-        valueListenable: screenNotifier,
+        valueListenable: PageManager.screenNotifier,
         builder: (_, baseScreen, __) {
           if (Responsive.isDesktop(context)) {
             return Scaffold(

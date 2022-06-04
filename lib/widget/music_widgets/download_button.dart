@@ -5,7 +5,7 @@ import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/screen/screens/home_screen.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
-import 'package:asterfox/util/in_app_notification/notification_data.dart';
+import 'package:asterfox/utils/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 

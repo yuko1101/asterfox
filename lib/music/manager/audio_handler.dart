@@ -1,6 +1,6 @@
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
-import 'package:asterfox/util/os.dart';
+import 'package:asterfox/utils/os.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 

@@ -2,7 +2,7 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'dart:io';
 
-import 'package:asterfox/util/config_file.dart';
+import 'package:asterfox/utils/config_file.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 
 class SettingsData {
