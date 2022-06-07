@@ -99,7 +99,7 @@ class AudioDataManager {
     } else if ([RepeatState.one, RepeatState.all].contains(repeat)) {
       return true;
     }
-    print('hasNext: $current, $max, $indices, ${getCurrentIndex(index, sequence)}');
+    // print('hasNext: $current, $max, $indices, ${getCurrentIndex(index, sequence)}');
     return current < max - 1;
   }
 
