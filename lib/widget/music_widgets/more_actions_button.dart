@@ -92,11 +92,11 @@ class MoreActionsButton extends StatelessWidget {
                             height: 5,
                             width: 40,
                           ),
-                          SingleChildScrollView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            child: Column(
-                              children: _actions.where((action) => action.songFilter(song)).toList(),
-
+                          Flexible(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: _actions.where((action) => action.songFilter(song)).toList(),
+                              ),
                             ),
                           )
                         ],
