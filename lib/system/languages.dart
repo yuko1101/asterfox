@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:asterfox/config/settings_data.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Language {
