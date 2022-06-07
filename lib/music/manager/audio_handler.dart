@@ -221,9 +221,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       var index = _player.currentIndex;
       final newQueue = queue.value;
       if (index == null || newQueue.isEmpty) return;
-      if (_player.shuffleModeEnabled) {
-        index = _player.shuffleIndices![index];
-      }
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
       newQueue[index] = newMediaItem;
@@ -234,11 +231,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   void _listenForCurrentSongIndexChanges() {
     _player.currentIndexStream.listen((index) {
+      print("index:$index");
       final playlist = queue.value;
       if (index == null || playlist.isEmpty) return;
-      if (_player.shuffleModeEnabled) {
-        index = _player.shuffleIndices![index];
-      }
       mediaItem.add(playlist[index]);
     });
   }
@@ -248,7 +243,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
       var sequence = sequenceState?.sequence;
       if (sequence == null || sequence.isEmpty) sequence = [];
-      final List<MusicData> playlist = AudioDataManager.getShuffledPlaylist(sequence, sequenceState?.shuffleModeEnabled ?? false, sequenceState?.shuffleIndices);
+      final List<MusicData> playlist = AudioDataManager.getPlaylist(sequence);
       final items = playlist.map((song) => (song.toMediaItem()));
       // print(items.length.toString() + " added songs");
       setQueueItems(items.toList());
