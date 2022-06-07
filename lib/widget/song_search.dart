@@ -5,7 +5,7 @@ import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/utils/youtube_music_utils.dart';
-import 'package:asterfox/utils/network_util.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 

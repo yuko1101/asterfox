@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/screen/base_screen.dart';
-import 'package:asterfox/screen/page_manager.dart';
 import 'package:colored_json/colored_json.dart';
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/screen/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:asterfox/system/theme/theme.dart';
 
@@ -89,7 +89,7 @@ class DebugAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
-          PageManager.goBack(context);
+          EasyApp.popPage(context);
         },
       ),
     );

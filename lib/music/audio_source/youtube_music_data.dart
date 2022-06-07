@@ -1,5 +1,6 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:easy_app/easy_app.dart';
 
 class YouTubeMusicData extends MusicData {
   YouTubeMusicData(
@@ -33,7 +34,7 @@ class YouTubeMusicData extends MusicData {
   final String authorId;
 
   @override
-  String get savePath => "$localPath/music/yt_$id.mp3";
+  String get savePath => "${EasyApp.localPath}/music/yt_$id.mp3";
 
   @override
   String get mediaURL => "https://www.youtube.com/watch?v=$id";

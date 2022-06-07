@@ -9,5 +9,8 @@
   "useful_functions": "Useful Functions",
   "general_settings": "General Settings",
   "auto_download": "Auto Download",
-  "auto_download_description": "Download songs automatically when you add them to the queue."
+  "auto_download_description": "Download songs automatically when you add them to the queue.",
+  "network_not_accessible": "Network is not accessible",
+  "network_not_connected": "Network is not connected",
+  "song_unplayable": "Song is not playable"
 }

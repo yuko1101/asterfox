@@ -6,11 +6,11 @@ import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/music/manager/notifiers/data_notifier.dart';
 import 'package:asterfox/music/manager/notifiers/playlist_notifier.dart';
 import 'package:asterfox/music/manager/notifiers/song_notifier.dart';
-import 'package:asterfox/utils/os.dart';
 import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:easy_app/utils/os.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'audio_data_manager.dart';

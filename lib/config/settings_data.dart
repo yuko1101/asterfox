@@ -2,8 +2,9 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'dart:io';
 
-import 'package:asterfox/utils/config_file.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/utils/config_file.dart';
 
 class SettingsData {
   static late ConfigFile settings;
@@ -14,7 +15,7 @@ class SettingsData {
     "auto_download": false,
   };
   static Future<void> init() async {
-    settings = await ConfigFile(File("$localPath/settings.json"), defaultData).load();
+    settings = await ConfigFile(File("${EasyApp.localPath}/settings.json"), defaultData).load();
   }
 
   static Future<void> save() async {

@@ -1,7 +1,7 @@
 import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/main.dart';
-import 'package:asterfox/utils/responsive.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class AudioProgressBar extends StatelessWidget {

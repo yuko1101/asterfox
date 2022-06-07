@@ -1,12 +1,8 @@
 import 'dart:io';
 
-import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/audio_source/youtube_music_data.dart';
-import 'package:asterfox/utils/config_file.dart';
-import 'package:uuid/uuid.dart';
-
-
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/utils/config_file.dart';
 
 class LocalMusicsData {
   static late ConfigFile musicData;
@@ -14,7 +10,7 @@ class LocalMusicsData {
   static const bool _compact = false;
 
   static Future<void> init() async {
-    musicData = await ConfigFile(File("$localPath/music.json"), {}).load();
+    musicData = await ConfigFile(File("${EasyApp.localPath}/music.json"), {}).load();
   }
 
   static Future<void> saveData() async {

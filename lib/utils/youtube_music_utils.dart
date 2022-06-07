@@ -4,7 +4,9 @@ import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/utils/logger.dart';
-import 'package:asterfox/utils/network_util.dart';
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/utils/languages.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 class YouTubeMusicUtils {
@@ -54,7 +56,10 @@ class YouTubeMusicUtils {
 
       // インターネット接続確認
       if (!NetworkUtils.networkAccessible()) {
-        NetworkUtils.showNetworkAccessDeniedMessage();
+        NetworkUtils.showNetworkAccessDeniedMessage(
+          notAccessibleMessage: Language.getText("network_not_accessible"),
+          notConnectedMessage: Language.getText("network_not_connected")
+        );
         return null;
       }
 
@@ -63,7 +68,7 @@ class YouTubeMusicUtils {
       try {
         manifest = await yt.videos.streamsClient.getManifest(videoId);
       } on VideoUnplayableException {
-        Fluttertoast.showToast(msg: "この曲は再生できません");
+        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
         yt.close();
         return null;
       }
@@ -114,7 +119,7 @@ class YouTubeMusicUtils {
 
 
 Future<String> getFilePath(String id) async {
-  final path = localPath;
+  final path = EasyApp.localPath;
   return '$path${Platform.pathSeparator}music${Platform.pathSeparator}yt_$id.mp3';
 }
 

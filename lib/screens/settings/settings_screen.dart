@@ -1,11 +1,10 @@
 import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/config/settings_data.dart';
-import 'package:asterfox/screen/base_screen.dart';
-import 'package:asterfox/screen/page_manager.dart';
-import 'package:asterfox/screen/screens/home_screen.dart';
-import 'package:asterfox/screen/screens/settings/theme_settings_screen.dart';
-import 'package:asterfox/system/languages.dart';
+import 'package:asterfox/screens/settings/theme_settings_screen.dart';
 import 'package:asterfox/system/theme/theme.dart';
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/screen/base_screen.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -29,7 +28,7 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget {
     return AppBar(
       title: Text(Language.getText("settings")),
       leading: IconButton(
-        onPressed: () => PageManager.goBack(context),
+        onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
         tooltip: "戻る",
       ),
@@ -57,7 +56,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   title: Text(Language.getText("theme")),
                   description: Text(AppTheme.themeNames.values.join("、")),
                   onPressed: (context) {
-                    PageManager.pushPage(context, ThemeSettingsScreen());
+                    EasyApp.pushPage(context, ThemeSettingsScreen());
                   },
                   trailing: const Icon(Icons.keyboard_arrow_right),
                 )

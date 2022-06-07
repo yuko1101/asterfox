@@ -1,8 +1,9 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
-import 'package:asterfox/utils/network_util.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
@@ -54,7 +55,7 @@ class MusicData {
 
   String get mediaURL => url;
 
-  String get savePath => "$localPath/music/$key.mp3";
+  String get savePath => "${EasyApp.localPath}/music/$key.mp3";
 
   void destroy() {
     _created.remove(this);

@@ -5,11 +5,12 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
-import 'package:asterfox/screen/screens/home_screen.dart';
-import 'package:asterfox/utils/in_app_notification/notification_data.dart';
 import 'package:asterfox/utils/youtube_music_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:easy_app/utils/in_app_notification/notification_data.dart';
+
+import '../screens/home_screen.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSongByID(String id) async {

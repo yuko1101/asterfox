@@ -12,6 +12,9 @@ class AppTheme {
     brightness: Brightness.light,
     appBarTheme: const AppBarTheme(color: Colors.white, foregroundColor: Colors.black),
     backgroundColor: Colors.white,
+    drawerTheme: const DrawerThemeData(
+        backgroundColor: Colors.white
+    ),
 
     extensions: <ThemeExtension<dynamic>>[
       ExtraColors(
@@ -33,6 +36,9 @@ class AppTheme {
     scaffoldBackgroundColor: getGrey(20),
     dialogBackgroundColor: getGrey(20),
     focusColor: Colors.orange,
+    drawerTheme: DrawerThemeData(
+      backgroundColor: getGrey(20),
+    ),
 
     extensions: <ThemeExtension<dynamic>>[
       ExtraColors(

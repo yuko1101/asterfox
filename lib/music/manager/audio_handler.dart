@@ -1,7 +1,7 @@
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
-import 'package:asterfox/utils/os.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
@@ -34,7 +34,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   // In this simple example, we handle only 4 actions: play, pause, seek and
-  // stop. Any button press from the Flutter UI, notification, lock screen or
+  // stop. Any button press from the Flutter UI, notification, lock screens or
   // headset will be routed through to these 4 methods so that you can handle
   // your audio playback logic in one place.
 

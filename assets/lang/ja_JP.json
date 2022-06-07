@@ -9,5 +9,8 @@
   "useful_functions": "便利機能",
   "general_settings": "基本設定",
   "auto_download": "自動ダウンロード",
-  "auto_download_description": "曲の追加時に自動的にダウンロードします"
+  "auto_download_description": "曲の追加時に自動的にダウンロードします",
+  "network_not_accessible": "ネットワークにアクセス出来ません",
+  "network_not_connected": "ネットワークに接続されていません",
+  "song_unplayable": "この曲を再生することが出来ません"
 }

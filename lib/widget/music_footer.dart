@@ -1,5 +1,5 @@
-import 'package:asterfox/utils/responsive.dart';
 import 'package:asterfox/widget/music_widgets/more_actions_button.dart';
+import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 import 'music_widgets/audio_progress_bar.dart';

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
+import 'package:easy_app/easy_app.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:asterfox/main.dart';
@@ -31,7 +32,7 @@ class MusicDownloader {
     }
     song.url = song.savePath;
 
-    final imagePath = "$localPath/images/${song.audioId}.png";
+    final imagePath = "${EasyApp.localPath}/images/${song.audioId}.png";
     await _saveImage(song, imagePath);
 
     song.imageUrls = [imagePath];

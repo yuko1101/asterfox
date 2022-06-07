@@ -1,45 +1,53 @@
 import 'dart:async';
-
 import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/config/settings_data.dart';
-import 'package:asterfox/screen/page_manager.dart';
-import 'package:asterfox/screen/screens/main_screen.dart';
-import 'package:asterfox/system/languages.dart';
+import 'package:asterfox/screens/debug_screen.dart';
+import 'package:asterfox/screens/home_screen.dart';
+import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/utils/network_util.dart';
-import 'package:asterfox/utils/os.dart';
-import 'package:asterfox/utils/youtube_music_utils.dart';
+import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/screen/drawer.dart';
+import 'package:easy_app/screen/main_screen.dart';
+import 'package:easy_app/utils/os.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:path_provider/path_provider.dart';
 import 'music/manager/music_manager.dart';
 
 late final MusicManager musicManager;
-late final String localPath;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (OS.getOS() != OSType.web) localPath = (await getApplicationDocumentsDirectory()).path;
+  await EasyApp.initializePath();
+
   await SettingsData.init();
   SettingsData.applySettings();
-  NetworkUtils.init();
 
   musicManager = MusicManager(true);
   await musicManager.init();
+
+  await EasyApp.initialize(
+    homeScreen: HomeScreen(),
+    languages: [
+      "ja_JP",
+      "en_US",
+    ],
+    activateConnectionChecker: true
+  );
+
+
+
   await SettingsData.applyMusicManagerSettings();
   await LocalMusicsData.init();
   await CustomColors.load();
-  await Language.init();
 
   init();
   runApp(const AsterfoxApp());
 }
 
 void init() async {
-  debugPrint("localPath: $localPath");
-  if (OS.getOS() != OSType.windows) {
+  debugPrint("localPath: ${EasyApp.localPath}");
+  if (OS.isMobile()) {
     SharingIntent.init();
   }
 }
@@ -56,10 +64,52 @@ class AsterfoxApp extends StatelessWidget {
         return MaterialApp(
           title: 'Asterfox',
           theme: AppTheme.themes[value],
-          home: WillPopScope(
-            onWillPop: () async => PageManager.goBack(context),
-            child: const MainScreen()
-          ),
+          home: MainScreen(sideMenu: SideMenu(
+            appIcon: Image.asset(
+              "assets/images/asterfox.png",
+              scale: 0.1,
+            ),
+            title: const Text(
+                "Asterfox",
+                textScaleFactor: 1.3
+            ),
+            items: [
+              SideMenuItem(
+                  title: const Text("Home"),
+                  icon: const Icon(Icons.home),
+                  onPressed: () {
+                    if (EasyApp.currentScreen is HomeScreen) return;
+                    EasyApp.pushPage(context, HomeScreen());
+                  }
+              ),
+              SideMenuItem(
+                  title: const Text("Playlist"),
+                  icon: const Icon(Icons.playlist_play),
+                  onPressed: () {}
+              ),
+              SideMenuItem(
+                  title: const Text("Playback"),
+                  icon: const Icon(Icons.replay),
+                  onPressed: () {}
+              ),
+              SideMenuItem(
+                  title: const Text("Settings"),
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    if (EasyApp.currentScreen is SettingsScreen) return;
+                    EasyApp.pushPage(context, SettingsScreen());
+                  }
+              ),
+              SideMenuItem(
+                  title: const Text("Debug"),
+                  icon: const Icon(Icons.bug_report),
+                  onPressed: () {
+                    if (EasyApp.currentScreen is DebugScreen) return;
+                    EasyApp.pushPage(context, const DebugScreen());
+                  }
+              )
+            ],
+          ),),
           debugShowCheckedModeBanner: false,
         );
       },
