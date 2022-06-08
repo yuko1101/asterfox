@@ -18,7 +18,7 @@ class HomeScreenMusicManager {
       final completer = Completer();
       final songKey = const Uuid().v4();
       downloadProgress[songKey] = ValueNotifier<int>(0);
-      homeNotification.pushNotification(
+      HomeScreen.homeNotification.pushNotification(
         NotificationData(
             child: ValueListenableBuilder<int>(
               valueListenable: downloadProgress[songKey]!,
@@ -51,7 +51,7 @@ class HomeScreenMusicManager {
     // <normal add>
 
     final completer = Completer();
-    homeNotification.pushNotification(
+    HomeScreen.homeNotification.pushNotification(
         NotificationData(
             child: Row(
               children: const [
@@ -82,7 +82,7 @@ class HomeScreenMusicManager {
   static Future<void> download(MusicData song, ) async {
     final completer = Completer();
     downloadProgress[song.key] = ValueNotifier<int>(0);
-    homeNotification.pushNotification(
+    HomeScreen.homeNotification.pushNotification(
       NotificationData(
           child: ValueListenableBuilder<int>(
             valueListenable: downloadProgress[song.key]!,

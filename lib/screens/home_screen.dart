@@ -1,3 +1,4 @@
+import 'package:asterfox/config/custom_colors.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
@@ -9,9 +10,11 @@ import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:flutter/material.dart';
 
 
-final homeNotification = InAppNotification();
+
 
 class HomeScreen extends BaseScreen {
+  static late InAppNotification homeNotification;
+
   HomeScreen() : super(
     screen: Stack(
       children: [
