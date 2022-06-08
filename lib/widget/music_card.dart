@@ -69,7 +69,7 @@ class MusicCardWidget extends StatelessWidget {
             ),
             onTap: () {},
             child: ListTile(
-              title: Text("${song.title} shuffled: ${musicManager.audioDataManager.shuffledPlaylist.indexWhere((element) => element.key == song.key)}, normal: ${musicManager.audioDataManager.playlist.indexWhere((element) => element.key == song.key)}, ${musicManager.audioDataManager.shuffledIndices}"),
+              title: Text(song.title),
               onTap: onTap,
               trailing: playing ? SizedBox(width: 20, height: 20, child: ValueListenableBuilder<PlayingState>(
                 valueListenable: musicManager.playingStateNotifier,

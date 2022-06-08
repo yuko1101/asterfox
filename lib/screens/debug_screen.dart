@@ -93,6 +93,7 @@ class DebugMainScreen extends StatelessWidget {
                           return ListTile(
                             key: Key(songs[index].key),
                             title: Text(songs[index].title),
+                            // title: Text("${songs[index].title}  shuffled: ${musicManager.audioDataManager.shuffledPlaylist.indexWhere((element) => element.key == songs[index].key)}, normal: ${musicManager.audioDataManager.playlist.indexWhere((element) => element.key == songs[index].key)}, ${musicManager.audioDataManager.shuffledIndices}"),
                             subtitle: Text(songs[index].author),
                             leading: SizedBox(
                               height: 50,
