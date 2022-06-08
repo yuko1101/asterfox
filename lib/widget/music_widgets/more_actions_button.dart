@@ -1,3 +1,4 @@
+import 'package:asterfox/config/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
@@ -47,6 +48,35 @@ class MoreActionsButton extends StatelessWidget {
         Navigator.pop(context);
       },
       songFilter: (MusicData? song) => song != null,
+    ),
+    _Action(
+        id: "delete_from_local",
+        icon: Icons.delete_forever,
+        title: Language.getText("delete_from_local"),
+        onTap: (context) {
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(Language.getText("delete_from_local")),
+              content: Text(Language.getText("delete_from_local_confirm_message")),
+              actions: [
+                TextButton(
+                  child: Text(Language.getText("cancel")),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: Text(Language.getText("delete")),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    LocalMusicsData.removeFromLocal(musicManager.audioDataManager.currentSong!);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+        songFilter: (MusicData? song) => song != null && LocalMusicsData.isSaved(song: song),
     ),
     _Action(
         id: "refresh_all",

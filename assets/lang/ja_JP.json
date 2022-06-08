@@ -12,5 +12,10 @@
   "auto_download_description": "曲の追加時に自動的にダウンロードします",
   "network_not_accessible": "ネットワークにアクセス出来ません",
   "network_not_connected": "ネットワークに接続されていません",
-  "song_unplayable": "この曲を再生することが出来ません"
+  "song_unplayable": "この曲を再生することが出来ません",
+  "cancel": "キャンセル",
+  "delete": "削除",
+  "ok": "OK",
+  "delete_from_local_confirm_message": "この曲をローカルから削除しますか？",
+  "delete_from_local": "ローカルストレージから削除"
 }
