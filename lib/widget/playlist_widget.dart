@@ -40,17 +40,16 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               cardIndex: index,
           ),
           itemCount: widget.songs.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorder: (oldIndex, newIndex) async {
             if (oldIndex < newIndex) newIndex -= 1;
 
             print("oldIndex: $oldIndex, newIndex: $newIndex");
 
-            final song = widget.songs.removeAt(oldIndex);
-
-
-            if (widget.linked) musicManager.move(oldIndex, newIndex);
-
+            if (widget.linked) await musicManager.move(oldIndex, newIndex);
             setState(() {
+              if (widget.linked) return;
+              // if not linked, need to move the song widget.
+              final song = widget.songs.removeAt(oldIndex);
               widget.songs.insert(newIndex, song);
             });
           }

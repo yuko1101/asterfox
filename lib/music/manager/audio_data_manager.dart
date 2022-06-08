@@ -15,19 +15,22 @@ class AudioDataManager {
   PlayingState get playingState => getPlayingState(audioPlayer.playerState, audioPlayer.sequence);
   ProgressBarState get progress => getProgress(audioPlayer.position, audioPlayer.bufferedPosition, audioPlayer.duration ?? Duration.zero);
   RepeatState get repeatState => getRepeatState(audioPlayer.loopMode);
-  bool get shuffle => audioPlayer.shuffleModeEnabled;
+  bool get shuffled => audioPlayer.shuffleModeEnabled;
   bool get hasNext => getHasNext(audioPlayer.currentIndex, audioPlayer.sequence, audioPlayer.loopMode, audioPlayer.shuffleModeEnabled, audioPlayer.shuffleIndices);
 
+  List<int>? get shuffledIndices => audioPlayer.shuffleIndices;
 
+  int getShuffledIndex(int normalIndex) => AudioDataManager.normalIndexToShuffledIndex(normalIndex, shuffled, shuffledIndices);
+  int getNormalIndex(int shuffledIndex) => AudioDataManager.shuffledIndexToNormalIndex(shuffledIndex, shuffled, shuffledIndices);
 
   static List<MusicData> getPlaylist(List<IndexedAudioSource>? sequence) {
     final playlist = sequence ?? [];
     return playlist.map((audioSource) => audioSource.toMusicData()).toList();
   }
 
-  static List<MusicData> getShuffledPlaylist(List<IndexedAudioSource>? sequence, bool shuffle, List<int>? indices) {
+  static List<MusicData> getShuffledPlaylist(List<IndexedAudioSource>? sequence, bool shuffled, List<int>? indices) {
     final playlist = getPlaylist(sequence);
-    if (!shuffle) {
+    if (!shuffled) {
       return playlist;
     } else {
       if (indices == null) {
@@ -36,7 +39,7 @@ class AudioDataManager {
       // print('shuffledPlaylist: $indices, ${indices.map((index) => index >= playlist.length ? null : playlist[index].title)}');
       // print("shuffled: ${indices.map((index) => index >= playlist.length ? null : playlist[index].title).where((element) => element != null).map((e) => e as String).toList()}");
 
-      // avoid out of range error on delete song (the delay in the shuffled indices causes the error)
+      // avoid out of range error on delete song (maybe the delay in the shuffled indices causes the error)
       return indices.map((index) => index >= playlist.length ? null : playlist[index]).where((element) => element != null).map((e) => e as MusicData).toList();
     }
   }
@@ -46,9 +49,9 @@ class AudioDataManager {
     return index;
   }
 
-  static int? getCurrentShuffledIndex(int? index, List<IndexedAudioSource>? sequence, bool shuffle, List<int>? indices) {
+  static int? getCurrentShuffledIndex(int? index, List<IndexedAudioSource>? sequence, bool suffled, List<int>? indices) {
     final currentIndex = getCurrentIndex(index, sequence);
-    if (!shuffle) return currentIndex;
+    if (!suffled) return currentIndex;
     if (indices == null) return currentIndex;
     if (currentIndex == null) return null;
     return !indices.contains(currentIndex) ? null : indices.indexOf(currentIndex);
@@ -87,10 +90,9 @@ class AudioDataManager {
     return loopModeToRepeatState(loopMode);
   }
 
-  // TODO: support shuffle mode
-  static bool getHasNext(int? index, List<IndexedAudioSource>? sequence, LoopMode loopMode, bool shuffle, List<int>? indices) {
+  static bool getHasNext(int? index, List<IndexedAudioSource>? sequence, LoopMode loopMode, bool shuffled, List<int>? indices) {
     final max = sequence?.length ?? 0;
-    final current = getCurrentShuffledIndex(index, sequence, shuffle, indices);
+    final current = getCurrentShuffledIndex(index, sequence, shuffled, indices);
     final repeat = getRepeatState(loopMode);
     if (max == 0) {
       return false;
@@ -101,6 +103,22 @@ class AudioDataManager {
     }
     // print('hasNext: $current, $max, $indices, ${getCurrentIndex(index, sequence)}');
     return current < max - 1;
+  }
+
+  static int shuffledIndexToNormalIndex(int index, bool shuffled, List<int>? indices) {
+    // if not shuffled, return index
+    if (indices == null || !shuffled) return index;
+
+    print("shuffled: $index to normal: ${indices[index]} by indices: $indices");
+    return indices[index];
+  }
+
+  static int normalIndexToShuffledIndex(int index, bool shuffled, List<int>? indices) {
+    // if not shuffled, return index
+    if (indices == null || !shuffled) return index;
+
+    print("normal: $index to shuffled: ${indices.indexOf(index)} by indices: $indices");
+    return indices.indexOf(index);
   }
 
 }

@@ -165,7 +165,7 @@ class MusicManager {
   }
 
   Future<void> toggleShuffle() async {
-    final enable = !audioDataManager.shuffle;
+    final enable = !audioDataManager.shuffled;
     _audioHandler.setShuffleMode(enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }
 
