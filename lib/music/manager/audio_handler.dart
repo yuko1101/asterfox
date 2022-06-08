@@ -182,10 +182,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
       // move original playlist to be in the same order as the shuffled playlist
       await BubbleSort<MusicData>(
-        compare: (a, b) {
-          print("${shuffledSongs.indexWhere((s) => s.key == a.key)} ${shuffledSongs.indexWhere((s) => s.key == b.key)}");
-          return shuffledSongs.indexWhere((s) => s.key == a.key) - shuffledSongs.indexWhere((s) => s.key == b.key);
-        },
+        compare: (a, b) => shuffledSongs.indexWhere((s) => s.key == a.key) - shuffledSongs.indexWhere((s) => s.key == b.key),
         move: (currentIndex, newIndex) async {
           await _playlist.move(currentIndex, newIndex);
           final move = copy.removeAt(currentIndex);
@@ -193,7 +190,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
           return copy;
         }
       ).sort(songs, (song) => shuffledSongs.indexWhere((s) => s.key == song.key));
-      print("${copy.map((e) => e.title)}");
 
     } else {
       await _playlist.move(currentIndex, newIndex);
