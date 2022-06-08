@@ -24,7 +24,7 @@ class MusicThumbnail extends StatelessWidget {
             width: 80,
             child: FittedBox(
               fit: BoxFit.contain,
-              child: _ImageWidget(song?.imageUrls ?? []),
+              child: MusicImageWidget(song?.imageUrls ?? []),
             ),
           );
         },
@@ -32,8 +32,8 @@ class MusicThumbnail extends StatelessWidget {
   }
 }
 
-class _ImageWidget extends StatelessWidget {
-  const _ImageWidget(this.images, {Key? key}) : super(key: key);
+class MusicImageWidget extends StatelessWidget {
+  const MusicImageWidget(this.images, {Key? key}) : super(key: key);
   final List<String> images;
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class _ImageWidget extends StatelessWidget {
     }
     if (_httpRegex.hasMatch(images[0])) {
       if (!NetworkUtils.networkAccessible()) return defaultImage;
-      return Image.network(images[0], errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) => _ImageWidget(images.sublist(1)));
+      return Image.network(images[0], errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) => MusicImageWidget(images.sublist(1)));
     }
     return Image.file(File(images[0]));
   }

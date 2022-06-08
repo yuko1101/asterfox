@@ -10,6 +10,7 @@ class PlaylistWidget extends StatefulWidget {
     this.playing,
     this.linked = false,
     this.padding,
+    this.songWidgetBuilder,
     Key? key
   }) : super(key: key);
 
@@ -17,6 +18,7 @@ class PlaylistWidget extends StatefulWidget {
   final MusicData? playing;
   final bool linked;
   final EdgeInsetsGeometry? padding;
+  final Widget Function(BuildContext, int)? songWidgetBuilder;
 
   @override
   _PlaylistWidgetState createState() => _PlaylistWidgetState();
@@ -32,7 +34,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         child: ReorderableListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => MusicCardWidget(
+          itemBuilder: widget.songWidgetBuilder ?? (context, index) => MusicCardWidget(
               song: widget.songs[index],
               playing: widget.songs[index].key == widget.playing?.key,
               key: Key(widget.songs[index].key),
