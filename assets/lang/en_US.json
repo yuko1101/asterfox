@@ -17,5 +17,8 @@
   "delete": "Delete",
   "ok": "OK",
   "delete_from_local_confirm_message": "Are you sure you want to delete this song from your local storage?",
-  "delete_from_local": "Delete from local storage"
+  "delete_from_local": "Delete from local storage",
+  "song_history": "Song History",
+  "go_back": "Go back",
+  "no_song_history": "No song history"
 }

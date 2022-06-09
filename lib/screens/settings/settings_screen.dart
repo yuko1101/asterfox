@@ -30,7 +30,7 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget {
       leading: IconButton(
         onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
-        tooltip: "戻る",
+        tooltip: Language.getText("go_back"),
       ),
     );
   }

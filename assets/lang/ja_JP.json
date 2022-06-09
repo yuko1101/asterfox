@@ -17,5 +17,8 @@
   "delete": "削除",
   "ok": "OK",
   "delete_from_local_confirm_message": "この曲をローカルから削除しますか？",
-  "delete_from_local": "ローカルストレージから削除"
+  "delete_from_local": "ローカルストレージから削除",
+  "song_history": "再生履歴",
+  "go_back": "戻る",
+  "no_song_history": "再生履歴はありません",
 }

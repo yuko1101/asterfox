@@ -31,7 +31,7 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget {
       leading: IconButton(
         onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
-        tooltip: "戻る",
+        tooltip: Language.getText("go_back"),
       ),
     );
   }
@@ -51,7 +51,7 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
     return SettingsList(
       sections: [
         SettingsSection(
-            title: const Text("テーマ"),
+            title: Text(Language.getText("theme")),
             tiles: AppTheme.themes.keys.map((key) =>
                 RadioListTile(
                   title: Text(AppTheme.themeNames[key]!),
