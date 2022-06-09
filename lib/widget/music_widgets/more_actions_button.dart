@@ -1,4 +1,4 @@
-import 'package:asterfox/config/local_musics_data.dart';
+import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';

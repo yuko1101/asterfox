@@ -1,4 +1,4 @@
-import 'package:asterfox/config/custom_colors.dart';
+import 'package:asterfox/data/custom_colors.dart';
 import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screen.dart';

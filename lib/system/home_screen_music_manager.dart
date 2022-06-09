@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:asterfox/config/custom_colors.dart';
-import 'package:asterfox/config/settings_data.dart';
+import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';

@@ -1,4 +1,4 @@
-import 'package:asterfox/config/settings_data.dart';
+import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/system/theme/extra_colors.dart';
 import 'package:asterfox/system/theme/theme_options.dart';
 import 'package:asterfox/utils/color_util.dart';

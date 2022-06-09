@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:asterfox/main.dart';
 import 'package:http/http.dart';
 import 'package:flutter/foundation.dart';
-import 'package:asterfox/config/local_musics_data.dart';
+import 'package:asterfox/data/local_musics_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 

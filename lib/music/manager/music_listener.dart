@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:asterfox/config/settings_data.dart';
+import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:asterfox/music/manager/audio_handler.dart';

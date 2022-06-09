@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:asterfox/config/custom_colors.dart';
-import 'package:asterfox/config/local_musics_data.dart';
-import 'package:asterfox/config/settings_data.dart';
+import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/data/local_musics_data.dart';
+import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/screens/debug_screen.dart';
 import 'package:asterfox/screens/home_screen.dart';
 import 'package:asterfox/screens/settings/settings_screen.dart';

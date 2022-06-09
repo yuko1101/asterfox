@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:asterfox/config/settings_data.dart';
+import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:asterfox/music/manager/notifiers/data_notifier.dart';
