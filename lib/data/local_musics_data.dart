@@ -77,5 +77,5 @@ extension LocalMusicsDataExtension on MusicData {
     await MusicDownloader.download(this);
   }
 
-  get isSaved => LocalMusicsData.isSaved(song: this);
+  bool get isSaved => LocalMusicsData.isSaved(song: this);
 }
