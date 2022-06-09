@@ -47,9 +47,8 @@ class YouTubeMusicData extends MusicData {
 
   @override
   Future<void> refreshURL() async {
-    final url = await YouTubeMusicUtils.getAudioURL(id);
+    final url = await YouTubeMusicUtils.getAudioURL(id, forceRemote: true);
     if (url != null) {
-      this.url = url;
       remoteUrl = url;
     }
   }

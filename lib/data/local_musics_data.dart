@@ -4,6 +4,8 @@ import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 
+import '../music/music_downloader.dart';
+
 class LocalMusicsData {
   static late ConfigFile musicData;
 
@@ -69,3 +71,11 @@ class LocalMusicsData {
   }
 }
 
+
+extension LocalMusicsDataExtension on MusicData {
+  Future<void> save() async {
+    await MusicDownloader.download(this);
+  }
+
+  get isSaved => LocalMusicsData.isSaved(song: this);
+}

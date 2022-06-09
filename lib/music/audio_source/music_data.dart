@@ -114,9 +114,6 @@ class MusicData {
     }
   }
 
-  Future<void> save() async {
-    await MusicDownloader.download(this);
-  }
 
   final _httpRegex = RegExp(r'^https?:\/\/.+$');
   Future<Map<String, dynamic>?> getAvailableImage() async {

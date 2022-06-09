@@ -10,11 +10,11 @@ import 'package:easy_app/utils/network_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 class YouTubeMusicUtils {
-  static Future<String?> getAudioURL(String videoId) async {
+  static Future<String?> getAudioURL(String videoId, {bool forceRemote = false}) async {
     // 曲が保存されているかどうか
-    bool local = LocalMusicsData.isSaved();
-    if (local) {
-      return await getFilePath(videoId);
+    bool local = LocalMusicsData.isSaved(audioId: videoId);
+    if (local && !forceRemote) {
+      return LocalMusicsData.getById(videoId)!.url;
     } else {
       // オンライン上から取得
 
@@ -48,7 +48,7 @@ class YouTubeMusicUtils {
 
   static Future<YouTubeMusicData?> getYouTubeAudio(String videoId, {String? key}) async {
     // 曲が保存されているかどうか
-    bool local = await isLocal(videoId);
+    bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local) {
       return LocalMusicsData.getById(videoId) as YouTubeMusicData?;
     } else {
@@ -113,28 +113,5 @@ class YouTubeMusicUtils {
     final results = await yt.search.getQuerySuggestions(query);
     yt.close();
     return results.toList();
-  }
-}
-
-
-
-Future<String> getFilePath(String id) async {
-  final path = EasyApp.localPath;
-  return '$path${Platform.pathSeparator}music${Platform.pathSeparator}yt_$id.mp3';
-}
-
-Future<File> getFile(String id) async {
-  return File(await getFilePath(id));
-}
-
-Future<bool> isLocal(String id) async {
-  try {
-    final file = await getFile(id);
-    log("file: " + file.existsSync().toString());
-    return file.existsSync();
-  } catch (e) {
-    log("error: false");
-    log(e);
-    return false;
   }
 }
