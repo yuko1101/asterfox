@@ -1,4 +1,3 @@
-import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:audio_service/audio_service.dart';
@@ -17,6 +16,7 @@ class MusicData {
     required this.author,
     required this.keywords,
     required this.url,
+    this.remoteUrl,
     required this.audioId,
     required this.duration,
     required this.isLocal,
@@ -25,6 +25,9 @@ class MusicData {
   }) {
     this.key = key ?? const Uuid().v4();
     _created.add(this);
+    if (_httpRegex.hasMatch(url)) {
+      remoteUrl ??= url;
+    }
 }
   final MusicType type;
   List<String> imageUrls; // can be changed on save to local. The reason this is a list is because sometimes images are not available. Load the first image if it is available.
@@ -38,6 +41,7 @@ class MusicData {
   bool isLocal; // can be changed on save to local
   double volume; // can be changed on volume change
   late String key;
+  String? remoteUrl;
 
 
   MediaItem toMediaItem() {
@@ -53,7 +57,7 @@ class MusicData {
     );
   }
 
-  String get mediaURL => url;
+  String get mediaURL => remoteUrl ?? url;
 
   String get savePath => "${EasyApp.localPath}/music/$key.mp3";
 
@@ -69,6 +73,7 @@ class MusicData {
     final json = {
       'type': type.name,
       'url': savePath,
+      'remoteUrl': remoteUrl,
       'imageUrls': imageUrls,
       'title': title,
       'description': description,
@@ -95,6 +100,7 @@ class MusicData {
         return MusicData(
           type: type,
           url: json['url'] as String,
+          remoteUrl: json['remoteUrl'] as String?,
           imageUrls: (json['imageUrls'] as List).map((e) => e as String).toList(),
           title: json['title'] as String,
           description: json['description'] as String,
@@ -126,6 +132,10 @@ class MusicData {
     }
     return null;
   }
+
+  Future<void> refreshURL() async {
+  }
+
 }
 
 

@@ -1,5 +1,5 @@
-import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/utils/youtube_music_utils.dart';
 import 'package:easy_app/easy_app.dart';
 
 class YouTubeMusicData extends MusicData {
@@ -44,6 +44,15 @@ class YouTubeMusicData extends MusicData {
     'id': id,
     'authorId': authorId,
   };
+
+  @override
+  Future<void> refreshURL() async {
+    final url = await YouTubeMusicUtils.getAudioURL(id);
+    if (url != null) {
+      this.url = url;
+      remoteUrl = url;
+    }
+  }
 
   // from json
   factory YouTubeMusicData.fromJson(Map<String, dynamic> json, {bool local = true}) {
