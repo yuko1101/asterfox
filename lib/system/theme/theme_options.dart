@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 class ThemeOptions extends ThemeExtension<ThemeOptions> {
   ThemeOptions({
-    required this.isShadowed,
+    required this.shadow,
   });
-  final ShadowLevel isShadowed;
+  final ShadowLevel shadow;
 
   @override
   ThemeExtension<ThemeOptions> copyWith({
-      ShadowLevel? isShadowed,
+      ShadowLevel? shadow,
   }) {
     return ThemeOptions(
-      isShadowed: isShadowed ?? this.isShadowed,
+      shadow: shadow ?? this.shadow,
     );
   }
 

@@ -24,7 +24,7 @@ class AppTheme {
           quaternary: getGrey(150),
           themeColor: getGrey(255)
       ),
-      ThemeOptions(isShadowed: ShadowLevel.high)
+      ThemeOptions(shadow: ShadowLevel.high)
     ]
   );
 
@@ -48,7 +48,7 @@ class AppTheme {
         quaternary: getGrey(30),
         themeColor: getGrey(0),
       ),
-      ThemeOptions(isShadowed: ShadowLevel.low)
+      ThemeOptions(shadow: ShadowLevel.low)
     ]
 
   );

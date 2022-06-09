@@ -22,14 +22,14 @@ class ExtraColors extends ThemeExtension<ExtraColors> {
     Color? secondary,
     Color? tertiary,
     Color? quaternary,
-    Color? oppose,
+    Color? themeColor,
   }) {
     return ExtraColors(
       primary: primary ?? this.primary,
       secondary: secondary ?? this.secondary,
       tertiary: tertiary ?? this.tertiary,
       quaternary: quaternary ?? this.quaternary,
-      themeColor: oppose ?? this.themeColor,
+      themeColor: themeColor ?? this.themeColor,
     );
   }
 
@@ -43,7 +43,7 @@ class ExtraColors extends ThemeExtension<ExtraColors> {
       secondary: Color.lerp(secondary, other.secondary, t),
       tertiary: Color.lerp(tertiary, other.tertiary, t),
       quaternary: Color.lerp(quaternary, other.quaternary, t),
-      oppose: Color.lerp(themeColor, other.themeColor, t),
+      themeColor: Color.lerp(themeColor, other.themeColor, t),
     );
   }
 
