@@ -10,20 +10,29 @@ import 'package:flutter/material.dart';
 class MusicCardWidget extends StatelessWidget {
   const MusicCardWidget({
     required this.song,
-    required this.cardIndex,
     this.playing = false,
     this.linked = false,
+    required this.index,
+    this.onTap,
+    this.onRemove,
     Key? key
   }) : super(key: key);
 
   final MusicData song;
   final bool playing;
   final bool linked;
-  final int cardIndex;
+  final int index;
+
+  final dynamic Function(int)? onTap;
+  final dynamic Function(int, DismissDirection)? onRemove;
 
   @override
   Widget build(BuildContext context) {
-    onTap() {
+    onTapFunction() {
+      if (onTap != null) {
+        onTap!(index);
+        return;
+      }
       if (linked) {
         musicManager.seek(
           Duration.zero,
@@ -31,7 +40,7 @@ class MusicCardWidget extends StatelessWidget {
       );
       }
     }
-    final child = Theme.of(context).themeOptions.isShadowed.level > ShadowLevel.medium.level ?
+    final child = Theme.of(context).themeOptions.shadow.level > ShadowLevel.medium.level ?
       Container(
         margin: const EdgeInsets.only(top: 2.0),
         decoration: BoxDecoration(
@@ -47,7 +56,7 @@ class MusicCardWidget extends StatelessWidget {
         child: Material(
           child: ListTile(
             title: Text(song.title),
-            onTap: onTap,
+            onTap: onTapFunction,
             tileColor: playing ? CustomColors.getColor("accent").withOpacity(0.3) : Theme.of(context).extraColors.themeColor,
           ),
         ),
@@ -70,7 +79,7 @@ class MusicCardWidget extends StatelessWidget {
             onTap: () {},
             child: ListTile(
               title: Text(song.title),
-              onTap: onTap,
+              onTap: onTapFunction,
               trailing: playing ? SizedBox(width: 20, height: 20, child: ValueListenableBuilder<PlayingState>(
                 valueListenable: musicManager.playingStateNotifier,
                 builder: (context, value, child) {
@@ -88,6 +97,10 @@ class MusicCardWidget extends StatelessWidget {
         key: Key(song.key),
         child: child,
         onDismissed: (DismissDirection dismissDirection) {
+          if (onRemove != null) {
+            onRemove!(index, dismissDirection);
+            return;
+          }
           if (linked) musicManager.remove(song.key);
         },
     );

@@ -3,6 +3,7 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/widget/music_footer.dart';
+import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:asterfox/widget/song_search.dart';
 import 'package:easy_app/screen/base_screen.dart';
@@ -18,19 +19,15 @@ class HomeScreen extends BaseScreen {
   HomeScreen() : super(
     screen: Stack(
       children: [
-        ValueListenableBuilder<PlayingState>(
-          valueListenable: musicManager.playingStateNotifier,
-          builder: (_, __, ___) => ValueListenableBuilder<List<MusicData>>(
-            valueListenable: musicManager.shuffledPlaylistNotifier,
-            builder: (_, songs, __) => ValueListenableBuilder<MusicData?>(
-              valueListenable: musicManager.currentSongNotifier,
-              builder: (_, currentSong, __) => PlaylistWidget(
-                padding: const EdgeInsets.only(top: 15),
-                songs: songs,
-                playing: currentSong,
-                linked: true,
-              ),
-            ),
+        TripleNotifierWidget<PlayingState, List<MusicData>, MusicData?>(
+          notifier1: musicManager.playingStateNotifier,
+          notifier2: musicManager.shuffledPlaylistNotifier,
+          notifier3: musicManager.currentSongNotifier,
+          builder: (context, playingState, playlist, currentSong, child) => PlaylistWidget(
+            songs: playlist,
+            playing: currentSong,
+            linked: true,
+            padding: const EdgeInsets.only(top: 15),
           ),
         ),
         homeNotification
