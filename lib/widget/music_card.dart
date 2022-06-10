@@ -5,6 +5,7 @@ import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/system/theme/theme_options.dart';
 import 'package:asterfox/utils/color_util.dart';
+import 'package:asterfox/widget/music_widgets/music_thumbnail.dart';
 import 'package:flutter/material.dart';
 
 class MusicCardWidget extends StatelessWidget {
@@ -40,62 +41,52 @@ class MusicCardWidget extends StatelessWidget {
       );
       }
     }
-    final child = Theme.of(context).themeOptions.shadow.level > ShadowLevel.medium.level ?
-      Container(
-        margin: const EdgeInsets.only(top: 2.0),
-        decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).shadowColor.withOpacity(0.5),
-                spreadRadius: 1,
-                blurRadius: 4,
-                offset: const Offset(2, 2),
-              )
-            ]
-        ),
-        child: Material(
-          child: ListTile(
-            title: Text(song.title),
-            onTap: onTapFunction,
-            tileColor: playing ? CustomColors.getColor("accent").withOpacity(0.3) : Theme.of(context).extraColors.themeColor,
-          ),
-        ),
-      )
-        :
-      Container(
-        margin: const EdgeInsets.only(top: 2.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Theme.of(context).extraColors.primary.withOpacity(0.05), width: 2),
-        ),
-        child: Material(
-          borderRadius: BorderRadius.circular(10),
-          // ListTileのRippleが丸まらないのを直す
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            customBorder: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            onTap: () {},
-            child: ListTile(
-              title: Text(song.title),
-              onTap: onTapFunction,
-              trailing: playing ? SizedBox(width: 20, height: 20, child: ValueListenableBuilder<PlayingState>(
-                valueListenable: musicManager.playingStateNotifier,
-                builder: (context, value, child) {
-                  return value == PlayingState.playing ? const Image(image: AssetImage("assets/images/playing.gif"), fit: BoxFit.cover)
-                    : const Icon(Icons.pause);
-                }
-              )) : null,
-              tileColor: Theme.of(context).extraColors.quaternary,
-
-            ),
-          ),
-        ),
-      );
     return Dismissible(
         key: Key(song.key),
-        child: child,
+        background: Container(
+          color: Theme.of(context).extraColors.primary.withOpacity(0.07)
+        ),
+        child: ListTile(
+          title: Text(song.title),
+          subtitle: Text(song.author),
+          leading: SizedBox(
+            width: 60,
+            height: 60,
+            child: Stack(
+              children: [
+                Opacity(
+                  opacity: playing ? 0.3 : 1.0,
+                  child: SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: FittedBox(
+                      child: MusicImageWidget(song.imageUrls),
+                      fit: BoxFit.fitHeight,
+                      clipBehavior: Clip.antiAlias,
+                    ),
+                  ),
+                ),
+                if (playing) Center(
+                  child: SizedBox(
+                    height: 25,
+                    width: 25,
+                    child: ValueListenableBuilder<PlayingState>(
+                      valueListenable: musicManager.playingStateNotifier,
+                      builder: (_, playingState, __) {
+                        if (playingState == PlayingState.playing) {
+                          return Image.asset("assets/images/playing.gif", color: Theme.of(context).extraColors.primary);
+                        } else {
+                          return Icon(Icons.pause, color: Theme.of(context).extraColors.primary);
+                        }
+                      }
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          onTap: onTapFunction,
+        ),
         onDismissed: (DismissDirection dismissDirection) {
           if (onRemove != null) {
             onRemove!(index, dismissDirection);

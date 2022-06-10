@@ -82,35 +82,40 @@ class MobileMusicFooter extends StatelessWidget {
         children: [
           Row(
             children: [
-              const SizedBox(width: 10),
-              const MusicThumbnail(),
-              const SizedBox(width: 20),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
+                height: 70,
+                width: 70,
+                child: const FittedBox(
+                  child: MusicThumbnail(),
+                  fit: BoxFit.fitHeight,
+                  clipBehavior: Clip.antiAlias
+                )
+              ),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [CurrentSongTitle(), CurrentSongAuthor()],
+                  children: const [
+                    CurrentSongTitle(),
+                    CurrentSongAuthor()
+                  ],
                 ),
               ),
               const SizedBox(width: 10)
             ]
           ),
-          Row(
-            children: [
-              const SizedBox(width: 30),
-              Expanded(
-                child: Column(
-                  children: [
-                    Row(
-                      children: const [TimeText()],
-                      mainAxisAlignment: MainAxisAlignment.end,
-                    ),
-                    const AudioProgressBar()
-                  ],
+          Container(
+            margin: const EdgeInsets.only(left: 20, right: 20),
+            child: Column(
+              children: const [
+                Align(
+                  child: TimeText(),
+                  alignment: Alignment.bottomRight,
                 ),
-              ),
-              const SizedBox(width: 30)
-            ],
+                AudioProgressBar()
+              ],
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
