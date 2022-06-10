@@ -12,8 +12,9 @@ class SongHistoryData {
 
   static Future<void> init(MusicManager manager) async {
     historyData = await ConfigFile(File("${EasyApp.localPath}/history.json"), {"history": []}).load();
+
+    // when song is played, add it to history.
     manager.currentSongNotifier.addListener(() {
-      print("add listener ${manager.audioDataManager.currentSong?.title}");
       if (manager.audioDataManager.currentSong != null) addAndSave(manager.audioDataManager.currentSong!);
     });
   }
