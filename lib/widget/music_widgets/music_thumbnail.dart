@@ -18,15 +18,7 @@ class MusicThumbnail extends StatelessWidget {
     return ValueListenableBuilder<MusicData?>(
         valueListenable: musicManager.currentSongNotifier,
         builder: (context, song, child) {
-
-          return SizedBox(
-            height: 50,
-            width: 80,
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: MusicImageWidget(song?.imageUrls ?? []),
-            ),
-          );
+          return MusicImageWidget(song?.imageUrls ?? []);
         },
     );
   }
