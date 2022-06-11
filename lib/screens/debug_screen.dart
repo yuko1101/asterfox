@@ -76,6 +76,12 @@ class DebugMainScreen extends StatelessWidget {
                       showSearch(context: context, delegate: SongSearch());
                     },
                     icon: const Icon(Icons.search)
+                ),
+                IconButton(
+                    onPressed: () {
+                      print(getCreate());
+                    },
+                    icon: const Icon(Icons.discount)
                 )
               ],
             ),
