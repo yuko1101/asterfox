@@ -9,12 +9,16 @@ import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:http/http.dart' as http;
+
 class YouTubeMusicUtils {
-  static Future<String?> getAudioURL(String videoId, {bool forceRemote = false}) async {
+  static Future<String?> getAudioURL(String videoId, String key, {bool forceRemote = false}) async {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local && !forceRemote) {
-      return LocalMusicsData.getById(videoId)!.url;
+      final song = LocalMusicsData.getByAudioId(videoId, key)!;
+      song.destroy();
+      return song.url;
     } else {
       // オンライン上から取得
 
@@ -46,11 +50,11 @@ class YouTubeMusicUtils {
     }
   }
 
-  static Future<YouTubeMusicData?> getYouTubeAudio(String videoId, {String? key}) async {
+  static Future<YouTubeMusicData?> getYouTubeAudio(String videoId, String key) async {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local) {
-      return LocalMusicsData.getById(videoId) as YouTubeMusicData?;
+      return LocalMusicsData.getByAudioId(videoId, key) as YouTubeMusicData?;
     } else {
       // オンライン上から取得
 
@@ -83,8 +87,15 @@ class YouTubeMusicUtils {
 
       yt.close();
 
+      String imageUrl = video.thumbnails.maxResUrl;
+      final imageRes = await http.get(Uri.parse(video.thumbnails.maxResUrl));
+      if (imageRes.statusCode != 200) {
+        imageUrl = video.thumbnails.highResUrl;
+      }
+
       return YouTubeMusicData(
           url: manifest.audioOnly.withHighestBitrate().url.toString(),
+          remoteUrl: manifest.audioOnly.withHighestBitrate().url.toString(),
           id: videoId,
           title: video.title,
           description: video.description,
@@ -94,7 +105,8 @@ class YouTubeMusicUtils {
           isLocal: false,
           keywords: video.keywords,
           volume: 1.0,
-          imageUrls: [video.thumbnails.maxResUrl, video.thumbnails.highResUrl],
+          imageUrl: imageUrl,
+          remoteImageUrl: imageUrl,
           key: key
       );
 

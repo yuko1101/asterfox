@@ -16,9 +16,12 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "ok": "OK",
-  "delete_from_local_confirm_message": "Are you sure you want to delete this song from your local storage?",
   "delete_from_local": "Delete from local storage",
+  "delete_from_local_confirm_message": "Are you sure you want to delete this song from your local storage?",
   "song_history": "Song History",
   "go_back": "Go back",
-  "no_song_history": "No song history"
+  "no_song_history": "No song history",
+  "song_unable_to_load": "Unable to load the song",
+  "delete_from_history": "Delete from history",
+  "delete_from_history_confirm_message": "Are you sure you want to delete this song from your history?"
 }

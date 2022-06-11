@@ -8,6 +8,7 @@ import 'package:asterfox/utils/youtube_music_utils.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class SongSearch extends SearchDelegate<String> {
@@ -180,7 +181,7 @@ class _SearchTile extends StatelessWidget {
           setQuery(suggestion.value);
         } else if (suggestion.tags.contains(_Tag.youtube)) {
           close();
-          HomeScreenMusicManager.addSongByID(suggestion.value);
+          HomeScreenMusicManager.addSong(const Uuid().v4(), youtubeId: suggestion.value);
         }
       },
     );

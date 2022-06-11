@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
+import 'package:asterfox/utils/extensions.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +36,7 @@ class MusicDownloader {
     final imagePath = "${EasyApp.localPath}/images/${song.audioId}.png";
     await _saveImage(song, imagePath);
 
-    song.imageUrls = [imagePath];
+    song.imageUrl = imagePath;
 
     await LocalMusicsData.save(song);
 
@@ -122,12 +123,11 @@ class MusicDownloader {
   }
 
   static Future<void> _saveImage(MusicData song, String path) async {
-    final available = await song.getAvailableImage();
-    if (available == null) {
-      print("no image available");
+    if (!song.imageUrl.isUrl) {
+      print("Image already saved");
       return;
     }
-    final http.Response imageRes = available["response"];
+    final imageRes = await http.get(Uri.parse(song.imageUrl));
     final imageFile = File(path);
     if (!imageFile.parent.existsSync()) imageFile.parent.createSync(recursive: true);
     imageFile.writeAsBytesSync(imageRes.bodyBytes);

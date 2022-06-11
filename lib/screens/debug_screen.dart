@@ -102,7 +102,7 @@ class DebugMainScreen extends StatelessWidget {
                                 children: [
                                   Opacity(
                                     opacity: musicManager.audioDataManager.currentIndex == index ? 0.3 : 1.0,
-                                    child: MusicImageWidget(songs[index].imageUrls)
+                                    child: MusicImageWidget(songs[index].imageUrl)
                                   ),
                                   if (musicManager.audioDataManager.currentIndex == index) Center(
                                     child: SizedBox(

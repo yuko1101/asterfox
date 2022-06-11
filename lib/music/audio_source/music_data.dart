@@ -1,47 +1,42 @@
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
-import 'package:asterfox/music/music_downloader.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';
-import 'package:http/http.dart' as http;
 
 class MusicData {
   MusicData({
     required this.type,
-    required this.imageUrls,
+    required this.url,
+    required this.remoteUrl,
+    required this.imageUrl,
+    required this.remoteImageUrl,
     required this.title,
     required this.description,
     required this.author,
     required this.keywords,
-    required this.url,
-    this.remoteUrl,
     required this.audioId,
     required this.duration,
     required this.isLocal,
     required this.volume,
-    String? key,
+    required this.key,
   }) {
-    this.key = key ?? const Uuid().v4();
     _created.add(this);
-    if (_httpRegex.hasMatch(url)) {
-      remoteUrl ??= url;
-    }
 }
   final MusicType type;
-  List<String> imageUrls; // can be changed on save to local. The reason this is a list is because sometimes images are not available. Load the first image if it is available.
   final String title;
   final String description;
   final String author;
   final List<String> keywords;
   String url; // can be changed if the url is expired (especially for YouTube), or the song saved locally.
+  String imageUrl; // can be changed on saving to local storage.
   late String audioId;
-  Duration duration; // can be changed on clip-cut
-  bool isLocal; // can be changed on save to local
-  double volume; // can be changed on volume change
-  late String key;
-  String? remoteUrl;
+  Duration duration; // can be changed on clip-cut.
+  bool isLocal; // can be changed on saving to local storage.
+  double volume; // can be changed on volume change.
+  final String key;
+  String remoteUrl;
+  String remoteImageUrl;
 
 
   MediaItem toMediaItem() {
@@ -57,7 +52,7 @@ class MusicData {
     );
   }
 
-  String get mediaURL => remoteUrl ?? url;
+  String get mediaURL => remoteUrl;
 
   String get savePath => "${EasyApp.localPath}/music/$key.mp3";
 
@@ -74,7 +69,8 @@ class MusicData {
       'type': type.name,
       'url': savePath,
       'remoteUrl': remoteUrl,
-      'imageUrls': imageUrls,
+      'imageUrl': imageUrl,
+      'remoteImageUrl': remoteImageUrl,
       'title': title,
       'description': description,
       'author': author,
@@ -91,17 +87,19 @@ class MusicData {
 
   Map<String, dynamic> get jsonExtras => {};
 
-  factory MusicData.fromJson(Map<String, dynamic> json, bool local) {
+  factory MusicData.fromJson(Map<String, dynamic> json, bool local, String key) {
     final type = MusicType.values.firstWhere((musicType) => musicType.name == json['type'] as String);
     switch (type) {
       case MusicType.youtube:
-        return YouTubeMusicData.fromJson(json, local: local);
+        return YouTubeMusicData.fromJson(json, local, key);
       default:
         return MusicData(
+          key: key,
           type: type,
           url: json['url'] as String,
-          remoteUrl: json['remoteUrl'] as String?,
-          imageUrls: (json['imageUrls'] as List).map((e) => e as String).toList(),
+          remoteUrl: json['remoteUrl'] as String,
+          imageUrl: json['imageUrl'] as String,
+          remoteImageUrl: json['remoteImageUrl'] as String,
           title: json['title'] as String,
           description: json['description'] as String,
           author: json['author'] as String,
@@ -115,22 +113,14 @@ class MusicData {
   }
 
 
-  final _httpRegex = RegExp(r'^https?:\/\/.+$');
-  Future<Map<String, dynamic>?> getAvailableImage() async {
-    for (final imageUrl in imageUrls) {
-      if (!NetworkUtils.networkAccessible() && _httpRegex.hasMatch(imageUrl)) continue;
-      if (!_httpRegex.hasMatch(imageUrl)) {
-        return {'url': imageUrl};
-      }
-      final imageRes = await http.get(Uri.parse(imageUrl));
-      if (imageRes.statusCode == 200) {
-        return {"url": imageUrl, "response": imageRes};
-      }
-    }
+
+
+  Future<String?> refreshURL() async {
     return null;
   }
 
-  Future<void> refreshURL() async {
+  Future<bool> isUrlAvailable() async {
+    return true;
   }
 
 }

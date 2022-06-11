@@ -13,6 +13,7 @@ import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:flutter/material.dart';
 import 'music/manager/music_manager.dart';
@@ -43,6 +44,8 @@ Future<void> main() async {
     ],
     activateConnectionChecker: true
   );
+
+  print(Language.currentLanguage);
 
   await SettingsData.applyMusicManagerSettings();
   await LocalMusicsData.init();

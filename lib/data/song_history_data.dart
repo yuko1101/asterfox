@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/music_manager.dart';
+import 'package:asterfox/utils/extensions.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
+import 'package:uuid/uuid.dart';
 
 class SongHistoryData {
   static late ConfigFile historyData;
@@ -34,7 +37,7 @@ class SongHistoryData {
 
   static List<MusicData> getAll() {
     final data = historyData.getValue("history") as List<dynamic>;
-    return data.map((e) => MusicData.fromJson(e, true)).toList();
+    return data.map((e) => MusicData.fromJson(e, true, const Uuid().v4())).toList();
   }
 
   static Future<void> removeFromHistory(MusicData song) async {
@@ -60,5 +63,28 @@ extension SongHistoryDataExtension on MusicData {
     final song = data.firstWhere((element) => element["audioId"] == audioId, orElse: () => null);
     if (song == null) return null;
     return song["last_played"] as int;
+  }
+
+  // ローカルストレージに保存されている場合は、LocalMusicsDataから読み込み、
+  // そうでない場合は、URLを更新して、リモートのMusicDataとして読み込む。
+  Future<MusicData?> renew(String key) async {
+    final localMusicData =  LocalMusicsData.getByAudioId(audioId, key);
+    if (localMusicData != null) return localMusicData;
+
+    final url = await isUrlAvailable() ? remoteUrl : await refreshURL();
+    destroy();
+    // urlを取得できなかった場合は、nullを返す
+    if (url == null) return null;
+
+    final json = toJson();
+    json["url"] = url;
+    json["remoteUrl"] = url;
+
+    if ((json["remoteImageUrl"] as String).isEmpty) {
+      throw Exception("Cannot resolve image url");
+    }
+    json["imageUrl"] = json["remoteImageUrl"];
+
+    return MusicData.fromJson(json, false, key);
   }
 }

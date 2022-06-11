@@ -27,7 +27,7 @@ class DownloadButton extends StatelessWidget {
             final List<IndexedAudioSource?> songs = musicManager.audioHandler.audioPlayer.sequence ?? [];
             final audioSourceIndex = songs.indexWhere((element) => element != null && element.tag["key"] == song?.key);
             final IndexedAudioSource? audioSource = audioSourceIndex != -1 ? songs[audioSourceIndex] : null;
-            final isDownloaded = song != null && audioSource != null && LocalMusicsData.getById(song.audioId) != null && _httpRegex.hasMatch(audioSource.tag["url"]);
+            final isDownloaded = song != null && audioSource != null && LocalMusicsData.isSaved(audioId: song.audioId) && _httpRegex.hasMatch(audioSource.tag["url"]);
 
             if (isDownloading) {
               return ValueListenableBuilder<int>(

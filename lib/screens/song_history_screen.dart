@@ -1,11 +1,14 @@
 import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 
 class SongHistoryScreen extends BaseScreen {
   SongHistoryScreen() : super(
@@ -58,15 +61,44 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
               subtitle: Text(song.author),
               trailing: IconButton(
                 icon: const Icon(Icons.close),
+                tooltip: Language.getText("delete_from_history"),
                 onPressed: () {
-                  setState(() {
-                    SongHistoryData.removeFromHistory(song);
-                  });
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(Language.getText("delete_from_history")),
+                      content: Text(Language.getText("delete_from_history_confirm_message")),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(Language.getText("cancel")),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              SongHistoryData.removeFromHistory(song);
+                            });
+                          },
+                          child: Text(Language.getText("delete")),
+                        ),
+                      ],
+                    ),
+
+                  );
+
                 },
               ),
-              onTap: () {
-                  musicManager.add(song);
-                  EasyApp.popPage(context);
+              onTap: () async {
+                final key = const Uuid().v4();
+                final musicData = await song.renew(key);
+                if (musicData == null) {
+                  Fluttertoast.showToast(msg: Language.getText("song_unable_to_load"));
+                  return;
+                }
+                HomeScreenMusicManager.addSong(key, musicData: musicData);
+                EasyApp.popPage(context);
               },
             );
           },

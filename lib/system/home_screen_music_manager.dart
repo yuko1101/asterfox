@@ -14,15 +14,15 @@ import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import '../screens/home_screen.dart';
 
 class HomeScreenMusicManager {
-  static Future<void> addSongByID(String id) async {
+  static Future<void> addSong(String key, {String? youtubeId, MusicData? musicData}) async {
+    assert(youtubeId != null || musicData != null);
     if (SettingsData.getValue(key: "auto_download")) {
       final completer = Completer();
-      final songKey = const Uuid().v4();
-      downloadProgress[songKey] = ValueNotifier<int>(0);
+      downloadProgress[key] = ValueNotifier<int>(0);
       HomeScreen.homeNotification.pushNotification(
         NotificationData(
             child: ValueListenableBuilder<int>(
-              valueListenable: downloadProgress[songKey]!,
+              valueListenable: downloadProgress[key]!,
               builder: (_, percentage, __) => Column(
                 children: [
                   const Text("自動ダウンロード中"),
@@ -39,7 +39,13 @@ class HomeScreenMusicManager {
               ),
             ),
             progress: () async {
-              final YouTubeMusicData song = (await YouTubeMusicUtils.getYouTubeAudio(id, key: songKey))!;
+              MusicData song;
+              if (youtubeId != null) {
+                song = (await YouTubeMusicUtils.getYouTubeAudio(youtubeId, key))!;
+              } else {
+                song = musicData!;
+              }
+
               await song.save();
               await musicManager.add(song);
               completer.complete();
@@ -66,7 +72,12 @@ class HomeScreenMusicManager {
               ],
             ),
             progress: () async {
-              final YouTubeMusicData song = (await YouTubeMusicUtils.getYouTubeAudio(id))!;
+              MusicData song;
+              if (youtubeId != null) {
+                song = (await YouTubeMusicUtils.getYouTubeAudio(youtubeId, key))!;
+              } else {
+                song = musicData!;
+              }
               await musicManager.add(song);
               completer.complete();
             }
@@ -76,7 +87,7 @@ class HomeScreenMusicManager {
   }
   static Future<void> addSongBySearch(String query) async {
     final list = await YouTubeMusicUtils.searchYouTubeVideo(query);
-    await addSongByID(list.first.id.value);
+    await addSong(const Uuid().v4(), youtubeId: list.first.id.value);
   }
 
   /// Download a song with progress indicator notification

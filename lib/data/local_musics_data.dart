@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/utils/extensions.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
+import 'package:uuid/uuid.dart';
 
 import '../music/music_downloader.dart';
 
@@ -29,7 +31,7 @@ class LocalMusicsData {
 
   static List<MusicData> getAll() {
     final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values.map((e) => MusicData.fromJson(e, true)).toList();
+    return data.values.map((e) => MusicData.fromJson(e, true, const Uuid().v4())).toList();
   }
   
   static List<String> getYouTubeIds() {
@@ -37,10 +39,10 @@ class LocalMusicsData {
     return data.values.where((element) => element["type"] == MusicType.youtube.name).map((e) => e["id"] as String).toList();
   }
 
-  static MusicData? getById(String? id) {
+  static MusicData? getByAudioId(String? id, String key) {
     if (id == null || !musicData.has(id)) return null;
     final data = musicData.getValue(id) as Map<String, dynamic>;
-    return MusicData.fromJson(data, true);
+    return MusicData.fromJson(data, true, key);
   }
 
   static bool isSaved({MusicData? song, String? audioId}) {
@@ -48,14 +50,12 @@ class LocalMusicsData {
     return musicData.has(song?.audioId ?? audioId!);
   }
 
-  static final _httpRegex = RegExp(r'^https?:\/\/.+$');
-
   static Future<void> removeFromLocal(MusicData song) async {
     if (!song.isLocal) return;
     final file = File(song.savePath);
     final imageDelete = () async {
-      String url = song.imageUrls.firstWhere((element) => !_httpRegex.hasMatch(element), orElse: () => "");
-      if (url.isNotEmpty) {
+      String url = song.imageUrl;
+      if (!url.isUrl) {
         final file = File(url);
         if (file.existsSync()) await file.delete();
       }

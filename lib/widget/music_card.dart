@@ -60,7 +60,7 @@ class MusicCardWidget extends StatelessWidget {
                     height: 60,
                     width: 60,
                     child: FittedBox(
-                      child: MusicImageWidget(song.imageUrls),
+                      child: MusicImageWidget(song.imageUrl),
                       fit: BoxFit.fitHeight,
                       clipBehavior: Clip.antiAlias,
                     ),
