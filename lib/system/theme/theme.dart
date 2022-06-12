@@ -58,11 +58,6 @@ class AppTheme {
     "dark": dark
   };
 
-  static Map<String, String> themeNames = {
-    "light": "ライト",
-    "dark": "ダーク"
-  };
-
   static Future<void> setTheme(String theme) async {
     if (!themes.keys.contains(theme)) throw Exception("theme not found");
     themeNotifier.value = theme;

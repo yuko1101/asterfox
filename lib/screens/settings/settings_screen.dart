@@ -54,7 +54,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
               tiles: [
                 SettingsTile.navigation(
                   title: Text(Language.getText("theme")),
-                  description: Text(AppTheme.themeNames.values.join("、")),
+                  description: Text(AppTheme.themes.keys.map((theme) => Language.getText("theme_$theme")).join(Language.getText("list_separator"))),
                   onPressed: (context) {
                     EasyApp.pushPage(context, ThemeSettingsScreen());
                   },

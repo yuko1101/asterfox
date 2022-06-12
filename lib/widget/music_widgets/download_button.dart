@@ -3,6 +3,7 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -38,7 +39,7 @@ class DownloadButton extends StatelessWidget {
                     margin: const EdgeInsets.only(right: 12, left: 12),
                     child: Tooltip(
                       child: const CircularProgressIndicator(),
-                      message: "ローカルに保存中: $percentage%",
+                      message: "${Language.getText("saving")}: $percentage%",
                     )
                   )
               );

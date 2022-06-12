@@ -32,7 +32,7 @@ class YouTubeMusicUtils {
       try {
         manifest = await yt.videos.streamsClient.getManifest(videoId);
       } on VideoUnplayableException {
-        Fluttertoast.showToast(msg: "この曲は再生できません");
+        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
         yt.close();
         return null;
       }

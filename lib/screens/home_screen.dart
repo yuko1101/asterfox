@@ -8,6 +8,7 @@ import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:asterfox/widget/song_search.dart';
 import 'package:easy_app/screen/base_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 
 
@@ -83,7 +84,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
       leading: IconButton(
         onPressed: () => AppDrawerController(context).openDrawer(),
         icon: const Icon(Icons.menu),
-        tooltip: "メニュー",
+        tooltip: Language.getText("menu"),
       ),
     );
   }

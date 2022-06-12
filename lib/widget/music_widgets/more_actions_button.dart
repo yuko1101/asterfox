@@ -97,6 +97,7 @@ class MoreActionsButton extends StatelessWidget {
         builder: (context, song, child) {
           return IconButton(
               icon: const Icon(Icons.more_vert),
+              tooltip: Language.getText("more_actions"),
               onPressed: _actions.indexWhere((action) => action.songFilter(song)) == -1 ? null : () {
                 showModalBottomSheet(
                   context: context,

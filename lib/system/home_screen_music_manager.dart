@@ -7,6 +7,7 @@ import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/utils/youtube_music_utils.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:easy_app/utils/in_app_notification/notification_data.dart';
@@ -25,7 +26,7 @@ class HomeScreenMusicManager {
               valueListenable: downloadProgress[key]!,
               builder: (_, percentage, __) => Column(
                 children: [
-                  const Text("自動ダウンロード中"),
+                  Text(Language.getText("downloading_automatically")),
                   SizedBox(
                     width: 100,
                     child: LinearProgressIndicator(
@@ -61,14 +62,14 @@ class HomeScreenMusicManager {
     HomeScreen.homeNotification.pushNotification(
         NotificationData(
             child: Row(
-              children: const [
-                SizedBox(
+              children: [
+                const SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator()
                 ),
-                SizedBox(width: 8),
-                Text("1曲を読み込み中"),
+                const SizedBox(width: 8),
+                Text(Language.getText("loading_songs").replaceAll("{count}", "1")),
               ],
             ),
             progress: () async {
@@ -100,7 +101,7 @@ class HomeScreenMusicManager {
             valueListenable: downloadProgress[song.key]!,
             builder: (_, percentage, __) => Column(
               children: [
-                const Text("ダウンロード中"),
+                Text(Language.getText("downloading")),
                 SizedBox(
                   width: 100,
                   child: LinearProgressIndicator(

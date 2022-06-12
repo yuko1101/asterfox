@@ -1,6 +1,7 @@
 
 import 'package:asterfox/main.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -16,19 +17,19 @@ class RepeatButton extends StatelessWidget {
             return IconButton(
               icon: Icon(Icons.repeat, color: Theme.of(context).disabledColor),
               onPressed: musicManager.nextRepeatMode,
-              tooltip: "リピート: OFF",
+              tooltip: "${Language.getText("repeat")}: ${Language.getText("off")}",
             );
           case RepeatState.all:
             return IconButton(
               icon: const Icon(Icons.repeat),
               onPressed: musicManager.nextRepeatMode,
-              tooltip: "リピート: キュー",
+              tooltip: "${Language.getText("repeat")}: ${Language.getText("queue")}",
             );
           case RepeatState.one:
             return IconButton(
               icon: const Icon(Icons.repeat_one),
               onPressed: musicManager.nextRepeatMode,
-              tooltip: "リピート: 1曲",
+              tooltip: "${Language.getText("repeat")}: 1${Language.getText("song")}",
             );
         }
       },

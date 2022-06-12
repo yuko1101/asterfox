@@ -54,7 +54,7 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
             title: Text(Language.getText("theme")),
             tiles: AppTheme.themes.keys.map((key) =>
                 RadioListTile(
-                  title: Text(AppTheme.themeNames[key]!),
+                  title: Text(Language.getText("theme_$key")),
                   value: key,
                   groupValue: AppTheme.themeNotifier.value,
                   activeColor: Color(CustomColors.data.getValue("accent") as int),

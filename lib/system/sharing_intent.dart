@@ -1,6 +1,7 @@
 import 'package:asterfox/main.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/utils/youtube_music_utils.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uuid/uuid.dart';
@@ -19,7 +20,7 @@ class SharingIntent {
     try {
       id = VideoId(text);
     } catch (e) {
-      Fluttertoast.showToast(msg: "無効なURLです");
+      Fluttertoast.showToast(msg: Language.getText("invalid_url"));
       return;
     }
     HomeScreenMusicManager.addSong(const Uuid().v4(), youtubeId: id.value);

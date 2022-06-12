@@ -18,19 +18,19 @@ class SongSearch extends SearchDelegate<String> {
       IconButton(
         icon: const Icon(Icons.clear),
         color: Theme.of(context).textTheme.bodyText1?.color,
-        tooltip: "クリア",
+        tooltip: Language.getText("clear"),
         onPressed: () {
           query = "";
-        }),
+        },),
       IconButton(
         icon: const Icon(Icons.search),
         color: Theme.of(context).textTheme.bodyText1?.color,
-        tooltip: "検索",
-      onPressed: () {
-          if (query.isEmpty || query == "") return;
-          search(context, query);
-        }
-      )
+        tooltip: Language.getText("search"),
+        onPressed: () {
+            if (query.isEmpty || query == "") return;
+            search(context, query);
+        },
+      ),
     ];
   }
 
@@ -42,7 +42,7 @@ class SongSearch extends SearchDelegate<String> {
       tooltip: Language.getText("go_back"),
       onPressed: () {
         close(context, "");
-      }
+      },
     );
   }
 
