@@ -48,7 +48,7 @@ class SongHistoryMainScreen extends StatefulWidget {
 class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
   @override
   Widget build(BuildContext context) {
-    final songs = SongHistoryData.getAll(isTemporary: true);
+    final songs = SongHistoryData.getAll(isTemporary: true).reversed.toList();
     return SafeArea(
         child: songs.isEmpty ? Center(
           child: Text(Language.getText("no_song_history"), style: TextStyle(color: Theme.of(context).extraColors.secondary)),
