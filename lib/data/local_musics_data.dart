@@ -29,9 +29,9 @@ class LocalMusicsData {
     }
   }
 
-  static List<MusicData> getAll() {
+  static List<MusicData> getAll({bool isTemporary = false}) {
     final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values.map((e) => MusicData.fromJson(e, true, const Uuid().v4())).toList();
+    return data.values.map((e) => MusicData.fromJson(json: e, isLocal: true, key: const Uuid().v4(), isTemporary: isTemporary)).toList();
   }
   
   static List<String> getYouTubeIds() {
@@ -39,19 +39,19 @@ class LocalMusicsData {
     return data.values.where((element) => element["type"] == MusicType.youtube.name).map((e) => e["id"] as String).toList();
   }
 
-  static MusicData? getByAudioId(String? id, String key) {
-    if (id == null || !musicData.has(id)) return null;
-    final data = musicData.getValue(id) as Map<String, dynamic>;
-    return MusicData.fromJson(data, true, key);
+  static MusicData? getByAudioId({required String? audioId, required String key, bool isTemporary = false}) {
+    if (audioId == null || !musicData.has(audioId)) return null;
+    final data = musicData.getValue(audioId) as Map<String, dynamic>;
+    return MusicData.fromJson(json: data, isLocal: true, key: key, isTemporary: isTemporary);
   }
 
   static bool isSaved({MusicData? song, String? audioId}) {
-    if (song == null && audioId == null) throw ArgumentError("song or audioId must be not null");
+    assert(song != null || audioId != null);
     return musicData.has(song?.audioId ?? audioId!);
   }
 
   static Future<void> removeFromLocal(MusicData song) async {
-    if (!song.isLocal) return;
+    if (!song.isSaved) return;
     final file = File(song.savePath);
     final imageDelete = () async {
       String url = song.imageUrl;

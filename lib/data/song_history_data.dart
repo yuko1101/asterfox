@@ -35,9 +35,14 @@ class SongHistoryData {
     await historyData.set(key: "history", value: data).save(compact: _compact);
   }
 
-  static List<MusicData> getAll() {
+  static List<MusicData> getAll({bool isTemporary = false}) {
     final data = historyData.getValue("history") as List<dynamic>;
-    return data.map((e) => MusicData.fromJson(e, true, const Uuid().v4())).toList();
+    return data.map((e) => MusicData.fromJson(
+      json: e,
+      isLocal: LocalMusicsData.isSaved(audioId: e["audioId"]),
+      key:  const Uuid().v4(),
+      isTemporary: isTemporary,
+    )).toList();
   }
 
   static Future<void> removeFromHistory(MusicData song) async {
@@ -67,12 +72,11 @@ extension SongHistoryDataExtension on MusicData {
 
   // ローカルストレージに保存されている場合は、LocalMusicsDataから読み込み、
   // そうでない場合は、URLを更新して、リモートのMusicDataとして読み込む。
-  Future<MusicData?> renew(String key) async {
-    final localMusicData =  LocalMusicsData.getByAudioId(audioId, key);
+  Future<MusicData?> renew(String key, {bool isTemporary = false}) async {
+    final localMusicData =  LocalMusicsData.getByAudioId(audioId: audioId, key: key, isTemporary: isTemporary);
     if (localMusicData != null) return localMusicData;
 
     final url = await isUrlAvailable() ? remoteUrl : await refreshURL();
-    destroy();
     // urlを取得できなかった場合は、nullを返す
     if (url == null) return null;
 
@@ -85,6 +89,6 @@ extension SongHistoryDataExtension on MusicData {
     }
     json["imageUrl"] = json["remoteImageUrl"];
 
-    return MusicData.fromJson(json, false, key);
+    return MusicData.fromJson(json: json, isLocal: false, key: key, isTemporary: isTemporary);
   }
 }

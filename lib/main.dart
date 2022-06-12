@@ -45,8 +45,6 @@ Future<void> main() async {
     activateConnectionChecker: true
   );
 
-  print(Language.currentLanguage);
-
   await SettingsData.applyMusicManagerSettings();
   await LocalMusicsData.init();
 

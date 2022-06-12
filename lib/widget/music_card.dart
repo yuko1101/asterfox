@@ -87,12 +87,13 @@ class MusicCardWidget extends StatelessWidget {
           ),
           onTap: onTapFunction,
         ),
-        onDismissed: (DismissDirection dismissDirection) {
+        onDismissed: (DismissDirection dismissDirection) async {
           if (onRemove != null) {
             onRemove!(index, dismissDirection);
             return;
           }
-          if (linked) musicManager.remove(song.key);
+          if (linked) await musicManager.remove(song.key);
+          song.destroy();
         },
     );
   }

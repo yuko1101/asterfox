@@ -102,10 +102,10 @@ class SongSearch extends SearchDelegate<String> {
     final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
-    final videoSuggestions = videos.map((e) => _Suggestion(tags: [_Tag.youtube, localIds.contains(e.id.value) ? _Tag.local : _Tag.remote], name: e.title, value: e.id.value, keywords: e.keywords)).toList();
+    final videoSuggestions = videos.map((e) => _Suggestion(tags: [_Tag.youtube, localIds.contains(e.id.value) ? _Tag.local : _Tag.remote], name: e.title, audioId: e.id.value, keywords: e.keywords)).toList();
 
     final List<String> words = await YouTubeMusicUtils.searchWords(text);
-    final wordsSuggestions = words.map((e) => _Suggestion(tags: [_Tag.word], name: e, value: e, keywords: [])).toList();
+    final wordsSuggestions = words.map((e) => _Suggestion(tags: [_Tag.word], name: e, audioId: e, keywords: [])).toList();
 
     final videoResult = filterAndSort(videoSuggestions);
     final wordResult = filterAndSort(wordsSuggestions);
@@ -123,11 +123,11 @@ class SongSearch extends SearchDelegate<String> {
     print("loading offline songs");
     final List<_Suggestion> list = [];
 
-    final List<MusicData> locals = LocalMusicsData.getAll();
+    final List<MusicData> locals = LocalMusicsData.getAll(isTemporary: true);
     list.addAll(locals.map((e) {
       final List<_Tag> tags = [_Tag.local];
       if (e is YouTubeMusicData) tags.add(_Tag.youtube);
-      return _Suggestion(tags: tags, name: e.title, value: e is YouTubeMusicData ? e.id : e.url, keywords: e.keywords);
+      return _Suggestion(tags: tags, name: e.title, audioId: e is YouTubeMusicData ? e.id : e.url, keywords: e.keywords);
     }));
 
     final List<_Suggestion> result = filterAndSort(list, filterSortingList: [_RelatedFilter(text), _RelevanceSorting(text)]);
@@ -178,10 +178,10 @@ class _SearchTile extends StatelessWidget {
       title: Text(suggestion.name),
       onTap: () async {
         if (suggestion.tags.contains(_Tag.word)) {
-          setQuery(suggestion.value);
+          setQuery(suggestion.audioId);
         } else if (suggestion.tags.contains(_Tag.youtube)) {
           close();
-          HomeScreenMusicManager.addSong(const Uuid().v4(), youtubeId: suggestion.value);
+          HomeScreenMusicManager.addSong(const Uuid().v4(), youtubeId: suggestion.audioId);
         }
       },
     );
@@ -192,12 +192,12 @@ class _Suggestion {
   _Suggestion({
     required this.tags,
     required this.name,
-    required this.value,
+    required this.audioId,
     required this.keywords
   });
   final List<_Tag> tags;
   final String name;
-  final String value;
+  final String audioId;
   final List<String> keywords;
 }
 

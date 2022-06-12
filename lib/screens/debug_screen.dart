@@ -79,7 +79,7 @@ class DebugMainScreen extends StatelessWidget {
                 ),
                 IconButton(
                     onPressed: () {
-                      print(getCreate());
+                      print(MusicData.getCreated());
                     },
                     icon: const Icon(Icons.discount)
                 )

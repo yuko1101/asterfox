@@ -20,7 +20,11 @@ class MusicData {
     required this.isLocal,
     required this.volume,
     required this.key,
+    this.isTemporary = false,
   }) {
+    print("MusicData created : temp = $isTemporary");
+    if (isTemporary) return;
+    print("MusicData: {key: $key, title: $title}");
     _created.add(this);
 }
   final MusicType type;
@@ -37,6 +41,8 @@ class MusicData {
   final String key;
   String remoteUrl;
   String remoteImageUrl;
+
+  final bool isTemporary;
 
 
   MediaItem toMediaItem() {
@@ -58,6 +64,7 @@ class MusicData {
 
   void destroy() {
     _created.remove(this);
+    print("MusicData destroyed : remaining = ${_created.length}");
   }
 
   factory MusicData.fromKey(String key) {
@@ -87,11 +94,16 @@ class MusicData {
 
   Map<String, dynamic> get jsonExtras => {};
 
-  factory MusicData.fromJson(Map<String, dynamic> json, bool local, String key) {
+  factory MusicData.fromJson({
+    required Map<String, dynamic> json,
+    required bool isLocal,
+    required String key,
+    bool isTemporary = false,
+  }) {
     final type = MusicType.values.firstWhere((musicType) => musicType.name == json['type'] as String);
     switch (type) {
       case MusicType.youtube:
-        return YouTubeMusicData.fromJson(json, local, key);
+        return YouTubeMusicData.fromJson(json: json, isLocal: isLocal, key: key, isTemporary: isTemporary);
       default:
         return MusicData(
           key: key,
@@ -105,15 +117,15 @@ class MusicData {
           author: json['author'] as String,
           audioId: json['audioId'] as String,
           duration: Duration(milliseconds: json['duration'] as int),
-          isLocal: local,
+          isLocal: isLocal,
           keywords: (json['keywords'] as List).map((e) => e as String).toList(),
           volume: json['volume'] as double,
+          isTemporary: isTemporary,
         );
     }
+
+
   }
-
-
-
 
   Future<String?> refreshURL() async {
     return null;
@@ -123,14 +135,19 @@ class MusicData {
     return true;
   }
 
-}
+  static final List<MusicData> _created = [];
+  static List<MusicData> getCreated() {
+    return _created;
+  }
 
+  static void clearCreated() {
+    _created.clear();
+  }
 
-List<MusicData> _created = [];
+  static void deleteCreated(String key) {
+    _created.removeWhere((song) => song.key == key);
+  }
 
-// ** Debug Only **
-List<MusicData> getCreate() {
-  return _created;
 }
 
 enum MusicType {
@@ -152,12 +169,12 @@ extension MusicTypeExtension on MusicType {
 
 extension MediaItemParseMusicData on MediaItem {
   MusicData toMusicData() {
-    return _created.firstWhere((musicData) => musicData.key == id);
+    return MusicData.getCreated().firstWhere((musicData) => musicData.key == id);
   }
 }
 
 extension AudioSourceParseMusicData on IndexedAudioSource {
   MusicData toMusicData() {
-    return _created.firstWhere((musicData) => musicData.key == tag["key"]);
+    return MusicData.getCreated().firstWhere((musicData) => musicData.key == tag["key"]);
   }
 }

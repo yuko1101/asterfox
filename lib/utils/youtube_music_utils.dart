@@ -16,8 +16,7 @@ class YouTubeMusicUtils {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local && !forceRemote) {
-      final song = LocalMusicsData.getByAudioId(videoId, key)!;
-      song.destroy();
+      final song = LocalMusicsData.getByAudioId(audioId: videoId, key: key, isTemporary: true)!;
       return song.url;
     } else {
       // オンライン上から取得
@@ -54,7 +53,7 @@ class YouTubeMusicUtils {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local) {
-      return LocalMusicsData.getByAudioId(videoId, key) as YouTubeMusicData?;
+      return LocalMusicsData.getByAudioId(audioId: videoId, key: key) as YouTubeMusicData?;
     } else {
       // オンライン上から取得
 
