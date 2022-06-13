@@ -80,11 +80,9 @@ class MusicListener {
   }
 
   void _updateLoopMode(LoopMode loopMode) {
-    final preRepeatMode = _audioDataManager.repeatState;
     _musicManager.repeatModeNotifier.value = AudioDataManager.getRepeatState(loopMode);
     _updateHasNextNotifier();
 
-    if (preRepeatMode != AudioDataManager.getRepeatState(loopMode)) SettingsData.settings.set(key: "repeatMode", value: repeatStateToString(loopModeToRepeatState(loopMode))).save();
   }
 
   void _updateHasNextNotifier() {

@@ -30,6 +30,8 @@ Future<void> main() async {
   musicManager = MusicManager(true);
   await musicManager.init();
 
+  await SettingsData.applyMusicManagerSettings();
+
   await CustomColors.load();
   await SongHistoryData.init(musicManager);
 
@@ -45,7 +47,6 @@ Future<void> main() async {
     activateConnectionChecker: true
   );
 
-  await SettingsData.applyMusicManagerSettings();
   await LocalMusicsData.init();
 
   init();
