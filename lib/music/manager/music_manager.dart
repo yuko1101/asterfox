@@ -19,10 +19,8 @@ import 'audio_handler.dart';
 class MusicManager {
 
   MusicManager(this.showNotification) {
-    useAudioSession = SettingsData.getValue(key: "useAudioSession") as bool;
   }
   final bool showNotification;
-  late final bool useAudioSession;
 
   late final SessionAudioHandler _audioHandler;
   late final AudioSession _audioSession;
@@ -57,15 +55,6 @@ class MusicManager {
             androidShowNotificationBadge: true,
           )
       );
-      if (useAudioSession) {
-        _audioSession = await AudioSession.instance;
-        await _audioSession.configure(const AudioSessionConfiguration.music());
-        if (await _audioSession.setActive(true)) {
-          print('AudioSession activated');
-        } else {
-          print('AudioSession activation failed');
-        }
-      }
     } else {
       print("windowsMode");
       _audioHandler = SessionAudioHandler(false);

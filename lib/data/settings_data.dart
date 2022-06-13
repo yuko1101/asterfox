@@ -10,7 +10,6 @@ class SettingsData {
   static late ConfigFile settings;
   static Map<String, dynamic> defaultData = {
     "theme": "light",
-    "useAudioSession": true,
     "repeatMode": "none",
     "auto_download": false,
   };
