@@ -181,7 +181,7 @@ class _SearchTile extends StatelessWidget {
           setQuery(suggestion.audioId);
         } else if (suggestion.tags.contains(_Tag.youtube)) {
           close();
-          HomeScreenMusicManager.addSong(const Uuid().v4(), youtubeId: suggestion.audioId);
+          HomeScreenMusicManager.addSong(key: const Uuid().v4(), youtubeId: suggestion.audioId);
         }
       },
     );

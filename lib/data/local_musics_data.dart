@@ -73,8 +73,9 @@ class LocalMusicsData {
 
 
 extension LocalMusicsDataExtension on MusicData {
-  Future<void> save() async {
-    await MusicDownloader.download(this);
+  Future<void> save({bool saveToJSON = true}) async {
+    if (isSaved) return;
+    await MusicDownloader.download(this, saveToJSON: saveToJSON);
   }
 
   bool get isSaved => LocalMusicsData.isSaved(song: this);

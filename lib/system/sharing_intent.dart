@@ -16,13 +16,34 @@ class SharingIntent {
 
   static Future<void> addSong(String? text) async {
     if (text == null) return;
+
+    final isPlaylist = await loadPlaylist(text);
+    if (isPlaylist) return;
+
     VideoId id;
     try {
       id = VideoId(text);
-    } catch (e) {
+    } on ArgumentError {
       Fluttertoast.showToast(msg: Language.getText("invalid_url"));
       return;
     }
-    HomeScreenMusicManager.addSong(const Uuid().v4(), youtubeId: id.value);
+    HomeScreenMusicManager.addSong(key: const Uuid().v4(), youtubeId: id.value);
+  }
+
+  static final RegExp playlistRegex = RegExp(r"^https?://www.youtube.com/playlist\?((.+=.+&)*)list=([^&]+)");
+  static Future<bool> loadPlaylist(String text) async {
+    if (!playlistRegex.hasMatch(text)) {
+      return false;
+    }
+    final match = playlistRegex.firstMatch(text)!;
+    final listId = match.group(3)!;
+    final yt = YoutubeExplode();
+    final playlist = await yt.playlists.get(listId);
+    if (playlist.videoCount == null || playlist.videoCount == 0) {
+      Fluttertoast.showToast(msg: Language.getText("external_playlist_empty"));
+      return true;
+    }
+    await HomeScreenMusicManager.addSongs(count: playlist.videoCount!, youtubePlaylist: listId);
+    return true;
   }
 }

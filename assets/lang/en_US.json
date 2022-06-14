@@ -31,7 +31,7 @@
   "play_previous_song": "Play the previous song",
   "downloading": "Downloading",
   "menu": "Menu",
-  "downloading_automatically": "Downloading automatically",
+  "downloading_automatically": "Auto Download",
   "play": "Play",
   "pause": "Pause",
   "play_next_song": "Play the next song",
@@ -45,5 +45,6 @@
   "off": "OFF",
   "on": "ON",
   "song": "Song",
-  "queue": "Queue"
+  "queue": "Queue",
+  "external_playlist_empty": "The external playlist is empty"
 }

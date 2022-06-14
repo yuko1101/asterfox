@@ -45,5 +45,6 @@
   "off": "OFF",
   "on": "ON",
   "song": "曲",
-  "queue": "キュー"
+  "queue": "キュー",
+  "external_playlist_empty": "外部プレイリストに曲がありません"
 }

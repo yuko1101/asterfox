@@ -17,7 +17,7 @@ final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
 final Map<String, ValueNotifier<int>> downloadProgress = {};
 
 class MusicDownloader {
-  static Future<void> download(MusicData? song) async {
+  static Future<void> download(MusicData? song, {bool saveToJSON = true}) async {
     if (song == null) return;
     if (song.isLocal) return;
 
@@ -38,7 +38,7 @@ class MusicDownloader {
 
     song.imageUrl = imagePath;
 
-    await LocalMusicsData.save(song);
+    if (saveToJSON) await LocalMusicsData.save(song);
 
     print("finished!");
 

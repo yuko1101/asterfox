@@ -97,7 +97,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                   Fluttertoast.showToast(msg: Language.getText("song_unable_to_load"));
                   return;
                 }
-                HomeScreenMusicManager.addSong(key, musicData: musicData);
+                HomeScreenMusicManager.addSong(key: key, musicData: musicData);
                 EasyApp.popPage(context);
               },
             );
