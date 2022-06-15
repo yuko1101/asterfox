@@ -9,13 +9,13 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class SharingIntent {
   static void init() {
-    ReceiveSharingIntent.getTextStream().listen(addSong);
+    ReceiveSharingIntent.getTextStream().listen((text) => addSong(text, false));
 
-    ReceiveSharingIntent.getInitialText().then(addSong);
+    ReceiveSharingIntent.getInitialText().then((text) => addSong(text, true));
   }
 
-  static Future<void> addSong(String? text) async {
-    Fluttertoast.showToast(msg: "Loading from $text");
+  static Future<void> addSong(String? text, bool initial) async {
+    Fluttertoast.showToast(msg: "${initial ? "Initial " : ""}Loading from $text");
     if (text == null) return;
 
     final isPlaylist = await loadPlaylist(text);
