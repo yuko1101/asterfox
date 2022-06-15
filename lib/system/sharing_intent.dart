@@ -15,6 +15,7 @@ class SharingIntent {
   }
 
   static Future<void> addSong(String? text) async {
+    Fluttertoast.showToast(msg: "Loading from $text");
     if (text == null) return;
 
     final isPlaylist = await loadPlaylist(text);
@@ -30,13 +31,13 @@ class SharingIntent {
     HomeScreenMusicManager.addSong(key: const Uuid().v4(), youtubeId: id.value);
   }
 
-  static final RegExp playlistRegex = RegExp(r"^https?://www.youtube.com/playlist\?((.+=.+&)*)list=([^&]+)");
+  static final RegExp playlistRegex = RegExp(r"^https?://(www.)?youtube.com/playlist\?((.+=.+&)*)list=([^&]+)");
   static Future<bool> loadPlaylist(String text) async {
     if (!playlistRegex.hasMatch(text)) {
       return false;
     }
     final match = playlistRegex.firstMatch(text)!;
-    final listId = match.group(3)!;
+    final listId = match.group(4)!;
     final yt = YoutubeExplode();
     final playlist = await yt.playlists.get(listId);
     if (playlist.videoCount == null || playlist.videoCount == 0) {

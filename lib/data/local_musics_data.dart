@@ -79,4 +79,12 @@ extension LocalMusicsDataExtension on MusicData {
   }
 
   bool get isSaved => LocalMusicsData.isSaved(song: this);
+
+  // 保存されている場合、URL等を保存されてるものに更新する
+  void loadLocal() {
+    if (!isSaved) return;
+    url = savePath;
+    imageUrl = imageSavePath;
+    isLocal = true;
+  }
 }

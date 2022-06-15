@@ -33,10 +33,9 @@ class MusicDownloader {
     }
     song.url = song.savePath;
 
-    final imagePath = "${EasyApp.localPath}/images/${song.audioId}.png";
-    await _saveImage(song, imagePath);
+    await _saveImage(song, song.imageSavePath);
 
-    song.imageUrl = imagePath;
+    song.imageUrl = song.imageSavePath;
 
     if (saveToJSON) await LocalMusicsData.save(song);
 

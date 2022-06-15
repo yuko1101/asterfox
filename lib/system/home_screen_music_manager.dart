@@ -150,6 +150,9 @@ class HomeScreenMusicManager {
                 await LocalMusicsData.save(song);
               }
             }
+            for (final song in songs) {
+              song.loadLocal();
+            }
             await musicManager.addAll(songs);
             completer.complete();
           },

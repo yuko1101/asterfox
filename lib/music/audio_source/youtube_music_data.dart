@@ -46,6 +46,9 @@ class YouTubeMusicData extends MusicData {
   String get savePath => "${EasyApp.localPath}/music/yt_$id.mp3";
 
   @override
+  String get imageSavePath => "${EasyApp.localPath}/music/yt_$id.png";
+
+  @override
   String get mediaURL => "https://www.youtube.com/watch?v=$id";
 
   @override

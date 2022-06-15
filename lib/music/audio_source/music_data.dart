@@ -61,6 +61,7 @@ class MusicData {
   String get mediaURL => remoteUrl;
 
   String get savePath => "${EasyApp.localPath}/music/$key.mp3";
+  String get imageSavePath => "${EasyApp.localPath}/images/$key.png";
 
   void destroy() {
     _created.remove(this);
@@ -74,7 +75,7 @@ class MusicData {
    Map<String, dynamic> toJson() {
     final json = {
       'type': type.name,
-      'url': savePath,
+      'url': url,
       'remoteUrl': remoteUrl,
       'imageUrl': imageUrl,
       'remoteImageUrl': remoteImageUrl,

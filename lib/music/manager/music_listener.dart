@@ -37,7 +37,10 @@ class MusicListener {
 
   void _updatePlaylistAndIndex(SequenceState? sequenceState) {
     final sequence = sequenceState?.sequence;
+
+
     final playlist = AudioDataManager.getPlaylist(sequence);
+    print(playlist.map((e) => e.url));
 
     var currentIndex = AudioDataManager.getCurrentIndex(sequenceState?.currentIndex, sequence);
     if (playlist.isNotEmpty && currentIndex == null) {
