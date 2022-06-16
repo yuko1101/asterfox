@@ -3,6 +3,7 @@ import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/widget/music_footer.dart';
+import 'package:asterfox/widget/music_widgets/volume_widget.dart';
 import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:asterfox/widget/song_search.dart';
@@ -16,7 +17,6 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends BaseScreen {
   static late InAppNotification homeNotification;
-
   HomeScreen() : super(
     screen: Stack(
       children: [
@@ -31,7 +31,12 @@ class HomeScreen extends BaseScreen {
             padding: const EdgeInsets.only(top: 15),
           ),
         ),
-        homeNotification
+        homeNotification,
+        const Positioned(
+          bottom: 5,
+          left: 5,
+          child: VolumeWidget(),
+        ),
       ]
     ),
     appBar: const HomeScreenAppBar(),

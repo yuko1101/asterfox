@@ -17,6 +17,8 @@ class AudioDataManager {
   RepeatState get repeatState => getRepeatState(audioPlayer.loopMode);
   bool get shuffled => audioPlayer.shuffleModeEnabled;
   bool get hasNext => getHasNext(audioPlayer.currentIndex, audioPlayer.sequence, audioPlayer.loopMode, audioPlayer.shuffleModeEnabled, audioPlayer.shuffleIndices);
+  double get volume => audioPlayer.volume;
+  double get currentSongVolume => currentSong?.volume ?? 1.0;
 
   List<int>? get shuffledIndices => audioPlayer.shuffleIndices;
 

@@ -33,6 +33,9 @@ class MusicListener {
     _audioHandler.audioPlayer.loopModeStream.listen((loopMode) {
       _updateLoopMode(loopMode);
     });
+    _audioHandler.audioPlayer.volumeStream.listen((volume) {
+      _updateVolume(volume);
+    });
   }
 
   void _updatePlaylistAndIndex(SequenceState? sequenceState) {
@@ -66,7 +69,7 @@ class MusicListener {
     _musicManager.currentSongNotifier.notify();
     _musicManager.shuffleModeNotifier.notify();
 
-
+    _musicManager.updateVolume();
   }
 
   void _updatePlaybackState(PlayerState playerState) {
@@ -91,6 +94,11 @@ class MusicListener {
   void _updateHasNextNotifier() {
     final hasNext = _audioDataManager.hasNext;
     _musicManager.hasNextNotifier.value = hasNext;
+  }
+
+  void _updateVolume(double volume) {
+    _musicManager.volumeNotifier.value = volume;
+    print("volume: $volume");
   }
 
 }

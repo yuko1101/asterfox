@@ -40,8 +40,9 @@ class MusicManager {
   final hasNextNotifier = ValueNotifier<bool>(false);
   final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
   final shuffleModeNotifier = DataNotifier<bool>(false);
-
-
+  final volumeNotifier = ValueNotifier<double>(1.0);
+  final baseVolumeNotifier = ValueNotifier<double>(1.0);
+  final muteNotifier = ValueNotifier<bool>(false);
 
   Future<void> init() async {
     if (!windowsMode && showNotification) {
@@ -190,6 +191,22 @@ class MusicManager {
     if (wasPlaying) {
       await play();
     }
+  }
+
+  // TODO: save the base volume
+  Future<void> setBaseVolume(double volume) async {
+    baseVolumeNotifier.value = volume;
+    print("setBaseVolume: " + volume.toString());
+    await updateVolume();
+  }
+
+  Future<void> updateVolume() async {
+    await _audioHandler.audioPlayer.setVolume((muteNotifier.value ? 0 : 1) * baseVolumeNotifier.value * audioDataManager.currentSongVolume);
+  }
+
+  Future<void> setMute(bool mute) async {
+    muteNotifier.value = mute;
+    await updateVolume();
   }
 
   SessionAudioHandler get audioHandler => _audioHandler;
