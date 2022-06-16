@@ -15,7 +15,7 @@ class SharingIntent {
   }
 
   static Future<void> addSong(String? text, bool initial) async {
-    Fluttertoast.showToast(msg: "${initial ? "Initial " : ""}Loading from $text");
+    // Fluttertoast.showToast(msg: "${initial ? "Initial " : ""}Loading from $text");
     if (text == null) return;
 
     final isPlaylist = await loadPlaylist(text);
