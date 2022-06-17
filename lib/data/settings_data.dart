@@ -12,6 +12,7 @@ class SettingsData {
     "theme": "light",
     "repeatMode": "none",
     "auto_download": false,
+    "volume": 1.0,
   };
   static Future<void> init() async {
     settings = await ConfigFile(File("${EasyApp.localPath}/settings.json"), defaultData).load();
@@ -31,6 +32,8 @@ class SettingsData {
       SettingsData.settings.set(key: "repeatMode", value: repeatStateToString(musicManager.audioDataManager.repeatState)).save();
     });
     if (repeatStateToString(musicManager.repeatModeNotifier.value) != getValue(key: "repeatMode") as String) musicManager.setRepeatMode(repeatStateFromString(getValue(key: "repeatMode") as String));
+    musicManager.baseVolumeNotifier.value = getValue(key: "volume");
+    await musicManager.updateVolume();
   }
 
   static dynamic getValue({String? key, List<String>? keys}) {

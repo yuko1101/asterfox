@@ -194,9 +194,10 @@ class MusicManager {
     }
   }
 
-  // TODO: save the base volume
   Future<void> setBaseVolume(double volume) async {
     baseVolumeNotifier.value = volume;
+    SettingsData.settings.set(key: "volume", value: volume);
+    await SettingsData.save();
     print("setBaseVolume: " + volume.toString());
     await updateVolume();
   }
