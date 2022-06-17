@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 final _tween = Tween<double>(begin: 0, end: 1);
 
 class VolumeWidget extends StatefulWidget {
-  const VolumeWidget({Key? key}) : super(key: key);
+  VolumeWidget({Key? key}) : super(key: key);
 
   static IconData getVolumeIcon(double volume, bool mute) {
     if (volume == 0 || mute) {
@@ -27,16 +27,23 @@ class VolumeWidget extends StatefulWidget {
   // when get the slider position, the position is log2(volume).
   static const num base = 3;
 
+  final ValueNotifier<bool> openedNotifier = ValueNotifier(false);
+
+
   @override
-  State<VolumeWidget> createState() => _VolumeWidgetState();
+  State<VolumeWidget> createState() => VolumeWidgetState();
 }
 
-class _VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderStateMixin {
+class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   late Animation<double> _progress;
 
   double _sliderValue = 0;
+
+  void close() {
+    _controller.reverse();
+  }
 
   @override
   void initState() {
@@ -47,6 +54,14 @@ class _VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSt
       vsync: this
     );
     _progress = _controller.drive(_tween);
+
+    _controller.addListener(() {
+      if (_controller.isAnimating) {
+        widget.openedNotifier.value = _controller.velocity >= 0;
+      } else {
+        widget.openedNotifier.value = _controller.isCompleted;
+      }
+    });
   }
 
   @override
@@ -63,33 +78,15 @@ class _VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSt
             notifier1: musicManager.baseVolumeNotifier,
             notifier2: musicManager.muteNotifier,
             builder: (context, volume, mute, child) {
-              // animation is not started yet
-              if (_progress.value == 0) {
-                // TODO: fix that onPressed ripple doesn't work
-                return InkWell(
-                  onLongPress: () {
-                    musicManager.setMute(!mute);
-                  },
-                  onTap: () {},
-                  child: FloatingActionButton(
-                    onPressed: _controller.forward,
-                    child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
-                    backgroundColor: Theme.of(context).backgroundColor,
-                    foregroundColor: Theme.of(context).extraColors.primary,
-                  ),
-                );
-              }
-              // animation is started
-              else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 5),
-                      height: _progress.value * 120,
-                      width: 50,
-                      decoration: BoxDecoration(
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 5),
+                    height: _progress.value * 120,
+                    width: 55,
+                    decoration: BoxDecoration(
                         color: Theme.of(context).backgroundColor,
                         borderRadius: BorderRadius.circular(40),
                         boxShadow: [
@@ -99,40 +96,41 @@ class _VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSt
                             offset: const Offset(0, 2),
                           )
                         ]
-                      ),
-                      child: RotatedBox(
-                        quarterTurns: 3,
-                        child: Slider(
-                          value: _sliderValue,
-                          max: 1,
-                          min: -1,
-                          thumbColor: CustomColors.getColor("accent"),
-                          activeColor: CustomColors.getColor("accent"),
-                          inactiveColor: CustomColors.getColor("accent").withOpacity(0.2),
-                          onChanged: (value) {
-                            setState(() {
-                              _sliderValue = value;
-                            });
-                          },
-                          onChangeEnd: (value) {
-                            if (value == -1) {
-                              musicManager.setMute(true);
-                              return;
-                            }
-                            musicManager.setBaseVolume(pow(VolumeWidget.base, value).toDouble());
-                          },
-                        ),
-                      ),
                     ),
-                    FloatingActionButton(
-                      onPressed: _controller.reverse,
+                    child: (_progress.value > 0.4) ? RotatedBox(
+                      quarterTurns: 3,
+                      child: Slider(
+                        value: _sliderValue,
+                        max: 1,
+                        min: -1,
+                        thumbColor: CustomColors.getColor("accent"),
+                        activeColor: CustomColors.getColor("accent"),
+                        inactiveColor: CustomColors.getColor("accent").withOpacity(0.2),
+                        onChanged: (value) {
+                          setState(() {
+                            _sliderValue = value;
+                          });
+                        },
+                        onChangeEnd: (value) {
+                          musicManager.setBaseVolume(pow(VolumeWidget.base, value).toDouble());
+                        },
+                      ),
+                    ) : null,
+                  ),
+                  InkWell(
+                    onLongPress: () {
+                      musicManager.setMute(!mute);
+                    },
+                    onTap: () {},
+                    child: FloatingActionButton(
+                      onPressed: _progress.value == 0 ? _controller.forward : _controller.reverse,
                       child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
                       backgroundColor: Theme.of(context).backgroundColor,
                       foregroundColor: Theme.of(context).extraColors.primary,
                     ),
-                  ],
-                );
-              }
+                  ),
+                ],
+              );
             }
         ),
     );
