@@ -114,8 +114,7 @@ class SongSearch extends SearchDelegate<String> {
 
     final result = [...videoResult, ...wordResult];
 
-    // ignore the warning
-    if (time == null || (time != null && time >= searchedAt)) {
+    if (time == null || (time >= searchedAt)) {
       suggestions.value = result;
     }
     
