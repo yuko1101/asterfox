@@ -12,7 +12,7 @@ import 'package:easy_app/screen/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:asterfox/system/theme/theme.dart';
 
-import '../widget/song_search.dart';
+import '../widget/search/song_search.dart';
 
 class DebugScreen extends BaseScreen {
   const DebugScreen() : super(
