@@ -27,6 +27,9 @@ class VolumeWidget extends StatefulWidget {
   // when get the slider position, the position is log2(volume).
   static const num base = 3;
 
+  static const double max = 1.0;
+  static const double min = -1.0;
+
   final ValueNotifier<bool> openedNotifier = ValueNotifier(false);
 
 
@@ -48,7 +51,11 @@ class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSta
   @override
   void initState() {
     super.initState();
+
     _sliderValue = MathUtils.log(musicManager.audioDataManager.volume, VolumeWidget.base);
+    _sliderValue = max(_sliderValue, VolumeWidget.min);
+    _sliderValue = min(_sliderValue, VolumeWidget.max);
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this
@@ -101,8 +108,8 @@ class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSta
                       quarterTurns: 3,
                       child: Slider(
                         value: _sliderValue,
-                        max: 1,
-                        min: -1,
+                        max: VolumeWidget.max,
+                        min: VolumeWidget.min,
                         thumbColor: CustomColors.getColor("accent"),
                         activeColor: CustomColors.getColor("accent"),
                         inactiveColor: CustomColors.getColor("accent").withOpacity(0.2),
