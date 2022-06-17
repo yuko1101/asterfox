@@ -79,6 +79,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                           onPressed: () {
                             setState(() {
                               SongHistoryData.removeFromHistory(song);
+                              Navigator.pop(context);
                             });
                           },
                           child: Text(Language.getText("delete")),
