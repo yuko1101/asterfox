@@ -28,7 +28,8 @@ class MusicManager {
 
   static bool windowsMode = OS.getOS() == OSType.windows;
   
-  //notifiers
+  // notifiers
+  // sync fast notifier can be used as notifier.value to get the value.
   final progressNotifier = ProgressNotifier();
   final playlistNotifier = PlaylistNotifier([]);
   final shuffledPlaylistNotifier = PlaylistNotifier([]);
@@ -41,8 +42,8 @@ class MusicManager {
   final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
   final shuffleModeNotifier = DataNotifier<bool>(false);
   final volumeNotifier = ValueNotifier<double>(1.0);
-  final baseVolumeNotifier = ValueNotifier<double>(1.0);
-  final muteNotifier = ValueNotifier<bool>(false);
+  final baseVolumeNotifier = ValueNotifier<double>(1.0); // sync fast
+  final muteNotifier = ValueNotifier<bool>(false); // sync fast
 
   Future<void> init() async {
     if (!windowsMode && showNotification) {
