@@ -111,6 +111,9 @@ class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSta
                             _sliderValue = value;
                           });
                         },
+                        onChangeStart: (value) {
+                          musicManager.setMute(false);
+                        },
                         onChangeEnd: (value) {
                           musicManager.setBaseVolume(pow(VolumeWidget.base, value).toDouble());
                         },
@@ -119,6 +122,9 @@ class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSta
                   ),
                   InkWell(
                     onLongPress: () {
+                      musicManager.setMute(!mute);
+                    },
+                    onDoubleTap: () {
                       musicManager.setMute(!mute);
                     },
                     onTap: () {},
