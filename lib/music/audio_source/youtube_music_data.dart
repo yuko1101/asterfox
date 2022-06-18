@@ -1,8 +1,8 @@
-import 'package:asterfox/system/exceptions/network_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../../system/exceptions/network_exception.dart';
 import '../../system/exceptions/refresh_url_failed_exception.dart';
 import '../../utils/youtube_music_utils.dart';
 import 'music_data.dart';
@@ -49,7 +49,7 @@ class YouTubeMusicData extends MusicData {
   String get savePath => "${EasyApp.localPath}/music/yt_$id.mp3";
 
   @override
-  String get imageSavePath => "${EasyApp.localPath}/music/yt_$id.png";
+  String get imageSavePath => "${EasyApp.localPath}/images/yt_$id.png";
 
   @override
   String get mediaURL => "https://www.youtube.com/watch?v=$id";

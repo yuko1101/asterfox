@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
+import '../system/exceptions/network_exception.dart';
 import '../utils/extensions.dart';
 
 class LocalMusicsData {
@@ -87,9 +88,32 @@ class LocalMusicsData {
     final futures = songs.map((e) => removeFromLocal(e));
     await Future.wait(futures);
   }
+
+  /// Clean unused local files
+  static Future<void> clean() async {
+    final List<FileSystemEntity> toRemove = [];
+
+    final songs = getAll(isTemporary: true);
+
+    final musicDir = Directory("${EasyApp.localPath}/music");
+    final musicFiles = musicDir.listSync();
+    toRemove.addAll(musicFiles.where((file) {
+      return !songs.any((song) => song.savePath == file.path);
+    }));
+
+    final imagesDir = Directory("${EasyApp.localPath}/images");
+    final imagesFiles = imagesDir.listSync();
+    toRemove.addAll(imagesFiles.where((file) {
+      return !songs.any((song) => song.imageSavePath == file.path);
+    }));
+
+    await Future.wait(toRemove.map((file) => file.delete()));
+    print("Cleaned ${toRemove.length} files");
+  }
 }
 
 extension LocalMusicsDataExtension on MusicData {
+  /// Throws [NetworkException] if the network is not accessible.
   Future<void> save({bool saveToJSON = true}) async {
     if (isSaved) return;
     await MusicDownloader.download(this, saveToJSON: saveToJSON);

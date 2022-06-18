@@ -1,22 +1,23 @@
 import 'dart:async';
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/music_downloader.dart';
-import 'package:asterfox/system/exceptions/network_exception.dart';
-import 'package:asterfox/utils/extensions.dart';
-import 'package:asterfox/utils/youtube_music_utils.dart';
+
+import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
-import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../data/custom_colors.dart';
+import '../data/local_musics_data.dart';
+import '../data/settings_data.dart';
+import '../main.dart';
+import '../music/audio_source/music_data.dart';
+import '../music/music_downloader.dart';
 import '../screens/home_screen.dart';
+import '../utils/extensions.dart';
+import '../utils/youtube_music_utils.dart';
 import 'exceptions/local_song_not_found_exception.dart';
+import 'exceptions/network_exception.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSong({
@@ -92,7 +93,15 @@ class HomeScreenMusicManager {
             song = musicData!;
           }
 
-          if (autoDownloadEnabled) await song.save();
+          if (autoDownloadEnabled) {
+            try {
+              await song.save();
+            } on NetworkException {
+              Fluttertoast.showToast(
+                  msg: Language.getText("network_not_accessible"));
+              return;
+            }
+          }
           await musicManager.add(song);
           completer.complete();
         },
@@ -184,13 +193,20 @@ class HomeScreenMusicManager {
 
           if (autoDownloadEnabled) {
             isDownloadMode!.value = true;
-            await Future.wait(songs.map((song) async {
-              await song.save(saveToJSON: false);
-              progress!.value = progress.value + 1;
-            }));
-            for (final song in songs) {
-              if (song.isSaved) continue;
-              await LocalMusicsData.save(song);
+            try {
+              await Future.wait(songs.map((song) async {
+                await song.save(saveToJSON: false);
+                progress!.value = progress.value + 1;
+              }));
+              for (final song in songs) {
+                if (song.isSaved) continue;
+                await LocalMusicsData.save(song);
+              }
+            } on NetworkException {
+              Fluttertoast.showToast(
+                  msg: Language.getText("network_not_accessible"));
+              completer.complete();
+              return;
             }
           }
           for (final song in songs) {
@@ -278,7 +294,13 @@ class HomeScreenMusicManager {
           ),
         ),
         progress: () async {
-          await MusicDownloader.download(song);
+          try {
+            await MusicDownloader.download(song);
+          } on NetworkException {
+            Fluttertoast.showToast(
+                msg: Language.getText("network_not_accessible"));
+            return;
+          }
           completer.complete();
         },
       ),

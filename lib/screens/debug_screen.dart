@@ -34,77 +34,86 @@ class DebugMainScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: Theme.of(context).brightness == Brightness.dark
-                      ? const Icon(Icons.dark_mode)
-                      : const Icon(Icons.light_mode),
-                  onPressed: () {
-                    if (AppTheme.themeNotifier.value != "dark") {
-                      AppTheme.setTheme("dark");
-                    } else {
-                      AppTheme.setTheme("light");
-                      // showSearch(context: context, delegate: delegate);
-                    }
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.skip_previous),
-                  onPressed: musicManager.previous,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.play_arrow),
-                  onPressed: musicManager.play,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.pause),
-                  onPressed: musicManager.pause,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.skip_next),
-                  onPressed: musicManager.next,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("保存された曲の全削除"),
-                        content: const Text("本当に削除しますか？"),
-                        actions: [
-                          TextButton(
-                            child: const Text("キャンセル"),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          TextButton(
-                            child: const Text("OK"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              LocalMusicsData.removeAllFromLocal(
-                                  LocalMusicsData.getAll());
-                              LocalMusicsData.saveData();
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    showSearch(context: context, delegate: SongSearch());
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.discount),
-                  onPressed: () {
-                    print(MusicData.getCreated());
-                  },
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Theme.of(context).brightness == Brightness.dark
+                        ? const Icon(Icons.dark_mode)
+                        : const Icon(Icons.light_mode),
+                    onPressed: () {
+                      if (AppTheme.themeNotifier.value != "dark") {
+                        AppTheme.setTheme("dark");
+                      } else {
+                        AppTheme.setTheme("light");
+                        // showSearch(context: context, delegate: delegate);
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.skip_previous),
+                    onPressed: musicManager.previous,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.play_arrow),
+                    onPressed: musicManager.play,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.pause),
+                    onPressed: musicManager.pause,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.skip_next),
+                    onPressed: musicManager.next,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("保存された曲の全削除"),
+                          content: const Text("本当に削除しますか？"),
+                          actions: [
+                            TextButton(
+                              child: const Text("キャンセル"),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            TextButton(
+                              child: const Text("OK"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                LocalMusicsData.removeAllFromLocal(
+                                    LocalMusicsData.getAll());
+                                LocalMusicsData.saveData();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      showSearch(context: context, delegate: SongSearch());
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.discount),
+                    onPressed: () {
+                      print(MusicData.getCreated());
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: () async {
+                      LocalMusicsData.clean();
+                    },
+                  ),
+                ],
+              ),
             ),
             ValueListenableBuilder<MusicData?>(
               valueListenable: musicManager.currentSongNotifier,

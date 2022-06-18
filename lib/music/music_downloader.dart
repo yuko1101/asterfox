@@ -9,7 +9,9 @@ import 'package:http/http.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../data/local_musics_data.dart';
+import '../system/exceptions/network_exception.dart';
 import '../utils/extensions.dart';
+import '../utils/network_check.dart';
 import 'audio_source/music_data.dart';
 import 'audio_source/youtube_music_data.dart';
 
@@ -17,10 +19,13 @@ final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
 final Map<String, ValueNotifier<int>> downloadProgress = {};
 
 class MusicDownloader {
+  /// Throws [NetworkException] if network is not accessible.
   static Future<void> download(MusicData? song,
       {bool saveToJSON = true}) async {
     if (song == null) return;
     if (song.isLocal) return;
+
+    NetworkCheck.check();
 
     if (downloading.value.contains(song.key)) return;
 
