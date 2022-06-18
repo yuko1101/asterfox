@@ -108,10 +108,19 @@ class SongSearch extends SearchDelegate<String> {
     final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
-    final videoSuggestions = videos.map((e) => SongSuggestion(tags: [SongTag.youtube, localIds.contains(e.id.value) ? SongTag.local : SongTag.remote], name: e.title, audioId: e.id.value, keywords: e.keywords)).toList();
+    final videoSuggestions = videos.map((e) => SongSuggestion(
+        tags: [
+          SongTag.youtube,
+          localIds.contains(e.id.value) ? SongTag.local : SongTag.remote
+        ],
+        title: e.title,
+        subtitle: e.author,
+        audioId: e.id.value,
+        keywords: e.keywords
+    )).toList();
 
     final List<String> words = await YouTubeMusicUtils.searchWords(text);
-    final wordsSuggestions = words.map((e) => SongSuggestion(tags: [SongTag.word], name: e, audioId: e, keywords: [])).toList();
+    final wordsSuggestions = words.map((e) => SongSuggestion(tags: [SongTag.word], title: e, audioId: e, keywords: [])).toList();
 
     final videoResult = filterAndSort(videoSuggestions);
     final wordResult = filterAndSort(wordsSuggestions);
@@ -132,7 +141,7 @@ class SongSearch extends SearchDelegate<String> {
     list.addAll(locals.map((e) {
       final List<SongTag> tags = [SongTag.local];
       if (e is YouTubeMusicData) tags.add(SongTag.youtube);
-      return SongSuggestion(tags: tags, name: e.title, audioId: e is YouTubeMusicData ? e.id : e.url, keywords: e.keywords);
+      return SongSuggestion(tags: tags, title: e.title, subtitle: e.author, audioId: e is YouTubeMusicData ? e.id : e.url, keywords: e.keywords);
     }));
 
     final List<SongSuggestion> result = filterAndSort(list, filterSortingList: [RelatedFilter(text), RelevanceSorting(text)]);
@@ -146,12 +155,14 @@ class SongSearch extends SearchDelegate<String> {
 class SongSuggestion {
   SongSuggestion({
     required this.tags,
-    required this.name,
+    required this.title,
+    this.subtitle,
     required this.audioId,
     required this.keywords
   });
   final List<SongTag> tags;
-  final String name;
+  final String title;
+  final String? subtitle;
   final String audioId;
   final List<String> keywords;
 }

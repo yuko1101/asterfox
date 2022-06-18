@@ -56,7 +56,7 @@ class RelevanceSorting extends FilterSorting {
 
 int _getScore(SongSuggestion suggestion, String query) {
   int score = 0;
-  if (suggestion.name.toLowerCase().contains(query.toLowerCase())) score += 1;
+  if (suggestion.title.toLowerCase().contains(query.toLowerCase())) score += 1;
   if (suggestion.keywords.any((e) => e.toLowerCase().contains(query.toLowerCase()))) score += 1;
   return score;
 }

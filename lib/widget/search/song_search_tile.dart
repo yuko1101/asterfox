@@ -1,3 +1,4 @@
+import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/widget/search/song_search.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -30,17 +31,54 @@ class SongSearchTile extends StatelessWidget {
     } else {
       icon = const Icon(Icons.question_mark);
     }
-    return ListTile(
-      leading: icon,
-      title: Text(suggestion.name),
-      onTap: () async {
-        if (suggestion.tags.contains(SongTag.word)) {
-          setQuery(suggestion.audioId);
-        } else if (suggestion.tags.contains(SongTag.youtube)) {
-          close();
-          HomeScreenMusicManager.addSong(key: const Uuid().v4(), youtubeId: suggestion.audioId);
-        }
-      },
+    return Container(
+      padding: const EdgeInsets.only(top: 8, bottom: 8),
+      child: InkWell(
+        onTap: () {
+          if (suggestion.tags.contains(SongTag.word)) {
+            setQuery(suggestion.audioId);
+          } else if (suggestion.tags.contains(SongTag.youtube)) {
+            close();
+            HomeScreenMusicManager.addSong(key: const Uuid().v4(), youtubeId: suggestion.audioId);
+          }
+        },
+        child: Row(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 10, right: 10),
+              width: 40,
+              height: 40,
+              child: icon,
+            ),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    suggestion.title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Theme.of(context).extraColors.primary,
+                    ),
+                  ),
+                  if (suggestion.subtitle != null) Text(
+                    suggestion.subtitle!,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).extraColors.secondary,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
