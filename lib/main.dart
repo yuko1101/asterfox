@@ -26,12 +26,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyApp.initializePath();
 
+  // run this before initializing the music manager
   await SettingsData.init();
   SettingsData.applySettings();
 
+  // run this before initializing HomeScreen
   musicManager = MusicManager(true);
   await musicManager.init();
 
+  // run this after initializing the music manager
   await SettingsData.applyMusicManagerSettings();
 
   await CustomColors.load();
@@ -49,6 +52,9 @@ Future<void> main() async {
     activateConnectionChecker: true,
     minimumNetworkLevel: ConnectivityResult.wifi,
   );
+
+  // run this after initializing NetworkUtils in EasyApp
+  await SettingsData.applyNetworkSettings();
 
   await LocalMusicsData.init();
 

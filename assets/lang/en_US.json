@@ -46,5 +46,7 @@
   "on": "ON",
   "song": "Song",
   "queue": "Queue",
-  "external_playlist_empty": "The external playlist is empty"
+  "external_playlist_empty": "The external playlist is empty",
+  "use_mobile_network": "Use mobile network",
+  "use_mobile_network_description": "Allow this app to use the mobile network."
 }

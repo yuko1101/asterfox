@@ -46,5 +46,7 @@
   "on": "ON",
   "song": "曲",
   "queue": "キュー",
-  "external_playlist_empty": "外部プレイリストに曲がありません"
+  "external_playlist_empty": "外部プレイリストに曲がありません",
+  "use_mobile_network": "モバイルデータ通信の使用",
+  "use_mobile_network_description": "モバイルデータ通信を使用の許可設定"
 }

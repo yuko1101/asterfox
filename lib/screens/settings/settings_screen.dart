@@ -1,6 +1,8 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screen.dart';
 import 'package:easy_app/utils/languages.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -70,7 +72,11 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             title: Text(Language.getText("useful_functions")),
             tiles: [
               SettingsTile.switchTile(
+                title: Text(Language.getText("auto_download")),
+                description:
+                    Text(Language.getText("auto_download_description")),
                 initialValue: SettingsData.getValue(key: "auto_download"),
+                activeSwitchColor: CustomColors.getColor("accent"),
                 onToggle: (value) {
                   setState(() {
                     SettingsData.settings
@@ -78,11 +84,24 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                     SettingsData.save();
                   });
                 },
-                title: Text(Language.getText("auto_download")),
-                activeSwitchColor: CustomColors.getColor("accent"),
+              ),
+              SettingsTile.switchTile(
+                title: Text(Language.getText("use_mobile_network")),
                 description:
-                    Text(Language.getText("auto_download_description")),
-              )
+                    Text(Language.getText("use_mobile_network_description")),
+                initialValue: SettingsData.getValue(key: "use_mobile_network"),
+                activeSwitchColor: CustomColors.getColor("accent"),
+                onToggle: (value) {
+                  setState(() {
+                    NetworkUtils.setMinimumNetworkLevel(value
+                        ? ConnectivityResult.mobile
+                        : ConnectivityResult.wifi);
+                    SettingsData.settings
+                        .set(key: "use_mobile_network", value: value);
+                    SettingsData.save();
+                  });
+                },
+              ),
             ],
           )
         ],
