@@ -26,7 +26,7 @@ class VolumeWidget extends StatefulWidget {
   // if the base is 2,
   // when moved the volume slider, the volume is set to 2^x, where x is the value of the slider.
   // when get the slider position, the position is log2(volume).
-  static const num base = 3;
+  static const num base = 4;
 
   static const double max = 1.0;
   static const double min = -1.0;
@@ -54,7 +54,7 @@ class VolumeWidgetState extends State<VolumeWidget>
     super.initState();
 
     _sliderValue =
-        MathUtils.log(musicManager.audioDataManager.volume, VolumeWidget.base);
+        MathUtils.log(musicManager.baseVolumeNotifier.value, VolumeWidget.base);
     _sliderValue = max(_sliderValue, VolumeWidget.min);
     _sliderValue = min(_sliderValue, VolumeWidget.max);
 

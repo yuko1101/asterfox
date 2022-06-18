@@ -104,8 +104,7 @@ class MoreActionsButton extends StatelessWidget {
           icon: const Icon(Icons.more_vert),
           tooltip: Language.getText("more_actions"),
           onPressed: _actions.any((action) => action.songFilter(song))
-              ? null
-              : () {
+              ? () {
                   showModalBottomSheet(
                     context: context,
                     backgroundColor: Colors.transparent,
@@ -159,7 +158,8 @@ class MoreActionsButton extends StatelessWidget {
                       ),
                     ),
                   );
-                },
+                }
+              : null,
         );
       },
     );
