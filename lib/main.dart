@@ -9,10 +9,12 @@ import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:asterfox/screens/song_history_screen.dart';
 import 'package:asterfox/system/sharing_intent.dart';
 import 'package:asterfox/system/theme/theme.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:flutter/material.dart';
 import 'music/manager/music_manager.dart';
@@ -43,7 +45,8 @@ Future<void> main() async {
       "ja_JP",
       "en_US",
     ],
-    activateConnectionChecker: true
+    activateConnectionChecker: true,
+    minimumNetworkLevel: ConnectivityResult.wifi,
   );
 
   await LocalMusicsData.init();

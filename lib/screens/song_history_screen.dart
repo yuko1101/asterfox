@@ -1,6 +1,8 @@
 import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
+import 'package:asterfox/system/exceptions/network_exception.dart';
+import 'package:asterfox/system/exceptions/refresh_url_failed_exception.dart';
 import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:easy_app/easy_app.dart';
@@ -93,13 +95,16 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
               ),
               onTap: () async {
                 final key = const Uuid().v4();
-                final musicData = await song.renew(key);
-                if (musicData == null) {
-                  Fluttertoast.showToast(msg: Language.getText("song_unable_to_load"));
-                  return;
+                try {
+                  final musicData = await song.renew(key);
+                  HomeScreenMusicManager.addSong(key: key, musicData: musicData);
+                  EasyApp.popPage(context);
+                } on RefreshUrlFailedException {
+                  // TODO: multi-language
+                  Fluttertoast.showToast(msg: "Failed to refresh url");
+                } on NetworkException {
+                  Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
                 }
-                HomeScreenMusicManager.addSong(key: key, musicData: musicData);
-                EasyApp.popPage(context);
               },
             );
           },

@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/music_manager.dart';
+import 'package:asterfox/system/exceptions/local_song_not_found_exception.dart';
+import 'package:asterfox/system/exceptions/network_exception.dart';
+import 'package:asterfox/system/exceptions/refresh_url_failed_exception.dart';
 import 'package:asterfox/utils/extensions.dart';
+import 'package:asterfox/utils/network_check.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
@@ -72,23 +76,31 @@ extension SongHistoryDataExtension on MusicData {
 
   // ローカルストレージに保存されている場合は、LocalMusicsDataから読み込み、
   // そうでない場合は、URLを更新して、リモートのMusicDataとして読み込む。
-  Future<MusicData?> renew(String key, {bool isTemporary = false}) async {
-    final localMusicData =  LocalMusicsData.getByAudioId(audioId: audioId, key: key, isTemporary: isTemporary);
-    if (localMusicData != null) return localMusicData;
+  /// Throws [NetworkException] if network is not accessible.
+  ///
+  /// Throws [RefreshUrlFailedException] if refresh url failed.
+  Future<MusicData> renew(String key, {bool isTemporary = false}) async {
+    try {
+      final localMusicData =  LocalMusicsData.getByAudioId(audioId: audioId, key: key, isTemporary: isTemporary);
+      return localMusicData;
+    } on LocalSongNotFoundException {
+      // インターネット接続確認
+      NetworkCheck.check();
 
-    final url = await isUrlAvailable() ? remoteUrl : await refreshURL();
-    // urlを取得できなかった場合は、nullを返す
-    if (url == null) return null;
+      final url = await isUrlAvailable() ? remoteUrl : await refreshURL();
+      // urlを取得できなかった場合は、nullを返す
+      if (url == null) throw RefreshUrlFailedException();
 
-    final json = toJson();
-    json["url"] = url;
-    json["remoteUrl"] = url;
+      final json = toJson();
+      json["url"] = url;
+      json["remoteUrl"] = url;
 
-    if ((json["remoteImageUrl"] as String).isEmpty) {
-      throw Exception("Cannot resolve image url");
+      if ((json["remoteImageUrl"] as String).isEmpty) {
+        throw Exception("Cannot resolve image url");
+      }
+      json["imageUrl"] = json["remoteImageUrl"];
+
+      return MusicData.fromJson(json: json, isLocal: false, key: key, isTemporary: isTemporary);
     }
-    json["imageUrl"] = json["remoteImageUrl"];
-
-    return MusicData.fromJson(json: json, isLocal: false, key: key, isTemporary: isTemporary);
   }
 }

@@ -7,6 +7,7 @@ import 'package:easy_app/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
 
 import '../music/music_downloader.dart';
+import '../system/exceptions/local_song_not_found_exception.dart';
 
 class LocalMusicsData {
   static late ConfigFile musicData;
@@ -39,8 +40,8 @@ class LocalMusicsData {
     return data.values.where((element) => element["type"] == MusicType.youtube.name).map((e) => e["id"] as String).toList();
   }
 
-  static MusicData? getByAudioId({required String? audioId, required String key, bool isTemporary = false}) {
-    if (audioId == null || !musicData.has(audioId)) return null;
+  static MusicData getByAudioId({required String audioId, required String key, bool isTemporary = false}) {
+    if (!musicData.has(audioId)) throw LocalSongNotFoundException(audioId);
     final data = musicData.getValue(audioId) as Map<String, dynamic>;
     return MusicData.fromJson(json: data, isLocal: true, key: key, isTemporary: isTemporary);
   }

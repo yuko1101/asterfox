@@ -10,7 +10,10 @@ import 'package:asterfox/widget/search/sort_and_filter.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+
+import '../../system/exceptions/network_exception.dart';
 
 class SongSearch extends SearchDelegate<String> {
   @override
@@ -101,7 +104,11 @@ class SongSearch extends SearchDelegate<String> {
 
   void search(BuildContext context, String text) async {
     close(context, "");
-    await HomeScreenMusicManager.addSongBySearch(text);
+    try {
+      await HomeScreenMusicManager.addSongBySearch(text);
+    } on NetworkException {
+      Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
+    }
   }
 
   void loadSuggestions(String text, {int? time}) async {

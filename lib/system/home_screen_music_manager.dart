@@ -5,15 +5,18 @@ import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/music_downloader.dart';
+import 'package:asterfox/system/exceptions/network_exception.dart';
 import 'package:asterfox/utils/extensions.dart';
 import 'package:asterfox/utils/youtube_music_utils.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../screens/home_screen.dart';
+import 'exceptions/local_song_not_found_exception.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSong({required String key, String? youtubeId, MusicData? musicData}) async {
@@ -60,7 +63,19 @@ class HomeScreenMusicManager {
           progress: () async {
             MusicData song;
             if (youtubeId != null) {
-              song = (await YouTubeMusicUtils.getYouTubeAudio(videoId: youtubeId, key: key))!;
+              try {
+                song = (await YouTubeMusicUtils.getYouTubeAudio(videoId: youtubeId, key: key));
+              } on VideoUnplayableException {
+                Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
+                return;
+              } on LocalSongNotFoundException {
+                // TODO: multi-language
+                Fluttertoast.showToast(msg: "Local song not found");
+                return;
+              } on NetworkException {
+                Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
+                return;
+              }
             } else {
               song = musicData!;
             }
@@ -137,7 +152,12 @@ class HomeScreenMusicManager {
             if (musicDataList != null) {
               songs = musicDataList;
             } else {
-              songs = (await YouTubeMusicUtils.getPlaylist(playlistId: youtubePlaylist!)).first;
+              try {
+                songs = (await YouTubeMusicUtils.getPlaylist(playlistId: youtubePlaylist!)).first;
+              } on NetworkException {
+                Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
+                return;
+              }
             }
 
             if (autoDownload) {

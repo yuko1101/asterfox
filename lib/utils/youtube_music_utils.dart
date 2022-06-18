@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/main.dart';
 import 'package:asterfox/music/audio_source/youtube_music_data.dart';
-import 'package:asterfox/utils/logger.dart';
-import 'package:easy_app/easy_app.dart';
+import 'package:asterfox/system/exceptions/local_song_not_found_exception.dart';
+import 'package:asterfox/utils/network_check.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:easy_app/utils/pair.dart';
@@ -13,31 +11,33 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:http/http.dart' as http;
+import 'package:asterfox/system/exceptions/network_exception.dart';
 
 class YouTubeMusicUtils {
-  static Future<String?> getAudioURL(String videoId, String key, {bool forceRemote = false}) async {
+  /// Throws [NetworkException] if the network is not accessible.
+  ///
+  /// Throws [VideoUnplayableException] if the video is not playable.
+  ///
+  /// Throws [LocalSongNotFoundException] if the song is local one, and is not found in the local storage.
+  static Future<String> getAudioURL(String videoId, String key, {bool forceRemote = false}) async {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local && !forceRemote) {
-      final song = LocalMusicsData.getByAudioId(audioId: videoId, key: key, isTemporary: true)!;
+      final song = LocalMusicsData.getByAudioId(audioId: videoId, key: key, isTemporary: true);
       return song.url;
     } else {
       // オンライン上から取得
 
       // インターネット接続確認
-      if (!NetworkUtils.networkAccessible()) {
-        NetworkUtils.showNetworkAccessDeniedMessage();
-        return null;
-      }
+      NetworkCheck.check();
 
       final YoutubeExplode yt = YoutubeExplode();
       StreamManifest manifest;
       try {
         manifest = await yt.videos.streamsClient.getManifest(videoId);
       } on VideoUnplayableException {
-        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
         yt.close();
-        return null;
+        rethrow;
       }
 
       // if (manifest.audio.isEmpty && manifest.audioOnly.isEmpty) {
@@ -52,7 +52,12 @@ class YouTubeMusicUtils {
     }
   }
 
-  static Future<YouTubeMusicData?> getYouTubeAudio({
+  /// Throws [NetworkException] if the network is not accessible.
+  ///
+  /// Throws [VideoUnplayableException] if the video is not playable.
+  ///
+  /// Throws [LocalSongNotFoundException] if the song is local one, and is not found in the local storage.
+  static Future<YouTubeMusicData> getYouTubeAudio({
     required String videoId,
     required String key,
     bool isTemporary = false,
@@ -60,27 +65,21 @@ class YouTubeMusicUtils {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local) {
-      return LocalMusicsData.getByAudioId(audioId: videoId, key: key) as YouTubeMusicData?;
+      // throws LocalSongNotFoundException
+      return LocalMusicsData.getByAudioId(audioId: videoId, key: key) as YouTubeMusicData;
     } else {
       // オンライン上から取得
 
       // インターネット接続確認
-      if (!NetworkUtils.networkAccessible()) {
-        NetworkUtils.showNetworkAccessDeniedMessage(
-          notAccessibleMessage: Language.getText("network_not_accessible"),
-          notConnectedMessage: Language.getText("network_not_connected")
-        );
-        return null;
-      }
+      NetworkCheck.check();
 
       final YoutubeExplode yt = YoutubeExplode();
       StreamManifest manifest;
       try {
         manifest = await yt.videos.streamsClient.getManifest(videoId);
       } on VideoUnplayableException {
-        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
         yt.close();
-        return null;
+        rethrow;
       }
 
       // if (manifest.audio.isEmpty && manifest.audioOnly.isEmpty) {
@@ -104,18 +103,14 @@ class YouTubeMusicUtils {
   }
 
   /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
+  ///
+  /// Throws [NetworkException] if the network is not accessible.
   static Future<Pair<List<YouTubeMusicData>, List<Video>>> getPlaylist({
     required String playlistId,
     bool isTemporary = false,
   }) async {
     // インターネット接続確認
-    if (!NetworkUtils.networkAccessible()) {
-      NetworkUtils.showNetworkAccessDeniedMessage(
-          notAccessibleMessage: Language.getText("network_not_accessible"),
-          notConnectedMessage: Language.getText("network_not_connected")
-      );
-      return Pair([], []);
-    }
+    NetworkCheck.check();
 
     final YoutubeExplode yt = YoutubeExplode();
     // final Playlist playlist = await yt.playlists.get(playlistId);
@@ -189,14 +184,22 @@ class YouTubeMusicUtils {
     );
   }
 
+  /// Throws [NetworkException] if the network is not accessible.
   static Future<List<Video>> searchYouTubeVideo(String query) async {
+    // インターネット接続確認
+    NetworkCheck.check();
+
     final YoutubeExplode yt = YoutubeExplode();
     final results = await yt.search.search(query);
     yt.close();
     return results.toList();
   }
 
+  /// Throws [NetworkException] if the network is not accessible.
   static Future<List<String>> searchWords(String query) async {
+    // インターネット接続確認
+    NetworkCheck.check();
+
     final YoutubeExplode yt = YoutubeExplode();
     final results = await yt.search.getQuerySuggestions(query);
     yt.close();
