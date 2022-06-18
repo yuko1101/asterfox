@@ -27,7 +27,8 @@ class BubbleSort<T> {
     return result;
   }
 
-  FutureOr<List<T>> sortWithCorrector(List<T> list, int Function(T) corrector) async {
+  FutureOr<List<T>> sortWithCorrector(
+      List<T> list, int Function(T) corrector) async {
     List<T> result = list;
     for (int i = 0; i < result.length - 1; i++) {
       for (int j = i + 1; j < result.length; j++) {

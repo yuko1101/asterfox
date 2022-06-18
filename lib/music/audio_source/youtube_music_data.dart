@@ -1,28 +1,30 @@
+import 'package:asterfox/system/exceptions/network_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:uuid/uuid.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../../system/exceptions/refresh_url_failed_exception.dart';
 import '../../utils/youtube_music_utils.dart';
 import 'music_data.dart';
 
 class YouTubeMusicData extends MusicData {
-  YouTubeMusicData(
-      {required this.id,
-      required String url,
-      required String remoteUrl,
-      required String imageUrl,
-      required String remoteImageUrl,
-      required String title,
-      required String description,
-      required String author,
-      required this.authorId,
-      required List<String> keywords,
-      required Duration duration,
-      required bool isLocal,
-      required double volume,
-      required String key,
-      bool isTemporary = false,
-      })
-      : super(
+  YouTubeMusicData({
+    required this.id,
+    required String url,
+    required String remoteUrl,
+    required String imageUrl,
+    required String remoteImageUrl,
+    required String title,
+    required String description,
+    required String author,
+    required this.authorId,
+    required List<String> keywords,
+    required Duration duration,
+    required bool isLocal,
+    required double volume,
+    required String key,
+    bool isTemporary = false,
+  }) : super(
           type: MusicType.youtube,
           url: url,
           remoteUrl: remoteUrl,
@@ -38,7 +40,7 @@ class YouTubeMusicData extends MusicData {
           volume: volume,
           key: key,
           isTemporary: isTemporary,
-  );
+        );
 
   final String id;
   final String authorId;
@@ -54,18 +56,23 @@ class YouTubeMusicData extends MusicData {
 
   @override
   Map<String, dynamic> get jsonExtras => {
-    'id': id,
-    'authorId': authorId,
-  };
+        'id': id,
+        'authorId': authorId,
+      };
 
+  /// Throws [RefreshUrlFailedException] if failed to refresh the url.
   @override
-  Future<String?> refreshURL() async {
-    final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(), forceRemote: true);
-    if (url != null) {
+  Future<String> refreshURL() async {
+    try {
+      final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(),
+          forceRemote: true);
       remoteUrl = url;
       return url;
+    } on NetworkException {
+      throw RefreshUrlFailedException();
+    } on VideoUnplayableException {
+      throw RefreshUrlFailedException();
     }
-    return null;
   }
 
   final _expiresRegex = RegExp("expires=([0-9]+)");

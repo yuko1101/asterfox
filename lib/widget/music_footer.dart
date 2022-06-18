@@ -66,15 +66,15 @@ class MobileMusicFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.5),
-              spreadRadius:   5,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            )
-          ],
-          color: Theme.of(context).backgroundColor
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
+        color: Theme.of(context).backgroundColor,
       ),
       height: 170,
       child: Column(
@@ -89,8 +89,8 @@ class MobileMusicFooter extends StatelessWidget {
                 child: const FittedBox(
                   child: MusicThumbnail(),
                   fit: BoxFit.fitHeight,
-                  clipBehavior: Clip.antiAlias
-                )
+                  clipBehavior: Clip.antiAlias,
+                ),
               ),
               Expanded(
                 child: Column(
@@ -98,12 +98,12 @@ class MobileMusicFooter extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     CurrentSongTitle(),
-                    CurrentSongAuthor()
+                    CurrentSongAuthor(),
                   ],
                 ),
               ),
-              const SizedBox(width: 10)
-            ]
+              const SizedBox(width: 10),
+            ],
           ),
           Container(
             margin: const EdgeInsets.only(left: 20, right: 20),
@@ -113,7 +113,7 @@ class MobileMusicFooter extends StatelessWidget {
                   child: TimeText(),
                   alignment: Alignment.bottomRight,
                 ),
-                AudioProgressBar()
+                AudioProgressBar(),
               ],
             ),
           ),
@@ -141,10 +141,10 @@ class MobileMusicFooter extends StatelessWidget {
                   ],
                 ),
               ),
-            ]
-          )
-        ]
-      )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

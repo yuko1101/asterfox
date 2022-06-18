@@ -14,8 +14,8 @@ class SingleNotifierWidget<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<T>(
-        valueListenable: notifier,
-        builder: builder
+      valueListenable: notifier,
+      builder: builder,
     );
   }
 }
@@ -35,15 +35,15 @@ class DoubleNotifierWidget<T, U> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<T>(
-        valueListenable: notifier1,
-        builder: (context, value1, child) {
-          return ValueListenableBuilder<U>(
-              valueListenable: notifier2,
-              builder: (context, value2, child) {
-                return builder(context, value1, value2, child);
-              }
-          );
-        }
+      valueListenable: notifier1,
+      builder: (context, value1, child) {
+        return ValueListenableBuilder<U>(
+          valueListenable: notifier2,
+          builder: (context, value2, child) {
+            return builder(context, value1, value2, child);
+          },
+        );
+      },
     );
   }
 }
@@ -65,20 +65,20 @@ class TripleNotifierWidget<T, U, V> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<T>(
-        valueListenable: notifier1,
-        builder: (context, value1, child) {
-          return ValueListenableBuilder<U>(
-              valueListenable: notifier2,
-              builder: (context, value2, child) {
-                return ValueListenableBuilder<V>(
-                    valueListenable: notifier3,
-                    builder: (context, value3, child) {
-                      return builder(context, value1, value2, value3, child);
-                    }
-                );
-              }
-          );
-        }
+      valueListenable: notifier1,
+      builder: (context, value1, child) {
+        return ValueListenableBuilder<U>(
+          valueListenable: notifier2,
+          builder: (context, value2, child) {
+            return ValueListenableBuilder<V>(
+              valueListenable: notifier3,
+              builder: (context, value3, child) {
+                return builder(context, value1, value2, value3, child);
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -102,25 +102,26 @@ class QuadNotifierWidget<T, U, V, W> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<T>(
-        valueListenable: notifier1,
-        builder: (context, value1, child) {
-          return ValueListenableBuilder<U>(
-              valueListenable: notifier2,
-              builder: (context, value2, child) {
-                return ValueListenableBuilder<V>(
-                    valueListenable: notifier3,
-                    builder: (context, value3, child) {
-                      return ValueListenableBuilder<W>(
-                          valueListenable: notifier4,
-                          builder: (context, value4, child) {
-                            return builder(context, value1, value2, value3, value4, child);
-                          }
-                      );
-                    }
+      valueListenable: notifier1,
+      builder: (context, value1, child) {
+        return ValueListenableBuilder<U>(
+          valueListenable: notifier2,
+          builder: (context, value2, child) {
+            return ValueListenableBuilder<V>(
+              valueListenable: notifier3,
+              builder: (context, value3, child) {
+                return ValueListenableBuilder<W>(
+                  valueListenable: notifier4,
+                  builder: (context, value4, child) {
+                    return builder(
+                        context, value1, value2, value3, value4, child);
+                  },
                 );
-              }
-          );
-        }
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -146,30 +147,31 @@ class QuintNotifierWidget<T, U, V, W, X> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<T>(
-        valueListenable: notifier1,
-        builder: (context, value1, child) {
-          return ValueListenableBuilder<U>(
-              valueListenable: notifier2,
-              builder: (context, value2, child) {
-                return ValueListenableBuilder<V>(
-                    valueListenable: notifier3,
-                    builder: (context, value3, child) {
-                      return ValueListenableBuilder<W>(
-                          valueListenable: notifier4,
-                          builder: (context, value4, child) {
-                            return ValueListenableBuilder<X>(
-                                valueListenable: notifier5,
-                                builder: (context, value5, child) {
-                                  return builder(context, value1, value2, value3, value4, value5, child);
-                                }
-                            );
-                          }
-                      );
-                    }
+      valueListenable: notifier1,
+      builder: (context, value1, child) {
+        return ValueListenableBuilder<U>(
+          valueListenable: notifier2,
+          builder: (context, value2, child) {
+            return ValueListenableBuilder<V>(
+              valueListenable: notifier3,
+              builder: (context, value3, child) {
+                return ValueListenableBuilder<W>(
+                  valueListenable: notifier4,
+                  builder: (context, value4, child) {
+                    return ValueListenableBuilder<X>(
+                      valueListenable: notifier5,
+                      builder: (context, value5, child) {
+                        return builder(context, value1, value2, value3, value4,
+                            value5, child);
+                      },
+                    );
+                  },
                 );
-              }
-          );
-        }
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

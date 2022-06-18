@@ -12,17 +12,18 @@ import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 
 class SongHistoryScreen extends BaseScreen {
-  SongHistoryScreen() : super(
-    appBar: const SongHistoryAppBar(),
-    screen: const SongHistoryMainScreen(),
-  );
+  SongHistoryScreen()
+      : super(
+          appBar: const SongHistoryAppBar(),
+          screen: const SongHistoryMainScreen(),
+        );
 }
 
 class SongHistoryAppBar extends StatelessWidget with PreferredSizeWidget {
   const SongHistoryAppBar({
     Key? key,
   }) : super(key: key);
-  
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
@@ -51,63 +52,71 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
   Widget build(BuildContext context) {
     final songs = SongHistoryData.getAll(isTemporary: true).reversed.toList();
     return SafeArea(
-        child: songs.isEmpty ? Center(
-          child: Text(Language.getText("no_song_history"), style: TextStyle(color: Theme.of(context).extraColors.secondary)),
-        ) : ListView.builder(
-          itemCount: songs.length,
-          itemBuilder: (context, index) {
-            final song = songs[index];
-            return ListTile(
-              title: Text(song.title),
-              subtitle: Text(song.author),
-              trailing: IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: Language.getText("delete_from_history"),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text(Language.getText("delete_from_history")),
-                      content: Text(Language.getText("delete_from_history_confirm_message")),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(Language.getText("cancel")),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              SongHistoryData.removeFromHistory(song);
-                              Navigator.pop(context);
-                            });
-                          },
-                          child: Text(Language.getText("delete")),
-                        ),
-                      ],
-                    ),
-
-                  );
-
-                },
+      child: songs.isEmpty
+          ? Center(
+              child: Text(
+                Language.getText("no_song_history"),
+                style: TextStyle(
+                  color: Theme.of(context).extraColors.secondary,
+                ),
               ),
-              onTap: () async {
-                final key = const Uuid().v4();
-                try {
-                  final musicData = await song.renew(key);
-                  HomeScreenMusicManager.addSong(key: key, musicData: musicData);
-                  EasyApp.popPage(context);
-                } on RefreshUrlFailedException {
-                  // TODO: multi-language
-                  Fluttertoast.showToast(msg: "Failed to refresh url");
-                } on NetworkException {
-                  Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
-                }
+            )
+          : ListView.builder(
+              itemCount: songs.length,
+              itemBuilder: (context, index) {
+                final song = songs[index];
+                return ListTile(
+                  title: Text(song.title),
+                  subtitle: Text(song.author),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.close),
+                    tooltip: Language.getText("delete_from_history"),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(Language.getText("delete_from_history")),
+                          content: Text(Language.getText(
+                              "delete_from_history_confirm_message")),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(Language.getText("cancel")),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  SongHistoryData.removeFromHistory(song);
+                                  Navigator.pop(context);
+                                });
+                              },
+                              child: Text(Language.getText("delete")),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  onTap: () async {
+                    final key = const Uuid().v4();
+                    try {
+                      final musicData = await song.renew(key);
+                      HomeScreenMusicManager.addSong(
+                          key: key, musicData: musicData);
+                      EasyApp.popPage(context);
+                    } on RefreshUrlFailedException {
+                      // TODO: multi-language
+                      Fluttertoast.showToast(msg: "Failed to refresh url");
+                    } on NetworkException {
+                      Fluttertoast.showToast(
+                          msg: Language.getText("network_not_accessible"));
+                    }
+                  },
+                );
               },
-            );
-          },
-        ),
+            ),
     );
   }
 }

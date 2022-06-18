@@ -15,10 +15,10 @@ class MusicThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<MusicData?>(
-        valueListenable: musicManager.currentSongNotifier,
-        builder: (context, song, child) {
-          return MusicImageWidget(song?.imageUrl);
-        },
+      valueListenable: musicManager.currentSongNotifier,
+      builder: (context, song, child) {
+        return MusicImageWidget(song?.imageUrl);
+      },
     );
   }
 }
@@ -37,5 +37,4 @@ class MusicImageWidget extends StatelessWidget {
     }
     return Image.file(File(image!));
   }
-
 }

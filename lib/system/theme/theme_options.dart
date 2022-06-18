@@ -8,7 +8,7 @@ class ThemeOptions extends ThemeExtension<ThemeOptions> {
 
   @override
   ThemeExtension<ThemeOptions> copyWith({
-      ShadowLevel? shadow,
+    ShadowLevel? shadow,
   }) {
     return ThemeOptions(
       shadow: shadow ?? this.shadow,
@@ -16,11 +16,11 @@ class ThemeOptions extends ThemeExtension<ThemeOptions> {
   }
 
   @override
-  ThemeExtension<ThemeOptions> lerp(ThemeExtension<ThemeOptions>? other, double t) {
+  ThemeExtension<ThemeOptions> lerp(
+      ThemeExtension<ThemeOptions>? other, double t) {
     return this;
   }
 }
-
 
 enum ShadowLevel {
   none,

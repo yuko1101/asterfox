@@ -17,7 +17,8 @@ final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
 final Map<String, ValueNotifier<int>> downloadProgress = {};
 
 class MusicDownloader {
-  static Future<void> download(MusicData? song, {bool saveToJSON = true}) async {
+  static Future<void> download(MusicData? song,
+      {bool saveToJSON = true}) async {
     if (song == null) return;
     if (song.isLocal) return;
 
@@ -57,7 +58,8 @@ class MusicDownloader {
 
     final YoutubeExplode yt = YoutubeExplode();
     final manifest = await yt.videos.streamsClient.getManifest(id);
-    final streams = manifest.audioOnly.isEmpty ? manifest.audio : manifest.audioOnly;
+    final streams =
+        manifest.audioOnly.isEmpty ? manifest.audio : manifest.audioOnly;
     final audio = streams.first;
     final audioStream = yt.videos.streamsClient.get(audio);
     final output = file.openWrite(mode: FileMode.writeOnlyAppend);
@@ -78,11 +80,10 @@ class MusicDownloader {
     yt.close();
   }
 
-
   // TODO: add startsAt and endsAt as parameters to download a part of the song
-  static Future<String> _downloadMp3(String url, String downloadPath, String key) async {
+  static Future<String> _downloadMp3(
+      String url, String downloadPath, String key) async {
     var completer = Completer<String>();
-
 
     final request = Request('GET', Uri.parse(url));
     final StreamedResponse response = await Client().send(request);
@@ -98,7 +99,7 @@ class MusicDownloader {
     print("downloading...");
 
     response.stream.listen(
-          (List<int> newBytes) {
+      (List<int> newBytes) {
         bytes.addAll(newBytes);
         final downloadedLength = bytes.length;
         final percentage = (downloadedLength / contentLength! * 100).ceil();
@@ -118,7 +119,6 @@ class MusicDownloader {
     );
 
     return completer.future;
-
   }
 
   static Future<void> _saveImage(MusicData song, String path) async {
@@ -128,7 +128,9 @@ class MusicDownloader {
     }
     final imageRes = await http.get(Uri.parse(song.imageUrl));
     final imageFile = File(path);
-    if (!imageFile.parent.existsSync()) imageFile.parent.createSync(recursive: true);
+    if (!imageFile.parent.existsSync()) {
+      imageFile.parent.createSync(recursive: true);
+    }
     imageFile.writeAsBytesSync(imageRes.bodyBytes);
     print("Download Complete!");
   }

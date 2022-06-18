@@ -13,9 +13,14 @@ class CurrentSongTitle extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              child: Text(musicData?.title ?? "", style: const TextStyle(fontSize: 20))
+            physics: const BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            child: Text(
+              musicData?.title ?? "",
+              style: const TextStyle(
+                fontSize: 20,
+              ),
+            ),
           ),
         );
       },
@@ -32,11 +37,16 @@ class CurrentSongAuthor extends StatelessWidget {
       builder: (_, musicData, __) {
         return Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child:
-          SingleChildScrollView(
+          child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            child: Text(musicData?.author ?? "", style: const TextStyle(fontSize: 18, color: Colors.grey))
+            child: Text(
+              musicData?.author ?? "",
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
           ),
         );
       },

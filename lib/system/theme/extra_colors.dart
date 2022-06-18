@@ -6,7 +6,6 @@ class ExtraColors extends ThemeExtension<ExtraColors> {
     required this.secondary,
     required this.tertiary,
     required this.quaternary,
-
     required this.themeColor,
   });
   final Color primary;
@@ -34,7 +33,8 @@ class ExtraColors extends ThemeExtension<ExtraColors> {
   }
 
   @override
-  ThemeExtension<ExtraColors> lerp(ThemeExtension<ExtraColors>? other, double t) {
+  ThemeExtension<ExtraColors> lerp(
+      ThemeExtension<ExtraColors>? other, double t) {
     if (other is! ExtraColors) {
       return this;
     }
@@ -46,7 +46,4 @@ class ExtraColors extends ThemeExtension<ExtraColors> {
       themeColor: Color.lerp(themeColor, other.themeColor, t),
     );
   }
-
-
-
 }

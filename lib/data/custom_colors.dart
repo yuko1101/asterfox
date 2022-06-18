@@ -8,11 +8,10 @@ class CustomColors {
   static late ConfigFile data;
 
   static Future<void> load() async {
-    final Map<String, int> defaultColorData = {
-      "accent": Colors.orange.value
-    };
-    data = await ConfigFile(File("${EasyApp.localPath}/custom_colors.json"), defaultColorData).load();
-
+    final Map<String, int> defaultColorData = {"accent": Colors.orange.value};
+    data = await ConfigFile(
+            File("${EasyApp.localPath}/custom_colors.json"), defaultColorData)
+        .load();
   }
 
   static Color getColor(String name) {

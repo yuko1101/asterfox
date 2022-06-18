@@ -16,7 +16,9 @@ class SettingsData {
     "volume": 1.0,
   };
   static Future<void> init() async {
-    settings = await ConfigFile(File("${EasyApp.localPath}/settings.json"), defaultData).load();
+    settings = await ConfigFile(
+            File("${EasyApp.localPath}/settings.json"), defaultData)
+        .load();
   }
 
   static Future<void> save() async {
@@ -24,15 +26,26 @@ class SettingsData {
   }
 
   static Future<void> applySettings() async {
-    if (AppTheme.themeNotifier.value != getValue(key: "theme") as String) AppTheme.themeNotifier.value = getValue(key: "theme") as String;
+    if (AppTheme.themeNotifier.value != getValue(key: "theme") as String) {
+      AppTheme.themeNotifier.value = getValue(key: "theme") as String;
+    }
   }
 
   static Future<void> applyMusicManagerSettings() async {
     musicManager.repeatModeNotifier.addListener(() {
       print("repeatModeNotifier.addListener");
-      SettingsData.settings.set(key: "repeatMode", value: repeatStateToString(musicManager.audioDataManager.repeatState)).save();
+      SettingsData.settings
+          .set(
+              key: "repeatMode",
+              value: repeatStateToString(
+                  musicManager.audioDataManager.repeatState))
+          .save();
     });
-    if (repeatStateToString(musicManager.repeatModeNotifier.value) != getValue(key: "repeatMode") as String) musicManager.setRepeatMode(repeatStateFromString(getValue(key: "repeatMode") as String));
+    if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
+        getValue(key: "repeatMode") as String) {
+      musicManager.setRepeatMode(
+          repeatStateFromString(getValue(key: "repeatMode") as String));
+    }
     musicManager.baseVolumeNotifier.value = getValue(key: "volume");
     await musicManager.updateVolume();
   }

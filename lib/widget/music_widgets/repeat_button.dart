@@ -17,19 +17,22 @@ class RepeatButton extends StatelessWidget {
             return IconButton(
               icon: Icon(Icons.repeat, color: Theme.of(context).disabledColor),
               onPressed: musicManager.nextRepeatMode,
-              tooltip: "${Language.getText("repeat")}: ${Language.getText("off")}",
+              tooltip:
+                  "${Language.getText("repeat")}: ${Language.getText("off")}",
             );
           case RepeatState.all:
             return IconButton(
               icon: const Icon(Icons.repeat),
               onPressed: musicManager.nextRepeatMode,
-              tooltip: "${Language.getText("repeat")}: ${Language.getText("queue")}",
+              tooltip:
+                  "${Language.getText("repeat")}: ${Language.getText("queue")}",
             );
           case RepeatState.one:
             return IconButton(
               icon: const Icon(Icons.repeat_one),
               onPressed: musicManager.nextRepeatMode,
-              tooltip: "${Language.getText("repeat")}: 1${Language.getText("song")}",
+              tooltip:
+                  "${Language.getText("repeat")}: 1${Language.getText("song")}",
             );
         }
       },
@@ -99,4 +102,3 @@ enum RepeatState {
   all,
   one,
 }
-

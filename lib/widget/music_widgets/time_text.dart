@@ -9,16 +9,16 @@ class TimeText extends StatelessWidget {
   String getProgress(progress, total) {
     return total.inHours < 1
         ? total.inMinutes < 10
-        ? progress.toString().split(".")[0].replaceFirst("0:0", "")
-        : progress.toString().split(".")[0].replaceFirst("0:", "")
+            ? progress.toString().split(".")[0].replaceFirst("0:0", "")
+            : progress.toString().split(".")[0].replaceFirst("0:", "")
         : progress.toString().split(".")[0];
   }
 
   String getTotal(total) {
     return total.inHours < 1
         ? total.inMinutes < 10
-        ? total.toString().split(".")[0].replaceFirst("0:0", "")
-        : total.toString().split(".")[0].replaceFirst("0:", "")
+            ? total.toString().split(".")[0].replaceFirst("0:0", "")
+            : total.toString().split(".")[0].replaceFirst("0:", "")
         : total.toString().split(".")[0];
   }
 
@@ -29,9 +29,11 @@ class TimeText extends StatelessWidget {
       builder: (_, value, __) {
         return Text(
           "${getProgress(value.current, value.total)} / ${getTotal(value.total)}",
-          style: TextStyle(color: Theme.of(context).textTheme.headline3?.color)
+          style: TextStyle(
+            color: Theme.of(context).textTheme.headline3?.color,
+          ),
         );
-      }
+      },
     );
   }
 }

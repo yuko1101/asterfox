@@ -10,10 +10,11 @@ import '../../system/theme/theme.dart';
 import 'theme_settings_screen.dart';
 
 class SettingsScreen extends BaseScreen {
-  SettingsScreen() : super(
-    screen: const _MainSettingsScreen(),
-    appBar: const _AppBar(),
-  );
+  SettingsScreen()
+      : super(
+          screen: const _MainSettingsScreen(),
+          appBar: const _AppBar(),
+        );
 }
 
 class _AppBar extends StatelessWidget with PreferredSizeWidget {
@@ -51,17 +52,19 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
       body: SettingsList(
         sections: [
           SettingsSection(
-              title: Text(Language.getText("general_settings")),
-              tiles: [
-                SettingsTile.navigation(
-                  title: Text(Language.getText("theme")),
-                  description: Text(AppTheme.themes.keys.map((theme) => Language.getText("theme_$theme")).join(Language.getText("list_separator"))),
-                  onPressed: (context) {
-                    EasyApp.pushPage(context, ThemeSettingsScreen());
-                  },
-                  trailing: const Icon(Icons.keyboard_arrow_right),
-                )
-              ]
+            title: Text(Language.getText("general_settings")),
+            tiles: [
+              SettingsTile.navigation(
+                title: Text(Language.getText("theme")),
+                description: Text(AppTheme.themes.keys
+                    .map((theme) => Language.getText("theme_$theme"))
+                    .join(Language.getText("list_separator"))),
+                onPressed: (context) {
+                  EasyApp.pushPage(context, ThemeSettingsScreen());
+                },
+                trailing: const Icon(Icons.keyboard_arrow_right),
+              )
+            ],
           ),
           SettingsSection(
             title: Text(Language.getText("useful_functions")),
@@ -70,13 +73,15 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 initialValue: SettingsData.getValue(key: "auto_download"),
                 onToggle: (value) {
                   setState(() {
-                    SettingsData.settings.set(key: "auto_download", value: value);
+                    SettingsData.settings
+                        .set(key: "auto_download", value: value);
                     SettingsData.save();
                   });
                 },
                 title: Text(Language.getText("auto_download")),
                 activeSwitchColor: CustomColors.getColor("accent"),
-                description: Text(Language.getText("auto_download_description")),
+                description:
+                    Text(Language.getText("auto_download_description")),
               )
             ],
           )

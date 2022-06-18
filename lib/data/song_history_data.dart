@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/manager/music_manager.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
+import '../system/exceptions/network_exception.dart';
 import '../system/exceptions/refresh_url_failed_exception.dart';
 import '../utils/network_check.dart';
 import 'local_musics_data.dart';
@@ -17,11 +18,14 @@ class SongHistoryData {
   static const bool _compact = false;
 
   static Future<void> init(MusicManager manager) async {
-    historyData = await ConfigFile(File("${EasyApp.localPath}/history.json"), {"history": []}).load();
+    historyData = await ConfigFile(
+        File("${EasyApp.localPath}/history.json"), {"history": []}).load();
 
     // when song is played, add it to history.
     manager.currentSongNotifier.addListener(() {
-      if (manager.audioDataManager.currentSong != null) addAndSave(manager.audioDataManager.currentSong!);
+      if (manager.audioDataManager.currentSong != null) {
+        addAndSave(manager.audioDataManager.currentSong!);
+      }
     });
   }
 
@@ -40,12 +44,14 @@ class SongHistoryData {
 
   static List<MusicData> getAll({bool isTemporary = false}) {
     final data = historyData.getValue("history") as List<dynamic>;
-    return data.map((e) => MusicData.fromJson(
-      json: e,
-      isLocal: LocalMusicsData.isSaved(audioId: e["audioId"]),
-      key:  const Uuid().v4(),
-      isTemporary: isTemporary,
-    )).toList();
+    return data
+        .map((e) => MusicData.fromJson(
+              json: e,
+              isLocal: LocalMusicsData.isSaved(audioId: e["audioId"]),
+              key: const Uuid().v4(),
+              isTemporary: isTemporary,
+            ))
+        .toList();
   }
 
   static Future<void> removeFromHistory(MusicData song) async {
@@ -56,7 +62,8 @@ class SongHistoryData {
 
   static Future<void> removeAllFromHistory(List<MusicData> songs) async {
     final data = historyData.getValue("history") as List<dynamic>;
-    data.removeWhere((element) => songs.any((e) => e.audioId == element["audioId"]));
+    data.removeWhere(
+        (element) => songs.any((e) => e.audioId == element["audioId"]));
     await historyData.set(key: "history", value: data).save(compact: _compact);
   }
 
@@ -67,8 +74,10 @@ class SongHistoryData {
 
 extension SongHistoryDataExtension on MusicData {
   int? get lastPlayed {
-    final data = SongHistoryData.historyData.getValue("history") as List<dynamic>;
-    final song = data.firstWhere((element) => element["audioId"] == audioId, orElse: () => null);
+    final data =
+        SongHistoryData.historyData.getValue("history") as List<dynamic>;
+    final song = data.firstWhere((element) => element["audioId"] == audioId,
+        orElse: () => null);
     if (song == null) return null;
     return song["last_played"] as int;
   }
@@ -80,15 +89,15 @@ extension SongHistoryDataExtension on MusicData {
   /// Throws [RefreshUrlFailedException] if refresh url failed.
   Future<MusicData> renew(String key, {bool isTemporary = false}) async {
     try {
-      final localMusicData =  LocalMusicsData.getByAudioId(audioId: audioId, key: key, isTemporary: isTemporary);
+      final localMusicData = LocalMusicsData.getByAudioId(
+          audioId: audioId, key: key, isTemporary: isTemporary);
       return localMusicData;
     } on LocalSongNotFoundException {
       // インターネット接続確認
       NetworkCheck.check();
 
+      // can throw RefreshUrlFailedException
       final url = await isUrlAvailable() ? remoteUrl : await refreshURL();
-      // urlを取得できなかった場合は、nullを返す
-      if (url == null) throw RefreshUrlFailedException();
 
       final json = toJson();
       json["url"] = url;
@@ -99,7 +108,12 @@ extension SongHistoryDataExtension on MusicData {
       }
       json["imageUrl"] = json["remoteImageUrl"];
 
-      return MusicData.fromJson(json: json, isLocal: false, key: key, isTemporary: isTemporary);
+      return MusicData.fromJson(
+        json: json,
+        isLocal: false,
+        key: key,
+        isTemporary: isTemporary,
+      );
     }
   }
 }

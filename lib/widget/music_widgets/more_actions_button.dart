@@ -21,25 +21,26 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.share,
       title: Language.getText("share"),
       onTap: (context) async {
-        final MusicData song =
-          musicManager.audioDataManager.currentSong!;
+        final MusicData song = musicManager.audioDataManager.currentSong!;
         Share.share(song.mediaURL, subject: song.title);
         Navigator.pop(context);
       },
       songFilter: (MusicData? song) => song != null,
     ),
     _Action(
-        id: "youtube",
-        icon: Icons.open_in_new,
-        title: Language.getText("open_in_youtube"),
-        onTap: (context) async {
-          final launched = await launchUrl(Uri.parse(musicManager.audioDataManager.currentSong!.mediaURL), mode: LaunchMode.externalNonBrowserApplication);
-          if (!launched) {
-            Fluttertoast.showToast(msg: Language.getText("launch_url_error"));
-          }
-          Navigator.pop(context);
-        },
-        songFilter: (MusicData? song) => song != null && song is YouTubeMusicData,
+      id: "youtube",
+      icon: Icons.open_in_new,
+      title: Language.getText("open_in_youtube"),
+      onTap: (context) async {
+        final launched = await launchUrl(
+            Uri.parse(musicManager.audioDataManager.currentSong!.mediaURL),
+            mode: LaunchMode.externalNonBrowserApplication);
+        if (!launched) {
+          Fluttertoast.showToast(msg: Language.getText("launch_url_error"));
+        }
+        Navigator.pop(context);
+      },
+      songFilter: (MusicData? song) => song != null && song is YouTubeMusicData,
     ),
     _Action(
       id: "export",
@@ -51,93 +52,117 @@ class MoreActionsButton extends StatelessWidget {
       songFilter: (MusicData? song) => song != null,
     ),
     _Action(
-        id: "delete_from_local",
-        icon: Icons.delete_forever,
-        title: Language.getText("delete_from_local"),
-        onTap: (context) {
-          Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(Language.getText("delete_from_local")),
-              content: Text(Language.getText("delete_from_local_confirm_message")),
-              actions: [
-                TextButton(
-                  child: Text(Language.getText("cancel")),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                TextButton(
-                  child: Text(Language.getText("delete")),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    LocalMusicsData.removeFromLocal(musicManager.audioDataManager.currentSong!);
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-        songFilter: (MusicData? song) => song != null && LocalMusicsData.isSaved(song: song),
+      id: "delete_from_local",
+      icon: Icons.delete_forever,
+      title: Language.getText("delete_from_local"),
+      onTap: (context) {
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(Language.getText("delete_from_local")),
+            content:
+                Text(Language.getText("delete_from_local_confirm_message")),
+            actions: [
+              TextButton(
+                child: Text(Language.getText("cancel")),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              TextButton(
+                child: Text(Language.getText("delete")),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  LocalMusicsData.removeFromLocal(
+                      musicManager.audioDataManager.currentSong!);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+      songFilter: (MusicData? song) =>
+          song != null && LocalMusicsData.isSaved(song: song),
     ),
     _Action(
-        id: "refresh_all",
-        icon: Icons.refresh,
-        title: Language.getText("refresh_all"),
-        onTap: (context) {
-          musicManager.refreshSongs();
-          Navigator.pop(context);
-        },
-        songFilter: (MusicData? song) => song != null,
+      id: "refresh_all",
+      icon: Icons.refresh,
+      title: Language.getText("refresh_all"),
+      onTap: (context) {
+        musicManager.refreshSongs();
+        Navigator.pop(context);
+      },
+      songFilter: (MusicData? song) => song != null,
     )
   ];
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<MusicData?>(
-        valueListenable: musicManager.currentSongNotifier,
-        builder: (context, song, child) {
-          return IconButton(
-              icon: const Icon(Icons.more_vert),
-              tooltip: Language.getText("more_actions"),
-              onPressed: _actions.indexWhere((action) => action.songFilter(song)) == -1 ? null : () {
-                showModalBottomSheet(
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  enableDrag: true,
-                  builder: (context) => Container(
-                    margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                    child: Material(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      // 一番下のListTileの角が丸まらないのを直す
-                      clipBehavior: Clip.antiAlias,
-                      color: Theme.of(context).backgroundColor,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(20)),
-                              color: Theme.of(context).textTheme.headline1?.color?.withOpacity(0.1),
-                            ),
-                            margin: const EdgeInsets.only(top: 7, bottom: 4),
-                            height: 5,
-                            width: 40,
-                          ),
-                          Flexible(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: _actions.where((action) => action.songFilter(song)).toList(),
+      valueListenable: musicManager.currentSongNotifier,
+      builder: (context, song, child) {
+        return IconButton(
+          icon: const Icon(Icons.more_vert),
+          tooltip: Language.getText("more_actions"),
+          onPressed: _actions.any((action) => action.songFilter(song))
+              ? null
+              : () {
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    enableDrag: true,
+                    builder: (context) => Container(
+                      margin: const EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                        bottom: 10,
+                      ),
+                      child: Material(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        // 一番下のListTileの角が丸まらないのを直す
+                        clipBehavior: Clip.antiAlias,
+                        color: Theme.of(context).backgroundColor,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline1
+                                    ?.color
+                                    ?.withOpacity(0.1),
                               ),
+                              margin: const EdgeInsets.only(
+                                top: 7,
+                                bottom: 4,
+                              ),
+                              height: 5,
+                              width: 40,
                             ),
-                          )
-                        ],
+                            Flexible(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: _actions
+                                      .where(
+                                          (action) => action.songFilter(song))
+                                      .toList(),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              });
-        });
+                  );
+                },
+        );
+      },
+    );
   }
 }
 

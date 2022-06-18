@@ -1,7 +1,8 @@
 import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:flutter/foundation.dart';
 
-class SongNotifier extends ChangeNotifier implements ValueListenable<MusicData?> {
+class SongNotifier extends ChangeNotifier
+    implements ValueListenable<MusicData?> {
   SongNotifier(this.value);
   @override
   MusicData? value;
@@ -9,5 +10,4 @@ class SongNotifier extends ChangeNotifier implements ValueListenable<MusicData?>
   void notify() {
     notifyListeners();
   }
-
 }

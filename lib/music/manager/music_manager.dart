@@ -17,9 +17,7 @@ import 'notifiers/playlist_notifier.dart';
 import 'notifiers/song_notifier.dart';
 
 class MusicManager {
-
-  MusicManager(this.showNotification) {
-  }
+  MusicManager(this.showNotification) {}
   final bool showNotification;
 
   late final SessionAudioHandler _audioHandler;
@@ -27,14 +25,15 @@ class MusicManager {
   late final AudioDataManager audioDataManager;
 
   static bool windowsMode = OS.getOS() == OSType.windows;
-  
+
   // notifiers
   // sync fast notifier can be used as notifier.value to get the value.
   final progressNotifier = ProgressNotifier();
   final playlistNotifier = PlaylistNotifier([]);
   final shuffledPlaylistNotifier = PlaylistNotifier([]);
   final currentSongNotifier = SongNotifier(null);
-  final playingStateNotifier = ValueNotifier<PlayingState>(PlayingState.disabled);
+  final playingStateNotifier =
+      ValueNotifier<PlayingState>(PlayingState.disabled);
   final currentIndexNotifier = DataNotifier<int?>(null); // シャッフルない状態でのindex
   final currentShuffledIndexNotifier = DataNotifier<int?>(null); // シャッフル対応index
 
@@ -55,8 +54,7 @@ class MusicManager {
             androidNotificationOngoing: true,
             androidStopForegroundOnPause: true,
             androidShowNotificationBadge: true,
-          )
-      );
+          ));
     } else {
       print("windowsMode");
       _audioHandler = SessionAudioHandler(false);
@@ -66,9 +64,11 @@ class MusicManager {
   }
 
   Future<void> play() async {
-    print("Played a playlist: " + audioDataManager.playlist.length.toString() + " songs");
+    print(
+        "Played a playlist: ${audioDataManager.playlist.length.toString()} songs");
     await _audioHandler.play();
   }
+
   Future<void> pause() async {
     await _audioHandler.pause();
   }
@@ -85,6 +85,7 @@ class MusicManager {
       await _audioHandler.skipToPreviousUnforced();
     }
   }
+
   Future<void> next([bool force = false]) async {
     if (force) {
       await _audioHandler.skipToNext();
@@ -95,14 +96,16 @@ class MusicManager {
 
   Future<void> add(MusicData song) async {
     await _audioHandler.addQueueItem(song.toMediaItem());
-
   }
+
   Future<void> addAll(List<MusicData> songs) async {
-    await _audioHandler.addQueueItems(songs.map((e) => e.toMediaItem()).toList());
+    await _audioHandler
+        .addQueueItems(songs.map((e) => e.toMediaItem()).toList());
   }
 
   Future<void> remove(String key) async {
-    final int index = audioDataManager.playlist.indexWhere((song) => song.key == key);
+    final int index =
+        audioDataManager.playlist.indexWhere((song) => song.key == key);
     if (index != -1) {
       await _audioHandler.removeQueueItemAt(index);
     }
@@ -111,9 +114,9 @@ class MusicManager {
   Future<void> clear() async {
     await _audioHandler.clear();
   }
-  
+
   Future<void> move(int currentIndex, int newIndex) async {
-   // await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
+    // await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
     await _audioHandler.move(currentIndex, newIndex);
   }
 
@@ -125,7 +128,8 @@ class MusicManager {
     // if current progress is less than 5 sec, skip previous. if not, replay the current song.
     if (audioDataManager.progress.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.
-      if (audioDataManager.repeatState == RepeatState.none && audioDataManager.currentShuffledIndex == 0) {
+      if (audioDataManager.repeatState == RepeatState.none &&
+          audioDataManager.currentShuffledIndex == 0) {
         await seek(Duration.zero);
       } else {
         await previous(force);
@@ -142,7 +146,8 @@ class MusicManager {
   ];
 
   Future<void> setRepeatMode(RepeatState mode) async {
-    await _audioHandler.setRepeatMode(repeatStateToAudioServiceRepeatMode(mode));
+    await _audioHandler
+        .setRepeatMode(repeatStateToAudioServiceRepeatMode(mode));
   }
 
   Future<void> nextRepeatMode() async {
@@ -157,7 +162,8 @@ class MusicManager {
 
   Future<void> toggleShuffle() async {
     final enable = !audioDataManager.shuffled;
-    _audioHandler.setShuffleMode(enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
+    _audioHandler.setShuffleMode(
+        enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }
 
   Future<void> setSongs(List<MusicData> songs) async {
@@ -172,7 +178,6 @@ class MusicManager {
     final wasPlaying = audioDataManager.playingState == PlayingState.playing;
     if (index == -1) {
       await _audioHandler.setSongs(audioDataManager.playlist);
-
     } else {
       final MusicData song = audioDataManager.playlist[index];
 
@@ -188,7 +193,10 @@ class MusicManager {
 
       await _audioHandler.insertQueueItem(index, song.toMediaItem());
     }
-    await seek(currentPosition, index: index == -1 || currentIndex == index ? currentIndex : null);
+    await seek(
+      currentPosition,
+      index: index == -1 || currentIndex == index ? currentIndex : null,
+    );
     if (wasPlaying) {
       await play();
     }
@@ -203,7 +211,9 @@ class MusicManager {
   }
 
   Future<void> updateVolume() async {
-    await _audioHandler.audioPlayer.setVolume((muteNotifier.value ? 0 : 1) * baseVolumeNotifier.value * audioDataManager.currentSongVolume);
+    await _audioHandler.audioPlayer.setVolume((muteNotifier.value ? 0 : 1) *
+        baseVolumeNotifier.value *
+        audioDataManager.currentSongVolume);
   }
 
   Future<void> setMute(bool mute) async {

@@ -9,6 +9,8 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../data/local_musics_data.dart';
 import '../music/audio_source/youtube_music_data.dart';
+import '../system/exceptions/local_song_not_found_exception.dart';
+import '../system/exceptions/network_exception.dart';
 import 'network_check.dart';
 
 class YouTubeMusicUtils {
@@ -17,11 +19,13 @@ class YouTubeMusicUtils {
   /// Throws [VideoUnplayableException] if the video is not playable.
   ///
   /// Throws [LocalSongNotFoundException] if the song is local one, and is not found in the local storage.
-  static Future<String> getAudioURL(String videoId, String key, {bool forceRemote = false}) async {
+  static Future<String> getAudioURL(String videoId, String key,
+      {bool forceRemote = false}) async {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local && !forceRemote) {
-      final song = LocalMusicsData.getByAudioId(audioId: videoId, key: key, isTemporary: true);
+      final song = LocalMusicsData.getByAudioId(
+          audioId: videoId, key: key, isTemporary: true);
       return song.url;
     } else {
       // オンライン上から取得
@@ -46,7 +50,6 @@ class YouTubeMusicUtils {
       yt.close();
 
       return manifest.audioOnly.withHighestBitrate().url.toString();
-
     }
   }
 
@@ -64,7 +67,8 @@ class YouTubeMusicUtils {
     bool local = LocalMusicsData.isSaved(audioId: videoId);
     if (local) {
       // throws LocalSongNotFoundException
-      return LocalMusicsData.getByAudioId(audioId: videoId, key: key) as YouTubeMusicData;
+      return LocalMusicsData.getByAudioId(audioId: videoId, key: key)
+          as YouTubeMusicData;
     } else {
       // オンライン上から取得
 
@@ -87,16 +91,10 @@ class YouTubeMusicUtils {
 
       final Video video = await yt.videos.get(videoId);
 
-
       yt.close();
 
       return getFromVideo(
-          video: video,
-          manifest: manifest,
-          key: key,
-          isTemporary: isTemporary
-      );
-
+          video: video, manifest: manifest, key: key, isTemporary: isTemporary);
     }
   }
 
@@ -136,19 +134,21 @@ class YouTubeMusicUtils {
         return null;
       }
       return getFromVideo(
-          video: video,
-          key: const Uuid().v4(),
-          manifest: manifest,
-          isTemporary: isTemporary
+        video: video,
+        key: const Uuid().v4(),
+        manifest: manifest,
+        isTemporary: isTemporary,
       );
     }).toList();
 
-    final List<YouTubeMusicData> loadedVideos = (await Future.wait(parsers)).where((element) => element != null).map((e) => e as YouTubeMusicData).toList();
+    final List<YouTubeMusicData> loadedVideos = (await Future.wait(parsers))
+        .where((element) => element != null)
+        .map((e) => e as YouTubeMusicData)
+        .toList();
 
     yt.close();
 
     return Pair(loadedVideos, unloadedVideos);
-
   }
 
   static Future<YouTubeMusicData> getFromVideo({

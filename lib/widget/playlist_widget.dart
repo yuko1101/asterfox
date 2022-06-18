@@ -4,7 +4,6 @@ import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import 'music_card.dart';
 
-
 class PlaylistWidget extends StatefulWidget {
   const PlaylistWidget({
     required this.songs,
@@ -15,7 +14,7 @@ class PlaylistWidget extends StatefulWidget {
     this.onMove,
     this.onRemove,
     this.onTap,
-    Key? key
+    Key? key,
   }) : super(key: key);
 
   final List<MusicData> songs;
@@ -28,7 +27,6 @@ class PlaylistWidget extends StatefulWidget {
   final dynamic Function(int, DismissDirection)? onRemove;
   final dynamic Function(int)? onTap;
 
-
   @override
   _PlaylistWidgetState createState() => _PlaylistWidgetState();
 }
@@ -36,10 +34,11 @@ class PlaylistWidget extends StatefulWidget {
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   @override
   Widget build(BuildContext context) {
-
-  if ((widget.onRemove != null || widget.onTap != null) && widget.songWidgetBuilder != null) {
-    throw ArgumentError("You can't use onRemove or onTap if you use songWidgetBuilder.");
-  }
+    if ((widget.onRemove != null || widget.onTap != null) &&
+        widget.songWidgetBuilder != null) {
+      throw ArgumentError(
+          "You can't use onRemove or onTap if you use songWidgetBuilder.");
+    }
 
     return SizedBox(
       child: SingleChildScrollView(
@@ -47,22 +46,26 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         child: ReorderableListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: widget.songWidgetBuilder ?? (context, index) => MusicCardWidget(
-              song: widget.songs[index],
-              isPlaying: widget.songs[index].key == widget.playing?.key && widget.isLinked,
-              key: Key(widget.songs[index].key),
-              isLinked: widget.isLinked,
-              index: index,
-              onTap: widget.onTap,
-              onRemove: widget.onRemove,
-          ),
+          itemBuilder: widget.songWidgetBuilder ??
+              (context, index) => MusicCardWidget(
+                    song: widget.songs[index],
+                    isPlaying: widget.songs[index].key == widget.playing?.key &&
+                        widget.isLinked,
+                    key: Key(widget.songs[index].key),
+                    isLinked: widget.isLinked,
+                    index: index,
+                    onTap: widget.onTap,
+                    onRemove: widget.onRemove,
+                  ),
           itemCount: widget.songs.length,
           onReorder: (oldIndex, newIndex) async {
             if (oldIndex < newIndex) newIndex -= 1;
 
             print("oldIndex: $oldIndex, newIndex: $newIndex");
 
-            if (widget.isLinked && widget.onMove == null) await musicManager.move(oldIndex, newIndex);
+            if (widget.isLinked && widget.onMove == null) {
+              await musicManager.move(oldIndex, newIndex);
+            }
             setState(() {
               if (!widget.isLinked) {
                 final song = widget.songs.removeAt(oldIndex);
@@ -70,9 +73,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               }
 
               if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
-
             });
-          }
+          },
         ),
       ),
     );

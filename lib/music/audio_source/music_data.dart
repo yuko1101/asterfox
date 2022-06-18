@@ -26,13 +26,14 @@ class MusicData {
     if (isTemporary) return;
     print("MusicData: {key: $key, title: $title}");
     _created.add(this);
-}
+  }
   final MusicType type;
   final String title;
   final String description;
   final String author;
   final List<String> keywords;
-  String url; // can be changed if the url is expired (especially for YouTube), or the song saved locally.
+  String
+      url; // can be changed if the url is expired (especially for YouTube), or the song saved locally.
   String imageUrl; // can be changed on saving to local storage.
   late String audioId;
   Duration duration; // can be changed on clip-cut.
@@ -44,7 +45,6 @@ class MusicData {
 
   final bool isTemporary;
 
-
   MediaItem toMediaItem() {
     return MediaItem(
       id: key,
@@ -54,7 +54,7 @@ class MusicData {
       displayDescription: description,
       extras: {
         "url": url,
-      }
+      },
     );
   }
 
@@ -72,7 +72,7 @@ class MusicData {
     return _created.firstWhere((element) => element.key == key);
   }
 
-   Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     final json = {
       'type': type.name,
       'url': url,
@@ -101,10 +101,12 @@ class MusicData {
     required String key,
     bool isTemporary = false,
   }) {
-    final type = MusicType.values.firstWhere((musicType) => musicType.name == json['type'] as String);
+    final type = MusicType.values
+        .firstWhere((musicType) => musicType.name == json['type'] as String);
     switch (type) {
       case MusicType.youtube:
-        return YouTubeMusicData.fromJson(json: json, isLocal: isLocal, key: key, isTemporary: isTemporary);
+        return YouTubeMusicData.fromJson(
+            json: json, isLocal: isLocal, key: key, isTemporary: isTemporary);
       default:
         return MusicData(
           key: key,
@@ -124,12 +126,10 @@ class MusicData {
           isTemporary: isTemporary,
         );
     }
-
-
   }
 
-  Future<String?> refreshURL() async {
-    return null;
+  Future<String> refreshURL() async {
+    return remoteUrl;
   }
 
   Future<bool> isUrlAvailable() async {
@@ -148,13 +148,9 @@ class MusicData {
   static void deleteCreated(String key) {
     _created.removeWhere((song) => song.key == key);
   }
-
 }
 
-enum MusicType {
-  youtube,
-  custom
-}
+enum MusicType { youtube, custom }
 
 extension MusicTypeExtension on MusicType {
   String get name {
@@ -167,15 +163,16 @@ extension MusicTypeExtension on MusicType {
   }
 }
 
-
 extension MediaItemParseMusicData on MediaItem {
   MusicData toMusicData() {
-    return MusicData.getCreated().firstWhere((musicData) => musicData.key == id);
+    return MusicData.getCreated()
+        .firstWhere((musicData) => musicData.key == id);
   }
 }
 
 extension AudioSourceParseMusicData on IndexedAudioSource {
   MusicData toMusicData() {
-    return MusicData.getCreated().firstWhere((musicData) => musicData.key == tag["key"]);
+    return MusicData.getCreated()
+        .firstWhere((musicData) => musicData.key == tag["key"]);
   }
 }

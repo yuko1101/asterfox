@@ -15,7 +15,8 @@ class LocalMusicsData {
   static const bool _compact = false;
 
   static Future<void> init() async {
-    musicData = await ConfigFile(File("${EasyApp.localPath}/music.json"), {}).load();
+    musicData =
+        await ConfigFile(File("${EasyApp.localPath}/music.json"), {}).load();
   }
 
   static Future<void> saveData() async {
@@ -23,27 +24,43 @@ class LocalMusicsData {
   }
 
   static Future<void> save(MusicData song) async {
-
     if (!song.isLocal) {
       song.isLocal = true;
-      await musicData.set(key: song.audioId, value: song.toJson()).save(compact: _compact);
+      await musicData
+          .set(key: song.audioId, value: song.toJson())
+          .save(compact: _compact);
     }
   }
 
   static List<MusicData> getAll({bool isTemporary = false}) {
     final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values.map((e) => MusicData.fromJson(json: e, isLocal: true, key: const Uuid().v4(), isTemporary: isTemporary)).toList();
-  }
-  
-  static List<String> getYouTubeIds() {
-    final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values.where((element) => element["type"] == MusicType.youtube.name).map((e) => e["id"] as String).toList();
+    return data.values
+        .map((e) => MusicData.fromJson(
+              json: e,
+              isLocal: true,
+              key: const Uuid().v4(),
+              isTemporary: isTemporary,
+            ))
+        .toList();
   }
 
-  static MusicData getByAudioId({required String audioId, required String key, bool isTemporary = false}) {
+  static List<String> getYouTubeIds() {
+    final data = musicData.getValue(null) as Map<String, dynamic>;
+    return data.values
+        .where((element) => element["type"] == MusicType.youtube.name)
+        .map((e) => e["id"] as String)
+        .toList();
+  }
+
+  static MusicData getByAudioId({
+    required String audioId,
+    required String key,
+    bool isTemporary = false,
+  }) {
     if (!musicData.has(audioId)) throw LocalSongNotFoundException(audioId);
     final data = musicData.getValue(audioId) as Map<String, dynamic>;
-    return MusicData.fromJson(json: data, isLocal: true, key: key, isTemporary: isTemporary);
+    return MusicData.fromJson(
+        json: data, isLocal: true, key: key, isTemporary: isTemporary);
   }
 
   static bool isSaved({MusicData? song, String? audioId}) {
@@ -71,7 +88,6 @@ class LocalMusicsData {
     await Future.wait(futures);
   }
 }
-
 
 extension LocalMusicsDataExtension on MusicData {
   Future<void> save({bool saveToJSON = true}) async {

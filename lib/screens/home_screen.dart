@@ -14,52 +14,55 @@ import '../widget/search/song_search.dart';
 
 class HomeScreen extends BaseScreen {
   static late InAppNotification homeNotification;
-  HomeScreen() : super(
-    screen: Builder(
-      builder: (context) {
-        final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
-        final volumeWidget = VolumeWidget(key: volumeWidgetKey);
+  HomeScreen()
+      : super(
+          screen: Builder(
+            builder: (context) {
+              final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
+              final volumeWidget = VolumeWidget(key: volumeWidgetKey);
 
-        return Stack(
-          children: [
-            TripleNotifierWidget<PlayingState, List<MusicData>, MusicData?>(
-              notifier1: musicManager.playingStateNotifier,
-              notifier2: musicManager.shuffledPlaylistNotifier,
-              notifier3: musicManager.currentSongNotifier,
-              builder: (context, playingState, playlist, currentSong, child) => PlaylistWidget(
-                songs: playlist,
-                playing: currentSong,
-                isLinked: true,
-                padding: const EdgeInsets.only(top: 15),
-              ),
-            ),
-            homeNotification,
-            ValueListenableBuilder<bool>(
-                valueListenable: volumeWidget.openedNotifier,
-                builder: (context, opened, _) {
-                  if (opened) {
-                    return GestureDetector(
-                      onTap: volumeWidgetKey.currentState?.close,
-                    );
-                  } else {
-                    return Container();
-                  }
-                }
-            ),
-            Positioned(
-              bottom: 5,
-              left: 5,
-              child: volumeWidget,
-            ),
-          ]
+              return Stack(
+                children: [
+                  TripleNotifierWidget<PlayingState, List<MusicData>,
+                      MusicData?>(
+                    notifier1: musicManager.playingStateNotifier,
+                    notifier2: musicManager.shuffledPlaylistNotifier,
+                    notifier3: musicManager.currentSongNotifier,
+                    builder:
+                        (context, playingState, playlist, currentSong, child) =>
+                            PlaylistWidget(
+                      songs: playlist,
+                      playing: currentSong,
+                      isLinked: true,
+                      padding: const EdgeInsets.only(top: 15),
+                    ),
+                  ),
+                  homeNotification,
+                  ValueListenableBuilder<bool>(
+                    valueListenable: volumeWidget.openedNotifier,
+                    builder: (context, opened, _) {
+                      if (opened) {
+                        return GestureDetector(
+                          onTap: volumeWidgetKey.currentState?.close,
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
+                  Positioned(
+                    bottom: 5,
+                    left: 5,
+                    child: volumeWidget,
+                  ),
+                ],
+              );
+            },
+          ),
+          appBar: const HomeScreenAppBar(),
+          footer: const MusicFooter(),
         );
-      }
-    ),
-    appBar: const HomeScreenAppBar(),
-    footer: const MusicFooter(),
-  );
 }
-
 
 class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
   const HomeScreenAppBar({
@@ -88,7 +91,9 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.start,
       ),
       actions: [
-        IconButton(onPressed: () => openSearch(context), icon: const Icon(Icons.search)),
+        IconButton(
+            onPressed: () => openSearch(context),
+            icon: const Icon(Icons.search)),
         // IconButton(
         //   onPressed: () async {
         //     debugPrint("pressed");
@@ -109,6 +114,7 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
       ),
     );
   }
+
   openSearch(BuildContext context) {
     showSearch(context: context, delegate: SongSearch());
   }
@@ -134,4 +140,3 @@ class AppDrawerController {
     }
   }
 }
-

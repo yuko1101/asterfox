@@ -6,16 +6,16 @@ import '../../system/theme/theme.dart';
 import 'song_search.dart';
 
 class SongSearchTile extends StatelessWidget {
-  const SongSearchTile(
-      this.suggestion,
-      this.setQuery,
-      this.close,
-      {Key? key}) : super(key: key);
+  const SongSearchTile({
+    required this.suggestion,
+    required this.setQuery,
+    required this.close,
+    Key? key,
+  }) : super(key: key);
 
   final SongSuggestion suggestion;
   final void Function(String) setQuery;
   final VoidCallback close;
-
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,10 @@ class SongSearchTile extends StatelessWidget {
             setQuery(suggestion.audioId);
           } else if (suggestion.tags.contains(SongTag.youtube)) {
             close();
-            HomeScreenMusicManager.addSong(key: const Uuid().v4(), youtubeId: suggestion.audioId);
+            HomeScreenMusicManager.addSong(
+              key: const Uuid().v4(),
+              youtubeId: suggestion.audioId,
+            );
           }
         },
         child: Row(
@@ -64,15 +67,16 @@ class SongSearchTile extends StatelessWidget {
                       color: Theme.of(context).extraColors.primary,
                     ),
                   ),
-                  if (suggestion.subtitle != null) Text(
-                    suggestion.subtitle!,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Theme.of(context).extraColors.secondary,
+                  if (suggestion.subtitle != null)
+                    Text(
+                      suggestion.subtitle!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).extraColors.secondary,
+                      ),
                     ),
-                  ),
                 ],
               ),
             )

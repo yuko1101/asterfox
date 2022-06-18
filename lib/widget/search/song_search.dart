@@ -25,14 +25,15 @@ class SongSearch extends SearchDelegate<String> {
         tooltip: Language.getText("clear"),
         onPressed: () {
           query = "";
-        },),
+        },
+      ),
       IconButton(
         icon: const Icon(Icons.search),
         color: Theme.of(context).textTheme.bodyText1?.color,
         tooltip: Language.getText("search"),
         onPressed: () {
-            if (query.isEmpty || query == "") return;
-            search(context, query);
+          if (query.isEmpty || query == "") return;
+          search(context, query);
         },
       ),
     ];
@@ -41,7 +42,10 @@ class SongSearch extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: AnimatedIcon(icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
       color: Theme.of(context).textTheme.bodyText1?.color,
       tooltip: Language.getText("go_back"),
       onPressed: () {
@@ -60,7 +64,8 @@ class SongSearch extends SearchDelegate<String> {
     search(context, query);
   }
 
-  ValueNotifier<List<SongSuggestion>> suggestions = ValueNotifier<List<SongSuggestion>>([]);
+  ValueNotifier<List<SongSuggestion>> suggestions =
+      ValueNotifier<List<SongSuggestion>>([]);
 
   String? lastQuery;
 
@@ -74,7 +79,6 @@ class SongSearch extends SearchDelegate<String> {
       if (timer != null && timer!.isActive) {
         print("timer.cancel");
         timer!.cancel();
-
       }
 
       if (NetworkUtils.networkAccessible()) {
@@ -96,9 +100,13 @@ class SongSearch extends SearchDelegate<String> {
     return ValueListenableBuilder<List<SongSuggestion>>(
       valueListenable: suggestions,
       builder: (_, value, __) => ListView.builder(
-        itemBuilder: (context, index) => SongSearchTile(value[index], setQuery, () => close(context, "")),
+        itemBuilder: (context, index) => SongSearchTile(
+          suggestion: value[index],
+          setQuery: setQuery,
+          close: () => close(context, ""),
+        ),
         itemCount: value.length,
-      )
+      ),
     );
   }
 
@@ -115,29 +123,39 @@ class SongSearch extends SearchDelegate<String> {
     final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
     final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
-    final videoSuggestions = videos.map((e) => SongSuggestion(
-        tags: [
-          SongTag.youtube,
-          localIds.contains(e.id.value) ? SongTag.local : SongTag.remote
-        ],
-        title: e.title,
-        subtitle: e.author,
-        audioId: e.id.value,
-        keywords: e.keywords
-    )).toList();
+    final videoSuggestions = videos
+        .map((e) => SongSuggestion(
+              tags: [
+                SongTag.youtube,
+                localIds.contains(e.id.value) ? SongTag.local : SongTag.remote
+              ],
+              title: e.title,
+              subtitle: e.author,
+              audioId: e.id.value,
+              keywords: e.keywords,
+            ))
+        .toList();
 
     final List<String> words = await YouTubeMusicUtils.searchWords(text);
-    final wordsSuggestions = words.map((e) => SongSuggestion(tags: [SongTag.word], title: e, audioId: e, keywords: [])).toList();
+    final wordsSuggestions = words
+        .map((e) => SongSuggestion(
+            tags: [SongTag.word], title: e, audioId: e, keywords: []))
+        .toList();
 
-    final videoResult = filterAndSort(videoSuggestions);
-    final wordResult = filterAndSort(wordsSuggestions);
+    final videoResult = filterAndSort(
+      list: videoSuggestions,
+      filterSortingList: [],
+    );
+    final wordResult = filterAndSort(
+      list: wordsSuggestions,
+      filterSortingList: [],
+    );
 
     final result = [...videoResult, ...wordResult];
 
     if (time == null || (time >= searchedAt)) {
       suggestions.value = result;
     }
-    
   }
 
   void loadOfflineSongs(String text) {
@@ -148,12 +166,20 @@ class SongSearch extends SearchDelegate<String> {
     list.addAll(locals.map((e) {
       final List<SongTag> tags = [SongTag.local];
       if (e is YouTubeMusicData) tags.add(SongTag.youtube);
-      return SongSuggestion(tags: tags, title: e.title, subtitle: e.author, audioId: e is YouTubeMusicData ? e.id : e.url, keywords: e.keywords);
+      return SongSuggestion(
+        tags: tags,
+        title: e.title,
+        subtitle: e.author,
+        audioId: e is YouTubeMusicData ? e.id : e.url,
+        keywords: e.keywords,
+      );
     }));
 
-    final List<SongSuggestion> result = filterAndSort(list, filterSortingList: [RelatedFilter(text), RelevanceSorting(text)]);
+    final List<SongSuggestion> result = filterAndSort(
+      list: list,
+      filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
+    );
     suggestions.value = result;
-
   }
 
   void setQuery(newQuery) => query = newQuery;
@@ -165,7 +191,7 @@ class SongSuggestion {
     required this.title,
     this.subtitle,
     required this.audioId,
-    required this.keywords
+    required this.keywords,
   });
   final List<SongTag> tags;
   final String title;
@@ -174,9 +200,4 @@ class SongSuggestion {
   final List<String> keywords;
 }
 
-enum SongTag {
-  local,
-  remote,
-  youtube,
-  word
-}
+enum SongTag { local, remote, youtube, word }

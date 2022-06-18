@@ -63,7 +63,6 @@ void init() async {
   }
 }
 
-
 class AsterfoxApp extends StatelessWidget {
   const AsterfoxApp({Key? key}) : super(key: key);
 
@@ -75,55 +74,54 @@ class AsterfoxApp extends StatelessWidget {
         return MaterialApp(
           title: 'Asterfox',
           theme: AppTheme.themes[value],
-          home: MainScreen(sideMenu: SideMenu(
-            appIcon: Image.asset(
-              "assets/images/asterfox.png",
-              scale: 0.1,
-            ),
-            title: const Text(
-                "Asterfox",
-                textScaleFactor: 1.3
-            ),
-            items: [
-              SideMenuItem(
+          home: MainScreen(
+            sideMenu: SideMenu(
+              appIcon: Image.asset(
+                "assets/images/asterfox.png",
+                scale: 0.1,
+              ),
+              title: const Text("Asterfox", textScaleFactor: 1.3),
+              items: [
+                SideMenuItem(
                   title: const Text("Home"),
                   icon: const Icon(Icons.home),
                   onPressed: () {
                     if (EasyApp.currentScreen is HomeScreen) return;
                     EasyApp.pushPage(context, HomeScreen());
-                  }
-              ),
-              SideMenuItem(
+                  },
+                ),
+                SideMenuItem(
                   title: const Text("Playlist"),
                   icon: const Icon(Icons.playlist_play),
-                  onPressed: () {}
-              ),
-              SideMenuItem(
+                  onPressed: () {},
+                ),
+                SideMenuItem(
                   title: const Text("History"),
                   icon: const Icon(Icons.replay),
                   onPressed: () {
                     if (EasyApp.currentScreen is SongHistoryScreen) return;
                     EasyApp.pushPage(context, SongHistoryScreen());
-                  }
-              ),
-              SideMenuItem(
+                  },
+                ),
+                SideMenuItem(
                   title: const Text("Settings"),
                   icon: const Icon(Icons.settings),
                   onPressed: () {
                     if (EasyApp.currentScreen is SettingsScreen) return;
                     EasyApp.pushPage(context, SettingsScreen());
-                  }
-              ),
-              SideMenuItem(
+                  },
+                ),
+                SideMenuItem(
                   title: const Text("Debug"),
                   icon: const Icon(Icons.bug_report),
                   onPressed: () {
                     if (EasyApp.currentScreen is DebugScreen) return;
                     EasyApp.pushPage(context, const DebugScreen());
-                  }
-              )
-            ],
-          ),),
+                  },
+                )
+              ],
+            ),
+          ),
           debugShowCheckedModeBanner: false,
         );
       },

@@ -9,11 +9,12 @@ import '../../system/theme/theme.dart';
 import 'settings_screen.dart';
 
 class ThemeSettingsScreen extends BaseScreen {
-  ThemeSettingsScreen() : super(
-    screen: const _ThemeChoice(),
-    appBar: const _AppBar(),
-    previousPage: SettingsScreen()
-  );
+  ThemeSettingsScreen()
+      : super(
+          screen: const _ThemeChoice(),
+          appBar: const _AppBar(),
+          previousPage: SettingsScreen(),
+        );
 }
 
 class _AppBar extends StatelessWidget with PreferredSizeWidget {
@@ -45,30 +46,28 @@ class _ThemeChoice extends StatefulWidget {
 }
 
 class _ThemeChoiceState extends State<_ThemeChoice> {
-
   @override
   Widget build(BuildContext context) {
     return SettingsList(
       sections: [
         SettingsSection(
-            title: Text(Language.getText("theme")),
-            tiles: AppTheme.themes.keys.map((key) =>
-                RadioListTile(
+          title: Text(Language.getText("theme")),
+          tiles: AppTheme.themes.keys
+              .map((key) => RadioListTile(
                   title: Text(Language.getText("theme_$key")),
                   value: key,
                   groupValue: AppTheme.themeNotifier.value,
-                  activeColor: Color(CustomColors.data.getValue("accent") as int),
+                  activeColor:
+                      Color(CustomColors.data.getValue("accent") as int),
                   onChanged: (value) {
-                    setState(() {
-                      AppTheme.setTheme(value as String);
-                    });
-                  }
-                )
-            ).map((radioListTile) =>
-                CustomSettingsTile(
-                  child: radioListTile
-                )
-            ).toList()
+                    setState(
+                      () {
+                        AppTheme.setTheme(value as String);
+                      },
+                    );
+                  }))
+              .map((radioListTile) => CustomSettingsTile(child: radioListTile))
+              .toList(),
         ),
       ],
     );

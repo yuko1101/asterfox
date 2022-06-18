@@ -15,10 +15,11 @@ import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
 
 class DebugScreen extends BaseScreen {
-  const DebugScreen() : super(
-      screen: const DebugMainScreen(),
-      appBar: const DebugAppBar(),
-  );
+  const DebugScreen()
+      : super(
+          screen: const DebugMainScreen(),
+          appBar: const DebugAppBar(),
+        );
 }
 
 class DebugMainScreen extends StatelessWidget {
@@ -35,21 +36,39 @@ class DebugMainScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                IconButton(onPressed: () {
+                IconButton(
+                  icon: Theme.of(context).brightness == Brightness.dark
+                      ? const Icon(Icons.dark_mode)
+                      : const Icon(Icons.light_mode),
+                  onPressed: () {
                     if (AppTheme.themeNotifier.value != "dark") {
-
                       AppTheme.setTheme("dark");
                     } else {
                       AppTheme.setTheme("light");
                       // showSearch(context: context, delegate: delegate);
                     }
-                  }, icon: Theme.of(context).brightness == Brightness.dark ? const Icon(Icons.dark_mode) : const Icon(Icons.light_mode)),
-                IconButton(onPressed: musicManager.previous, icon: const Icon(Icons.skip_previous)),
-                IconButton(onPressed: musicManager.play, icon: const Icon(Icons.play_arrow)),
-                IconButton(onPressed: musicManager.pause, icon: const Icon(Icons.pause)),
-                IconButton(onPressed: musicManager.next, icon: const Icon(Icons.skip_next)),
-                IconButton(onPressed: () {
-                  showDialog(
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.skip_previous),
+                  onPressed: musicManager.previous,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.play_arrow),
+                  onPressed: musicManager.play,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.pause),
+                  onPressed: musicManager.pause,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.skip_next),
+                  onPressed: musicManager.next,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text("保存された曲の全削除"),
@@ -63,26 +82,28 @@ class DebugMainScreen extends StatelessWidget {
                             child: const Text("OK"),
                             onPressed: () {
                               Navigator.of(context).pop();
-                              LocalMusicsData.removeAllFromLocal(LocalMusicsData.getAll());
+                              LocalMusicsData.removeAllFromLocal(
+                                  LocalMusicsData.getAll());
                               LocalMusicsData.saveData();
                             },
                           ),
                         ],
-                      )
-                  );
-                }, icon: const Icon(Icons.delete)),
-                IconButton(
-                    onPressed: () {
-                      showSearch(context: context, delegate: SongSearch());
-                    },
-                    icon: const Icon(Icons.search)
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
-                    onPressed: () {
-                      print(MusicData.getCreated());
-                    },
-                    icon: const Icon(Icons.discount)
-                )
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    showSearch(context: context, delegate: SongSearch());
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.discount),
+                  onPressed: () {
+                    print(MusicData.getCreated());
+                  },
+                ),
               ],
             ),
             ValueListenableBuilder<MusicData?>(
@@ -92,85 +113,95 @@ class DebugMainScreen extends StatelessWidget {
                   valueListenable: musicManager.shuffledPlaylistNotifier,
                   builder: (_, songs, __) {
                     return PlaylistWidget(
-                        songs: songs,
-                        playing: song,
-                        isLinked: true,
-                        songWidgetBuilder: (context, index) {
-                          return ListTile(
-                            key: Key(songs[index].key),
-                            title: Text(songs[index].title),
-                            // title: Text("${songs[index].title}  shuffled: ${musicManager.audioDataManager.shuffledPlaylist.indexWhere((element) => element.key == songs[index].key)}, normal: ${musicManager.audioDataManager.playlist.indexWhere((element) => element.key == songs[index].key)}, ${musicManager.audioDataManager.shuffledIndices}"),
-                            subtitle: Text(songs[index].author),
-                            leading: SizedBox(
-                              height: 50,
-                              width: 70,
-                              child: Stack(
-                                children: [
-                                  Opacity(
-                                    opacity: musicManager.audioDataManager.currentIndex == index ? 0.3 : 1.0,
-                                    child: MusicImageWidget(songs[index].imageUrl)
-                                  ),
-                                  if (musicManager.audioDataManager.currentIndex == index) Center(
+                      songs: songs,
+                      playing: song,
+                      isLinked: true,
+                      songWidgetBuilder: (context, index) {
+                        return ListTile(
+                          key: Key(songs[index].key),
+                          title: Text(songs[index].title),
+                          // title: Text("${songs[index].title}  shuffled: ${musicManager.audioDataManager.shuffledPlaylist.indexWhere((element) => element.key == songs[index].key)}, normal: ${musicManager.audioDataManager.playlist.indexWhere((element) => element.key == songs[index].key)}, ${musicManager.audioDataManager.shuffledIndices}"),
+                          subtitle: Text(songs[index].author),
+                          leading: SizedBox(
+                            height: 50,
+                            width: 70,
+                            child: Stack(
+                              children: [
+                                Opacity(
+                                  opacity: musicManager
+                                              .audioDataManager.currentIndex ==
+                                          index
+                                      ? 0.3
+                                      : 1.0,
+                                  child:
+                                      MusicImageWidget(songs[index].imageUrl),
+                                ),
+                                if (musicManager
+                                        .audioDataManager.currentIndex ==
+                                    index)
+                                  Center(
                                     child: SizedBox(
                                       height: 25,
                                       width: 25,
-                                      child: ValueListenableBuilder<PlayingState>(
-                                        valueListenable: musicManager.playingStateNotifier,
+                                      child:
+                                          ValueListenableBuilder<PlayingState>(
+                                        valueListenable:
+                                            musicManager.playingStateNotifier,
                                         builder: (_, playingState, __) {
-                                          if (playingState == PlayingState.playing) {
-                                            return Image.asset("assets/images/playing.gif");
+                                          if (playingState ==
+                                              PlayingState.playing) {
+                                            return Image.asset(
+                                                "assets/images/playing.gif");
                                           } else {
                                             return const Icon(Icons.pause);
                                           }
-                                        }
-                                      )),
+                                        },
+                                      ),
+                                    ),
                                   ),
-
-                                ]
-                              ),
+                              ],
                             ),
-                            onTap: () {
-                              musicManager.seek(Duration.zero, index: index);
-                            },
-                          );
-                        },
+                          ),
+                          onTap: () {
+                            musicManager.seek(Duration.zero, index: index);
+                          },
+                        );
+                      },
                     );
-                  }
+                  },
                 );
-              }
+              },
             ),
             ValueListenableBuilder<MusicData?>(
-                valueListenable: musicManager.currentSongNotifier,
-                builder: (_, song, __) {
-                  if (song == null) {
-                    return Container();
-                  }
-                  final String json = const JsonEncoder.withIndent("  ").convert(song.toJson());
-                  return ColoredJson(
-                    data: json,
-                    intColor: Colors.orange,
-                    doubleColor: Colors.red,
-                    commaColor: Colors.grey,
-                    squareBracketColor: Colors.grey,
-                    colonColor: Colors.grey,
-                    curlyBracketColor: Colors.purpleAccent,
-                  );
+              valueListenable: musicManager.currentSongNotifier,
+              builder: (_, song, __) {
+                if (song == null) {
+                  return Container();
                 }
+                final String json =
+                    const JsonEncoder.withIndent("  ").convert(song.toJson());
+                return ColoredJson(
+                  data: json,
+                  intColor: Colors.orange,
+                  doubleColor: Colors.red,
+                  commaColor: Colors.grey,
+                  squareBracketColor: Colors.grey,
+                  colonColor: Colors.grey,
+                  curlyBracketColor: Colors.purpleAccent,
+                );
+              },
             )
           ],
         ),
       ),
     );
   }
-
-
 }
 
 class DebugAppBar extends StatelessWidget implements PreferredSizeWidget {
   const DebugAppBar({
     Key? key,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {

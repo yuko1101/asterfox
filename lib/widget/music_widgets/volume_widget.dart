@@ -33,12 +33,12 @@ class VolumeWidget extends StatefulWidget {
 
   final ValueNotifier<bool> openedNotifier = ValueNotifier(false);
 
-
   @override
   State<VolumeWidget> createState() => VolumeWidgetState();
 }
 
-class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderStateMixin {
+class VolumeWidgetState extends State<VolumeWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   late Animation<double> _progress;
@@ -53,13 +53,14 @@ class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSta
   void initState() {
     super.initState();
 
-    _sliderValue = MathUtils.log(musicManager.audioDataManager.volume, VolumeWidget.base);
+    _sliderValue =
+        MathUtils.log(musicManager.audioDataManager.volume, VolumeWidget.base);
     _sliderValue = max(_sliderValue, VolumeWidget.min);
     _sliderValue = min(_sliderValue, VolumeWidget.max);
 
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
-      vsync: this
+      vsync: this,
     );
     _progress = _controller.drive(_tween);
 
@@ -81,72 +82,78 @@ class VolumeWidgetState extends State<VolumeWidget> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        animation: _progress,
-        builder: (context, _) => DoubleNotifierWidget<double, bool>(
-            notifier1: musicManager.baseVolumeNotifier,
-            notifier2: musicManager.muteNotifier,
-            builder: (context, volume, mute, child) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 5),
-                    height: _progress.value * 120,
-                    width: 55,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).backgroundColor,
-                        borderRadius: BorderRadius.circular(40),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          )
-                        ]
+      animation: _progress,
+      builder: (context, _) => DoubleNotifierWidget<double, bool>(
+        notifier1: musicManager.baseVolumeNotifier,
+        notifier2: musicManager.muteNotifier,
+        builder: (context, volume, mute, child) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 5),
+                height: _progress.value * 120,
+                width: 55,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).backgroundColor,
+                  borderRadius: BorderRadius.circular(40),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
-                    child: (_progress.value > 0.4) ? RotatedBox(
-                      quarterTurns: 3,
-                      child: Slider(
-                        value: _sliderValue,
-                        max: VolumeWidget.max,
-                        min: VolumeWidget.min,
-                        thumbColor: CustomColors.getColor("accent"),
-                        activeColor: CustomColors.getColor("accent"),
-                        inactiveColor: CustomColors.getColor("accent").withOpacity(0.2),
-                        onChanged: (value) {
-                          setState(() {
-                            _sliderValue = value;
-                          });
-                        },
-                        onChangeStart: (value) {
-                          musicManager.setMute(false);
-                        },
-                        onChangeEnd: (value) {
-                          musicManager.setBaseVolume(pow(VolumeWidget.base, value).toDouble());
-                        },
-                      ),
-                    ) : null,
-                  ),
-                  InkWell(
-                    onLongPress: () {
-                      musicManager.setMute(!mute);
-                    },
-                    onDoubleTap: () {
-                      musicManager.setMute(!mute);
-                    },
-                    onTap: () {},
-                    child: FloatingActionButton(
-                      onPressed: _progress.value == 0 ? _controller.forward : _controller.reverse,
-                      child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
-                      backgroundColor: Theme.of(context).backgroundColor,
-                      foregroundColor: Theme.of(context).extraColors.primary,
-                    ),
-                  ),
-                ],
-              );
-            }
-        ),
+                  ],
+                ),
+                child: (_progress.value > 0.4)
+                    ? RotatedBox(
+                        quarterTurns: 3,
+                        child: Slider(
+                          value: _sliderValue,
+                          max: VolumeWidget.max,
+                          min: VolumeWidget.min,
+                          thumbColor: CustomColors.getColor("accent"),
+                          activeColor: CustomColors.getColor("accent"),
+                          inactiveColor:
+                              CustomColors.getColor("accent").withOpacity(0.2),
+                          onChanged: (value) {
+                            setState(() {
+                              _sliderValue = value;
+                            });
+                          },
+                          onChangeStart: (value) {
+                            musicManager.setMute(false);
+                          },
+                          onChangeEnd: (value) {
+                            musicManager.setBaseVolume(
+                                pow(VolumeWidget.base, value).toDouble());
+                          },
+                        ),
+                      )
+                    : null,
+              ),
+              InkWell(
+                onLongPress: () {
+                  musicManager.setMute(!mute);
+                },
+                onDoubleTap: () {
+                  musicManager.setMute(!mute);
+                },
+                onTap: () {},
+                child: FloatingActionButton(
+                  onPressed: _progress.value == 0
+                      ? _controller.forward
+                      : _controller.reverse,
+                  child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
+                  backgroundColor: Theme.of(context).backgroundColor,
+                  foregroundColor: Theme.of(context).extraColors.primary,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

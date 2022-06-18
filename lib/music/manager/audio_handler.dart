@@ -7,7 +7,6 @@ import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
-
   final _player = AudioPlayer();
   var _playlist = ConcatenatingAudioSource(children: []);
 
@@ -15,13 +14,14 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   final fix = OS.getOS() == OSType.windows;
   final bool useSession;
 
-
   /// Initialise our audio handler.
   SessionAudioHandler(this.useSession) {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
-    if (useSession) _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
+    if (useSession) {
+      _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
+    }
 
     // _notifyAudioHandlerAboutPlaybackEvents();
 
@@ -69,7 +69,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     if (_player.loopMode == LoopMode.one) {
       final int? currentIndex = _player.currentIndex;
       if (currentIndex == null) return;
-      final int nextIndex = (currentIndex + 1) % (_player.sequence ?? []).length;
+      final int nextIndex =
+          (currentIndex + 1) % (_player.sequence ?? []).length;
       await _player.seek(Duration.zero, index: nextIndex);
     } else {
       await _player.seekToNext();
@@ -86,7 +87,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     if (_player.loopMode == LoopMode.one) {
       final int? currentIndex = _player.currentIndex;
       if (currentIndex == null) return;
-      final int previousIndex = (currentIndex - 1) % (_player.sequence ?? []).length;
+      final int previousIndex =
+          (currentIndex - 1) % (_player.sequence ?? []).length;
       await _player.seek(Duration.zero, index: previousIndex);
     } else {
       await _player.seekToPrevious();
@@ -96,7 +98,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> skipToPreviousUnforced() async {
     await _player.seekToPrevious();
   }
-
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
@@ -171,7 +172,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> move(int currentIndex, int newIndex) async {
     final bool shuffled = audioPlayer.shuffleModeEnabled;
     if (shuffled) {
-      final shuffledSongs = AudioDataManager.getShuffledPlaylist(audioPlayer.sequence, shuffled, audioPlayer.shuffleIndices);
+      final shuffledSongs = AudioDataManager.getShuffledPlaylist(
+          audioPlayer.sequence, shuffled, audioPlayer.shuffleIndices);
       final songs = AudioDataManager.getPlaylist(audioPlayer.sequence);
 
       // move song in shuffled playlist
@@ -183,15 +185,17 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
       // move original playlist to be in the same order as the shuffled playlist
       await BubbleSort<MusicData>(
-        compare: (a, b) => shuffledSongs.indexWhere((s) => s.key == a.key) - shuffledSongs.indexWhere((s) => s.key == b.key),
+        compare: (a, b) =>
+            shuffledSongs.indexWhere((s) => s.key == a.key) -
+            shuffledSongs.indexWhere((s) => s.key == b.key),
         move: (currentIndex, newIndex) async {
           await _playlist.move(currentIndex, newIndex);
           final move = copy.removeAt(currentIndex);
           copy.insert(newIndex, move);
           return copy;
-        }
-      ).sort(songs, (song) => shuffledSongs.indexWhere((s) => s.key == song.key));
-
+        },
+      ).sort(
+          songs, (song) => shuffledSongs.indexWhere((s) => s.key == song.key));
     } else {
       await _playlist.move(currentIndex, newIndex);
     }
@@ -202,7 +206,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> setSongs(List<MusicData> songs) async {
-    _playlist = ConcatenatingAudioSource(children: songs.map((e) => e.toMediaItem()).map(_createAudioSource).toList());
+    _playlist = ConcatenatingAudioSource(
+        children:
+            songs.map((e) => e.toMediaItem()).map(_createAudioSource).toList());
     await _player.setAudioSource(_playlist);
   }
 
@@ -279,9 +285,10 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> setQueueItems(List<MediaItem> songs) async {
     // notify system
-    final newQueue = queue.value..clear()..addAll(songs.toSet().toList());
+    final newQueue = queue.value
+      ..clear()
+      ..addAll(songs.toSet().toList());
     queue.add(newQueue);
     // print("set to ${queue.valueOrNull?.length ?? 0} songs");
   }
-
 }
