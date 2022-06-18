@@ -1,11 +1,9 @@
 import 'dart:math';
 
-import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:asterfox/music/manager/audio_handler.dart';
-import 'package:asterfox/music/manager/music_manager.dart';
 import 'audio_data_manager.dart';
+import 'audio_handler.dart';
+import 'music_manager.dart';
 
 class MusicListener {
   MusicListener(this._musicManager, this._audioHandler) {

@@ -1,12 +1,12 @@
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-import 'package:asterfox/system/theme/theme.dart';
+import '../../data/custom_colors.dart';
+import '../../system/theme/theme.dart';
+import 'settings_screen.dart';
 
 class ThemeSettingsScreen extends BaseScreen {
   ThemeSettingsScreen() : super(

@@ -23,13 +23,13 @@ class HomeScreenMusicManager {
     assert(youtubeId != null || musicData != null);
 
     // the auto downloader works only for remote music
-    final bool autoDownload = SettingsData.getValue(key: "auto_download") && (!LocalMusicsData.isSaved(audioId: youtubeId, song: musicData));
+    final bool autoDownloadEnabled = SettingsData.getValue(key: "auto_download") && (!LocalMusicsData.isSaved(audioId: youtubeId, song: musicData));
 
     final completer = Completer();
 
-    if (autoDownload) downloadProgress[key] = ValueNotifier<int>(0);
+    if (autoDownloadEnabled) downloadProgress[key] = ValueNotifier<int>(0);
 
-    final Widget notification = autoDownload ? ValueListenableBuilder<int>(
+    final Widget notification = autoDownloadEnabled ? ValueListenableBuilder<int>(
       valueListenable: downloadProgress[key]!,
       builder: (_, percentage, __) => Column(
         children: [
@@ -80,7 +80,7 @@ class HomeScreenMusicManager {
               song = musicData!;
             }
 
-            if (autoDownload) await song.save();
+            if (autoDownloadEnabled) await song.save();
             await musicManager.add(song);
             completer.complete();
           }
@@ -97,18 +97,18 @@ class HomeScreenMusicManager {
     assert(count > 0);
     assert(musicDataList != null || youtubePlaylist != null);
 
-    final bool autoDownload = SettingsData.getValue(key: "auto_download");
+    final bool autoDownloadEnabled = SettingsData.getValue(key: "auto_download");
 
     final completer = Completer();
 
     ValueNotifier<int>? progress;
     ValueNotifier<bool>? isDownloadMode;
-    if (autoDownload) {
+    if (autoDownloadEnabled) {
       progress = ValueNotifier<int>(0);
       isDownloadMode = ValueNotifier<bool>(false);
     }
 
-    final Widget notification = autoDownload ? ValueListenableBuilder<int>(
+    final Widget notification = autoDownloadEnabled ? ValueListenableBuilder<int>(
       valueListenable: progress!,
       builder: (_, i, __) => Column(
         children: [
@@ -160,7 +160,7 @@ class HomeScreenMusicManager {
               }
             }
 
-            if (autoDownload) {
+            if (autoDownloadEnabled) {
               isDownloadMode!.value = true;
               await Future.wait(songs.map((song) async {
                 await song.save(saveToJSON: false);

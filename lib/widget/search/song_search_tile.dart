@@ -1,9 +1,9 @@
-import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/widget/search/song_search.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../system/home_screen_music_manager.dart';
+import '../../system/theme/theme.dart';
+import 'song_search.dart';
 
 class SongSearchTile extends StatelessWidget {
   const SongSearchTile(

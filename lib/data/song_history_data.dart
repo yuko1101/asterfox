@@ -1,16 +1,15 @@
 import 'dart:io';
 
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/manager/music_manager.dart';
-import 'package:asterfox/system/exceptions/local_song_not_found_exception.dart';
-import 'package:asterfox/system/exceptions/network_exception.dart';
-import 'package:asterfox/system/exceptions/refresh_url_failed_exception.dart';
-import 'package:asterfox/utils/extensions.dart';
-import 'package:asterfox/utils/network_check.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
+
+import '../music/audio_source/music_data.dart';
+import '../music/manager/music_manager.dart';
+import '../system/exceptions/local_song_not_found_exception.dart';
+import '../system/exceptions/refresh_url_failed_exception.dart';
+import '../utils/network_check.dart';
+import 'local_musics_data.dart';
 
 class SongHistoryData {
   static late ConfigFile historyData;

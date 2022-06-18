@@ -1,14 +1,15 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/widget/music_card.dart';
 import 'package:flutter/material.dart';
+
+import '../main.dart';
+import '../music/audio_source/music_data.dart';
+import 'music_card.dart';
 
 
 class PlaylistWidget extends StatefulWidget {
   const PlaylistWidget({
     required this.songs,
     this.playing,
-    this.linked = false,
+    this.isLinked = false,
     this.padding,
     this.songWidgetBuilder,
     this.onMove,
@@ -19,7 +20,7 @@ class PlaylistWidget extends StatefulWidget {
 
   final List<MusicData> songs;
   final MusicData? playing;
-  final bool linked;
+  final bool isLinked;
   final EdgeInsetsGeometry? padding;
   final Widget Function(BuildContext, int)? songWidgetBuilder;
 
@@ -48,9 +49,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: widget.songWidgetBuilder ?? (context, index) => MusicCardWidget(
               song: widget.songs[index],
-              playing: widget.songs[index].key == widget.playing?.key && widget.linked,
+              isPlaying: widget.songs[index].key == widget.playing?.key && widget.isLinked,
               key: Key(widget.songs[index].key),
-              linked: widget.linked,
+              isLinked: widget.isLinked,
               index: index,
               onTap: widget.onTap,
               onRemove: widget.onRemove,
@@ -61,9 +62,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
             print("oldIndex: $oldIndex, newIndex: $newIndex");
 
-            if (widget.linked && widget.onMove == null) await musicManager.move(oldIndex, newIndex);
+            if (widget.isLinked && widget.onMove == null) await musicManager.move(oldIndex, newIndex);
             setState(() {
-              if (!widget.linked) {
+              if (!widget.isLinked) {
                 final song = widget.songs.removeAt(oldIndex);
                 widget.songs.insert(newIndex, song);
               }

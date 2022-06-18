@@ -1,11 +1,12 @@
 import 'dart:math';
 
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/utils/math.dart';
-import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:flutter/material.dart';
+
+import '../../data/custom_colors.dart';
+import '../../main.dart';
+import '../../system/theme/theme.dart';
+import '../../utils/math.dart';
+import '../notifiers_widget.dart';
 
 final _tween = Tween<double>(begin: 0, end: 1);
 

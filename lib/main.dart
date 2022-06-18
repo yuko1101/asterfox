@@ -1,23 +1,24 @@
 import 'dart:async';
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/data/song_history_data.dart';
-import 'package:asterfox/screens/debug_screen.dart';
-import 'package:asterfox/screens/home_screen.dart';
-import 'package:asterfox/screens/settings/settings_screen.dart';
-import 'package:asterfox/screens/song_history_screen.dart';
-import 'package:asterfox/system/sharing_intent.dart';
-import 'package:asterfox/system/theme/theme.dart';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:flutter/material.dart';
+
+import 'data/custom_colors.dart';
+import 'data/local_musics_data.dart';
+import 'data/settings_data.dart';
+import 'data/song_history_data.dart';
 import 'music/manager/music_manager.dart';
+import 'screens/debug_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/settings/settings_screen.dart';
+import 'screens/song_history_screen.dart';
+import 'system/sharing_intent.dart';
+import 'system/theme/theme.dart';
 
 late final MusicManager musicManager;
 

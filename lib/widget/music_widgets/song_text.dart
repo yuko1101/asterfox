@@ -1,6 +1,7 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:flutter/material.dart';
+
+import '../../main.dart';
+import '../../music/audio_source/music_data.dart';
 
 class CurrentSongTitle extends StatelessWidget {
   const CurrentSongTitle({Key? key}) : super(key: key);

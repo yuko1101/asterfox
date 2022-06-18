@@ -1,18 +1,17 @@
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/manager/audio_data_manager.dart';
-import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/system/theme/theme_options.dart';
-import 'package:asterfox/utils/color_util.dart';
-import 'package:asterfox/widget/music_widgets/music_thumbnail.dart';
 import 'package:flutter/material.dart';
+
+import '../main.dart';
+import '../music/audio_source/music_data.dart';
+import '../music/manager/audio_data_manager.dart';
+import '../system/theme/theme.dart';
+import 'music_widgets/music_thumbnail.dart';
+
 
 class MusicCardWidget extends StatelessWidget {
   const MusicCardWidget({
     required this.song,
-    this.playing = false,
-    this.linked = false,
+    this.isPlaying = false,
+    this.isLinked = false,
     required this.index,
     this.onTap,
     this.onRemove,
@@ -20,8 +19,8 @@ class MusicCardWidget extends StatelessWidget {
   }) : super(key: key);
 
   final MusicData song;
-  final bool playing;
-  final bool linked;
+  final bool isPlaying;
+  final bool isLinked;
   final int index;
 
   final dynamic Function(int)? onTap;
@@ -45,7 +44,7 @@ class MusicCardWidget extends StatelessWidget {
                   height: 60,
                   child: MusicCardLeading(
                     song: song,
-                    playing: playing,
+                    playing: isPlaying,
                   ),
                 ),
                 Flexible(
@@ -81,7 +80,7 @@ class MusicCardWidget extends StatelessWidget {
               onTap!(index);
               return;
             }
-            if (linked) {
+            if (isLinked) {
               musicManager.seek(
                   Duration.zero,
                   index: musicManager.audioDataManager.playlist.indexWhere((element) => element.key == song.key)
@@ -94,7 +93,7 @@ class MusicCardWidget extends StatelessWidget {
             onRemove!(index, dismissDirection);
             return;
           }
-          if (linked) await musicManager.remove(song.key);
+          if (isLinked) await musicManager.remove(song.key);
           song.destroy();
         },
     );

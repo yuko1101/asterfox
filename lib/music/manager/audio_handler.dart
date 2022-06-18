@@ -1,9 +1,10 @@
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/manager/audio_data_manager.dart';
-import 'package:asterfox/utils/bubble_sort.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
+
+import '../../utils/bubble_sort.dart';
+import '../audio_source/music_data.dart';
+import 'audio_data_manager.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 

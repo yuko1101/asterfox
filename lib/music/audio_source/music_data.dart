@@ -1,8 +1,8 @@
-import 'package:asterfox/music/audio_source/youtube_music_data.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:uuid/uuid.dart';
+
+import 'youtube_music_data.dart';
 
 class MusicData {
   MusicData({

@@ -1,7 +1,8 @@
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/widget/music_widgets/audio_progress_bar.dart';
-import 'package:asterfox/widget/music_widgets/repeat_button.dart';
 import 'package:just_audio/just_audio.dart';
+
+import '../../widget/music_widgets/audio_progress_bar.dart';
+import '../../widget/music_widgets/repeat_button.dart';
+import '../audio_source/music_data.dart';
 
 class AudioDataManager {
   AudioDataManager(this.audioPlayer);

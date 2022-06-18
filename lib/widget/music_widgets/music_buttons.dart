@@ -1,9 +1,9 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/manager/audio_data_manager.dart';
-import 'package:asterfox/music/manager/music_listener.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+
+import '../../main.dart';
+import '../../music/audio_source/music_data.dart';
+import '../../music/manager/audio_data_manager.dart';
 
 class ShuffleButton extends StatelessWidget {
   const ShuffleButton({Key? key}) : super(key: key);

@@ -1,17 +1,17 @@
 import 'dart:convert';
 
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/manager/audio_data_manager.dart';
-import 'package:asterfox/widget/music_widgets/music_thumbnail.dart';
-import 'package:asterfox/widget/playlist_widget.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:asterfox/system/theme/theme.dart';
 
+import '../data/local_musics_data.dart';
+import '../main.dart';
+import '../music/audio_source/music_data.dart';
+import '../music/manager/audio_data_manager.dart';
+import '../system/theme/theme.dart';
+import '../widget/music_widgets/music_thumbnail.dart';
+import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
 
 class DebugScreen extends BaseScreen {
@@ -94,7 +94,7 @@ class DebugMainScreen extends StatelessWidget {
                     return PlaylistWidget(
                         songs: songs,
                         playing: song,
-                        linked: true,
+                        isLinked: true,
                         songWidgetBuilder: (context, index) {
                           return ListTile(
                             key: Key(songs[index].key),

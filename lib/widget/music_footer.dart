@@ -1,9 +1,9 @@
-import 'package:asterfox/widget/music_widgets/more_actions_button.dart';
 import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 import 'music_widgets/audio_progress_bar.dart';
 import 'music_widgets/download_button.dart';
+import 'music_widgets/more_actions_button.dart';
 import 'music_widgets/music_buttons.dart';
 import 'music_widgets/music_thumbnail.dart';
 import 'music_widgets/repeat_button.dart';

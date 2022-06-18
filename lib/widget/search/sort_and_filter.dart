@@ -1,4 +1,4 @@
-import 'package:asterfox/widget/search/song_search.dart';
+import 'song_search.dart';
 
 List<SongSuggestion> filterAndSort(List<SongSuggestion> list, {List<FilterSorting>? filterSortingList}) {
   if (filterSortingList == null) return list;
@@ -18,14 +18,14 @@ class FilterSorting {
 class YouTubeFilter extends FilterSorting {
   @override
   List<SongSuggestion> apply(List<SongSuggestion> list) {
-    return list.where((element) => element.tags.contains(SongTag.youtube)).toList();
+    return list.where((suggestion) => suggestion.tags.contains(SongTag.youtube)).toList();
   }
 }
 
 class LocalFilter extends FilterSorting {
   @override
   List<SongSuggestion> apply(List<SongSuggestion> list) {
-    return list.where((element) => element.tags.contains(SongTag.local)).toList();
+    return list.where((suggestion) => suggestion.tags.contains(SongTag.local)).toList();
   }
 }
 
@@ -35,7 +35,7 @@ class RelatedFilter extends FilterSorting {
   @override
   List<SongSuggestion> apply(List<SongSuggestion> list) {
     if (query.isEmpty) return list;
-    return list.where((element) => _getScore(element, query) > 0).toList();
+    return list.where((suggestion) => _getScore(suggestion, query) > 0).toList();
   }
 }
 

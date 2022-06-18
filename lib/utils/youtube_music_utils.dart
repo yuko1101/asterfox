@@ -1,17 +1,15 @@
 import 'dart:async';
 
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/music/audio_source/youtube_music_data.dart';
-import 'package:asterfox/system/exceptions/local_song_not_found_exception.dart';
-import 'package:asterfox/utils/network_check.dart';
 import 'package:easy_app/utils/languages.dart';
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:easy_app/utils/pair.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:http/http.dart' as http;
-import 'package:asterfox/system/exceptions/network_exception.dart';
+
+import '../data/local_musics_data.dart';
+import '../music/audio_source/youtube_music_data.dart';
+import 'network_check.dart';
 
 class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.

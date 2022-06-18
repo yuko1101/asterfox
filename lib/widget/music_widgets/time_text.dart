@@ -1,5 +1,6 @@
-import 'package:asterfox/main.dart';
 import 'package:flutter/material.dart';
+
+import '../../main.dart';
 import 'audio_progress_bar.dart';
 
 class TimeText extends StatelessWidget {

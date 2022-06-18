@@ -1,16 +1,15 @@
-import 'package:asterfox/data/song_history_data.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/system/exceptions/network_exception.dart';
-import 'package:asterfox/system/exceptions/refresh_url_failed_exception.dart';
-import 'package:asterfox/system/home_screen_music_manager.dart';
-import 'package:asterfox/system/theme/theme.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
+
+import '../data/song_history_data.dart';
+import '../system/exceptions/network_exception.dart';
+import '../system/exceptions/refresh_url_failed_exception.dart';
+import '../system/home_screen_music_manager.dart';
+import '../system/theme/theme.dart';
 
 class SongHistoryScreen extends BaseScreen {
   SongHistoryScreen() : super(
