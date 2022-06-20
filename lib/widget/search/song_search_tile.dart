@@ -31,20 +31,20 @@ class SongSearchTile extends StatelessWidget {
     } else {
       icon = const Icon(Icons.question_mark);
     }
-    return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
-      child: InkWell(
-        onTap: () {
-          if (suggestion.tags.contains(SongTag.word)) {
-            setQuery(suggestion.audioId);
-          } else if (suggestion.tags.contains(SongTag.youtube)) {
-            close();
-            HomeScreenMusicManager.addSong(
-              key: const Uuid().v4(),
-              youtubeId: suggestion.audioId,
-            );
-          }
-        },
+    return InkWell(
+      onTap: () {
+        if (suggestion.tags.contains(SongTag.word)) {
+          setQuery(suggestion.audioId);
+        } else if (suggestion.tags.contains(SongTag.youtube)) {
+          close();
+          HomeScreenMusicManager.addSong(
+            key: const Uuid().v4(),
+            youtubeId: suggestion.audioId,
+          );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: Row(
           children: [
             Container(
