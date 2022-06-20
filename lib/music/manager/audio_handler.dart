@@ -14,7 +14,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   final fix = OS.getOS() == OSType.windows;
   final bool useSession;
 
-  /// Initialise our audio handler.
+  /// Initialise the audio handler.
   SessionAudioHandler(this.useSession) {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
@@ -34,11 +34,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       _listenForSequenceStateChanges();
     }
   }
-
-  // In this simple example, we handle only 4 actions: play, pause, seek and
-  // stop. Any button press from the Flutter UI, notification, lock screens or
-  // headset will be routed through to these 4 methods so that you can handle
-  // your audio playback logic in one place.
 
   @override
   Future<void> play() async {
