@@ -7,6 +7,7 @@ import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/manager/audio_data_manager.dart';
 import '../widget/music_footer.dart';
+import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
 import '../widget/notifiers_widget.dart';
 import '../widget/playlist_widget.dart';
@@ -37,7 +38,16 @@ class HomeScreen extends BaseScreen {
                       padding: const EdgeInsets.only(top: 15),
                     ),
                   ),
-                  homeNotification,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      homeNotification,
+                      const LyricsButton()
+                    ],
+                  ),
+
+                  // <------ Volume Button ------>
                   ValueListenableBuilder<bool>(
                     valueListenable: volumeWidget.openedNotifier,
                     builder: (context, opened, _) {
@@ -55,6 +65,7 @@ class HomeScreen extends BaseScreen {
                     left: 5,
                     child: volumeWidget,
                   ),
+                  // <----------------------------->
                 ],
               );
             },
