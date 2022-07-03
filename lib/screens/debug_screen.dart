@@ -85,7 +85,7 @@ class DebugMainScreen extends StatelessWidget {
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 LocalMusicsData.removeAllFromLocal(
-                                    LocalMusicsData.getAll());
+                                    LocalMusicsData.getAll(isTemporary: true));
                                 LocalMusicsData.saveData();
                               },
                             ),
