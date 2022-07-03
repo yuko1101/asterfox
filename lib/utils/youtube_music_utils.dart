@@ -178,6 +178,7 @@ class YouTubeMusicUtils {
       imageUrl: imageUrl,
       remoteImageUrl: imageUrl,
       key: key,
+      lyrics: "", // TODO: by default, get from closed captions
       isTemporary: isTemporary,
     );
   }

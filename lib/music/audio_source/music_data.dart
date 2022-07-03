@@ -19,6 +19,7 @@ class MusicData {
     required this.duration,
     required this.isLocal,
     required this.volume,
+    required this.lyrics,
     required this.key,
     this.isTemporary = false,
   }) {
@@ -42,6 +43,8 @@ class MusicData {
   final String key;
   String remoteUrl;
   String remoteImageUrl;
+
+  String lyrics;
 
   final bool isTemporary;
 
@@ -86,6 +89,7 @@ class MusicData {
       'duration': duration.inMilliseconds,
       'keywords': keywords,
       'volume': volume,
+      'lyrics': lyrics,
     };
     jsonExtras.forEach((key, value) {
       json[key] = value;
@@ -123,6 +127,7 @@ class MusicData {
           isLocal: isLocal,
           keywords: (json['keywords'] as List).map((e) => e as String).toList(),
           volume: json['volume'] as double,
+          lyrics: json['lyrics'] as String,
           isTemporary: isTemporary,
         );
     }

@@ -22,6 +22,7 @@ class YouTubeMusicData extends MusicData {
     required Duration duration,
     required bool isLocal,
     required double volume,
+    required String lyrics,
     required String key,
     bool isTemporary = false,
   }) : super(
@@ -38,6 +39,7 @@ class YouTubeMusicData extends MusicData {
           duration: duration,
           isLocal: isLocal,
           volume: volume,
+          lyrics: lyrics,
           key: key,
           isTemporary: isTemporary,
         );
@@ -115,6 +117,7 @@ class YouTubeMusicData extends MusicData {
       isLocal: isLocal,
       keywords: (json['keywords'] as List).map((e) => e as String).toList(),
       volume: json['volume'] as double,
+      lyrics: json['lyrics'] as String,
       isTemporary: isTemporary,
     );
   }
