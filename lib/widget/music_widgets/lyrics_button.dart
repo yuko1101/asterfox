@@ -72,6 +72,18 @@ class LyricsButton extends StatelessWidget {
                 },
                 tooltip: Language.getText("close"),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.edit_note),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    final FindLyricsDialog findLyricsDialog =
+                        FindLyricsDialog(song);
+                    showDialog(
+                        context: context, builder: findLyricsDialog.pages[0]);
+                  },
+                )
+              ],
             ),
             Flexible(
               child: SingleChildScrollView(
@@ -80,7 +92,6 @@ class LyricsButton extends StatelessWidget {
                   color: Theme.of(context).backgroundColor,
                   child: Text(
                     song.lyrics,
-                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                   ),
                 ),
