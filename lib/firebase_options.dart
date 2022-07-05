@@ -28,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -47,30 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCF5Ik-ea5hhvEgrBgLuHuSKlOwbNnlq_U',
-    appId: '1:320722190134:android:40f5a0d141831204263d97',
-    messagingSenderId: '320722190134',
-    projectId: 'asterfox-88710',
-    storageBucket: 'asterfox-88710.appspot.com',
+    apiKey: 'AIzaSyCOuECEAmTWT_jr7HhZhnIUWAdXGifYlaM',
+    appId: '1:327268428452:android:6c19217fef7a5d1c8a1431',
+    messagingSenderId: '327268428452',
+    projectId: 'asterfox-cdd02',
+    storageBucket: 'asterfox-cdd02.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB4Ak19OZsnrGOINhbqruI7SIgV67SVWYc',
-    appId: '1:320722190134:ios:2f5de72a9d0d4af9263d97',
-    messagingSenderId: '320722190134',
-    projectId: 'asterfox-88710',
-    storageBucket: 'asterfox-88710.appspot.com',
-    iosClientId: '320722190134-mv9p0itd6tsofnm63v82litegj18i2sj.apps.googleusercontent.com',
-    iosBundleId: 'net.asterfox.app',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyB4Ak19OZsnrGOINhbqruI7SIgV67SVWYc',
-    appId: '1:320722190134:ios:2f5de72a9d0d4af9263d97',
-    messagingSenderId: '320722190134',
-    projectId: 'asterfox-88710',
-    storageBucket: 'asterfox-88710.appspot.com',
-    iosClientId: '320722190134-mv9p0itd6tsofnm63v82litegj18i2sj.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDGuFIOEpu-9ITv6JKp7AeuPSUxc24rN-E',
+    appId: '1:327268428452:ios:c481032696b7f7c28a1431',
+    messagingSenderId: '327268428452',
+    projectId: 'asterfox-cdd02',
+    storageBucket: 'asterfox-cdd02.appspot.com',
+    iosClientId: '327268428452-rrms5ck0pbr8bcg3e541b6hq2989mv15.apps.googleusercontent.com',
     iosBundleId: 'net.asterfox.app',
   );
 }
