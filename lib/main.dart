@@ -6,12 +6,15 @@ import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/os.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 import 'data/custom_colors.dart';
 import 'data/local_musics_data.dart';
 import 'data/settings_data.dart';
 import 'data/song_history_data.dart';
+import 'firebase_options.dart';
 import 'music/manager/music_manager.dart';
 import 'screens/debug_screen.dart';
 import 'screens/home_screen.dart';
@@ -29,6 +32,12 @@ Future<void> main() async {
   // run this before initializing the music manager
   await SettingsData.init();
   SettingsData.applySettings();
+
+  // Firebase set-up
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
   // run this before initializing HomeScreen
   musicManager = MusicManager(true);
