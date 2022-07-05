@@ -62,8 +62,9 @@ dependencies:
   settings_ui: ^2.0.2
 
   # firebase
+  firebase_core: ^1.19.1
   firebase_crashlytics: ^2.8.4
-  
+
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
   colored_json: ^1.1.0
