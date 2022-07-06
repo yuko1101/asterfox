@@ -64,6 +64,7 @@ dependencies:
   # firebase
   firebase_core: ^1.19.1
   firebase_crashlytics: ^2.8.4
+  firebase_analytics: ^9.1.12
 
 
   # Below are the dependencies for debugging, and don't need to be included in the release.

@@ -29,6 +29,13 @@
             {
               "client_id": "327268428452-ou3psgo1vr8c1st42qf13piejjneg3pf.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "327268428452-rrms5ck0pbr8bcg3e541b6hq2989mv15.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.asterfox.app"
+              }
             }
           ]
         }
