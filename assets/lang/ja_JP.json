@@ -56,5 +56,11 @@
   "finish": "完了",
   "lyrics": "歌詞",
   "close": "閉じる",
-  "lyrics_not_found": "歌詞が見つかりませんでした"
+  "lyrics_not_found": "歌詞が見つかりませんでした",
+  "login": "ログイン",
+  "welcome_back": "ようこそ",
+  "email": "メールアドレス",
+  "password": "パスワード",
+  "invalid_email": "無効なメールアドレス",
+  "input_password": "パスワードを入力してください"
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/screens/login_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
@@ -7,6 +8,7 @@ import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -92,54 +94,63 @@ class AsterfoxApp extends StatelessWidget {
         return MaterialApp(
           title: 'Asterfox',
           theme: AppTheme.themes[value],
-          home: MainScreen(
-            sideMenu: SideMenu(
-              appIcon: Image.asset(
-                "assets/images/asterfox.png",
-                scale: 0.1,
-              ),
-              title: const Text("Asterfox", textScaleFactor: 1.3),
-              items: [
-                SideMenuItem(
-                  title: const Text("Home"),
-                  icon: const Icon(Icons.home),
-                  onPressed: () {
-                    if (EasyApp.currentScreen is HomeScreen) return;
-                    EasyApp.pushPage(context, HomeScreen());
-                  },
-                ),
-                SideMenuItem(
-                  title: const Text("Playlist"),
-                  icon: const Icon(Icons.playlist_play),
-                  onPressed: () {},
-                ),
-                SideMenuItem(
-                  title: const Text("History"),
-                  icon: const Icon(Icons.replay),
-                  onPressed: () {
-                    if (EasyApp.currentScreen is SongHistoryScreen) return;
-                    EasyApp.pushPage(context, SongHistoryScreen());
-                  },
-                ),
-                SideMenuItem(
-                  title: const Text("Settings"),
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    if (EasyApp.currentScreen is SettingsScreen) return;
-                    EasyApp.pushPage(context, SettingsScreen());
-                  },
-                ),
-                SideMenuItem(
-                  title: const Text("Debug"),
-                  icon: const Icon(Icons.bug_report),
-                  onPressed: () {
-                    if (EasyApp.currentScreen is DebugScreen) return;
-                    EasyApp.pushPage(context, const DebugScreen());
-                  },
-                )
-              ],
-            ),
-          ),
+          home: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return LoginScreen();
+                } else {
+                  return MainScreen(
+                    sideMenu: SideMenu(
+                      appIcon: Image.asset(
+                        "assets/images/asterfox.png",
+                        scale: 0.1,
+                      ),
+                      title: const Text("Asterfox", textScaleFactor: 1.3),
+                      items: [
+                        SideMenuItem(
+                          title: const Text("Home"),
+                          icon: const Icon(Icons.home),
+                          onPressed: () {
+                            if (EasyApp.currentScreen is HomeScreen) return;
+                            EasyApp.pushPage(context, HomeScreen());
+                          },
+                        ),
+                        SideMenuItem(
+                          title: const Text("Playlist"),
+                          icon: const Icon(Icons.playlist_play),
+                          onPressed: () {},
+                        ),
+                        SideMenuItem(
+                          title: const Text("History"),
+                          icon: const Icon(Icons.replay),
+                          onPressed: () {
+                            if (EasyApp.currentScreen is SongHistoryScreen)
+                              return;
+                            EasyApp.pushPage(context, SongHistoryScreen());
+                          },
+                        ),
+                        SideMenuItem(
+                          title: const Text("Settings"),
+                          icon: const Icon(Icons.settings),
+                          onPressed: () {
+                            if (EasyApp.currentScreen is SettingsScreen) return;
+                            EasyApp.pushPage(context, SettingsScreen());
+                          },
+                        ),
+                        SideMenuItem(
+                          title: const Text("Debug"),
+                          icon: const Icon(Icons.bug_report),
+                          onPressed: () {
+                            if (EasyApp.currentScreen is DebugScreen) return;
+                            EasyApp.pushPage(context, const DebugScreen());
+                          },
+                        )
+                      ],
+                    ),
+                  );
+                }
+              }),
           debugShowCheckedModeBanner: false,
         );
       },
