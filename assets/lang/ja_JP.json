@@ -62,5 +62,6 @@
   "email": "メールアドレス",
   "password": "パスワード",
   "invalid_email": "無効なメールアドレス",
-  "input_password": "パスワードを入力してください"
+  "input_password": "パスワードを入力してください",
+  "logout": "ログアウト"
 }

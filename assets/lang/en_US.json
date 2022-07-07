@@ -62,5 +62,6 @@
   "email": "Email",
   "password": "Password",
   "invalid_email": "Invalid email",
-  "input_password": "Please input your password"
+  "input_password": "Please input your password",
+  "logout": "Log Out"
 }
