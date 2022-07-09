@@ -349,14 +349,17 @@ class SignUpMessage extends StatelessWidget {
           : null;
       final int nextStart = clickable?.start ?? text.length;
       if (currentIndex < nextStart) {
-        textSpans.add(TextSpan(text: text.substring(currentIndex, nextStart)));
+        textSpans.add(TextSpan(
+            text: text.substring(currentIndex, nextStart),
+            style: TextStyle(color: Theme.of(context).extraColors.primary)));
         currentIndex = nextStart;
       } else if (currentIndex == nextStart) {
         final rawText = text.substring(currentIndex, clickable!.end);
         textSpans.add(
           TextSpan(
             text: rawText.substring(1, rawText.length - 1),
-            style: TextStyle(color: Colors.amber[600]),
+            style: TextStyle(
+                color: Colors.amber[600], decoration: TextDecoration.underline),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 // TODO: sign up
