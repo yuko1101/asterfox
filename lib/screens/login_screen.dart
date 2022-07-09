@@ -15,6 +15,8 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,55 +43,61 @@ class LoginScreen extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           child: Container(
             padding: const EdgeInsets.only(left: 30, right: 30),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                // TODO: better ui
-                SizedBox(
-                  height: 200,
-                  width: 200,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.asset(
-                      "assets/images/asterfox.png",
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  // TODO: better ui
+                  SizedBox(
+                    height: 200,
+                    width: 200,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Image.asset(
+                        "assets/images/asterfox.png",
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  Language.getText("welcome_back"),
-                  style: const TextStyle(
-                      fontSize: 40, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                EmailField(
-                  emailController: emailController,
-                  passwordController: passwordController,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                PasswordField(
-                  passwordController: passwordController,
-                  emailController: emailController,
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                LoginButton(
-                  passwordController: passwordController,
-                  emailController: emailController,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                SignUpMessage(),
-                const SizedBox(
-                  height: 20,
-                )
-                // TODO: Add Google account login
-              ],
+                  Text(
+                    Language.getText("welcome_back"),
+                    style: const TextStyle(
+                        fontSize: 40, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  EmailField(
+                    formKey: formKey,
+                    emailController: emailController,
+                    passwordController: passwordController,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  PasswordField(
+                    formKey: formKey,
+                    passwordController: passwordController,
+                    emailController: emailController,
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  LoginButton(
+                    formKey: formKey,
+                    passwordController: passwordController,
+                    emailController: emailController,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SignUpMessage(),
+                  const SizedBox(
+                    height: 20,
+                  )
+                  // TODO: Add Google account login
+                ],
+              ),
             ),
           ),
         ),
@@ -97,8 +105,12 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  static Future<void> login(TextEditingController emailController,
-      TextEditingController passwordController, BuildContext context) async {
+  static Future<void> login(
+      GlobalKey<FormState> formKey,
+      TextEditingController emailController,
+      TextEditingController passwordController,
+      BuildContext context) async {
+    if (!formKey.currentState!.validate()) return;
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
@@ -138,10 +150,12 @@ class EmailField extends StatefulWidget {
       r"^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$");
 
   const EmailField({
+    required this.formKey,
     required this.emailController,
     required this.passwordController,
     Key? key,
   }) : super(key: key);
+  final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final TextEditingController passwordController;
 
@@ -190,8 +204,8 @@ class _EmailFieldState extends State<EmailField> {
       },
       onFieldSubmitted: (value) {
         if (widget.passwordController.text.isNotEmpty) {
-          LoginScreen.login(
-              widget.emailController, widget.passwordController, context);
+          LoginScreen.login(widget.formKey, widget.emailController,
+              widget.passwordController, context);
         }
       },
     );
@@ -200,10 +214,12 @@ class _EmailFieldState extends State<EmailField> {
 
 class PasswordField extends StatefulWidget {
   const PasswordField({
+    required this.formKey,
     required this.passwordController,
     required this.emailController,
     Key? key,
   }) : super(key: key);
+  final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
   final TextEditingController emailController;
 
@@ -240,8 +256,8 @@ class _PasswordFieldState extends State<PasswordField> {
         return null;
       },
       onFieldSubmitted: (value) {
-        LoginScreen.login(
-            widget.emailController, widget.passwordController, context);
+        LoginScreen.login(widget.formKey, widget.emailController,
+            widget.passwordController, context);
       },
       obscureText: !showPassword,
     );
@@ -250,10 +266,12 @@ class _PasswordFieldState extends State<PasswordField> {
 
 class LoginButton extends StatelessWidget {
   const LoginButton({
+    required this.formKey,
     required this.passwordController,
     required this.emailController,
     Key? key,
   }) : super(key: key);
+  final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
   final TextEditingController emailController;
 
@@ -298,7 +316,7 @@ class LoginButton extends StatelessWidget {
                 hoverColor: Colors.white10,
                 onTap: () async {
                   LoginScreen.login(
-                      emailController, passwordController, context);
+                      formKey, emailController, passwordController, context);
                 },
                 child: Center(
                   child: Text(
@@ -335,6 +353,8 @@ class LoginButtonClipper extends CustomClipper<Path> {
 }
 
 class SignUpMessage extends StatelessWidget {
+  const SignUpMessage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final text = Language.getText("sign_up_message");
