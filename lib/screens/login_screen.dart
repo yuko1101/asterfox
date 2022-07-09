@@ -4,8 +4,10 @@ import 'package:asterfox/system/theme/theme.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -34,8 +36,7 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        // TODO: fix that singlechildscrollview can be scrolled after opened keyboard and scrolled it,
-        // even if the height of its child is less than max size
+        // TODO: fix that singlechildscrollview can be scrolled after opened keyboard and scrolled it, even if the height of its child is less than max size
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Container(
@@ -81,6 +82,10 @@ class LoginScreen extends StatelessWidget {
                   emailController: emailController,
                 ),
                 const SizedBox(
+                  height: 10,
+                ),
+                SignUpMessage(),
+                const SizedBox(
                   height: 20,
                 )
                 // TODO: Add Google account login
@@ -92,29 +97,38 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  static Future<void> login(
-      String email, String password, BuildContext context) async {
+  static Future<void> login(TextEditingController emailController,
+      TextEditingController passwordController, BuildContext context) async {
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
+    // print("email: $email, password: $value");
     showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Dialog(
-              child: SizedBox(
-                height: 200,
-                width: 200,
-                child: Center(
-                  child: SizedBox(
-                    height: 40,
-                    width: 40,
-                    child: FittedBox(
-                      child: CircularProgressIndicator(),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-              ),
-            ));
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "invalid-email" ||
+          e.code == "user-not-found" ||
+          e.code == "wrong-password") {
+        emailController.clear();
+        passwordController.clear();
+        Fluttertoast.showToast(
+            msg: Language.getText("invalid_email_or_password"));
+      } else if (e.code == "user-disabled") {
+        emailController.clear();
+        passwordController.clear();
+        Fluttertoast.showToast(msg: Language.getText("disabled_user"));
+      }
+    }
     Navigator.pop(context);
   }
 }
@@ -164,7 +178,7 @@ class _EmailFieldState extends State<EmailField> {
       ),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (String? input) {
-        if (input == null || !EmailField.emailRegExp.hasMatch(input)) {
+        if (input == null || !EmailField.emailRegExp.hasMatch(input.trim())) {
           return Language.getText("invalid_email");
         }
         return null;
@@ -176,7 +190,8 @@ class _EmailFieldState extends State<EmailField> {
       },
       onFieldSubmitted: (value) {
         if (widget.passwordController.text.isNotEmpty) {
-          LoginScreen.login(value, widget.passwordController.text, context);
+          LoginScreen.login(
+              widget.emailController, widget.passwordController, context);
         }
       },
     );
@@ -225,10 +240,8 @@ class _PasswordFieldState extends State<PasswordField> {
         return null;
       },
       onFieldSubmitted: (value) {
-        final String email = widget.emailController.text;
-        final String password = value;
-        print("email: $email, password: $value");
-        LoginScreen.login(email, password, context);
+        LoginScreen.login(
+            widget.emailController, widget.passwordController, context);
       },
       obscureText: !showPassword,
     );
@@ -284,10 +297,8 @@ class LoginButton extends StatelessWidget {
                 splashColor: Colors.white10,
                 hoverColor: Colors.white10,
                 onTap: () async {
-                  final String email = emailController.text;
-                  final String password = passwordController.text;
-
-                  LoginScreen.login(email, password, context);
+                  LoginScreen.login(
+                      emailController, passwordController, context);
                 },
                 child: Center(
                   child: Text(
@@ -321,4 +332,42 @@ class LoginButtonClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class SignUpMessage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final text = Language.getText("sign_up_message");
+    final clickables = RegExp(r"\{[^{}]+\}").allMatches(text).toList();
+    final List<TextSpan> textSpans = [];
+
+    int currentIndex = 0;
+    int clickableIndex = 0;
+    while (currentIndex < text.length) {
+      final RegExpMatch? clickable = clickableIndex < clickables.length
+          ? clickables[clickableIndex]
+          : null;
+      final int nextStart = clickable?.start ?? text.length;
+      if (currentIndex < nextStart) {
+        textSpans.add(TextSpan(text: text.substring(currentIndex, nextStart)));
+        currentIndex = nextStart;
+      } else if (currentIndex == nextStart) {
+        final rawText = text.substring(currentIndex, clickable!.end);
+        textSpans.add(
+          TextSpan(
+            text: rawText.substring(1, rawText.length - 1),
+            style: TextStyle(color: Colors.amber[600]),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                // TODO: sign up
+                print("sign up");
+              },
+          ),
+        );
+        currentIndex = clickable.end;
+        clickableIndex++;
+      }
+    }
+    return RichText(text: TextSpan(children: textSpans));
+  }
 }

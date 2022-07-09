@@ -65,5 +65,9 @@
   "invalid_email": "無効なメールアドレス",
   "input_password": "パスワードを入力してください",
   "logout": "ログアウト",
-  "exit_app": "アプリを閉じる"
+  "exit_app": "アプリを閉じる",
+  "something_went_wrong": "エラーが発生しました",
+  "invalid_email_or_password": "メールアドレスまたはパスワードが正しくありません",
+  "disabled_user": "このアカウントは凍結されています",
+  "sign_up_message": "アカウントをお持ちではない場合、{作成}できます。"
 }

@@ -65,5 +65,9 @@
   "invalid_email": "Invalid email",
   "input_password": "Please input your password",
   "logout": "Log Out",
-  "exit_app": "Exit App"
+  "exit_app": "Exit App",
+  "something_went_wrong": "Something went wrong",
+  "invalid_email_or_password": "Invalid email or password",
+  "disabled_user": "This account is frozen",
+  "sign_up_message": "No account? {Sign Up}"
 }
