@@ -58,10 +58,12 @@
   "close": "Close",
   "lyrics_not_found": "Lyrics not found",
   "login": "Login",
+  "sign_in": "Sign In",
   "welcome_back": "Welcome back",
   "email": "Email",
   "password": "Password",
   "invalid_email": "Invalid email",
   "input_password": "Please input your password",
-  "logout": "Log Out"
+  "logout": "Log Out",
+  "exit_app": "Exit App"
 }

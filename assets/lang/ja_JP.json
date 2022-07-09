@@ -58,10 +58,12 @@
   "close": "閉じる",
   "lyrics_not_found": "歌詞が見つかりませんでした",
   "login": "ログイン",
+  "sign_in": "サインイン",
   "welcome_back": "ようこそ",
   "email": "メールアドレス",
   "password": "パスワード",
   "invalid_email": "無効なメールアドレス",
   "input_password": "パスワードを入力してください",
-  "logout": "ログアウト"
+  "logout": "ログアウト",
+  "exit_app": "アプリを閉じる"
 }
