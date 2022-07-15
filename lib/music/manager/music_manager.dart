@@ -17,7 +17,7 @@ import 'notifiers/playlist_notifier.dart';
 import 'notifiers/song_notifier.dart';
 
 class MusicManager {
-  MusicManager(this.showNotification) {}
+  MusicManager(this.showNotification);
   final bool showNotification;
 
   late final SessionAudioHandler _audioHandler;

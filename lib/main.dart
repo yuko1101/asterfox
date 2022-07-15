@@ -107,9 +107,9 @@ class AsterfoxApp extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   Fluttertoast.showToast(
                       msg: Language.getText("something_went_wrong"));
-                  return LoginScreen();
+                  return AuthScreen();
                 } else if (!snapshot.hasData) {
-                  return LoginScreen();
+                  return AuthScreen();
                 } else {
                   return const AppMainScreen();
                 }

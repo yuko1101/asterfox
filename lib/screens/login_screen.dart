@@ -9,13 +9,115 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({Key? key}) : super(key: key);
+class AuthScreen extends StatefulWidget {
+  AuthScreen({Key? key}) : super(key: key);
 
   final TextEditingController emailController = TextEditingController();
+
   final TextEditingController passwordController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+
+  static Future<void> login(
+      GlobalKey<FormState> formKey,
+      TextEditingController emailController,
+      TextEditingController passwordController,
+      BuildContext context) async {
+    if (!formKey.currentState!.validate()) return;
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
+    // print("email: $email, password: $value");
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "network-request-failed") {
+        Fluttertoast.showToast(msg: Language.getText("network_not_connected"));
+      } else if (e.code == "invalid-email" ||
+          e.code == "user-not-found" ||
+          e.code == "wrong-password") {
+        emailController.clear();
+        passwordController.clear();
+        Fluttertoast.showToast(
+            msg: Language.getText("invalid_email_or_password"));
+      } else if (e.code == "user-disabled") {
+        emailController.clear();
+        passwordController.clear();
+        Fluttertoast.showToast(msg: Language.getText("disabled_user"));
+      } else {
+        rethrow;
+      }
+    }
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
+  static Future<void> signUp(
+      GlobalKey<FormState> formKey,
+      TextEditingController emailController,
+      TextEditingController passwordController,
+      BuildContext context) async {
+    if (!formKey.currentState!.validate()) return;
+    final String email = emailController.text.trim();
+    final String password = passwordController.text.trim();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "email-already-in-use") {
+        emailController.clear();
+        passwordController.clear();
+        Fluttertoast.showToast(msg: Language.getText("email_already_in_use"));
+      } else if (e.code == "invalid-email") {
+        emailController.clear();
+        passwordController.clear();
+        Fluttertoast.showToast(msg: Language.getText("invalid_email"));
+      } else if (e.code == "weak-password") {
+        passwordController.clear();
+        Fluttertoast.showToast(msg: Language.getText("weak_password"));
+      } else {
+        rethrow;
+      }
+    }
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  bool signUp = false;
+
+  void changeMode(bool signUp) {
+    setState(() {
+      this.signUp = signUp;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +146,10 @@ class LoginScreen extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.only(left: 30, right: 30),
             child: Form(
-              key: formKey,
+              key: widget.formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  // TODO: better ui
                   SizedBox(
                     height: 200,
                     width: 200,
@@ -60,7 +161,9 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    Language.getText("welcome_back"),
+                    signUp
+                        ? Language.getText("welcome")
+                        : Language.getText("welcome_back"),
                     style: const TextStyle(
                         fontSize: 40, fontWeight: FontWeight.bold),
                   ),
@@ -68,30 +171,36 @@ class LoginScreen extends StatelessWidget {
                     height: 40,
                   ),
                   EmailField(
-                    formKey: formKey,
-                    emailController: emailController,
-                    passwordController: passwordController,
+                    formKey: widget.formKey,
+                    emailController: widget.emailController,
+                    passwordController: widget.passwordController,
+                    signUp: signUp,
                   ),
                   const SizedBox(
                     height: 20,
                   ),
                   PasswordField(
-                    formKey: formKey,
-                    passwordController: passwordController,
-                    emailController: emailController,
+                    formKey: widget.formKey,
+                    passwordController: widget.passwordController,
+                    emailController: widget.emailController,
+                    signUp: signUp,
                   ),
                   const SizedBox(
                     height: 40,
                   ),
-                  LoginButton(
-                    formKey: formKey,
-                    passwordController: passwordController,
-                    emailController: emailController,
+                  ConfirmButton(
+                    formKey: widget.formKey,
+                    passwordController: widget.passwordController,
+                    emailController: widget.emailController,
+                    signUp: signUp,
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  SignUpMessage(),
+                  AuthMessage(
+                    signUp: signUp,
+                    changeMode: changeMode,
+                  ),
                   const SizedBox(
                     height: 20,
                   )
@@ -104,45 +213,6 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
-
-  static Future<void> login(
-      GlobalKey<FormState> formKey,
-      TextEditingController emailController,
-      TextEditingController passwordController,
-      BuildContext context) async {
-    if (!formKey.currentState!.validate()) return;
-    final String email = emailController.text.trim();
-    final String password = passwordController.text.trim();
-    // print("email: $email, password: $value");
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    );
-    try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == "invalid-email" ||
-          e.code == "user-not-found" ||
-          e.code == "wrong-password") {
-        emailController.clear();
-        passwordController.clear();
-        Fluttertoast.showToast(
-            msg: Language.getText("invalid_email_or_password"));
-      } else if (e.code == "user-disabled") {
-        emailController.clear();
-        passwordController.clear();
-        Fluttertoast.showToast(msg: Language.getText("disabled_user"));
-      }
-    }
-    Navigator.pop(context);
-  }
 }
 
 class EmailField extends StatefulWidget {
@@ -153,11 +223,14 @@ class EmailField extends StatefulWidget {
     required this.formKey,
     required this.emailController,
     required this.passwordController,
+    required this.signUp,
     Key? key,
   }) : super(key: key);
   final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final TextEditingController passwordController;
+
+  final bool signUp;
 
   @override
   State<EmailField> createState() => _EmailFieldState();
@@ -204,8 +277,13 @@ class _EmailFieldState extends State<EmailField> {
       },
       onFieldSubmitted: (value) {
         if (widget.passwordController.text.isNotEmpty) {
-          LoginScreen.login(widget.formKey, widget.emailController,
-              widget.passwordController, context);
+          if (widget.signUp) {
+            AuthScreen.signUp(widget.formKey, widget.emailController,
+                widget.passwordController, context);
+          } else {
+            AuthScreen.login(widget.formKey, widget.emailController,
+                widget.passwordController, context);
+          }
         }
       },
     );
@@ -217,11 +295,17 @@ class PasswordField extends StatefulWidget {
     required this.formKey,
     required this.passwordController,
     required this.emailController,
+    required this.signUp,
     Key? key,
   }) : super(key: key);
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
   final TextEditingController emailController;
+
+  final bool signUp;
+
+  static final passwordRegExp =
+      RegExp("[a-zA-Z0-9*.!@#\$%^&(){}[\\]:\";'<>,\\.\\?\\/~`_\\+-=\\|]{8,32}");
 
   @override
   State<PasswordField> createState() => _PasswordFieldState();
@@ -252,28 +336,37 @@ class _PasswordFieldState extends State<PasswordField> {
       validator: (String? input) {
         if (input == null || input.isEmpty) {
           return Language.getText("input_password");
+        } else if (!PasswordField.passwordRegExp.hasMatch(input)) {
+          return Language.getText("invalid_password_format");
         }
         return null;
       },
       onFieldSubmitted: (value) {
-        LoginScreen.login(widget.formKey, widget.emailController,
-            widget.passwordController, context);
+        if (widget.signUp) {
+          AuthScreen.signUp(widget.formKey, widget.emailController,
+              widget.passwordController, context);
+        } else {
+          AuthScreen.login(widget.formKey, widget.emailController,
+              widget.passwordController, context);
+        }
       },
       obscureText: !showPassword,
     );
   }
 }
 
-class LoginButton extends StatelessWidget {
-  const LoginButton({
+class ConfirmButton extends StatelessWidget {
+  const ConfirmButton({
     required this.formKey,
     required this.passwordController,
     required this.emailController,
+    required this.signUp,
     Key? key,
   }) : super(key: key);
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
   final TextEditingController emailController;
+  final bool signUp;
 
   @override
   Widget build(BuildContext context) {
@@ -315,12 +408,19 @@ class LoginButton extends StatelessWidget {
                 splashColor: Colors.white10,
                 hoverColor: Colors.white10,
                 onTap: () async {
-                  LoginScreen.login(
-                      formKey, emailController, passwordController, context);
+                  if (signUp) {
+                    AuthScreen.signUp(
+                        formKey, emailController, passwordController, context);
+                  } else {
+                    AuthScreen.login(
+                        formKey, emailController, passwordController, context);
+                  }
                 },
                 child: Center(
                   child: Text(
-                    Language.getText("sign_in"),
+                    signUp
+                        ? Language.getText("sign_up")
+                        : Language.getText("login"),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -352,12 +452,21 @@ class LoginButtonClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-class SignUpMessage extends StatelessWidget {
-  const SignUpMessage({Key? key}) : super(key: key);
+class AuthMessage extends StatelessWidget {
+  const AuthMessage({
+    required this.signUp,
+    required this.changeMode,
+    Key? key,
+  }) : super(key: key);
+
+  final bool signUp;
+  final void Function(bool) changeMode;
 
   @override
   Widget build(BuildContext context) {
-    final text = Language.getText("sign_up_message");
+    final text = signUp
+        ? Language.getText("login_message")
+        : Language.getText("sign_up_message");
     final clickables = RegExp(r"\{[^{}]+\}").allMatches(text).toList();
     final List<TextSpan> textSpans = [];
 
@@ -382,8 +491,7 @@ class SignUpMessage extends StatelessWidget {
                 color: Colors.amber[600], decoration: TextDecoration.underline),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                // TODO: sign up
-                print("sign up");
+                changeMode(!signUp);
               },
           ),
         );
