@@ -75,5 +75,6 @@
   "sign_up_message": "アカウントをお持ちではない場合、{作成}できます。",
   "login_message": "すでにアカウントをお持ちですか? {サインイン}",
   "email_already_in_use": "このメールアドレスはすでに使用されています",
-  "weak_password": "パスワード強度が足りません"
+  "weak_password": "パスワード強度が足りません",
+  "verify_email": "メールアドレスの認証"
 }
