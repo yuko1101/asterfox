@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:asterfox/screens/song_history_screen.dart';
 import 'package:easy_app/easy_app.dart';
@@ -18,48 +20,62 @@ class AsterfoxScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            Fluttertoast.showToast(
-                msg: Language.getText("something_went_wrong"));
-            return AuthScreen();
-          } else if (!snapshot.hasData) {
-            return AuthScreen();
-          } else {
-            return const VerifyEmail();
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          Fluttertoast.showToast(msg: Language.getText("something_went_wrong"));
+          return AuthScreen();
+        } else if (!snapshot.hasData) {
+          return AuthScreen();
+        } else {
+          final User user = snapshot.data!;
+
+          if (!user.emailVerified) {
+            // TODO: find better solution
+            Future.delayed(const Duration(milliseconds: 50),
+                () => showVerifyEmailDialog(context));
           }
-        });
-  }
-}
 
-class VerifyEmail extends StatefulWidget {
-  const VerifyEmail({Key? key}) : super(key: key);
-
-  @override
-  State<VerifyEmail> createState() => _VerifyEmailState();
-}
-
-class _VerifyEmailState extends State<VerifyEmail> {
-  bool isEmailVerified = false;
-
-  @override
-  void initState() {
-    super.initState();
-    isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
+          return const AsterfoxMainScreen();
+        }
+      },
+    );
   }
 
-  @override
-  Widget build(BuildContext context) => isEmailVerified
-      ? const AsterfoxMainScreen()
-      : Scaffold(
-          appBar: AppBar(
-            title: Text(Language.getText("verify_email")),
-          ),
-          // TODO: create verify email screen
-        );
+  void showVerifyEmailDialog(BuildContext context) {
+    // TODO: better dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          title: Text(Language.getText("verify_email")),
+          actions: [
+            TextButton(
+              child: Text(Language.getText("send")),
+              onPressed: () {
+                FirebaseAuth.instance.currentUser!.sendEmailVerification();
+              },
+            )
+          ],
+        ),
+      ),
+    );
+
+    // check email verification every 2 seconds
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+      Future.sync(() async {
+        await FirebaseAuth.instance.currentUser!.reload();
+        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+          timer.cancel();
+          Navigator.pop(context);
+        }
+      });
+    });
+  }
 }
 
 class AsterfoxMainScreen extends StatelessWidget {

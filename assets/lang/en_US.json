@@ -76,5 +76,6 @@
   "login_message": "Already have an account? {Login}",
   "email_already_in_use": "This email address is already in use",
   "weak_password": "This password is too weak",
-  "verify_email": "Verify Email"
+  "verify_email": "Verify Email",
+  "send": "Send"
 }
