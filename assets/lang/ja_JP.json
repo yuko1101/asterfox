@@ -77,5 +77,8 @@
   "email_already_in_use": "このメールアドレスはすでに使用されています",
   "weak_password": "パスワード強度が足りません",
   "verify_email": "メールアドレスの認証",
-  "send": "送信"
+  "send": "送信",
+  "forgot_password": "パスワードを忘れた場合",
+  "reset_password": "パスワードのリセット",
+  "reset_password_email_sent": "パスワードリセットのメールを送信しました"
 }

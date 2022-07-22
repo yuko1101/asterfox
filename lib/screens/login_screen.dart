@@ -190,6 +190,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(
                       height: 10,
                     ),
+                    Visibility(child: ForgotPassword()),
                     AuthMessage(
                       signUp: signUp,
                       changeMode: changeMode,
@@ -488,7 +489,9 @@ class AuthMessage extends StatelessWidget {
           TextSpan(
             text: rawText.substring(1, rawText.length - 1),
             style: TextStyle(
-                color: Colors.amber[600], decoration: TextDecoration.underline),
+              color: Colors.amber[600],
+              decoration: TextDecoration.underline,
+            ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 changeMode(!signUp);
@@ -500,5 +503,71 @@ class AuthMessage extends StatelessWidget {
       }
     }
     return RichText(text: TextSpan(children: textSpans));
+  }
+}
+
+class ForgotPassword extends StatelessWidget {
+  const ForgotPassword({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        text: Language.getText("forgot_password"),
+        style: TextStyle(
+          color: Colors.amber[600],
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            resetPassword(context);
+          },
+      ),
+    );
+  }
+
+  static void resetPassword(BuildContext context) {
+    final controller = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Language.getText("reset_password")),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            autofillHints: const [AutofillHints.email],
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            decoration: InputDecoration(
+              labelText: Language.getText("email"),
+            ),
+            validator: (String? input) {
+              if (input == null ||
+                  !EmailField.emailRegExp.hasMatch(input.trim())) {
+                return Language.getText("invalid_email");
+              }
+              return null;
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: Text(Language.getText("send")),
+            onPressed: () async {
+              if (!formKey.currentState!.validate()) return;
+              Navigator.pop(context);
+              AsterfoxScreen.loadingNotifier.value = true;
+              // TODO: handle [There is no user record corresponding to this identifier. The user may have been deleted.]
+              await FirebaseAuth.instance
+                  .sendPasswordResetEmail(email: controller.text);
+              AsterfoxScreen.loadingNotifier.value = false;
+              Fluttertoast.showToast(
+                  msg: Language.getText("reset_password_email_sent"));
+            },
+          )
+        ],
+      ),
+    );
   }
 }

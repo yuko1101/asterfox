@@ -77,5 +77,8 @@
   "email_already_in_use": "This email address is already in use",
   "weak_password": "This password is too weak",
   "verify_email": "Verify Email",
-  "send": "Send"
+  "send": "Send",
+  "forgot_password": "Forgot Password?",
+  "reset_password": "Reset Password",
+  "reset_password_email_sent": "Reset Password email has been sent"
 }

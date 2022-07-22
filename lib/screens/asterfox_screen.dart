@@ -49,7 +49,7 @@ class AsterfoxScreen extends StatelessWidget {
         ),
         ValueListenableBuilder<bool>(
           valueListenable: loadingNotifier,
-          builder: (context, visible, __) {
+          builder: (context, visible, _) {
             final screenSize = MediaQuery.of(context).size;
             return Visibility(
               visible: visible,
