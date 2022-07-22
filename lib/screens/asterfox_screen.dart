@@ -17,30 +17,48 @@ import 'login_screen.dart';
 class AsterfoxScreen extends StatelessWidget {
   const AsterfoxScreen({Key? key}) : super(key: key);
 
+  static final ValueNotifier<bool> loadingNotifier = ValueNotifier(false);
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          Fluttertoast.showToast(msg: Language.getText("something_went_wrong"));
-          return AuthScreen();
-        } else if (!snapshot.hasData) {
-          return AuthScreen();
-        } else {
-          final User user = snapshot.data!;
+    return Stack(
+      children: [
+        StreamBuilder<User?>(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              Fluttertoast.showToast(
+                  msg: Language.getText("something_went_wrong"));
+              return AuthScreen();
+            } else if (!snapshot.hasData) {
+              return AuthScreen();
+            } else {
+              final User user = snapshot.data!;
 
-          if (!user.emailVerified) {
-            // TODO: find better solution
-            Future.delayed(const Duration(milliseconds: 50),
-                () => showVerifyEmailDialog(context));
-          }
+              if (!user.emailVerified) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  showVerifyEmailDialog(context);
+                });
+              }
 
-          return const AsterfoxMainScreen();
-        }
-      },
+              return const AsterfoxMainScreen();
+            }
+          },
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: loadingNotifier,
+          builder: (_, visible, __) {
+            return Visibility(
+              visible: visible,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

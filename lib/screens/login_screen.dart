@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/os.dart';
@@ -30,16 +31,19 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
-    showDialog(
+    final dialogRoute = DialogRoute(
       context: context,
       barrierDismissible: false,
-      builder: (context) => WillPopScope(
+      builder: (_) => WillPopScope(
         onWillPop: () async => false,
         child: const Center(
           child: CircularProgressIndicator(),
         ),
       ),
     );
+
+    AsterfoxScreen.loadingNotifier.value = true;
+
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
@@ -61,9 +65,7 @@ class AuthScreen extends StatefulWidget {
         rethrow;
       }
     }
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    AsterfoxScreen.loadingNotifier.value = false;
   }
 
   static Future<void> signUp(
@@ -75,16 +77,8 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    );
+    AsterfoxScreen.loadingNotifier.value = true;
+
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -104,9 +98,7 @@ class AuthScreen extends StatefulWidget {
         rethrow;
       }
     }
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    AsterfoxScreen.loadingNotifier.value = false;
   }
 }
 
@@ -147,65 +139,67 @@ class _AuthScreenState extends State<AuthScreen> {
             padding: const EdgeInsets.only(left: 30, right: 30),
             child: Form(
               key: widget.formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Image.asset(
-                        "assets/images/asterfox.png",
+              child: AutofillGroup(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    SizedBox(
+                      height: 200,
+                      width: 200,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Image.asset(
+                          "assets/images/asterfox.png",
+                        ),
                       ),
                     ),
-                  ),
-                  Text(
-                    signUp
-                        ? Language.getText("welcome")
-                        : Language.getText("welcome_back"),
-                    style: const TextStyle(
-                        fontSize: 40, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  EmailField(
-                    formKey: widget.formKey,
-                    emailController: widget.emailController,
-                    passwordController: widget.passwordController,
-                    signUp: signUp,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  PasswordField(
-                    formKey: widget.formKey,
-                    passwordController: widget.passwordController,
-                    emailController: widget.emailController,
-                    signUp: signUp,
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  ConfirmButton(
-                    formKey: widget.formKey,
-                    passwordController: widget.passwordController,
-                    emailController: widget.emailController,
-                    signUp: signUp,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  AuthMessage(
-                    signUp: signUp,
-                    changeMode: changeMode,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  )
-                  // TODO: Add Google account login
-                ],
+                    Text(
+                      signUp
+                          ? Language.getText("welcome")
+                          : Language.getText("welcome_back"),
+                      style: const TextStyle(
+                          fontSize: 40, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    EmailField(
+                      formKey: widget.formKey,
+                      emailController: widget.emailController,
+                      passwordController: widget.passwordController,
+                      signUp: signUp,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    PasswordField(
+                      formKey: widget.formKey,
+                      passwordController: widget.passwordController,
+                      emailController: widget.emailController,
+                      signUp: signUp,
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    ConfirmButton(
+                      formKey: widget.formKey,
+                      passwordController: widget.passwordController,
+                      emailController: widget.emailController,
+                      signUp: signUp,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    AuthMessage(
+                      signUp: signUp,
+                      changeMode: changeMode,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    )
+                    // TODO: Add Google account login
+                  ],
+                ),
               ),
             ),
           ),
@@ -241,6 +235,7 @@ class _EmailFieldState extends State<EmailField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofillHints: const [AutofillHints.email],
       controller: widget.emailController,
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -316,6 +311,9 @@ class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofillHints: widget.signUp
+          ? const [AutofillHints.newPassword]
+          : const [AutofillHints.password],
       controller: widget.passwordController,
       decoration: InputDecoration(
         labelText: Language.getText("password"),
