@@ -49,11 +49,17 @@ class AsterfoxScreen extends StatelessWidget {
         ),
         ValueListenableBuilder<bool>(
           valueListenable: loadingNotifier,
-          builder: (_, visible, __) {
+          builder: (context, visible, __) {
+            final screenSize = MediaQuery.of(context).size;
             return Visibility(
               visible: visible,
-              child: const Center(
-                child: CircularProgressIndicator(),
+              child: Container(
+                height: screenSize.height,
+                width: screenSize.width,
+                color: Colors.black45,
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
             );
           },
@@ -76,6 +82,12 @@ class AsterfoxScreen extends StatelessWidget {
               child: Text(Language.getText("send")),
               onPressed: () {
                 FirebaseAuth.instance.currentUser!.sendEmailVerification();
+              },
+            ),
+            TextButton(
+              child: Text(Language.getText("logout")),
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
               },
             )
           ],

@@ -238,6 +238,7 @@ class _EmailFieldState extends State<EmailField> {
       autofillHints: const [AutofillHints.email],
       controller: widget.emailController,
       textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: Language.getText("email"),
         border: const OutlineInputBorder(),
@@ -314,6 +315,7 @@ class _PasswordFieldState extends State<PasswordField> {
       autofillHints: widget.signUp
           ? const [AutofillHints.newPassword]
           : const [AutofillHints.password],
+      obscureText: !showPassword,
       controller: widget.passwordController,
       decoration: InputDecoration(
         labelText: Language.getText("password"),
@@ -348,7 +350,7 @@ class _PasswordFieldState extends State<PasswordField> {
               widget.passwordController, context);
         }
       },
-      obscureText: !showPassword,
+      onEditingComplete: () => TextInput.finishAutofillContext(),
     );
   }
 }
