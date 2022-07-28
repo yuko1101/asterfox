@@ -196,7 +196,7 @@ packages:
       path: "../EasyApp"
       relative: true
     source: path
-    version: "0.1.14"
+    version: "0.1.16"
   fake_async:
     dependency: transitive
     description:
