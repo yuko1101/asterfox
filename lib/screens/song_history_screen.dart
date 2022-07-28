@@ -1,5 +1,5 @@
 import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screen.dart';
+import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,11 +11,13 @@ import '../system/exceptions/refresh_url_failed_exception.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 
-class SongHistoryScreen extends BaseScreen {
-  SongHistoryScreen()
-      : super(
+class SongHistoryScreen extends ScaffoldScreen {
+  const SongHistoryScreen({
+    Key? key,
+  }) : super(
           appBar: const SongHistoryAppBar(),
-          screen: const SongHistoryMainScreen(),
+          body: const SongHistoryMainScreen(),
+          key: key,
         );
 }
 

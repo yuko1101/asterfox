@@ -1,5 +1,5 @@
 import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screen.dart';
+import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -8,12 +8,14 @@ import '../../data/custom_colors.dart';
 import '../../system/theme/theme.dart';
 import 'settings_screen.dart';
 
-class ThemeSettingsScreen extends BaseScreen {
-  ThemeSettingsScreen()
-      : super(
-          screen: const _ThemeChoice(),
+class ThemeSettingsScreen extends ScaffoldScreen {
+  const ThemeSettingsScreen({
+    Key? key,
+  }) : super(
+          key: key,
+          body: const _ThemeChoice(),
           appBar: const _AppBar(),
-          previousPage: SettingsScreen(),
+          previousPage: const SettingsScreen(),
         );
 }
 

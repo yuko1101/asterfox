@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screen.dart';
+import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../data/local_musics_data.dart';
@@ -14,11 +14,13 @@ import '../widget/music_widgets/music_thumbnail.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
 
-class DebugScreen extends BaseScreen {
-  const DebugScreen()
-      : super(
-          screen: const DebugMainScreen(),
+class DebugScreen extends ScaffoldScreen {
+  const DebugScreen({
+    Key? key,
+  }) : super(
+          body: const DebugMainScreen(),
           appBar: const DebugAppBar(),
+          key: key,
         );
 }
 
