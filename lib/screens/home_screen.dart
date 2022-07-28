@@ -1,4 +1,4 @@
-import 'package:easy_app/screen/base_screen.dart';
+import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
@@ -13,11 +13,12 @@ import '../widget/notifiers_widget.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
 
-class HomeScreen extends BaseScreen {
+class HomeScreen extends ScaffoldScreen {
   static late InAppNotification homeNotification;
-  HomeScreen()
-      : super(
-          screen: Builder(
+  HomeScreen({
+    Key? key,
+  }) : super(
+          body: Builder(
             builder: (context) {
               final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
               final volumeWidget = VolumeWidget(key: volumeWidgetKey);
@@ -43,7 +44,7 @@ class HomeScreen extends BaseScreen {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       homeNotification,
-                      const LyricsButton()
+                      const LyricsButton(),
                     ],
                   ),
 
@@ -72,6 +73,7 @@ class HomeScreen extends BaseScreen {
           ),
           appBar: const HomeScreenAppBar(),
           footer: const MusicFooter(),
+          key: key,
         );
 }
 

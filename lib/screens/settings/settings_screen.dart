@@ -1,6 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screen.dart';
+import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,11 +12,13 @@ import '../../data/settings_data.dart';
 import '../../system/theme/theme.dart';
 import 'theme_settings_screen.dart';
 
-class SettingsScreen extends BaseScreen {
-  SettingsScreen()
-      : super(
-          screen: const _MainSettingsScreen(),
+class SettingsScreen extends ScaffoldScreen {
+  const SettingsScreen({
+    Key? key,
+  }) : super(
+          body: const _MainSettingsScreen(),
           appBar: const _AppBar(),
+          key: key,
         );
 }
 
