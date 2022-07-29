@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/theme/theme.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -197,8 +199,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(
                       height: 20,
-                    )
-                    // TODO: Add Google account login
+                    ),
+                    GoogleSignInWidget(),
                   ],
                 ),
               ),
@@ -566,6 +568,66 @@ class ForgotPassword extends StatelessWidget {
                   msg: Language.getText("reset_password_email_sent"));
             },
           )
+        ],
+      ),
+    );
+  }
+}
+
+// https://developers.google.com/identity/branding-guidelines?hl=ja
+class GoogleSignInWidget extends StatelessWidget {
+  const GoogleSignInWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      margin: const EdgeInsets.only(left: 40, right: 40),
+      color: Colors.white,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/btn_google_light_normal_ios.svg",
+                    fit: BoxFit.fitWidth,
+                  ),
+                  const SizedBox(
+                    width: 24,
+                  ),
+                  Text(
+                    Language.getText("sign_in_with_google"),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontFamily: "Roboto",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 40,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  // handle google sign in
+                  print("google login");
+                },
+                child: Container(),
+              ),
+            ),
+          ),
         ],
       ),
     );

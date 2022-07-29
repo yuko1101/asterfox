@@ -80,5 +80,6 @@
   "send": "Send",
   "forgot_password": "Forgot Password?",
   "reset_password": "Reset Password",
-  "reset_password_email_sent": "Reset Password email has been sent"
+  "reset_password_email_sent": "Reset Password email has been sent",
+  "sign_in_with_google": "Sign in with Google"
 }

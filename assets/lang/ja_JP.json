@@ -80,5 +80,6 @@
   "send": "送信",
   "forgot_password": "パスワードを忘れた場合",
   "reset_password": "パスワードのリセット",
-  "reset_password_email_sent": "パスワードリセットのメールを送信しました"
+  "reset_password_email_sent": "パスワードリセットのメールを送信しました",
+  "sign_in_with_google": "Google でログイン"
 }
