@@ -580,6 +580,7 @@ class GoogleSignInWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Rippleエフェクトを修正したままで、各言語での「Sign in with Google」の長さに応じてボタンのサイズが変わるようにする
     return Container(
       height: 40,
       margin: const EdgeInsets.only(left: 40, right: 40),
