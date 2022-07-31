@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/theme/theme.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthScreen extends StatefulWidget {
   AuthScreen({Key? key}) : super(key: key);
@@ -622,8 +622,7 @@ class GoogleSignInWidget extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  // handle google sign in
-                  print("google login");
+                  googleLogin();
                 },
                 child: Container(),
               ),
@@ -632,5 +631,23 @@ class GoogleSignInWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static final GoogleSignIn googleSignIn = GoogleSignIn();
+  static Future<void> googleLogin() async {
+    AsterfoxScreen.loadingNotifier.value = true;
+
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) return;
+
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    AsterfoxScreen.loadingNotifier.value = false;
   }
 }
