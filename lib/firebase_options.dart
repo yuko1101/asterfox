@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCOuECEAmTWT_jr7HhZhnIUWAdXGifYlaM',
-    appId: '1:327268428452:android:6c19217fef7a5d1c8a1431',
-    messagingSenderId: '327268428452',
-    projectId: 'asterfox-cdd02',
-    storageBucket: 'asterfox-cdd02.appspot.com',
+    apiKey: 'AIzaSyAGJv7TB4ENpIyUztaWyUtYauDQTCGw698',
+    appId: '1:306826868375:android:cae845b03be7ed278a5bd2',
+    messagingSenderId: '306826868375',
+    projectId: 'asterfox',
+    storageBucket: 'asterfox.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDGuFIOEpu-9ITv6JKp7AeuPSUxc24rN-E',
-    appId: '1:327268428452:ios:c481032696b7f7c28a1431',
-    messagingSenderId: '327268428452',
-    projectId: 'asterfox-cdd02',
-    storageBucket: 'asterfox-cdd02.appspot.com',
-    iosClientId: '327268428452-rrms5ck0pbr8bcg3e541b6hq2989mv15.apps.googleusercontent.com',
+    apiKey: 'AIzaSyC-NwJxZObo4usjhcdPHtpATqIw7WCBWiI',
+    appId: '1:306826868375:ios:f940baa2b42c83588a5bd2',
+    messagingSenderId: '306826868375',
+    projectId: 'asterfox',
+    storageBucket: 'asterfox.appspot.com',
+    iosClientId: '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
     iosBundleId: 'net.asterfox.app',
   );
 }

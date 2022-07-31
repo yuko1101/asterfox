@@ -1,41 +1,34 @@
 {
   "project_info": {
-    "project_number": "327268428452",
-    "project_id": "asterfox-cdd02",
-    "storage_bucket": "asterfox-cdd02.appspot.com"
+    "project_number": "306826868375",
+    "project_id": "asterfox",
+    "storage_bucket": "asterfox.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:327268428452:android:6c19217fef7a5d1c8a1431",
+        "mobilesdk_app_id": "1:306826868375:android:cae845b03be7ed278a5bd2",
         "android_client_info": {
           "package_name": "net.asterfox.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "327268428452-ou3psgo1vr8c1st42qf13piejjneg3pf.apps.googleusercontent.com",
+          "client_id": "306826868375-h11mnb9f4cc6qv4tdm9mp653rci4h7dh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCOuECEAmTWT_jr7HhZhnIUWAdXGifYlaM"
+          "current_key": "AIzaSyAGJv7TB4ENpIyUztaWyUtYauDQTCGw698"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "327268428452-ou3psgo1vr8c1st42qf13piejjneg3pf.apps.googleusercontent.com",
+              "client_id": "306826868375-h11mnb9f4cc6qv4tdm9mp653rci4h7dh.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "327268428452-rrms5ck0pbr8bcg3e541b6hq2989mv15.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "net.asterfox.app"
-              }
             }
           ]
         }
