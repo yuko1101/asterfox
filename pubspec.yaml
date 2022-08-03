@@ -63,10 +63,11 @@ dependencies:
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^1.19.1
-  firebase_crashlytics: ^2.8.4
-  firebase_analytics: ^9.1.12
-  firebase_auth: ^3.4.1
+  firebase_core: ^1.20.0
+  firebase_crashlytics: ^2.8.6
+  firebase_analytics: ^9.3.0
+  firebase_auth: ^3.6.2
+  cloud_firestore: ^3.4.3
 
   google_sign_in: ^5.4.0
 

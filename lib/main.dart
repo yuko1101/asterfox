@@ -39,6 +39,7 @@ Future<void> main() async {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   }
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
   await analytics.logAppOpen();
 
   // run this before initializing HomeScreen

@@ -638,16 +638,18 @@ class GoogleSignInWidget extends StatelessWidget {
     AsterfoxScreen.loadingNotifier.value = true;
 
     final googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return;
 
-    final googleAuth = await googleUser.authentication;
+    if (googleUser != null) {
+      final googleAuth = await googleUser.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    }
+
     AsterfoxScreen.loadingNotifier.value = false;
   }
 }
