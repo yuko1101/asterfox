@@ -192,7 +192,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    Visibility(child: ForgotPassword()),
+                    const Visibility(child: ForgotPassword()),
                     AuthMessage(
                       signUp: signUp,
                       changeMode: changeMode,
@@ -200,7 +200,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    GoogleSignInWidget(),
+                    const GoogleSignInWidget(),
                   ],
                 ),
               ),
