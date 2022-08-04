@@ -13,10 +13,9 @@ class SettingsData {
   static late ConfigFile settings;
   static Map<String, dynamic> defaultData = {
     "theme": "light",
-    "repeatMode": "none",
+    "repeat_mode": "none",
     "auto_download": false,
     "volume": 1.0,
-    "use_mobile_network": true,
   };
   static Future<void> init() async {
     settings = await ConfigFile(
@@ -39,16 +38,16 @@ class SettingsData {
       print("repeatModeNotifier.addListener");
       SettingsData.settings
           .set(
-            key: "repeatMode",
+            key: "repeat_mode",
             value:
                 repeatStateToString(musicManager.audioDataManager.repeatState),
           )
           .save();
     });
     if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
-        getValue(key: "repeatMode") as String) {
+        getValue(key: "repeat_mode") as String) {
       musicManager.setRepeatMode(
-          repeatStateFromString(getValue(key: "repeatMode") as String));
+          repeatStateFromString(getValue(key: "repeat_mode") as String));
     }
     musicManager.baseVolumeNotifier.value = getValue(key: "volume");
     await musicManager.updateVolume();
