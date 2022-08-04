@@ -11,7 +11,7 @@ import '../widget/music_widgets/repeat_button.dart';
 
 class SettingsData {
   static late ConfigFile settings;
-  static Map<String, dynamic> defaultData = {
+  static const Map<String, dynamic> defaultData = {
     "theme": "light",
     "repeatMode": "none",
     "auto_download": false,
@@ -20,8 +20,9 @@ class SettingsData {
   };
   static Future<void> init() async {
     settings = await ConfigFile(
-            File("${EasyApp.localPath}/settings.json"), defaultData)
-        .load();
+      File("${EasyApp.localPath}/settings.json"),
+      defaultData,
+    ).load();
   }
 
   static Future<void> save() async {
