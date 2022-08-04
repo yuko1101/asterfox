@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:asterfox/screens/asterfox_screen.dart';
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
@@ -30,6 +31,8 @@ Future<void> main() async {
   // run this before initializing the music manager
   await SettingsData.init();
   SettingsData.applySettings();
+
+  // TODO: initialize TemporaryData when needed
 
   // Firebase set-up
   await Firebase.initializeApp(
@@ -69,6 +72,9 @@ Future<void> main() async {
   await SettingsData.applyNetworkSettings();
 
   await LocalMusicsData.init();
+
+  // run this after Firebase initialization, LocalMusicsData, and SettingsData
+  await CloudFirestoreManager.init();
 
   init();
   runApp(const AsterfoxApp());
