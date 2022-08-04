@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/data/temporary_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -32,7 +33,7 @@ Future<void> main() async {
   await SettingsData.init();
   SettingsData.applySettings();
 
-  // TODO: initialize TemporaryData when needed
+  await TemporaryData.init();
 
   // Firebase set-up
   await Firebase.initializeApp(

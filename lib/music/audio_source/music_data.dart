@@ -36,7 +36,7 @@ class MusicData {
   String
       url; // can be changed if the url is expired (especially for YouTube), or the song saved locally.
   String imageUrl; // can be changed on saving to local storage.
-  late String audioId;
+  final String audioId;
   Duration duration; // can be changed on clip-cut.
   bool isLocal; // can be changed on saving to local storage.
   double volume; // can be changed on volume change.
@@ -63,8 +63,8 @@ class MusicData {
 
   String get mediaURL => remoteUrl;
 
-  String get savePath => "${EasyApp.localPath}/music/$key.mp3";
-  String get imageSavePath => "${EasyApp.localPath}/images/$key.png";
+  String get savePath => "${EasyApp.localPath}/music/$audioId/audio.mp3";
+  String get imageSavePath => "${EasyApp.localPath}/images/$audioId/image.png";
 
   void destroy() {
     _created.remove(this);

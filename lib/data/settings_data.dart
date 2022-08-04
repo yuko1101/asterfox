@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:asterfox/data/temporary_data.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:easy_app/utils/network_utils.dart';
 
 import '../main.dart';
+import '../system/firebase/cloud_firestore.dart';
 import '../system/theme/theme.dart';
 import '../widget/music_widgets/repeat_button.dart';
 
@@ -27,6 +29,12 @@ class SettingsData {
 
   static Future<void> save() async {
     await settings.save();
+    if (NetworkUtils.networkConnected()) {
+      await CloudFirestoreManager.upload();
+    } else {
+      TemporaryData.data.set(key: "offline_changes", value: true);
+      await TemporaryData.save();
+    }
   }
 
   static Future<void> applySettings() async {
@@ -35,17 +43,20 @@ class SettingsData {
     }
   }
 
+  static bool _initializedRepeatListener = false;
   static Future<void> applyMusicManagerSettings() async {
-    musicManager.repeatModeNotifier.addListener(() {
-      print("repeatModeNotifier.addListener");
-      SettingsData.settings
-          .set(
-            key: "repeatMode",
-            value:
-                repeatStateToString(musicManager.audioDataManager.repeatState),
-          )
-          .save();
-    });
+    if (!_initializedRepeatListener) {
+      musicManager.repeatModeNotifier.addListener(() {
+        print("repeatModeNotifier.addListener");
+        settings.set(
+          key: "repeatMode",
+          value: repeatStateToString(musicManager.audioDataManager.repeatState),
+        );
+        save();
+      });
+      _initializedRepeatListener = true;
+    }
+
     if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
         getValue(key: "repeatMode") as String) {
       musicManager.setRepeatMode(

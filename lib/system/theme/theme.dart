@@ -52,7 +52,8 @@ class AppTheme {
   static Future<void> setTheme(String theme) async {
     if (!themes.keys.contains(theme)) throw Exception("theme not found");
     themeNotifier.value = theme;
-    await SettingsData.settings.set(key: "theme", value: theme).save();
+    SettingsData.settings.set(key: "theme", value: theme);
+    await SettingsData.save();
   }
 }
 

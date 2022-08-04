@@ -6,7 +6,9 @@ import 'package:easy_app/utils/config_file.dart';
 class TemporaryData {
   static late ConfigFile data;
 
-  static const Map<String, dynamic> defaultData = {};
+  static const Map<String, dynamic> defaultData = {
+    "offline_changes": false,
+  };
 
   static Future<void> init() async {
     data = await ConfigFile(

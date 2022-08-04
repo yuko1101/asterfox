@@ -39,7 +39,8 @@ class SongHistoryData {
     final toSave = song.toJson();
     toSave["last_played"] = DateTime.now().millisecondsSinceEpoch;
     data.add(toSave);
-    await historyData.set(key: "history", value: data).save(compact: _compact);
+    historyData.set(key: "history", value: data);
+    await saveData();
   }
 
   static List<MusicData> getAll({bool isTemporary = false}) {
@@ -57,18 +58,21 @@ class SongHistoryData {
   static Future<void> removeFromHistory(MusicData song) async {
     final data = historyData.getValue("history") as List<dynamic>;
     data.removeWhere((element) => element["audioId"] == song.audioId);
-    await historyData.set(key: "history", value: data).save(compact: _compact);
+    historyData.set(key: "history", value: data);
+    await saveData();
   }
 
   static Future<void> removeAllFromHistory(List<MusicData> songs) async {
     final data = historyData.getValue("history") as List<dynamic>;
     data.removeWhere(
         (element) => songs.any((e) => e.audioId == element["audioId"]));
-    await historyData.set(key: "history", value: data).save(compact: _compact);
+    historyData.set(key: "history", value: data);
+    await saveData();
   }
 
   static Future<void> clearHistory() async {
-    await historyData.set(key: "history", value: []).save(compact: _compact);
+    historyData.set(key: "history", value: []);
+    await saveData();
   }
 }
 
