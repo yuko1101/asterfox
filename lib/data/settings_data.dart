@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
-import 'package:easy_app/utils/network_utils.dart';
 
 import '../main.dart';
 import '../system/theme/theme.dart';
@@ -51,14 +49,6 @@ class SettingsData {
     }
     musicManager.baseVolumeNotifier.value = getValue(key: "volume");
     await musicManager.updateVolume();
-  }
-
-  static Future<void> applyNetworkSettings() async {
-    NetworkUtils.setMinimumNetworkLevel(
-      getValue(key: "use_mobile_network")
-          ? ConnectivityResult.mobile
-          : ConnectivityResult.wifi,
-    );
   }
 
   static dynamic getValue({String? key, List<String>? keys}) {

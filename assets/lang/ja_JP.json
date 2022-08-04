@@ -47,8 +47,6 @@
   "song": "曲",
   "queue": "キュー",
   "external_playlist_empty": "外部プレイリストに曲がありません",
-  "use_mobile_network": "モバイルデータ通信の使用",
-  "use_mobile_network_description": "モバイルデータ通信を使用の許可設定",
   "song_title": "曲名",
   "song_artist": "アーティスト名",
   "previous": "戻る",

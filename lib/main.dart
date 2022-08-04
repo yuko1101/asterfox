@@ -50,11 +50,7 @@ Future<void> main() async {
       "en_US",
     ],
     activateConnectionChecker: true,
-    minimumNetworkLevel: ConnectivityResult.wifi,
   );
-
-  // run this after initializing NetworkUtils in EasyApp
-  await SettingsData.applyNetworkSettings();
 
   await LocalMusicsData.init();
 

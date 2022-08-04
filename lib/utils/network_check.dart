@@ -4,7 +4,7 @@ import '../system/exceptions/network_exception.dart';
 
 class NetworkCheck {
   static void check() {
-    if (!NetworkUtils.networkAccessible()) {
+    if (!NetworkUtils.networkConnected()) {
       throw NetworkException();
     }
   }

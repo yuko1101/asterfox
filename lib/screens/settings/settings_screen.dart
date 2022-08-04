@@ -87,23 +87,6 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   });
                 },
               ),
-              SettingsTile.switchTile(
-                title: Text(Language.getText("use_mobile_network")),
-                description:
-                    Text(Language.getText("use_mobile_network_description")),
-                initialValue: SettingsData.getValue(key: "use_mobile_network"),
-                activeSwitchColor: CustomColors.getColor("accent"),
-                onToggle: (value) {
-                  setState(() {
-                    NetworkUtils.setMinimumNetworkLevel(value
-                        ? ConnectivityResult.mobile
-                        : ConnectivityResult.wifi);
-                    SettingsData.settings
-                        .set(key: "use_mobile_network", value: value);
-                    SettingsData.save();
-                  });
-                },
-              ),
             ],
           )
         ],

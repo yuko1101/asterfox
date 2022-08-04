@@ -47,8 +47,6 @@
   "song": "Song",
   "queue": "Queue",
   "external_playlist_empty": "The external playlist is empty",
-  "use_mobile_network": "Use mobile network",
-  "use_mobile_network_description": "Allow this app to use the mobile network.",
   "song_title": "Song Title",
   "song_artist": "Song Artist",
   "previous": "Previous",
