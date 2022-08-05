@@ -172,6 +172,7 @@ class SongSearch extends SearchDelegate<String> {
         subtitle: e.author,
         audioId: e is YouTubeMusicData ? e.id : e.url,
         keywords: e.keywords,
+        lyrics: e.lyrics,
       );
     }));
 
@@ -192,12 +193,14 @@ class SongSuggestion {
     this.subtitle,
     required this.audioId,
     required this.keywords,
+    this.lyrics,
   });
   final List<SongTag> tags;
   final String title;
   final String? subtitle;
   final String audioId;
   final List<String> keywords;
+  final String? lyrics;
 }
 
 enum SongTag { local, remote, youtube, word }

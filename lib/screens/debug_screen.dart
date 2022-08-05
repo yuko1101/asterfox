@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
@@ -114,6 +115,13 @@ class DebugMainScreen extends StatelessWidget {
                       LocalMusicsData.clean();
                     },
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.data_object),
+                    onPressed: () async {
+                      final data = await CloudFirestoreManager.getUserData();
+                      print(data);
+                    },
+                  )
                 ],
               ),
             ),

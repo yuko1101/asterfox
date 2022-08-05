@@ -1,15 +1,19 @@
 import 'dart:io';
 
+import 'package:asterfox/data/temporary_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:uuid/uuid.dart';
 
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
 import '../system/exceptions/network_exception.dart';
+import '../system/firebase/cloud_firestore.dart';
 import '../utils/extensions.dart';
 
+// TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
 class LocalMusicsData {
   static late ConfigFile musicData;
 
@@ -22,14 +26,19 @@ class LocalMusicsData {
 
   static Future<void> saveData() async {
     await musicData.save(compact: _compact);
+    if (NetworkUtils.networkConnected()) {
+      await CloudFirestoreManager.upload();
+    } else {
+      TemporaryData.data.set(key: "offline_changes", value: true);
+      await TemporaryData.save();
+    }
   }
 
   static Future<void> save(MusicData song) async {
     if (!song.isLocal) {
       song.isLocal = true;
-      await musicData
-          .set(key: song.audioId, value: song.toJson())
-          .save(compact: _compact);
+      musicData.set(key: song.audioId, value: song.toJson());
+      await saveData();
     }
   }
 

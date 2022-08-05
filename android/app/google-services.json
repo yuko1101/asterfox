@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "306826868375",
+    "project_id": "asterfox",
+    "storage_bucket": "asterfox.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306826868375:android:cae845b03be7ed278a5bd2",
+        "android_client_info": {
+          "package_name": "net.asterfox.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306826868375-h11mnb9f4cc6qv4tdm9mp653rci4h7dh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGJv7TB4ENpIyUztaWyUtYauDQTCGw698"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306826868375-h11mnb9f4cc6qv4tdm9mp653rci4h7dh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

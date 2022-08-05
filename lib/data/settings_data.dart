@@ -1,15 +1,18 @@
 import 'dart:io';
 
+import 'package:asterfox/data/temporary_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
+import 'package:easy_app/utils/network_utils.dart';
 
 import '../main.dart';
+import '../system/firebase/cloud_firestore.dart';
 import '../system/theme/theme.dart';
 import '../widget/music_widgets/repeat_button.dart';
 
 class SettingsData {
   static late ConfigFile settings;
-  static Map<String, dynamic> defaultData = {
+  static const Map<String, dynamic> defaultData = {
     "theme": "light",
     "repeat_mode": "none",
     "auto_download": false,
@@ -17,12 +20,19 @@ class SettingsData {
   };
   static Future<void> init() async {
     settings = await ConfigFile(
-            File("${EasyApp.localPath}/settings.json"), defaultData)
-        .load();
+      File("${EasyApp.localPath}/settings.json"),
+      defaultData,
+    ).load();
   }
 
   static Future<void> save() async {
     await settings.save();
+    if (NetworkUtils.networkConnected()) {
+      await CloudFirestoreManager.upload();
+    } else {
+      TemporaryData.data.set(key: "offline_changes", value: true);
+      await TemporaryData.save();
+    }
   }
 
   static Future<void> applySettings() async {
@@ -31,17 +41,19 @@ class SettingsData {
     }
   }
 
+  static bool _initializedRepeatListener = false;
   static Future<void> applyMusicManagerSettings() async {
-    musicManager.repeatModeNotifier.addListener(() {
-      print("repeatModeNotifier.addListener");
-      SettingsData.settings
-          .set(
-            key: "repeat_mode",
-            value:
-                repeatStateToString(musicManager.audioDataManager.repeatState),
-          )
-          .save();
-    });
+    if (!_initializedRepeatListener) {
+      musicManager.repeatModeNotifier.addListener(() {
+        print("repeatModeNotifier.addListener");
+        settings.set(
+          key: "repeat_mode",
+          value: repeatStateToString(musicManager.audioDataManager.repeatState),
+        );
+        save();
+      });
+      _initializedRepeatListener = true;
+    }
     if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
         getValue(key: "repeat_mode") as String) {
       musicManager.setRepeatMode(

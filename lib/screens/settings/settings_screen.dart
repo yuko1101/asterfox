@@ -3,6 +3,7 @@ import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -88,7 +89,18 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 },
               ),
             ],
-          )
+          ),
+          SettingsSection(
+            tiles: [
+              SettingsTile(
+                title: Text(Language.getText("logout")),
+                leading: const Icon(Icons.logout),
+                onPressed: (context) {
+                  FirebaseAuth.instance.signOut();
+                },
+              ),
+            ],
+          ),
         ],
       ),
     );
