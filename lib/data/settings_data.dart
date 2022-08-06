@@ -14,7 +14,7 @@ import '../widget/music_widgets/repeat_button.dart';
 class SettingsData {
   static late ConfigFile settings;
   static const Map<String, dynamic> defaultData = {
-    "theme": "light",
+    "theme": "dark",
     "repeat_mode": "none",
     "auto_download": false,
     "volume": 1.0,
