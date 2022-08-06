@@ -95,12 +95,12 @@ class MusicManager {
   }
 
   Future<void> add(MusicData song) async {
-    await _audioHandler.addQueueItem(song.toMediaItem());
+    await _audioHandler.addQueueItem(await song.toMediaItem());
   }
 
   Future<void> addAll(List<MusicData> songs) async {
     await _audioHandler
-        .addQueueItems(songs.map((e) => e.toMediaItem()).toList());
+        .addQueueItems(await Future.wait(songs.map((e) => e.toMediaItem())));
   }
 
   Future<void> remove(String key) async {
@@ -191,7 +191,7 @@ class MusicManager {
       // if removing is not finished, wait for it to finish
       if (!completer.isCompleted) await completer.future;
 
-      await _audioHandler.insertQueueItem(index, song.toMediaItem());
+      await _audioHandler.insertQueueItem(index, await song.toMediaItem());
     }
     await seek(
       currentPosition,

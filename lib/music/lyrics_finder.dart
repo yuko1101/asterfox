@@ -22,7 +22,7 @@ class LyricsFinder {
     }
 
     // 保存されているデータを更新
-    if (song.isSaved) {
+    if (song.isStored) {
       LocalMusicsData.musicData
           .get([song.audioId]).set(key: "lyrics", value: lyrics);
       await LocalMusicsData.saveData();

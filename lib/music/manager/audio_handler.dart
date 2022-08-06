@@ -201,9 +201,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> setSongs(List<MusicData> songs) async {
+    final mediaItems = await Future.wait(songs.map((e) => e.toMediaItem()));
     _playlist = ConcatenatingAudioSource(
-        children:
-            songs.map((e) => e.toMediaItem()).map(_createAudioSource).toList());
+        children: mediaItems.map(_createAudioSource).toList());
     await _player.setAudioSource(_playlist);
   }
 
@@ -267,12 +267,13 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void _listenForSequenceStateChanges() {
-    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
+    _player.sequenceStateStream.listen((SequenceState? sequenceState) async {
       // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
       var sequence = sequenceState?.sequence;
       if (sequence == null || sequence.isEmpty) sequence = [];
       final List<MusicData> playlist = AudioDataManager.getPlaylist(sequence);
-      final items = playlist.map((song) => (song.toMediaItem()));
+      final items =
+          await Future.wait(playlist.map((song) => song.toMediaItem()));
       // print(items.length.toString() + " added songs");
       setQueueItems(items.toList());
     });

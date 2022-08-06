@@ -158,11 +158,12 @@ class SongSearch extends SearchDelegate<String> {
     }
   }
 
-  void loadOfflineSongs(String text) {
+  void loadOfflineSongs(String text) async {
     print("loading offline songs");
     final List<SongSuggestion> list = [];
 
     final List<MusicData> locals = LocalMusicsData.getAll(isTemporary: true);
+    await Future.wait(locals.map((e) => e.getAvailableAudioUrl()));
     list.addAll(locals.map((e) {
       final List<SongTag> tags = [SongTag.local];
       if (e is YouTubeMusicData) tags.add(SongTag.youtube);
@@ -170,7 +171,7 @@ class SongSearch extends SearchDelegate<String> {
         tags: tags,
         title: e.title,
         subtitle: e.author,
-        audioId: e is YouTubeMusicData ? e.id : e.url,
+        audioId: e is YouTubeMusicData ? e.id : e.cachedAudioUrl,
         keywords: e.keywords,
         lyrics: e.lyrics,
       );

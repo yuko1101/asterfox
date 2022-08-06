@@ -48,7 +48,7 @@ class SongHistoryData {
     return data
         .map((e) => MusicData.fromJson(
               json: e,
-              isLocal: LocalMusicsData.isSaved(audioId: e["audioId"]),
+              isLocal: LocalMusicsData.isStored(audioId: e["audioId"]),
               key: const Uuid().v4(),
               isTemporary: isTemporary,
             ))
@@ -101,7 +101,9 @@ extension SongHistoryDataExtension on MusicData {
       NetworkCheck.check();
 
       // can throw RefreshUrlFailedException
-      final url = await isUrlAvailable() ? remoteUrl : await refreshURL();
+      final url = await isAudioUrlAvailable()
+          ? remoteAudioUrl
+          : await refreshAudioURL();
 
       final json = toJson();
       json["url"] = url;

@@ -1,3 +1,4 @@
+import 'package:asterfox/data/local_musics_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -10,9 +11,7 @@ import 'music_data.dart';
 class YouTubeMusicData extends MusicData {
   YouTubeMusicData({
     required this.id,
-    required String url,
     required String remoteUrl,
-    required String imageUrl,
     required String remoteImageUrl,
     required String title,
     required String description,
@@ -27,9 +26,7 @@ class YouTubeMusicData extends MusicData {
     bool isTemporary = false,
   }) : super(
           type: MusicType.youtube,
-          url: url,
-          remoteUrl: remoteUrl,
-          imageUrl: imageUrl,
+          remoteAudioUrl: remoteUrl,
           remoteImageUrl: remoteImageUrl,
           title: title,
           description: description,
@@ -37,7 +34,7 @@ class YouTubeMusicData extends MusicData {
           keywords: keywords,
           audioId: id,
           duration: duration,
-          isLocal: isLocal,
+          isDataStored: isLocal,
           volume: volume,
           lyrics: lyrics,
           key: key,
@@ -48,7 +45,7 @@ class YouTubeMusicData extends MusicData {
   final String authorId;
 
   @override
-  String get savePath => "${EasyApp.localPath}/music/$id/audio.mp3";
+  String get audioSavePath => "${EasyApp.localPath}/music/$id/audio.mp3";
 
   @override
   String get imageSavePath => "${EasyApp.localPath}/music/$id/image.png";
@@ -64,11 +61,15 @@ class YouTubeMusicData extends MusicData {
 
   /// Throws [RefreshUrlFailedException] if failed to refresh the url.
   @override
-  Future<String> refreshURL() async {
+  Future<String> refreshAudioURL() async {
+    print("refreshing youtube audio url...");
     try {
       final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(),
           forceRemote: true);
-      remoteUrl = url;
+      remoteAudioUrl = url;
+      LocalMusicsData.musicData
+          .get([audioId]).set(key: "remoteAudioUrl", value: url);
+      await LocalMusicsData.saveData();
       return url;
     } on NetworkException {
       throw RefreshUrlFailedException();
@@ -77,15 +78,15 @@ class YouTubeMusicData extends MusicData {
     }
   }
 
-  final _expiresRegex = RegExp("expires=([0-9]+)");
+  final _expiresRegex = RegExp("expire=([0-9]+)");
   @override
-  Future<bool> isUrlAvailable() async {
-    final expires = _expiresRegex.firstMatch(remoteUrl);
+  Future<bool> isAudioUrlAvailable() async {
+    final expires = _expiresRegex.firstMatch(remoteAudioUrl);
     if (expires != null) {
-      final expiresTime = int.parse(expires.group(1)!);
+      final expiresTime = int.parse(expires.group(1)!) * 1000;
       final now = DateTime.now().millisecondsSinceEpoch;
-      // 20秒の余裕を持たせる
-      if (expiresTime > now + 20000) {
+      // 1時間の余裕を持たせる
+      if (expiresTime > now + 60 * 60 * 1000) {
         return true;
       } else {
         return false;
@@ -105,9 +106,7 @@ class YouTubeMusicData extends MusicData {
     return YouTubeMusicData(
       key: key,
       id: json['id'] as String,
-      url: json['url'] as String,
-      remoteUrl: json['remoteUrl'] as String,
-      imageUrl: json['imageUrl'] as String,
+      remoteUrl: json['remoteAudioUrl'] as String,
       remoteImageUrl: json['remoteImageUrl'] as String,
       title: json['title'] as String,
       description: json['description'] as String,

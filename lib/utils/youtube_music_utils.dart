@@ -22,11 +22,11 @@ class YouTubeMusicUtils {
   static Future<String> getAudioURL(String videoId, String key,
       {bool forceRemote = false}) async {
     // 曲が保存されているかどうか
-    bool local = LocalMusicsData.isSaved(audioId: videoId);
+    bool local = LocalMusicsData.isStored(audioId: videoId);
     if (local && !forceRemote) {
       final song = LocalMusicsData.getByAudioId(
           audioId: videoId, key: key, isTemporary: true);
-      return song.url;
+      return song.audioUrl;
     } else {
       // オンライン上から取得
 
@@ -64,7 +64,7 @@ class YouTubeMusicUtils {
     bool isTemporary = false,
   }) async {
     // 曲が保存されているかどうか
-    bool local = LocalMusicsData.isSaved(audioId: videoId);
+    bool local = LocalMusicsData.isStored(audioId: videoId);
     if (local) {
       // throws LocalSongNotFoundException
       return LocalMusicsData.getByAudioId(audioId: videoId, key: key)
@@ -164,7 +164,6 @@ class YouTubeMusicUtils {
     }
 
     return YouTubeMusicData(
-      url: manifest.audioOnly.withHighestBitrate().url.toString(),
       remoteUrl: manifest.audioOnly.withHighestBitrate().url.toString(),
       id: video.id.value,
       title: video.title,
@@ -175,7 +174,6 @@ class YouTubeMusicUtils {
       isLocal: false,
       keywords: video.keywords,
       volume: 1.0,
-      imageUrl: imageUrl,
       remoteImageUrl: imageUrl,
       key: key,
       lyrics: "", // TODO: by default, get from closed captions

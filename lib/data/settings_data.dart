@@ -10,6 +10,7 @@ import '../system/firebase/cloud_firestore.dart';
 import '../system/theme/theme.dart';
 import '../widget/music_widgets/repeat_button.dart';
 
+// TODO: move `repeat_mode` and `volume` into TemporaryData
 class SettingsData {
   static late ConfigFile settings;
   static const Map<String, dynamic> defaultData = {

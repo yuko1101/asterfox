@@ -21,7 +21,7 @@ class DownloadButton extends StatelessWidget {
           valueListenable: downloading,
           builder: (_, downloadingSongs, __) {
             print("download changed!");
-            final downloadable = song != null && !song.isLocal;
+            final downloadable = song != null && !song.isDataStored;
             final isDownloading = downloadingSongs.contains(song?.key);
 
             final List<IndexedAudioSource?> songs =
@@ -32,7 +32,7 @@ class DownloadButton extends StatelessWidget {
                 audioSourceIndex != -1 ? songs[audioSourceIndex] : null;
             final isDownloaded = song != null &&
                 audioSource != null &&
-                LocalMusicsData.isSaved(audioId: song.audioId) &&
+                LocalMusicsData.isStored(audioId: song.audioId) &&
                 (audioSource.tag["url"] as String).isUrl;
 
             if (isDownloading) {
@@ -65,7 +65,7 @@ class DownloadButton extends StatelessWidget {
                   },
                   icon: const Icon(Icons.file_download));
             }
-            if (song != null && song.isLocal) {
+            if (song != null && song.isDataStored) {
               return const IconButton(
                   onPressed: null, icon: Icon(Icons.file_download_done));
             }

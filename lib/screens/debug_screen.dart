@@ -110,12 +110,6 @@ class DebugMainScreen extends StatelessWidget {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline),
-                    onPressed: () async {
-                      LocalMusicsData.clean();
-                    },
-                  ),
-                  IconButton(
                     icon: const Icon(Icons.data_object),
                     onPressed: () async {
                       final data = await CloudFirestoreManager.getUserData();

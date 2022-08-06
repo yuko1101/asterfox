@@ -21,9 +21,9 @@ final Map<String, ValueNotifier<int>> downloadProgress = {};
 class MusicDownloader {
   /// Throws [NetworkException] if network is not accessible.
   static Future<void> download(MusicData? song,
-      {bool saveToJSON = true}) async {
+      {bool storeToJson = true}) async {
     if (song == null) return;
-    if (song.isLocal) return;
+    if (song.isInstalled) return;
 
     NetworkCheck.check();
 
@@ -35,15 +35,12 @@ class MusicDownloader {
     if (song is YouTubeMusicData) {
       await _downloadFromYouTube(song);
     } else {
-      await _downloadMp3(song.url, song.savePath, song.key);
+      await _downloadMp3(song.remoteAudioUrl, song.audioSavePath, song.key);
     }
-    song.url = song.savePath;
 
-    await _saveImage(song, song.imageSavePath);
+    await _saveImage(song);
 
-    song.imageUrl = song.imageSavePath;
-
-    if (saveToJSON) await LocalMusicsData.save(song);
+    if (storeToJson) await LocalMusicsData.store(song);
 
     print("finished!");
 
@@ -55,7 +52,7 @@ class MusicDownloader {
 
   static Future<void> _downloadFromYouTube(YouTubeMusicData song) async {
     final String id = song.id;
-    final String downloadPath = song.savePath;
+    final String downloadPath = song.audioSavePath;
     final String key = song.key;
 
     final File file = File(downloadPath);
@@ -126,13 +123,13 @@ class MusicDownloader {
     return completer.future;
   }
 
-  static Future<void> _saveImage(MusicData song, String path) async {
-    if (!song.imageUrl.isUrl) {
+  static Future<void> _saveImage(MusicData song) async {
+    final imageFile = File(song.imageSavePath);
+    if (imageFile.existsSync()) {
       print("Image already saved");
       return;
     }
-    final imageRes = await http.get(Uri.parse(song.imageUrl));
-    final imageFile = File(path);
+    final imageRes = await http.get(Uri.parse(song.remoteImageUrl));
     if (!imageFile.parent.existsSync()) {
       imageFile.parent.createSync(recursive: true);
     }

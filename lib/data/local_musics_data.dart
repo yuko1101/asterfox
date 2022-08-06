@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:asterfox/data/temporary_data.dart';
+import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:easy_app/utils/network_utils.dart';
@@ -34,9 +35,9 @@ class LocalMusicsData {
     }
   }
 
-  static Future<void> save(MusicData song) async {
-    if (!song.isLocal) {
-      song.isLocal = true;
+  static Future<void> store(MusicData song) async {
+    if (!song.isDataStored) {
+      song.isDataStored = true;
       musicData.set(key: song.audioId, value: song.toJson());
       await saveData();
     }
@@ -73,23 +74,30 @@ class LocalMusicsData {
         json: data, isLocal: true, key: key, isTemporary: isTemporary);
   }
 
-  static bool isSaved({MusicData? song, String? audioId}) {
+  static bool isStored({MusicData? song, String? audioId}) {
     assert(song != null || audioId != null);
     return musicData.has(song?.audioId ?? audioId!);
   }
 
+  static bool isInstalled({MusicData? song, String? audioId}) {
+    assert(song != null || audioId != null);
+    return Directory(MusicData.getDirectoryPath(song?.audioId ?? audioId!))
+        .existsSync();
+  }
+
   static Future<void> removeFromLocal(MusicData song) async {
-    if (!song.isSaved) return;
-    final file = File(song.savePath);
-    final imageDelete = () async {
-      String url = song.imageUrl;
+    if (!song.isStored) return;
+    final file = File(song.audioSavePath);
+    imageDelete() async {
+      String url = song.imageSavePath;
       if (!url.isUrl) {
         final file = File(url);
         if (file.existsSync()) await file.delete();
       }
-    }();
+    }
+
     musicData.delete(key: song.audioId);
-    final futures = [file.delete(), imageDelete, saveData()];
+    final futures = [file.delete(), imageDelete(), saveData()];
     await Future.wait(futures);
   }
 
@@ -97,44 +105,34 @@ class LocalMusicsData {
     final futures = songs.map((e) => removeFromLocal(e));
     await Future.wait(futures);
   }
-
-  /// Clean unused local files
-  static Future<void> clean() async {
-    final List<FileSystemEntity> toRemove = [];
-
-    final songs = getAll(isTemporary: true);
-
-    final musicDir = Directory("${EasyApp.localPath}/music");
-    final musicFiles = musicDir.listSync();
-    toRemove.addAll(musicFiles.where((file) {
-      return !songs.any((song) => song.savePath == file.path);
-    }));
-
-    final imagesDir = Directory("${EasyApp.localPath}/images");
-    final imagesFiles = imagesDir.listSync();
-    toRemove.addAll(imagesFiles.where((file) {
-      return !songs.any((song) => song.imageSavePath == file.path);
-    }));
-
-    await Future.wait(toRemove.map((file) => file.delete()));
-    print("Cleaned ${toRemove.length} files");
-  }
 }
 
 extension LocalMusicsDataExtension on MusicData {
   /// Throws [NetworkException] if the network is not accessible.
-  Future<void> save({bool saveToJSON = true}) async {
-    if (isSaved) return;
-    await MusicDownloader.download(this, saveToJSON: saveToJSON);
+  Future<void> download({bool storeToJSON = true}) async {
+    if (isStored) return;
+    await MusicDownloader.download(this, storeToJson: storeToJSON);
   }
 
-  bool get isSaved => LocalMusicsData.isSaved(song: this);
-
-  // 保存されている場合、URL等を保存されてるものに更新する
-  void loadLocal() {
-    if (!isSaved) return;
-    url = savePath;
-    imageUrl = imageSavePath;
-    isLocal = true;
+  Future<void> store() async {
+    if (isStored) return;
+    await LocalMusicsData.store(this);
   }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  Future<void> install() async {
+    if (!isStored) throw SongNotStoredException();
+    if (isInstalled) return;
+    await MusicDownloader.download(this, storeToJson: false);
+  }
+
+  bool get isStored => LocalMusicsData.isStored(song: this);
+  bool get isInstalled => LocalMusicsData.isInstalled(song: this);
+
+  Future<String> get audioUrl async =>
+      isInstalled ? audioSavePath : await getAvailableAudioUrl();
+
+  String get cachedAudioUrl => isInstalled ? audioSavePath : remoteAudioUrl;
+
+  String get imageUrl => isInstalled ? imageSavePath : remoteImageUrl;
 }

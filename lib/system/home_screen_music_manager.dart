@@ -30,7 +30,7 @@ class HomeScreenMusicManager {
     // the auto downloader works only for remote music
     final bool autoDownloadEnabled =
         SettingsData.getValue(key: "auto_download") &&
-            (!LocalMusicsData.isSaved(audioId: youtubeId, song: musicData));
+            (!LocalMusicsData.isStored(audioId: youtubeId, song: musicData));
 
     final completer = Completer();
 
@@ -95,7 +95,7 @@ class HomeScreenMusicManager {
 
           if (autoDownloadEnabled) {
             try {
-              await song.save();
+              await song.download();
             } on NetworkException {
               Fluttertoast.showToast(
                   msg: Language.getText("network_not_accessible"));
@@ -195,12 +195,12 @@ class HomeScreenMusicManager {
             isDownloadMode!.value = true;
             try {
               await Future.wait(songs.map((song) async {
-                await song.save(saveToJSON: false);
+                await song.download(storeToJSON: false);
                 progress!.value = progress.value + 1;
               }));
               for (final song in songs) {
-                if (song.isSaved) continue;
-                await LocalMusicsData.save(song);
+                if (song.isStored) continue;
+                await LocalMusicsData.store(song);
               }
             } on NetworkException {
               Fluttertoast.showToast(
@@ -208,9 +208,6 @@ class HomeScreenMusicManager {
               completer.complete();
               return;
             }
-          }
-          for (final song in songs) {
-            song.loadLocal();
           }
           await musicManager.addAll(songs);
           completer.complete();

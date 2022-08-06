@@ -3,13 +3,12 @@ import 'package:easy_app/easy_app.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'youtube_music_data.dart';
+import '../../data/local_musics_data.dart';
 
 class MusicData {
   MusicData({
     required this.type,
-    required this.url,
-    required this.remoteUrl,
-    required this.imageUrl,
+    required this.remoteAudioUrl,
     required this.remoteImageUrl,
     required this.title,
     required this.description,
@@ -17,7 +16,7 @@ class MusicData {
     required this.keywords,
     required this.audioId,
     required this.duration,
-    required this.isLocal,
+    required this.isDataStored,
     required this.volume,
     required this.lyrics,
     required this.key,
@@ -33,22 +32,19 @@ class MusicData {
   final String description;
   final String author;
   final List<String> keywords;
-  String
-      url; // can be changed if the url is expired (especially for YouTube), or the song saved locally.
-  String imageUrl; // can be changed on saving to local storage.
   final String audioId;
   Duration duration; // can be changed on clip-cut.
-  bool isLocal; // can be changed on saving to local storage.
+  bool isDataStored; // can be changed on saving to local storage.
   double volume; // can be changed on volume change.
   final String key;
-  String remoteUrl;
+  String remoteAudioUrl;
   String remoteImageUrl;
 
   String lyrics;
 
   final bool isTemporary;
 
-  MediaItem toMediaItem() {
+  Future<MediaItem> toMediaItem() async {
     return MediaItem(
       id: key,
       title: title,
@@ -56,15 +52,16 @@ class MusicData {
       duration: duration,
       displayDescription: description,
       extras: {
-        "url": url,
+        "url": await audioUrl,
       },
     );
   }
 
-  String get mediaURL => remoteUrl;
+  String get mediaURL => remoteAudioUrl;
 
-  String get savePath => "${EasyApp.localPath}/music/$audioId/audio.mp3";
-  String get imageSavePath => "${EasyApp.localPath}/images/$audioId/image.png";
+  String get directoryPath => getDirectoryPath(audioId);
+  String get audioSavePath => getAudioSavePath(audioId);
+  String get imageSavePath => getImageSavePath(audioId);
 
   void destroy() {
     _created.remove(this);
@@ -78,9 +75,7 @@ class MusicData {
   Map<String, dynamic> toJson() {
     final json = {
       'type': type.name,
-      'url': url,
-      'remoteUrl': remoteUrl,
-      'imageUrl': imageUrl,
+      'remoteAudioUrl': remoteAudioUrl,
       'remoteImageUrl': remoteImageUrl,
       'title': title,
       'description': description,
@@ -115,16 +110,14 @@ class MusicData {
         return MusicData(
           key: key,
           type: type,
-          url: json['url'] as String,
-          remoteUrl: json['remoteUrl'] as String,
-          imageUrl: json['imageUrl'] as String,
+          remoteAudioUrl: json['remoteAudioUrl'] as String,
           remoteImageUrl: json['remoteImageUrl'] as String,
           title: json['title'] as String,
           description: json['description'] as String,
           author: json['author'] as String,
           audioId: json['audioId'] as String,
           duration: Duration(milliseconds: json['duration'] as int),
-          isLocal: isLocal,
+          isDataStored: isLocal,
           keywords: (json['keywords'] as List).map((e) => e as String).toList(),
           volume: json['volume'] as double,
           lyrics: json['lyrics'] as String,
@@ -133,13 +126,25 @@ class MusicData {
     }
   }
 
-  Future<String> refreshURL() async {
-    return remoteUrl;
+  Future<String> refreshAudioURL() async {
+    return remoteAudioUrl;
   }
 
-  Future<bool> isUrlAvailable() async {
+  Future<bool> isAudioUrlAvailable() async {
     return true;
   }
+
+  Future<String> getAvailableAudioUrl() async {
+    if (await isAudioUrlAvailable()) return remoteAudioUrl;
+    return await refreshAudioURL();
+  }
+
+  static String getDirectoryPath(String audioId) =>
+      "${EasyApp.localPath}/music/$audioId";
+  static String getAudioSavePath(String audioId) =>
+      "${getDirectoryPath(audioId)}/audio.mp3";
+  static String getImageSavePath(String audioId) =>
+      "${getDirectoryPath(audioId)}/image.png";
 
   static final List<MusicData> _created = [];
   static List<MusicData> getCreated() {

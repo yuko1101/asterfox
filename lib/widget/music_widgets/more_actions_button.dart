@@ -81,7 +81,7 @@ class MoreActionsButton extends StatelessWidget {
         );
       },
       songFilter: (MusicData? song) =>
-          song != null && LocalMusicsData.isSaved(song: song),
+          song != null && LocalMusicsData.isStored(song: song),
     ),
     _Action(
       id: "refresh_all",
