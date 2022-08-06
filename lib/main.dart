@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:asterfox/data/temporary_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/os.dart';

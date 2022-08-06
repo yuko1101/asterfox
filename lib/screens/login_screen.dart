@@ -33,16 +33,6 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
-    final dialogRoute = DialogRoute(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => WillPopScope(
-        onWillPop: () async => false,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    );
 
     AsterfoxScreen.loadingNotifier.value = true;
 

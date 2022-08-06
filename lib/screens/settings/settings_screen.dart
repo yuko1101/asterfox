@@ -1,8 +1,6 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -65,7 +63,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                     .map((theme) => Language.getText("theme_$theme"))
                     .join(Language.getText("list_separator"))),
                 onPressed: (context) {
-                  EasyApp.pushPage(context, ThemeSettingsScreen());
+                  EasyApp.pushPage(context, const ThemeSettingsScreen());
                 },
                 trailing: const Icon(Icons.keyboard_arrow_right),
               )

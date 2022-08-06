@@ -15,6 +15,7 @@ import '../system/firebase/cloud_firestore.dart';
 import '../utils/extensions.dart';
 
 // TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
+// TODO: move `remoteAudioUrl` into TemporaryData
 class LocalMusicsData {
   static late ConfigFile musicData;
 

@@ -10,7 +10,6 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../data/local_musics_data.dart';
 import '../system/exceptions/network_exception.dart';
-import '../utils/extensions.dart';
 import '../utils/network_check.dart';
 import 'audio_source/music_data.dart';
 import 'audio_source/youtube_music_data.dart';

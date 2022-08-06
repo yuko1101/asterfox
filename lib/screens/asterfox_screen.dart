@@ -139,7 +139,7 @@ class AsterfoxMainScreen extends StatelessWidget {
             icon: const Icon(Icons.replay),
             onPressed: () {
               if (EasyApp.currentScreen is SongHistoryScreen) return;
-              EasyApp.pushPage(context, SongHistoryScreen());
+              EasyApp.pushPage(context, const SongHistoryScreen());
             },
           ),
           SideMenuItem(
@@ -147,7 +147,7 @@ class AsterfoxMainScreen extends StatelessWidget {
             icon: const Icon(Icons.settings),
             onPressed: () {
               if (EasyApp.currentScreen is SettingsScreen) return;
-              EasyApp.pushPage(context, SettingsScreen());
+              EasyApp.pushPage(context, const SettingsScreen());
             },
           ),
           SideMenuItem(
