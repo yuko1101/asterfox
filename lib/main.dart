@@ -46,9 +46,6 @@ Future<void> main() async {
   musicManager = MusicManager(true);
   await musicManager.init();
 
-  // run this after initializing the music manager
-  await SettingsData.applyMusicManagerSettings();
-
   await CustomColors.load();
   await SongHistoryData.init(musicManager);
 
@@ -65,6 +62,9 @@ Future<void> main() async {
   );
 
   await LocalMusicsData.init();
+
+  // run this after initializing the music manager, EasyApp connection checker, and LocalMusicsData.
+  await SettingsData.applyMusicManagerSettings();
 
   // run this after Firebase initialization, LocalMusicsData, and SettingsData
   await CloudFirestoreManager.init();
