@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/music/utils/muisc_url_utils.dart';
 import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,7 @@ import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../screens/home_screen.dart';
-import '../utils/extensions.dart';
-import '../utils/youtube_music_utils.dart';
-import 'exceptions/local_song_not_found_exception.dart';
+import '../music/utils/youtube_music_utils.dart';
 import 'exceptions/network_exception.dart';
 
 class HomeScreenMusicManager {
@@ -79,10 +78,6 @@ class HomeScreenMusicManager {
                   videoId: youtubeId, key: key));
             } on VideoUnplayableException {
               Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
-              return;
-            } on LocalSongNotFoundException {
-              // TODO: multi-language
-              Fluttertoast.showToast(msg: "Local song not found");
               return;
             } on NetworkException {
               Fluttertoast.showToast(

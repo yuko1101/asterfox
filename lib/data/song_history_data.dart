@@ -48,7 +48,6 @@ class SongHistoryData {
     return data
         .map((e) => MusicData.fromJson(
               json: e,
-              isLocal: LocalMusicsData.isStored(audioId: e["audioId"]),
               key: const Uuid().v4(),
               isTemporary: isTemporary,
             ))
@@ -86,40 +85,11 @@ extension SongHistoryDataExtension on MusicData {
     return song["last_played"] as int;
   }
 
-  // ローカルストレージに保存されている場合は、LocalMusicsDataから読み込み、
-  // そうでない場合は、URLを更新して、リモートのMusicDataとして読み込む。
-  /// Throws [NetworkException] if network is not accessible.
-  ///
-  /// Throws [RefreshUrlFailedException] if refresh url failed.
-  Future<MusicData> renew(String key, {bool isTemporary = false}) async {
-    try {
-      final localMusicData = LocalMusicsData.getByAudioId(
-          audioId: audioId, key: key, isTemporary: isTemporary);
-      return localMusicData;
-    } on LocalSongNotFoundException {
-      // インターネット接続確認
-      NetworkCheck.check();
-
-      // can throw RefreshUrlFailedException
-      final url = await isAudioUrlAvailable()
-          ? remoteAudioUrl
-          : await refreshAudioURL();
-
-      final json = toJson();
-      json["url"] = url;
-      json["remoteUrl"] = url;
-
-      if ((json["remoteImageUrl"] as String).isEmpty) {
-        throw Exception("Cannot resolve image url");
-      }
-      json["imageUrl"] = json["remoteImageUrl"];
-
-      return MusicData.fromJson(
-        json: json,
-        isLocal: false,
-        key: key,
-        isTemporary: isTemporary,
-      );
-    }
+  MusicData renew({required String key, required bool? isTemporary}) {
+    return MusicData.fromJson(
+      json: toJson(),
+      key: key,
+      isTemporary: isTemporary ?? this.isTemporary,
+    );
   }
 }

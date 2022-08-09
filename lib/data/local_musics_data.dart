@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:asterfox/data/temporary_data.dart';
+import 'package:asterfox/music/utils/muisc_url_utils.dart';
 import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
@@ -12,7 +13,6 @@ import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
 import '../system/exceptions/network_exception.dart';
 import '../system/firebase/cloud_firestore.dart';
-import '../utils/extensions.dart';
 
 // TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
 // TODO: move `remoteAudioUrl` into TemporaryData
@@ -37,8 +37,7 @@ class LocalMusicsData {
   }
 
   static Future<void> store(MusicData song) async {
-    if (!song.isDataStored) {
-      song.isDataStored = true;
+    if (!song.isStored) {
       musicData.set(key: song.audioId, value: song.toJson());
       await saveData();
     }
@@ -49,7 +48,6 @@ class LocalMusicsData {
     return data.values
         .map((e) => MusicData.fromJson(
               json: e,
-              isLocal: true,
               key: const Uuid().v4(),
               isTemporary: isTemporary,
             ))
@@ -71,8 +69,7 @@ class LocalMusicsData {
   }) {
     if (!musicData.has(audioId)) throw LocalSongNotFoundException(audioId);
     final data = musicData.getValue(audioId) as Map<String, dynamic>;
-    return MusicData.fromJson(
-        json: data, isLocal: true, key: key, isTemporary: isTemporary);
+    return MusicData.fromJson(json: data, key: key, isTemporary: isTemporary);
   }
 
   static bool isStored({MusicData? song, String? audioId}) {

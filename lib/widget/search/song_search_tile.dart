@@ -1,6 +1,13 @@
+import 'package:asterfox/data/song_history_data.dart';
+import 'package:asterfox/music/utils/muisc_url_utils.dart';
+import 'package:asterfox/system/exceptions/network_exception.dart';
+import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../../music/audio_source/music_data.dart';
 import '../../system/home_screen_music_manager.dart';
 import '../../system/theme/theme.dart';
 import 'song_search.dart';
@@ -32,14 +39,33 @@ class SongSearchTile extends StatelessWidget {
       icon = const Icon(Icons.question_mark);
     }
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (suggestion.tags.contains(SongTag.word)) {
-          setQuery(suggestion.audioId);
+          setQuery(suggestion.word!);
         } else if (suggestion.tags.contains(SongTag.youtube)) {
           close();
+          MusicData? musicData = suggestion.musicData;
+          if (musicData == null) {
+            try {
+              musicData = await MusicUrlUtils.createMusicDataFromUrl(
+                mediaUrl: suggestion.mediaUrl!,
+                key: const Uuid().v4(),
+              );
+            } on VideoUnplayableException {
+              Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
+              return;
+            } on NetworkException {
+              Fluttertoast.showToast(
+                  msg: Language.getText("network_not_accessible"));
+              return;
+            }
+          } else {
+            musicData =
+                musicData.renew(key: const Uuid().v4(), isTemporary: false);
+          }
           HomeScreenMusicManager.addSong(
             key: const Uuid().v4(),
-            youtubeId: suggestion.audioId,
+            musicData: musicData,
           );
         }
       },

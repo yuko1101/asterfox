@@ -11,7 +11,7 @@ import '../../music/audio_source/music_data.dart';
 import '../../music/audio_source/youtube_music_data.dart';
 import '../../system/exceptions/network_exception.dart';
 import '../../system/home_screen_music_manager.dart';
-import '../../utils/youtube_music_utils.dart';
+import '../../music/utils/youtube_music_utils.dart';
 import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
 
@@ -131,7 +131,7 @@ class SongSearch extends SearchDelegate<String> {
               ],
               title: e.title,
               subtitle: e.author,
-              audioId: e.id.value,
+              mediaUrl: e.url,
               keywords: e.keywords,
             ))
         .toList();
@@ -139,7 +139,7 @@ class SongSearch extends SearchDelegate<String> {
     final List<String> words = await YouTubeMusicUtils.searchWords(text);
     final wordsSuggestions = words
         .map((e) => SongSuggestion(
-            tags: [SongTag.word], title: e, audioId: e, keywords: []))
+            tags: [SongTag.word], title: e, word: e, keywords: []))
         .toList();
 
     final videoResult = filterAndSort(
@@ -163,7 +163,6 @@ class SongSearch extends SearchDelegate<String> {
     final List<SongSuggestion> list = [];
 
     final List<MusicData> locals = LocalMusicsData.getAll(isTemporary: true);
-    await Future.wait(locals.map((e) => e.getAvailableAudioUrl()));
     list.addAll(locals.map((e) {
       final List<SongTag> tags = [SongTag.local];
       if (e is YouTubeMusicData) tags.add(SongTag.youtube);
@@ -171,7 +170,7 @@ class SongSearch extends SearchDelegate<String> {
         tags: tags,
         title: e.title,
         subtitle: e.author,
-        audioId: e is YouTubeMusicData ? e.id : e.cachedAudioUrl,
+        musicData: e,
         keywords: e.keywords,
         lyrics: e.lyrics,
       );
@@ -189,17 +188,28 @@ class SongSearch extends SearchDelegate<String> {
 
 class SongSuggestion {
   SongSuggestion({
+    this.musicData,
+    this.mediaUrl,
+    this.word,
     required this.tags,
     required this.title,
     this.subtitle,
-    required this.audioId,
     required this.keywords,
     this.lyrics,
-  });
+  }) {
+    assert(musicData != null || word != null || mediaUrl != null);
+    // タグにSongTag.wordを含む場合にはwordはnullにはならず、
+    // 含まない場合にはnullになる必要がある
+    assert((tags.contains(SongTag.word) && word != null) ||
+        (!tags.contains(SongTag.word) && word == null));
+  }
+  final MusicData? musicData;
+  final String? mediaUrl;
+  final String? word;
+
   final List<SongTag> tags;
   final String title;
   final String? subtitle;
-  final String audioId;
   final List<String> keywords;
   final String? lyrics;
 }

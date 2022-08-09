@@ -1,3 +1,4 @@
+import 'package:asterfox/music/utils/muisc_url_utils.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -7,7 +8,6 @@ import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/music_downloader.dart';
 import '../../system/home_screen_music_manager.dart';
-import '../../utils/extensions.dart';
 
 class DownloadButton extends StatelessWidget {
   const DownloadButton({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class DownloadButton extends StatelessWidget {
           valueListenable: downloading,
           builder: (_, downloadingSongs, __) {
             print("download changed!");
-            final downloadable = song != null && !song.isDataStored;
+            final downloadable = song != null && !song.isInstalled;
             final isDownloading = downloadingSongs.contains(song?.key);
 
             final List<IndexedAudioSource?> songs =
@@ -65,7 +65,7 @@ class DownloadButton extends StatelessWidget {
                   },
                   icon: const Icon(Icons.file_download));
             }
-            if (song != null && song.isDataStored) {
+            if (song != null && song.isInstalled) {
               return const IconButton(
                   onPressed: null, icon: Icon(Icons.file_download_done));
             }

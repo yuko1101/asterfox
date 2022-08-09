@@ -103,18 +103,10 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                   ),
                   onTap: () async {
                     final key = const Uuid().v4();
-                    try {
-                      final musicData = await song.renew(key);
-                      HomeScreenMusicManager.addSong(
-                          key: key, musicData: musicData);
-                      EasyApp.popPage(context);
-                    } on RefreshUrlFailedException {
-                      // TODO: multi-language
-                      Fluttertoast.showToast(msg: "Failed to refresh url");
-                    } on NetworkException {
-                      Fluttertoast.showToast(
-                          msg: Language.getText("network_not_accessible"));
-                    }
+                    final musicData = song.renew(key: key, isTemporary: false);
+                    HomeScreenMusicManager.addSong(
+                        key: key, musicData: musicData);
+                    EasyApp.popPage(context);
                   },
                 );
               },

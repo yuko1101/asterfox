@@ -1,3 +1,4 @@
+import 'package:asterfox/music/audio_source/url_music_data.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:just_audio/just_audio.dart';
@@ -16,7 +17,6 @@ class MusicData {
     required this.keywords,
     required this.audioId,
     required this.duration,
-    required this.isDataStored,
     required this.volume,
     required this.lyrics,
     required this.key,
@@ -34,7 +34,6 @@ class MusicData {
   final List<String> keywords;
   final String audioId;
   Duration duration; // can be changed on clip-cut.
-  bool isDataStored; // can be changed on saving to local storage.
   double volume; // can be changed on volume change.
   final String key;
   String remoteAudioUrl;
@@ -96,7 +95,6 @@ class MusicData {
 
   factory MusicData.fromJson({
     required Map<String, dynamic> json,
-    required bool isLocal,
     required String key,
     bool isTemporary = false,
   }) {
@@ -105,24 +103,33 @@ class MusicData {
     switch (type) {
       case MusicType.youtube:
         return YouTubeMusicData.fromJson(
-            json: json, isLocal: isLocal, key: key, isTemporary: isTemporary);
-      default:
-        return MusicData(
+          json: json,
           key: key,
-          type: type,
-          remoteAudioUrl: json['remoteAudioUrl'] as String,
-          remoteImageUrl: json['remoteImageUrl'] as String,
-          title: json['title'] as String,
-          description: json['description'] as String,
-          author: json['author'] as String,
-          audioId: json['audioId'] as String,
-          duration: Duration(milliseconds: json['duration'] as int),
-          isDataStored: isLocal,
-          keywords: (json['keywords'] as List).map((e) => e as String).toList(),
-          volume: json['volume'] as double,
-          lyrics: json['lyrics'] as String,
           isTemporary: isTemporary,
         );
+      case MusicType.url:
+        return UrlMusicData.fromJson(
+          json: json,
+          key: key,
+          isTemporary: isTemporary,
+        );
+      // default:
+      //   return MusicData(
+      //     key: key,
+      //     type: type,
+      //     remoteAudioUrl: json['remoteAudioUrl'] as String,
+      //     remoteImageUrl: json['remoteImageUrl'] as String,
+      //     title: json['title'] as String,
+      //     description: json['description'] as String,
+      //     author: json['author'] as String,
+      //     audioId: json['audioId'] as String,
+      //     duration: Duration(milliseconds: json['duration'] as int),
+      //     isDataStored: isLocal,
+      //     keywords: (json['keywords'] as List).map((e) => e as String).toList(),
+      //     volume: json['volume'] as double,
+      //     lyrics: json['lyrics'] as String,
+      //     isTemporary: isTemporary,
+      //   );
     }
   }
 
@@ -160,15 +167,15 @@ class MusicData {
   }
 }
 
-enum MusicType { youtube, custom }
+enum MusicType { youtube, url }
 
 extension MusicTypeExtension on MusicType {
   String get name {
     switch (this) {
       case MusicType.youtube:
         return "youtube";
-      case MusicType.custom:
-        return "custom";
+      case MusicType.url:
+        return "raw";
     }
   }
 }

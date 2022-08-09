@@ -5,7 +5,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../system/exceptions/network_exception.dart';
 import '../../system/exceptions/refresh_url_failed_exception.dart';
-import '../../utils/youtube_music_utils.dart';
+import '../utils/youtube_music_utils.dart';
 import 'music_data.dart';
 
 class YouTubeMusicData extends MusicData {
@@ -19,7 +19,6 @@ class YouTubeMusicData extends MusicData {
     required this.authorId,
     required List<String> keywords,
     required Duration duration,
-    required bool isLocal,
     required double volume,
     required String lyrics,
     required String key,
@@ -34,7 +33,6 @@ class YouTubeMusicData extends MusicData {
           keywords: keywords,
           audioId: id,
           duration: duration,
-          isDataStored: isLocal,
           volume: volume,
           lyrics: lyrics,
           key: key,
@@ -99,7 +97,6 @@ class YouTubeMusicData extends MusicData {
   // from json
   factory YouTubeMusicData.fromJson({
     required Map<String, dynamic> json,
-    required bool isLocal,
     required String key,
     bool isTemporary = false,
   }) {
@@ -113,7 +110,6 @@ class YouTubeMusicData extends MusicData {
       author: json['author'] as String,
       authorId: json['authorId'] as String,
       duration: Duration(milliseconds: json['duration'] as int),
-      isLocal: isLocal,
       keywords: (json['keywords'] as List).map((e) => e as String).toList(),
       volume: json['volume'] as double,
       lyrics: json['lyrics'] as String,

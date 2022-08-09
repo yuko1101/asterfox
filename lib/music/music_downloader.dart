@@ -34,7 +34,8 @@ class MusicDownloader {
     if (song is YouTubeMusicData) {
       await _downloadFromYouTube(song);
     } else {
-      await _downloadMp3(song.remoteAudioUrl, song.audioSavePath, song.key);
+      await _downloadMp3(
+          await song.getAvailableAudioUrl(), song.audioSavePath, song.key);
     }
 
     await _saveImage(song);

@@ -1,12 +1,12 @@
 import 'dart:io';
 
+import 'package:asterfox/music/utils/muisc_url_utils.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
-import '../../utils/extensions.dart';
 
 final Image defaultImage = Image.asset("assets/images/asterfox-no-image.png");
 
@@ -29,7 +29,7 @@ class MusicImageWidget extends StatelessWidget {
   final String? image;
   @override
   Widget build(BuildContext context) {
-    if (image == null) {
+    if (image == null || image!.isEmpty) {
       return defaultImage;
     }
     if (image!.isUrl) {

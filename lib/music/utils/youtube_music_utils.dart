@@ -7,18 +7,15 @@ import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import '../data/local_musics_data.dart';
-import '../music/audio_source/youtube_music_data.dart';
-import '../system/exceptions/local_song_not_found_exception.dart';
-import '../system/exceptions/network_exception.dart';
-import 'network_check.dart';
+import '../../data/local_musics_data.dart';
+import '../audio_source/youtube_music_data.dart';
+import '../../system/exceptions/network_exception.dart';
+import '../../utils/network_check.dart';
 
 class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  ///
-  /// Throws [LocalSongNotFoundException] if the song is local one, and is not found in the local storage.
   static Future<String> getAudioURL(String videoId, String key,
       {bool forceRemote = false}) async {
     // 曲が保存されているかどうか
@@ -56,8 +53,6 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  ///
-  /// Throws [LocalSongNotFoundException] if the song is local one, and is not found in the local storage.
   static Future<YouTubeMusicData> getYouTubeAudio({
     required String videoId,
     required String key,
@@ -171,7 +166,6 @@ class YouTubeMusicUtils {
       author: video.author,
       authorId: video.channelId.value,
       duration: video.duration ?? Duration.zero,
-      isLocal: false,
       keywords: video.keywords,
       volume: 1.0,
       remoteImageUrl: imageUrl,
