@@ -33,10 +33,11 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
+      // throw UnsupportedError(
+      //   'DefaultFirebaseOptions have not been configured for windows - '
+      //   'you can reconfigure this by running the FlutterFire CLI again.',
+      // );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -63,7 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '306826868375',
     projectId: 'asterfox',
     storageBucket: 'asterfox.appspot.com',
-    iosClientId: '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
+    iosClientId:
+        '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
     iosBundleId: 'net.asterfox.app',
   );
 }
