@@ -44,28 +44,12 @@ class SongSearchTile extends StatelessWidget {
           setQuery(suggestion.word!);
         } else if (suggestion.tags.contains(SongTag.youtube)) {
           close();
-          MusicData? musicData = suggestion.musicData;
-          if (musicData == null) {
-            try {
-              musicData = await MusicUrlUtils.createMusicDataFromUrl(
-                mediaUrl: suggestion.mediaUrl!,
-                key: const Uuid().v4(),
-              );
-            } on VideoUnplayableException {
-              Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
-              return;
-            } on NetworkException {
-              Fluttertoast.showToast(
-                  msg: Language.getText("network_not_accessible"));
-              return;
-            }
-          } else {
-            musicData =
-                musicData.renew(key: const Uuid().v4(), isTemporary: false);
-          }
+          MusicData? musicData = suggestion.musicData
+              ?.renew(key: const Uuid().v4(), isTemporary: false);
           HomeScreenMusicManager.addSong(
             key: const Uuid().v4(),
             musicData: musicData,
+            mediaUrl: suggestion.mediaUrl,
           );
         }
       },

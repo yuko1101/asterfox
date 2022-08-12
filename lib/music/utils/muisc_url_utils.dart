@@ -34,6 +34,17 @@ class MusicUrlUtils {
     }
     throw InvalidTypeOfMediaUrlException(mediaUrl);
   }
+
+  static String getAudioIdFromUrl(String mediaUrl) {
+    if (!mediaUrl.isUrl) {
+      throw ArgumentError.value(
+          mediaUrl, "Invalid URL", "`mediaUrl` is not a valid url");
+    }
+    if (mediaUrl.isYouTubeUrl) {
+      return VideoId(mediaUrl).value;
+    }
+    throw InvalidTypeOfMediaUrlException(mediaUrl);
+  }
 }
 
 final _httpRegex = RegExp(r'^https?:\/\/.+$');

@@ -23,13 +23,19 @@ class HomeScreenMusicManager {
     required String key,
     String? youtubeId,
     MusicData? musicData,
+    String? mediaUrl,
   }) async {
-    assert(youtubeId != null || musicData != null);
+    assert(youtubeId != null || musicData != null || mediaUrl != null);
 
     // the auto downloader works only for remote music
     final bool autoDownloadEnabled =
         SettingsData.getValue(key: "auto_download") &&
-            (!LocalMusicsData.isStored(audioId: youtubeId, song: musicData));
+            (!LocalMusicsData.isInstalled(
+                audioId: youtubeId ??
+                    (mediaUrl != null
+                        ? MusicUrlUtils.getAudioIdFromUrl(mediaUrl)
+                        : null),
+                song: musicData));
 
     final completer = Completer();
 
@@ -72,20 +78,36 @@ class HomeScreenMusicManager {
         child: notification,
         progress: () async {
           MusicData song;
-          if (youtubeId != null) {
-            try {
-              song = (await YouTubeMusicUtils.getYouTubeAudio(
-                  videoId: youtubeId, key: key));
-            } on VideoUnplayableException {
-              Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
-              return;
-            } on NetworkException {
-              Fluttertoast.showToast(
-                  msg: Language.getText("network_not_accessible"));
-              return;
+          if (musicData == null) {
+            if (youtubeId != null) {
+              try {
+                song = (await YouTubeMusicUtils.getYouTubeAudio(
+                    videoId: youtubeId, key: key));
+              } on VideoUnplayableException {
+                Fluttertoast.showToast(
+                    msg: Language.getText("song_unplayable"));
+                return;
+              } on NetworkException {
+                Fluttertoast.showToast(
+                    msg: Language.getText("network_not_accessible"));
+                return;
+              }
+            } else {
+              try {
+                song = (await MusicUrlUtils.createMusicDataFromUrl(
+                    mediaUrl: mediaUrl!, key: key));
+              } on VideoUnplayableException {
+                Fluttertoast.showToast(
+                    msg: Language.getText("song_unplayable"));
+                return;
+              } on NetworkException {
+                Fluttertoast.showToast(
+                    msg: Language.getText("network_not_accessible"));
+                return;
+              }
             }
           } else {
-            song = musicData!;
+            song = musicData;
           }
 
           if (autoDownloadEnabled) {

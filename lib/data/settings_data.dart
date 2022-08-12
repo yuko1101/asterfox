@@ -4,6 +4,7 @@ import 'package:asterfox/data/temporary_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:easy_app/utils/network_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../main.dart';
 import '../system/firebase/cloud_firestore.dart';
@@ -29,6 +30,7 @@ class SettingsData {
   static Future<void> save() async {
     await settings.save();
     if (NetworkUtils.networkConnected()) {
+      if (FirebaseAuth.instance.currentUser == null) return;
       await CloudFirestoreManager.upload();
     } else {
       TemporaryData.data.set(key: "offline_changes", value: true);
