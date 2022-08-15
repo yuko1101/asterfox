@@ -144,11 +144,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: assets/fonts/Roboto-Medium.ttf
-          weight: 500
 
 msix_config:
   display_name: Asterox

@@ -594,11 +594,7 @@ class GoogleSignInWidget extends StatelessWidget {
                   ),
                   Text(
                     Language.getText("sign_in_with_google"),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: "Roboto",
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: const TextStyle(color: Colors.black),
                   ),
                   const SizedBox(
                     width: 40,
