@@ -1,8 +1,10 @@
+import 'package:asterfox/screens/login_screen.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
@@ -94,6 +96,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 title: Text(Language.getText("logout")),
                 leading: const Icon(Icons.logout),
                 onPressed: (context) {
+                  GoogleSignInWidget.googleSignIn.disconnect();
                   FirebaseAuth.instance.signOut();
                 },
               ),
