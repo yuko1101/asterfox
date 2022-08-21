@@ -36,11 +36,63 @@ class LocalMusicsData {
     }
   }
 
+  static bool isStored({MusicData? song, String? audioId}) {
+    assert(song != null || audioId != null);
+    return musicData.has(song?.audioId ?? audioId!);
+  }
+
+  static bool isInstalled({MusicData? song, String? audioId}) {
+    assert(song != null || audioId != null);
+    return Directory(MusicData.getDirectoryPath(song?.audioId ?? audioId!))
+        .existsSync();
+  }
+
   static Future<void> store(MusicData song) async {
-    if (!song.isStored) {
-      musicData.set(key: song.audioId, value: song.toJson());
-      await saveData();
+    if (song.isStored) return;
+    musicData.set(key: song.audioId, value: song.toJson());
+    await saveData();
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  static Future<void> install(MusicData song) async {
+    if (!song.isStored) throw SongNotStoredException();
+    if (song.isInstalled) return;
+    await MusicDownloader.download(song, storeToJson: false);
+  }
+
+  static Future<void> download(MusicData song,
+      {bool storeToJSON = true}) async {
+    await MusicDownloader.download(song, storeToJson: storeToJSON);
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  static Future<void> uninstall(String audioId) async {
+    if (!isStored(audioId: audioId)) throw SongNotStoredException();
+    final dir = Directory(MusicData.getDirectoryPath(audioId));
+    await dir.delete(recursive: true);
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  static Future<void> uninstallSongs(List<String> audioIds) async {
+    final futures = audioIds.map((id) => uninstall(id));
+    await Future.wait(futures);
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  static Future<void> delete(String audioId, {bool saveDataFile = true}) async {
+    deleteFromDataFile() async {
+      musicData.delete(key: audioId);
+      if (saveDataFile) await saveData();
     }
+
+    await Future.wait([uninstall(audioId), deleteFromDataFile()]);
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  static Future<void> deleteSongs(List<String> audioIds) async {
+    final futures = audioIds.map((id) => delete(id, saveDataFile: false));
+    await Future.wait(futures);
+    await saveData();
   }
 
   static List<MusicData> getAll({bool isTemporary = false}) {
@@ -71,57 +123,31 @@ class LocalMusicsData {
     final data = musicData.getValue(audioId) as Map<String, dynamic>;
     return MusicData.fromJson(json: data, key: key, isTemporary: isTemporary);
   }
-
-  static bool isStored({MusicData? song, String? audioId}) {
-    assert(song != null || audioId != null);
-    return musicData.has(song?.audioId ?? audioId!);
-  }
-
-  static bool isInstalled({MusicData? song, String? audioId}) {
-    assert(song != null || audioId != null);
-    return Directory(MusicData.getDirectoryPath(song?.audioId ?? audioId!))
-        .existsSync();
-  }
-
-  static Future<void> removeFromLocal(MusicData song) async {
-    if (!song.isStored) return;
-    final file = File(song.audioSavePath);
-    imageDelete() async {
-      String url = song.imageSavePath;
-      if (!url.isUrl) {
-        final file = File(url);
-        if (file.existsSync()) await file.delete();
-      }
-    }
-
-    musicData.delete(key: song.audioId);
-    final futures = [file.delete(), imageDelete(), saveData()];
-    await Future.wait(futures);
-  }
-
-  static Future<void> removeAllFromLocal(List<MusicData> songs) async {
-    final futures = songs.map((e) => removeFromLocal(e));
-    await Future.wait(futures);
-  }
 }
 
 extension LocalMusicsDataExtension on MusicData {
   /// Throws [NetworkException] if the network is not accessible.
   Future<void> download({bool storeToJSON = true}) async {
-    if (isStored) return;
-    await MusicDownloader.download(this, storeToJson: storeToJSON);
+    await LocalMusicsData.download(this, storeToJSON: storeToJSON);
   }
 
   Future<void> store() async {
-    if (isStored) return;
     await LocalMusicsData.store(this);
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.
   Future<void> install() async {
-    if (!isStored) throw SongNotStoredException();
-    if (isInstalled) return;
-    await MusicDownloader.download(this, storeToJson: false);
+    await LocalMusicsData.install(this);
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  Future<void> unistall() async {
+    await LocalMusicsData.uninstall(audioId);
+  }
+
+  /// Throws [SongNotStoredException] if the song is not stored.
+  Future<void> delete() async {
+    await LocalMusicsData.delete(audioId);
   }
 
   bool get isStored => LocalMusicsData.isStored(song: this);

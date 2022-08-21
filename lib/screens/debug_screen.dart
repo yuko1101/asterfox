@@ -87,9 +87,10 @@ class DebugMainScreen extends StatelessWidget {
                               child: const Text("OK"),
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                LocalMusicsData.removeAllFromLocal(
-                                    LocalMusicsData.getAll(isTemporary: true));
-                                LocalMusicsData.saveData();
+                                LocalMusicsData.deleteSongs(
+                                    LocalMusicsData.getAll(isTemporary: true)
+                                        .map((e) => e.audioId)
+                                        .toList());
                               },
                             ),
                           ],

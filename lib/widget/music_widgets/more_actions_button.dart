@@ -72,16 +72,14 @@ class MoreActionsButton extends StatelessWidget {
                 child: Text(Language.getText("delete")),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  LocalMusicsData.removeFromLocal(
-                      musicManager.audioDataManager.currentSong!);
+                  musicManager.audioDataManager.currentSong!.delete();
                 },
               ),
             ],
           ),
         );
       },
-      songFilter: (MusicData? song) =>
-          song != null && LocalMusicsData.isStored(song: song),
+      songFilter: (MusicData? song) => song != null && song.isStored,
     ),
     _Action(
       id: "refresh_all",

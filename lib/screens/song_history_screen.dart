@@ -104,6 +104,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                   onTap: () async {
                     final key = const Uuid().v4();
                     final musicData = song.renew(key: key, isTemporary: false);
+                    debugPrint(musicData.toJson().toString());
                     HomeScreenMusicManager.addSong(
                         key: key, musicData: musicData);
                     EasyApp.popPage(context);

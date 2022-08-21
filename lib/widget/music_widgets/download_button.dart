@@ -67,7 +67,10 @@ class DownloadButton extends StatelessWidget {
             }
             if (song != null && song.isInstalled) {
               return const IconButton(
-                  onPressed: null, icon: Icon(Icons.file_download_done));
+                // TODO: uninstall, delete
+                onPressed: null,
+                icon: Icon(Icons.file_download_done),
+              );
             }
             return const IconButton(
                 onPressed: null, icon: Icon(Icons.file_download));
