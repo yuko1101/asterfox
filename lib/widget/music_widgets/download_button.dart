@@ -32,7 +32,7 @@ class DownloadButton extends StatelessWidget {
                 audioSourceIndex != -1 ? songs[audioSourceIndex] : null;
             final isDownloaded = song != null &&
                 audioSource != null &&
-                LocalMusicsData.isStored(audioId: song.audioId) &&
+                LocalMusicsData.isInstalled(audioId: song.audioId) &&
                 (audioSource.tag["url"] as String).isUrl;
 
             if (isDownloading) {
