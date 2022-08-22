@@ -28,7 +28,7 @@ class MusicUrlUtils {
     if (mediaUrl.isYouTubeUrl) {
       return await YouTubeMusicUtils.getYouTubeAudio(
         videoId: VideoId(mediaUrl).value,
-        key: const Uuid().v4(),
+        key: key,
         isTemporary: isTemporary,
       );
     }

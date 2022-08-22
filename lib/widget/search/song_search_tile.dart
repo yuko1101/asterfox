@@ -44,11 +44,9 @@ class SongSearchTile extends StatelessWidget {
           setQuery(suggestion.word!);
         } else if (suggestion.tags.contains(SongTag.youtube)) {
           close();
-          MusicData? musicData = suggestion.musicData
-              ?.renew(key: const Uuid().v4(), isTemporary: false);
-          HomeScreenMusicManager.addSong(
+          await HomeScreenMusicManager.addSong(
             key: const Uuid().v4(),
-            musicData: musicData,
+            musicData: suggestion.musicData,
             mediaUrl: suggestion.mediaUrl,
           );
         }

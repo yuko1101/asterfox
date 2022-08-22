@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/music/utils/muisc_url_utils.dart';
 import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:easy_app/utils/languages.dart';
@@ -26,6 +27,7 @@ class HomeScreenMusicManager {
     String? mediaUrl,
   }) async {
     assert(youtubeId != null || musicData != null || mediaUrl != null);
+    if (musicData != null) assert(musicData.isTemporary == true);
 
     // the auto downloader works only for remote music
     final bool autoDownloadEnabled =
@@ -107,7 +109,7 @@ class HomeScreenMusicManager {
               }
             }
           } else {
-            song = musicData;
+            song = musicData.renew(key: key, isTemporary: false);
           }
 
           if (autoDownloadEnabled) {
