@@ -93,6 +93,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             tiles: [
               SettingsTile(
                 title: Text(Language.getText("logout")),
+                description: Text(FirebaseAuth.instance.currentUser!.email ??
+                    FirebaseAuth.instance.currentUser!.displayName!),
                 leading: const Icon(Icons.logout),
                 onPressed: (context) {
                   GoogleSignInWidget.googleSignIn.disconnect();
