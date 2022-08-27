@@ -173,6 +173,7 @@ class YouTubeMusicUtils {
       key: key,
       lyrics: "", // TODO: by default, get from closed captions
       songStoredAt: null,
+      size: null,
       isTemporary: isTemporary,
     );
   }

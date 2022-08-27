@@ -38,6 +38,15 @@ class MusicDownloader {
           await song.getAvailableAudioUrl(), song.audioSavePath, song.key);
     }
 
+    // save file size
+    song.size = File(song.audioSavePath).lengthSync();
+    // if the song has already stored, update file size property and save.
+    if (song.isStored) {
+      LocalMusicsData.musicData
+          .get([song.audioId]).set(key: "size", value: song.size);
+      await LocalMusicsData.saveData();
+    }
+
     await _saveImage(song);
 
     if (storeToJson) await LocalMusicsData.store(song);

@@ -20,6 +20,7 @@ abstract class MusicData {
     required this.volume,
     required this.lyrics,
     required this.songStoredAt,
+    required this.size,
     required this.key,
     this.isTemporary = false,
   }) {
@@ -38,6 +39,7 @@ abstract class MusicData {
   double volume; // can be changed on volume change.
   String lyrics;
   int? songStoredAt;
+  int? size; // file size in Bytes
   final String key;
   String remoteAudioUrl;
   String remoteImageUrl;
@@ -74,18 +76,19 @@ abstract class MusicData {
 
   Map<String, dynamic> toJson() {
     final json = {
-      'type': type.name,
-      'remoteAudioUrl': remoteAudioUrl,
-      'remoteImageUrl': remoteImageUrl,
-      'title': title,
-      'description': description,
-      'author': author,
-      'audioId': audioId,
-      'duration': duration.inMilliseconds,
-      'keywords': keywords,
-      'volume': volume,
-      'lyrics': lyrics,
-      'songStoredAt': songStoredAt,
+      "type": type.name,
+      "remoteAudioUrl": remoteAudioUrl,
+      "remoteImageUrl": remoteImageUrl,
+      "title": title,
+      "description": description,
+      "author": author,
+      "audioId": audioId,
+      "duration": duration.inMilliseconds,
+      "keywords": keywords,
+      "volume": volume,
+      "lyrics": lyrics,
+      "songStoredAt": songStoredAt,
+      "size": size,
     };
     jsonExtras.forEach((key, value) {
       json[key] = value;
@@ -101,7 +104,7 @@ abstract class MusicData {
     bool isTemporary = false,
   }) {
     final type = MusicType.values
-        .firstWhere((musicType) => musicType.name == json['type'] as String);
+        .firstWhere((musicType) => musicType.name == json["type"] as String);
     switch (type) {
       case MusicType.youtube:
         return YouTubeMusicData.fromJson(
@@ -119,17 +122,17 @@ abstract class MusicData {
       //   return MusicData(
       //     key: key,
       //     type: type,
-      //     remoteAudioUrl: json['remoteAudioUrl'] as String,
-      //     remoteImageUrl: json['remoteImageUrl'] as String,
-      //     title: json['title'] as String,
-      //     description: json['description'] as String,
-      //     author: json['author'] as String,
-      //     audioId: json['audioId'] as String,
-      //     duration: Duration(milliseconds: json['duration'] as int),
+      //     remoteAudioUrl: json["remoteAudioUrl"] as String,
+      //     remoteImageUrl: json["remoteImageUrl"] as String,
+      //     title: json["title"] as String,
+      //     description: json["description"] as String,
+      //     author: json["author"] as String,
+      //     audioId: json["audioId"] as String,
+      //     duration: Duration(milliseconds: json["duration"] as int),
       //     isDataStored: isLocal,
-      //     keywords: (json['keywords'] as List).map((e) => e as String).toList(),
-      //     volume: json['volume'] as double,
-      //     lyrics: json['lyrics'] as String,
+      //     keywords: (json["keywords"] as List).map((e) => e as String).toList(),
+      //     volume: json["volume"] as double,
+      //     lyrics: json["lyrics"] as String,
       //     isTemporary: isTemporary,
       //   );
     }

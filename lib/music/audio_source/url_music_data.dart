@@ -14,6 +14,7 @@ class UrlMusicData extends MusicData {
     required double volume,
     required String lyrics,
     required int? songStoredAt,
+    required int? size,
     required String key,
     bool isTemporary = false,
   }) : super(
@@ -29,6 +30,7 @@ class UrlMusicData extends MusicData {
           volume: volume,
           lyrics: lyrics,
           songStoredAt: songStoredAt,
+          size: size,
           key: key,
           isTemporary: isTemporary,
         );
@@ -50,6 +52,7 @@ class UrlMusicData extends MusicData {
       volume: json["volume"] as double,
       lyrics: json["lyrics"] as String,
       songStoredAt: json["songStoredAt"] as int?,
+      size: json["size"] as int?,
       isTemporary: isTemporary,
     );
   }
