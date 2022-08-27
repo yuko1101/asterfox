@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'youtube_music_data.dart';
 import '../../data/local_musics_data.dart';
 
-class MusicData {
+abstract class MusicData {
   MusicData({
     required this.type,
     required this.remoteAudioUrl,
@@ -19,6 +19,7 @@ class MusicData {
     required this.duration,
     required this.volume,
     required this.lyrics,
+    required this.songStoredAt,
     required this.key,
     this.isTemporary = false,
   }) {
@@ -35,11 +36,11 @@ class MusicData {
   final String audioId;
   Duration duration; // can be changed on clip-cut.
   double volume; // can be changed on volume change.
+  String lyrics;
+  int? songStoredAt;
   final String key;
   String remoteAudioUrl;
   String remoteImageUrl;
-
-  String lyrics;
 
   final bool isTemporary;
 
@@ -84,6 +85,7 @@ class MusicData {
       'keywords': keywords,
       'volume': volume,
       'lyrics': lyrics,
+      'songStoredAt': songStoredAt,
     };
     jsonExtras.forEach((key, value) {
       json[key] = value;

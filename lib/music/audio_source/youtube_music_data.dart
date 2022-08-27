@@ -21,6 +21,7 @@ class YouTubeMusicData extends MusicData {
     required Duration duration,
     required double volume,
     required String lyrics,
+    required int? songStoredAt,
     required String key,
     bool isTemporary = false,
   }) : super(
@@ -35,6 +36,7 @@ class YouTubeMusicData extends MusicData {
           duration: duration,
           volume: volume,
           lyrics: lyrics,
+          songStoredAt: songStoredAt,
           key: key,
           isTemporary: isTemporary,
         );
@@ -102,17 +104,18 @@ class YouTubeMusicData extends MusicData {
   }) {
     return YouTubeMusicData(
       key: key,
-      id: json['id'] as String,
-      remoteUrl: json['remoteAudioUrl'] as String,
-      remoteImageUrl: json['remoteImageUrl'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      author: json['author'] as String,
-      authorId: json['authorId'] as String,
-      duration: Duration(milliseconds: json['duration'] as int),
-      keywords: (json['keywords'] as List).map((e) => e as String).toList(),
-      volume: json['volume'] as double,
-      lyrics: json['lyrics'] as String,
+      id: json["id"] as String,
+      remoteUrl: json["remoteAudioUrl"] as String,
+      remoteImageUrl: json["remoteImageUrl"] as String,
+      title: json["title"] as String,
+      description: json["description"] as String,
+      author: json["author"] as String,
+      authorId: json["authorId"] as String,
+      duration: Duration(milliseconds: json["duration"] as int),
+      keywords: (json["keywords"] as List).map((e) => e as String).toList(),
+      volume: json["volume"] as double,
+      lyrics: json["lyrics"] as String,
+      songStoredAt: json["songStoredAt"] as int?,
       isTemporary: isTemporary,
     );
   }

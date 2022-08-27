@@ -48,6 +48,7 @@ class LocalMusicsData {
 
   static Future<void> store(MusicData song) async {
     if (song.isStored) return;
+    song.songStoredAt = DateTime.now().millisecondsSinceEpoch;
     musicData.set(key: song.audioId, value: song.toJson());
     await saveData();
   }

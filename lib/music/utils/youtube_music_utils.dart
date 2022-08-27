@@ -146,6 +146,7 @@ class YouTubeMusicUtils {
     return Pair(loadedVideos, unloadedVideos);
   }
 
+  // even if the song is stored, this fetches it from remote.
   static Future<YouTubeMusicData> getFromVideo({
     required Video video,
     required StreamManifest manifest,
@@ -171,6 +172,7 @@ class YouTubeMusicUtils {
       remoteImageUrl: imageUrl,
       key: key,
       lyrics: "", // TODO: by default, get from closed captions
+      songStoredAt: null,
       isTemporary: isTemporary,
     );
   }
