@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:asterfox/screens/home_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
+import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
 
 import '../data/local_musics_data.dart';
@@ -41,35 +44,6 @@ class DebugMainScreen extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  IconButton(
-                    icon: Theme.of(context).brightness == Brightness.dark
-                        ? const Icon(Icons.dark_mode)
-                        : const Icon(Icons.light_mode),
-                    onPressed: () {
-                      if (AppTheme.themeNotifier.value != "dark") {
-                        AppTheme.setTheme("dark");
-                      } else {
-                        AppTheme.setTheme("light");
-                        // showSearch(context: context, delegate: delegate);
-                      }
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.skip_previous),
-                    onPressed: musicManager.previous,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.play_arrow),
-                    onPressed: musicManager.play,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.pause),
-                    onPressed: musicManager.pause,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.skip_next),
-                    onPressed: musicManager.next,
-                  ),
                   IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
@@ -116,7 +90,112 @@ class DebugMainScreen extends StatelessWidget {
                       final data = await CloudFirestoreManager.getUserData();
                       print(data);
                     },
-                  )
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.download),
+                    onPressed: () {
+                      final songsToInstall =
+                          LocalMusicsData.getAll(isTemporary: true)
+                              .where((song) => !song.isInstalled);
+                      int sizeInBytes = 0;
+                      bool isAccurate = true;
+                      for (final song in songsToInstall) {
+                        if (song.size == null) {
+                          isAccurate = false;
+                        } else {
+                          sizeInBytes += song.size!;
+                        }
+                      }
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("全曲インストール"),
+                          content: Text(
+                              "ダウンロードに必要な容量: ${isAccurate ? "" : "最低"}${formatBytes(sizeInBytes, 1)} (${songsToInstall.length}曲)"),
+                          actions: [
+                            TextButton(
+                              child: const Text("キャンセル"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: const Text("ダウンロード"),
+                              onPressed: () {
+                                final ValueNotifier<int> downloaded =
+                                    ValueNotifier(0);
+                                final futures = songsToInstall
+                                    .map((song) => () async {
+                                          await song.install();
+                                          downloaded.value =
+                                              downloaded.value + 1;
+                                        }())
+                                    .toList();
+                                HomeScreen.homeNotification.pushNotification(
+                                  NotificationData(
+                                    child: ValueListenableBuilder(
+                                      valueListenable: downloaded,
+                                      builder: (_, count, __) => Text(
+                                        "インストール中: $count/${futures.length}",
+                                      ),
+                                    ),
+                                    progress: () => Future.wait(futures),
+                                  ),
+                                );
+                                Navigator.pop(context);
+                                EasyApp.pushPage(context, HomeScreen());
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.clear_all),
+                    onPressed: () {
+                      final songsToUninstall =
+                          LocalMusicsData.getAll(isTemporary: true)
+                              .where((song) => song.isInstalled);
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("インストール済みの曲の全削除"),
+                          content: Text("${songsToUninstall.length}曲を削除します"),
+                          actions: [
+                            TextButton(
+                              child: const Text("キャンセル"),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: const Text("削除"),
+                              onPressed: () {
+                                final ValueNotifier<int> deleted =
+                                    ValueNotifier(0);
+                                final futures = songsToUninstall
+                                    .map((song) => () async {
+                                          await song.unistall();
+                                          deleted.value = deleted.value + 1;
+                                        }())
+                                    .toList();
+                                HomeScreen.homeNotification.pushNotification(
+                                  NotificationData(
+                                    child: ValueListenableBuilder(
+                                      valueListenable: deleted,
+                                      builder: (_, count, __) => Text(
+                                        "アンインストール中: $count/${futures.length}",
+                                      ),
+                                    ),
+                                    progress: () => Future.wait(futures),
+                                  ),
+                                );
+                                Navigator.pop(context);
+                                EasyApp.pushPage(context, HomeScreen());
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -209,6 +288,15 @@ class DebugMainScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static String formatBytes(int bytes, int decimals) {
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    var i = (log(bytes) / log(1024)).floor();
+    return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) +
+        ' ' +
+        suffixes[i];
   }
 }
 
