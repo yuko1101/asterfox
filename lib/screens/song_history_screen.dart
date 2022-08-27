@@ -2,12 +2,9 @@ import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/song_history_data.dart';
-import '../system/exceptions/network_exception.dart';
-import '../system/exceptions/refresh_url_failed_exception.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 

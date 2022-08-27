@@ -1,9 +1,5 @@
-import 'dart:convert';
-
-import 'package:asterfox/music/audio_source/url_music_data.dart';
 import 'package:asterfox/music/utils/youtube_music_utils.dart';
 import 'package:asterfox/system/exceptions/invalid_type_of_media_url_exception.dart';
-import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../audio_source/music_data.dart';

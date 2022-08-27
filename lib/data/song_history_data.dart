@@ -6,11 +6,6 @@ import 'package:uuid/uuid.dart';
 
 import '../music/audio_source/music_data.dart';
 import '../music/manager/music_manager.dart';
-import '../system/exceptions/local_song_not_found_exception.dart';
-import '../system/exceptions/network_exception.dart';
-import '../system/exceptions/refresh_url_failed_exception.dart';
-import '../utils/network_check.dart';
-import 'local_musics_data.dart';
 
 class SongHistoryData {
   static late ConfigFile historyData;

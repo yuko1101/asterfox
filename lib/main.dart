@@ -6,7 +6,6 @@ import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/os.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
