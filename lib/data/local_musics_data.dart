@@ -105,12 +105,17 @@ class LocalMusicsData {
         .toList();
   }
 
-  static List<String> getYouTubeIds() {
-    final data = musicData.getValue(null) as Map<String, dynamic>;
-    return data.values
-        .where((element) => element["type"] == MusicType.youtube.name)
-        .map((e) => e["id"] as String)
-        .toList();
+  // static List<String> getYouTubeIds() {
+  //   final data = musicData.getValue(null) as Map<String, dynamic>;
+  //   return data.values
+  //       .where((element) => element["type"] == MusicType.youtube.name)
+  //       .map((e) => e["id"] as String)
+  //       .toList();
+  // }
+
+  static List<String> getStoredAudioIds() {
+    final songs = musicData.getValue() as Map<String, dynamic>;
+    return songs.keys.toList();
   }
 
   static MusicData getByAudioId({

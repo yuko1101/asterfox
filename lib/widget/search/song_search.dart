@@ -121,20 +121,24 @@ class SongSearch extends SearchDelegate<String> {
 
   void loadSuggestions(String text, {int? time}) async {
     final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
-    final List<String> localIds = LocalMusicsData.getYouTubeIds();
 
-    final videoSuggestions = videos
-        .map((e) => SongSuggestion(
-              tags: [
-                SongTag.youtube,
-                localIds.contains(e.id.value) ? SongTag.local : SongTag.remote
-              ],
-              title: e.title,
-              subtitle: e.author,
-              mediaUrl: e.url,
-              keywords: e.keywords,
-            ))
-        .toList();
+    final videoSuggestions = videos.map((e) {
+      final List<SongTag> tags = [SongTag.youtube];
+      if (LocalMusicsData.isStored(audioId: e.id.value)) {
+        tags.add(SongTag.stored);
+        if (LocalMusicsData.isInstalled(audioId: e.id.value)) {
+          tags.add(SongTag.installed);
+        }
+      }
+
+      return SongSuggestion(
+        tags: tags,
+        title: e.title,
+        subtitle: e.author,
+        mediaUrl: e.url,
+        keywords: e.keywords,
+      );
+    }).toList();
 
     final List<String> words = await YouTubeMusicUtils.searchWords(text);
     final wordsSuggestions = words
@@ -162,9 +166,11 @@ class SongSearch extends SearchDelegate<String> {
     print("loading offline songs");
     final List<SongSuggestion> list = [];
 
-    final List<MusicData> locals = LocalMusicsData.getAll(isTemporary: true);
-    list.addAll(locals.map((e) {
-      final List<SongTag> tags = [SongTag.local];
+    final List<MusicData> storedSongs =
+        LocalMusicsData.getAll(isTemporary: true);
+    list.addAll(storedSongs.map((e) {
+      final List<SongTag> tags = [SongTag.stored];
+      if (e.isInstalled) tags.add(SongTag.installed);
       if (e is YouTubeMusicData) tags.add(SongTag.youtube);
       return SongSuggestion(
         tags: tags,
@@ -214,4 +220,4 @@ class SongSuggestion {
   final String? lyrics;
 }
 
-enum SongTag { local, remote, youtube, word }
+enum SongTag { installed, stored, youtube, word }

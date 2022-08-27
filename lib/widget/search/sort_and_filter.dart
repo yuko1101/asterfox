@@ -26,11 +26,11 @@ class YouTubeFilter extends FilterSorting {
   }
 }
 
-class LocalFilter extends FilterSorting {
+class StoredFliter extends FilterSorting {
   @override
   List<SongSuggestion> apply(List<SongSuggestion> list) {
     return list
-        .where((suggestion) => suggestion.tags.contains(SongTag.local))
+        .where((suggestion) => suggestion.tags.contains(SongTag.stored))
         .toList();
   }
 }

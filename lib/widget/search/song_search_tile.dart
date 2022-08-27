@@ -24,12 +24,12 @@ class SongSearchTile extends StatelessWidget {
     // TODO: custom colored icons
     if (suggestion.tags.contains(SongTag.word)) {
       icon = const Icon(Icons.tag, color: Colors.grey);
-    } else if (suggestion.tags.contains(SongTag.local)) {
+    } else if (suggestion.tags.contains(SongTag.installed)) {
       icon = const Icon(Icons.offline_pin_outlined, color: Colors.green);
-    } else if (suggestion.tags.contains(SongTag.remote)) {
-      icon = const Icon(Icons.library_music_outlined, color: Colors.blue);
+    } else if (suggestion.tags.contains(SongTag.stored)) {
+      icon = const Icon(Icons.star_outline, color: Colors.orange);
     } else {
-      icon = const Icon(Icons.question_mark);
+      icon = const Icon(Icons.library_music_outlined, color: Colors.blue);
     }
     return InkWell(
       onTap: () async {
