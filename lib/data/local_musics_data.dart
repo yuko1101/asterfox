@@ -96,7 +96,7 @@ class LocalMusicsData {
   }
 
   static List<MusicData> getAll({bool isTemporary = false}) {
-    final data = musicData.getValue(null) as Map<String, dynamic>;
+    final data = Map<String, dynamic>.from(musicData.getValue());
     return data.values
         .map((e) => MusicData.fromJson(
               json: e,

@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'youtube_music_data.dart';
 import '../../data/local_musics_data.dart';
 
-abstract class MusicData {
+class MusicData {
   MusicData({
     required this.type,
     required this.remoteAudioUrl,
