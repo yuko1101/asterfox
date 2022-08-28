@@ -60,8 +60,9 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             tiles: [
               SettingsTile.navigation(
                 title: Text(Language.getText("theme")),
-                description: Text(AppTheme.themes.keys
-                    .map((theme) => Language.getText("theme_$theme"))
+                description: Text(AppTheme.themes
+                    .map((theme) => theme.themeDetails.name)
+                    .map((name) => Language.getText("theme_$name"))
                     .join(Language.getText("list_separator"))),
                 onPressed: (context) {
                   EasyApp.pushPage(context, const ThemeSettingsScreen());
@@ -77,12 +78,12 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 title: Text(Language.getText("auto_download")),
                 description:
                     Text(Language.getText("auto_download_description")),
-                initialValue: SettingsData.getValue(key: "auto_download"),
+                initialValue: SettingsData.getValue(key: "autoDownload"),
                 activeSwitchColor: CustomColors.getColor("accent"),
                 onToggle: (value) {
                   setState(() {
                     SettingsData.settings
-                        .set(key: "auto_download", value: value);
+                        .set(key: "autoDownload", value: value);
                     SettingsData.save();
                   });
                 },

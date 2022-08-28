@@ -16,8 +16,8 @@ class SettingsData {
   static late ConfigFile settings;
   static const Map<String, dynamic> defaultData = {
     "theme": "dark",
-    "repeat_mode": "none",
-    "auto_download": false,
+    "repeatMode": "none",
+    "autoDownload": false,
     "volume": 1.0,
   };
   static Future<void> init() async {
@@ -39,8 +39,10 @@ class SettingsData {
   }
 
   static Future<void> applySettings() async {
-    if (AppTheme.themeNotifier.value != getValue(key: "theme") as String) {
-      AppTheme.themeNotifier.value = getValue(key: "theme") as String;
+    if (AppTheme.themeNotifier.value.themeDetails.name !=
+        getValue(key: "theme") as String) {
+      AppTheme.themeNotifier.value =
+          AppTheme.getTheme(getValue(key: "theme") as String);
     }
   }
 
@@ -50,7 +52,7 @@ class SettingsData {
       musicManager.repeatModeNotifier.addListener(() {
         print("repeatModeNotifier.addListener");
         settings.set(
-          key: "repeat_mode",
+          key: "repeatMode",
           value: repeatStateToString(musicManager.audioDataManager.repeatState),
         );
         save();
@@ -58,9 +60,9 @@ class SettingsData {
       _initializedRepeatListener = true;
     }
     if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
-        getValue(key: "repeat_mode") as String) {
+        getValue(key: "repeatMode") as String) {
       musicManager.setRepeatMode(
-          repeatStateFromString(getValue(key: "repeat_mode") as String));
+          repeatStateFromString(getValue(key: "repeatMode") as String));
     }
     musicManager.baseVolumeNotifier.value = getValue(key: "volume");
     await musicManager.updateVolume();

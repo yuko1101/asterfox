@@ -31,7 +31,7 @@ class HomeScreenMusicManager {
 
     // the auto downloader works only for remote music
     final bool autoDownloadEnabled =
-        SettingsData.getValue(key: "auto_download") &&
+        SettingsData.getValue(key: "autoDownload") &&
             (!LocalMusicsData.isInstalled(
                 audioId: youtubeId ??
                     (mediaUrl != null
@@ -137,8 +137,7 @@ class HomeScreenMusicManager {
     assert(count > 0);
     assert(musicDataList != null || youtubePlaylist != null);
 
-    final bool autoDownloadEnabled =
-        SettingsData.getValue(key: "auto_download");
+    final bool autoDownloadEnabled = SettingsData.getValue(key: "autoDownload");
 
     final completer = Completer();
 
