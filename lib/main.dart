@@ -85,11 +85,11 @@ class AsterfoxApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      builder: (context, value, child) {
+    return ValueListenableBuilder<ThemeData>(
+      builder: (context, theme, child) {
         return MaterialApp(
           title: 'Asterfox',
-          theme: AppTheme.themes[value],
+          theme: theme,
           home: const AsterfoxScreen(),
           debugShowCheckedModeBanner: false,
         );

@@ -54,11 +54,12 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
       sections: [
         SettingsSection(
           title: Text(Language.getText("theme")),
-          tiles: AppTheme.themes.keys
-              .map((key) => RadioListTile(
-                  title: Text(Language.getText("theme_$key")),
-                  value: key,
-                  groupValue: AppTheme.themeNotifier.value,
+          tiles: AppTheme.themes
+              .map((theme) => theme.themeDetails.name)
+              .map((name) => RadioListTile(
+                  title: Text(Language.getText("theme_$name")),
+                  value: name,
+                  groupValue: AppTheme.themeNotifier.value.themeDetails.name,
                   activeColor:
                       Color(CustomColors.data.getValue("accent") as int),
                   onChanged: (value) {
