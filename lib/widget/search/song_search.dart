@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:asterfox/data/custom_colors.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,23 @@ class SongSearch extends SearchDelegate<String> {
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
+      ValueListenableBuilder<bool>(
+        valueListenable: loading,
+        builder: (_, isLoading, __) => Visibility(
+          visible: isLoading,
+          child: Container(
+            height: 25,
+            width: 25,
+            margin: const EdgeInsets.only(right: 10),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: CircularProgressIndicator(
+                color: CustomColors.getColor("accent"),
+              ),
+            ),
+          ),
+        ),
+      ),
       IconButton(
         icon: const Icon(Icons.clear),
         color: Theme.of(context).textTheme.bodyText1?.color,
@@ -64,13 +82,14 @@ class SongSearch extends SearchDelegate<String> {
     search(context, query);
   }
 
-  ValueNotifier<List<SongSuggestion>> suggestions =
+  final ValueNotifier<List<SongSuggestion>> suggestions =
       ValueNotifier<List<SongSuggestion>>([]);
 
   String? lastQuery;
 
   Timer? timer;
   int searchedAt = 0;
+  final ValueNotifier<bool> loading = ValueNotifier(false);
 
   @override
   Widget buildSuggestions(BuildContext context) {
@@ -120,7 +139,13 @@ class SongSearch extends SearchDelegate<String> {
   }
 
   void loadSuggestions(String text, {int? time}) async {
-    final List<Video> videos = await YouTubeMusicUtils.searchYouTubeVideo(text);
+    loading.value = true;
+    final fetched = await Future.wait([
+      YouTubeMusicUtils.searchYouTubeVideo(text),
+      YouTubeMusicUtils.searchWords(text),
+    ]);
+    final List<Video> videos = fetched[0].map((e) => e as Video).toList();
+    final List<String> words = fetched[1].map((e) => e as String).toList();
 
     final videoSuggestions = videos.map((e) {
       final List<SongTag> tags = [SongTag.youtube];
@@ -140,7 +165,6 @@ class SongSearch extends SearchDelegate<String> {
       );
     }).toList();
 
-    final List<String> words = await YouTubeMusicUtils.searchWords(text);
     final wordsSuggestions = words
         .map((e) => SongSuggestion(
             tags: [SongTag.word], title: e, word: e, keywords: []))
@@ -159,10 +183,12 @@ class SongSearch extends SearchDelegate<String> {
 
     if (time == null || (time >= searchedAt)) {
       suggestions.value = result;
+      loading.value = false;
     }
   }
 
   void loadOfflineSongs(String text) async {
+    loading.value = true;
     print("loading offline songs");
     final List<SongSuggestion> list = [];
 
@@ -187,6 +213,7 @@ class SongSearch extends SearchDelegate<String> {
       filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
     );
     suggestions.value = result;
+    loading.value = false;
   }
 
   void setQuery(newQuery) => query = newQuery;
