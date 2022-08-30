@@ -9,7 +9,7 @@ import 'theme_options.dart';
 
 class AppTheme {
   static ValueNotifier<ThemeData> themeNotifier =
-      ValueNotifier<ThemeData>(themes[0]);
+      ValueNotifier<ThemeData>(themes[1]);
 
   static List<ThemeData> themes = [
     // light
