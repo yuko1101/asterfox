@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:asterfox/data/temporary_data.dart';
+import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
@@ -27,10 +27,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyApp.initializePath();
 
-  // run this before initializing the music manager
   await SettingsData.init();
 
-  await TemporaryData.init();
+  await DeviceSettingsData.init();
 
   // Firebase set-up
   await Firebase.initializeApp(
@@ -44,9 +43,12 @@ Future<void> main() async {
   musicManager = MusicManager(true);
   await musicManager.init();
 
+  // run this after initializing the music manager.
+  await DeviceSettingsData.applyMusicManagerSettings();
+
   await LocalMusicsData.init();
 
-  // run this after initializing the music manager, Firebase, LocalMusicsData, and SettingsData.
+  // run this after initializing Firebase, LocalMusicsData, and SettingsData.
   await CloudFirestoreManager.init();
 
   await CustomColors.load();

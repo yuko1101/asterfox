@@ -1,24 +1,17 @@
 import 'dart:io';
 
-import 'package:asterfox/data/temporary_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../main.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../system/theme/theme.dart';
-import '../widget/music_widgets/repeat_button.dart';
 
-// TODO: move `repeat_mode` and `volume` into TemporaryData
 class SettingsData {
   static late ConfigFile settings;
   static const Map<String, dynamic> defaultData = {
     "theme": "dark",
-    "repeatMode": "none",
     "autoDownload": false,
-    "volume": 1.0,
   };
   static Future<void> init() async {
     settings = await ConfigFile(
@@ -40,28 +33,6 @@ class SettingsData {
       AppTheme.themeNotifier.value =
           AppTheme.getTheme(getValue(key: "theme") as String);
     }
-  }
-
-  static bool _initializedRepeatListener = false;
-  static Future<void> applyMusicManagerSettings() async {
-    if (!_initializedRepeatListener) {
-      musicManager.repeatModeNotifier.addListener(() {
-        print("repeatModeNotifier.addListener");
-        settings.set(
-          key: "repeatMode",
-          value: repeatStateToString(musicManager.audioDataManager.repeatState),
-        );
-        save();
-      });
-      _initializedRepeatListener = true;
-    }
-    if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
-        getValue(key: "repeatMode") as String) {
-      musicManager.setRepeatMode(
-          repeatStateFromString(getValue(key: "repeatMode") as String));
-    }
-    musicManager.baseVolumeNotifier.value = getValue(key: "volume");
-    await musicManager.updateVolume();
   }
 
   static dynamic getValue({String? key, List<String>? keys}) {

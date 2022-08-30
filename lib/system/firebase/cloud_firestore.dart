@@ -65,7 +65,6 @@ class CloudFirestoreManager {
       ]);
       await Future.wait([
         SettingsData.applySettings(),
-        SettingsData.applyMusicManagerSettings(),
       ]);
     });
   }
