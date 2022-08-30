@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:asterfox/data/device_settings_data.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../data/settings_data.dart';
 import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
 import '../audio_source/music_data.dart';
@@ -204,8 +204,8 @@ class MusicManager {
 
   Future<void> setBaseVolume(double volume) async {
     baseVolumeNotifier.value = volume;
-    SettingsData.settings.set(key: "volume", value: volume);
-    await SettingsData.save();
+    DeviceSettingsData.data.set(key: "volume", value: volume);
+    await DeviceSettingsData.save();
     print("setBaseVolume: " + volume.toString());
     await updateVolume();
   }
