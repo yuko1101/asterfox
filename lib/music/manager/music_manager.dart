@@ -40,8 +40,8 @@ class MusicManager {
   final hasNextNotifier = ValueNotifier<bool>(false);
   final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
   final shuffleModeNotifier = DataNotifier<bool>(false);
-  final volumeNotifier = ValueNotifier<double>(1.0);
-  final baseVolumeNotifier = ValueNotifier<double>(1.0); // sync fast
+  final volumeNotifier = ValueNotifier<num>(1.0);
+  final baseVolumeNotifier = ValueNotifier<num>(1.0); // sync fast
   final muteNotifier = ValueNotifier<bool>(false); // sync fast
 
   Future<void> init() async {

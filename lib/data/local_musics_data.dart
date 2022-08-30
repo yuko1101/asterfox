@@ -5,6 +5,7 @@ import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:easy_app/utils/network_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
 import '../music/audio_source/music_data.dart';
@@ -25,13 +26,10 @@ class LocalMusicsData {
         await ConfigFile(File("${EasyApp.localPath}/music.json"), {}).load();
   }
 
-  static Future<void> saveData() async {
+  static Future<void> saveData({bool upload = true}) async {
     await musicData.save(compact: _compact);
-    if (NetworkUtils.networkConnected()) {
-      await CloudFirestoreManager.upload();
-    } else {
-      TemporaryData.data.set(key: "offline_changes", value: true);
-      await TemporaryData.save();
+    if (FirebaseAuth.instance.currentUser != null && upload) {
+      await CloudFirestoreManager.update();
     }
   }
 

@@ -13,7 +13,7 @@ final _tween = Tween<double>(begin: 0, end: 1);
 class VolumeWidget extends StatefulWidget {
   VolumeWidget({Key? key}) : super(key: key);
 
-  static IconData getVolumeIcon(double volume, bool mute) {
+  static IconData getVolumeIcon(num volume, bool mute) {
     if (volume == 0 || mute) {
       return Icons.volume_off;
     } else if (volume < 1) {
@@ -83,7 +83,7 @@ class VolumeWidgetState extends State<VolumeWidget>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _progress,
-      builder: (context, _) => DoubleNotifierWidget<double, bool>(
+      builder: (context, _) => DoubleNotifierWidget<num, bool>(
         notifier1: musicManager.baseVolumeNotifier,
         notifier2: musicManager.muteNotifier,
         builder: (context, volume, mute, child) {

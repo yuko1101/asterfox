@@ -85,13 +85,6 @@ class DebugMainScreen extends StatelessWidget {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.data_object),
-                    onPressed: () async {
-                      final data = await CloudFirestoreManager.getUserData();
-                      print(data);
-                    },
-                  ),
-                  IconButton(
                     icon: const Icon(Icons.download),
                     onPressed: () {
                       final songsToInstall =

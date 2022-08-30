@@ -29,7 +29,6 @@ Future<void> main() async {
 
   // run this before initializing the music manager
   await SettingsData.init();
-  SettingsData.applySettings();
 
   await TemporaryData.init();
 
@@ -45,6 +44,11 @@ Future<void> main() async {
   musicManager = MusicManager(true);
   await musicManager.init();
 
+  await LocalMusicsData.init();
+
+  // run this after initializing the music manager, Firebase, LocalMusicsData, and SettingsData.
+  await CloudFirestoreManager.init();
+
   await CustomColors.load();
   await SongHistoryData.init(musicManager);
 
@@ -59,14 +63,6 @@ Future<void> main() async {
     ],
     activateConnectionChecker: true,
   );
-
-  await LocalMusicsData.init();
-
-  // run this after initializing the music manager, EasyApp connection checker, and LocalMusicsData.
-  await SettingsData.applyMusicManagerSettings();
-
-  // run this after Firebase initialization, LocalMusicsData, and SettingsData
-  await CloudFirestoreManager.init();
 
   init();
   runApp(const AsterfoxApp());

@@ -1,7 +1,7 @@
+import 'dart:async';
+
 import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/data/temporary_data.dart';
-import 'package:asterfox/system/exceptions/not_logged_in_exception.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,81 +11,62 @@ class CloudFirestoreManager {
   /// Must run after initializing FirebaseAuth, LocalMusicsData, SettingsData,
   /// and TemporaryData.
   static Future<void> init() async {
-    if (FirebaseAuth.instance.currentUser != null) {
-      if (!TemporaryData.getValue(key: "offline_changes")) {
-        await applyToLocal();
-      } else {
-        await upload();
-        TemporaryData.data.set(key: "offline_changes", value: false);
-        await TemporaryData.save();
-      }
+    FirebaseFirestore.instance.settings =
+        const Settings(persistenceEnabled: true);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _listenDataUpdate();
     }
     FirebaseAuth.instance.authStateChanges().listen((user) async {
-      await applyToLocal(user);
+      if (user == null) return;
+      _listenDataUpdate();
     });
   }
 
-  /// Returns null if Firebase's currentUser is null.
-  static Future<Map<String, dynamic>?> getUserData([User? user]) async {
-    final User? target = user ?? FirebaseAuth.instance.currentUser;
-    if (target == null) {
-      userData = null;
-      return null;
-    }
-
-    final doc = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(target.uid)
-        .get();
-    final data = doc.data();
-
-    if (data == null) {
-      await setUserData({
-        "settings": SettingsData.settings.data,
-        "songs": LocalMusicsData.musicData.data
-      });
-    } else {
-      userData = data;
-    }
-    return data;
-  }
-
-  /// Throws [NotLoggedInException] if Firebase's currentUser is null.
-  static Future<void> setUserData(Map<String, dynamic> data) async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) throw NotLoggedInException();
-
+  static Future<void> update() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final Map<String, dynamic> data = {
+      "songs": LocalMusicsData.musicData.data,
+      "settings": SettingsData.settings.data,
+    };
     await FirebaseFirestore.instance
         .collection("users")
         .doc(user.uid)
         .set(data);
-    userData = data;
   }
 
-  static Future<void> applyToLocal([User? user]) async {
-    print("apply to local");
-    final data = await getUserData(user);
-    if (data == null) return;
+  static StreamSubscription? _streamSubscription;
+  static Future<void> _listenDataUpdate() async {
+    if (_streamSubscription != null) await _streamSubscription!.cancel();
+    final user = FirebaseAuth.instance.currentUser!;
+    final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
 
-    LocalMusicsData.musicData.data = data["songs"];
-    SettingsData.settings.data = data["settings"];
+    final data = await doc.get();
+    if (data.data() == null) {
+      LocalMusicsData.musicData.resetData();
+      SettingsData.settings.resetData();
+      await Future.wait([LocalMusicsData.saveData(), SettingsData.save()]);
+      await update();
+    }
 
-    print(data["settings"]);
-    print(SettingsData.settings.data);
-
-    await Future.wait([
-      LocalMusicsData.musicData.save(),
-      SettingsData.settings.save(),
-      SettingsData.applySettings(),
-      SettingsData.applyMusicManagerSettings(),
-    ]);
-  }
-
-  /// Throws [NotLoggedInException] if Firebase's currentUser is null.
-  static Future<void> upload() async {
-    await setUserData({
-      "settings": SettingsData.settings.data,
-      "songs": LocalMusicsData.musicData.data
+    _streamSubscription = FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .snapshots(includeMetadataChanges: true)
+        .listen((snapshot) async {
+      final data = snapshot.data();
+      print("database update (cache: ${snapshot.metadata.isFromCache})");
+      if (data == null) return;
+      LocalMusicsData.musicData.data = data["songs"];
+      SettingsData.settings.data = data["settings"];
+      await Future.wait([
+        LocalMusicsData.saveData(upload: false),
+        SettingsData.save(upload: false),
+      ]);
+      await Future.wait([
+        SettingsData.applySettings(),
+        SettingsData.applyMusicManagerSettings(),
+      ]);
     });
   }
 }

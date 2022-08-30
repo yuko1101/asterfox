@@ -27,14 +27,10 @@ class SettingsData {
     ).load();
   }
 
-  static Future<void> save() async {
+  static Future<void> save({bool upload = true}) async {
     await settings.save();
-    if (NetworkUtils.networkConnected()) {
-      if (FirebaseAuth.instance.currentUser == null) return;
-      await CloudFirestoreManager.upload();
-    } else {
-      TemporaryData.data.set(key: "offline_changes", value: true);
-      await TemporaryData.save();
+    if (FirebaseAuth.instance.currentUser != null && upload) {
+      await CloudFirestoreManager.update();
     }
   }
 
