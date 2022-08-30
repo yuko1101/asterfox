@@ -12,6 +12,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+// TODO: alert users to connect to the Internet when offline
 class AuthScreen extends StatefulWidget {
   AuthScreen({Key? key}) : super(key: key);
 

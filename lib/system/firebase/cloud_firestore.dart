@@ -11,8 +11,10 @@ class CloudFirestoreManager {
   /// Must run after initializing FirebaseAuth, LocalMusicsData, SettingsData,
   /// and TemporaryData.
   static Future<void> init() async {
-    FirebaseFirestore.instance.settings =
-        const Settings(persistenceEnabled: true);
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _listenDataUpdate();

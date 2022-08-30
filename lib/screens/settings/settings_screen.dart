@@ -2,8 +2,10 @@ import 'package:asterfox/screens/login_screen.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
+import 'package:easy_app/utils/network_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
@@ -98,6 +100,12 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                     FirebaseAuth.instance.currentUser!.displayName!),
                 leading: const Icon(Icons.logout),
                 onPressed: (context) {
+                  if (!NetworkUtils.networkConnected()) {
+                    // TODO: multi-lang
+                    Fluttertoast.showToast(
+                        msg: "You cannot sign out when offline.");
+                    return;
+                  }
                   GoogleSignInWidget.googleSignIn.disconnect();
                   FirebaseAuth.instance.signOut();
                 },
