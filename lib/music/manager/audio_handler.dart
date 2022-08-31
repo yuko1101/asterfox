@@ -153,6 +153,12 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
+  @override
+  Future<void> onNotificationDeleted() async {
+    await _player.stop();
+    return super.onNotificationDeleted();
+  }
+
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
     return AudioSource.uri(
       Uri.parse(mediaItem.extras!['url']),
