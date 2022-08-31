@@ -280,11 +280,19 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> setQueueItems(List<MediaItem> songs) async {
+    final preQueue = [...queue.value]; // make immutable (just in case)
+
     // notify system
     final newQueue = queue.value
       ..clear()
       ..addAll(songs.toSet().toList());
     queue.add(newQueue);
     // print("set to ${queue.valueOrNull?.length ?? 0} songs");
+    final songCount = queue.value.length;
+    if (songCount == 0 && preQueue.isNotEmpty) {
+      // remove music notification
+      await _player.stop();
+      await _player.load();
+    }
   }
 }
