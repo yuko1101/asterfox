@@ -38,16 +38,16 @@ class MusicDownloader {
           await song.getAvailableAudioUrl(), song.audioSavePath, song.key);
     }
 
+    await _saveImage(song);
+
     // save file size
-    song.size = File(song.audioSavePath).lengthSync();
+    song.size = await Directory(song.directoryPath).length;
     // if the song has already stored, update file size property and save.
     if (song.isStored) {
       LocalMusicsData.musicData
           .get([song.audioId]).set(key: "size", value: song.size);
       await LocalMusicsData.saveData();
     }
-
-    await _saveImage(song);
 
     if (storeToJson) await LocalMusicsData.store(song);
 
@@ -144,5 +144,14 @@ class MusicDownloader {
     }
     imageFile.writeAsBytesSync(imageRes.bodyBytes);
     print("Download Complete!");
+  }
+}
+
+extension DirectoryLengthExtension on Directory {
+  Future<int> get length async {
+    final files = listSync();
+    final lengthList =
+        await Future.wait(files.map((file) => File(file.path).length()));
+    return lengthList.reduce((a, b) => a + b);
   }
 }
