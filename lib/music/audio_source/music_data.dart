@@ -64,6 +64,7 @@ class MusicData {
   String get directoryPath => getDirectoryPath(audioId);
   String get audioSavePath => getAudioSavePath(audioId);
   String get imageSavePath => getImageSavePath(audioId);
+  String get installCompleteFilePath => getInstallCompleteFilePath(audioId);
 
   void destroy() {
     _created.remove(this);
@@ -157,6 +158,8 @@ class MusicData {
       "${getDirectoryPath(audioId)}/audio.mp3";
   static String getImageSavePath(String audioId) =>
       "${getDirectoryPath(audioId)}/image.png";
+  static String getInstallCompleteFilePath(String audioId) =>
+      "${getDirectoryPath(audioId)}/installed.txt";
 
   static final List<MusicData> _created = [];
   static List<MusicData> getCreated() {

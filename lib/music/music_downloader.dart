@@ -51,6 +51,9 @@ class MusicDownloader {
 
     if (storeToJson) await LocalMusicsData.store(song);
 
+    // インストールが完了してることが判断できるように空のテキストファイルを生成する
+    File(song.installCompleteFilePath).createSync();
+
     print("finished!");
 
     downloadProgress.remove(song.key);

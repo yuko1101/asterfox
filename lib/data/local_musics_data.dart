@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
@@ -40,8 +38,9 @@ class LocalMusicsData {
 
   static bool isInstalled({MusicData? song, String? audioId}) {
     assert(song != null || audioId != null);
-    return Directory(MusicData.getDirectoryPath(song?.audioId ?? audioId!))
-        .existsSync();
+    final file =
+        File(MusicData.getInstallCompleteFilePath(song?.audioId ?? audioId!));
+    return file.existsSync();
   }
 
   static Future<void> store(MusicData song) async {
