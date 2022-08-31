@@ -217,11 +217,19 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   PlaybackState _transformEvent(PlaybackEvent event) {
     return PlaybackState(
       controls: [
-        MediaControl.skipToPrevious,
+        const MediaControl(
+          androidIcon: "drawable/ic_skip_previous",
+          label: "Previous",
+          action: MediaAction.skipToPrevious,
+        ),
         MediaControl.rewind,
-        if (_player.playing) MediaControl.pause else MediaControl.play,
+        _player.playing ? MediaControl.pause : MediaControl.play,
         MediaControl.fastForward,
-        MediaControl.skipToNext,
+        const MediaControl(
+          action: MediaAction.skipToNext,
+          label: "Next",
+          androidIcon: "drawable/ic_skip_next",
+        ),
       ],
       systemActions: const {
         MediaAction.seek,
