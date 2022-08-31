@@ -51,6 +51,7 @@ class MusicData {
       id: key,
       title: title,
       artist: author,
+      artUri: Uri.parse(isInstalled ? "file://$imageSavePath" : remoteImageUrl),
       duration: duration,
       displayDescription: description,
       extras: {
