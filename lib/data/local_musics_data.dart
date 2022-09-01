@@ -92,7 +92,7 @@ class LocalMusicsData {
     await saveData();
   }
 
-  static List<MusicData> getAll({bool isTemporary = false}) {
+  static List<MusicData> getAll({required bool isTemporary}) {
     final data = Map<String, dynamic>.from(musicData.getValue());
     return data.values
         .map((e) => MusicData.fromJson(
@@ -119,7 +119,7 @@ class LocalMusicsData {
   static MusicData getByAudioId({
     required String audioId,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) {
     if (!musicData.has(audioId)) throw LocalSongNotFoundException(audioId);
     final data = musicData.getValue(audioId) as Map<String, dynamic>;

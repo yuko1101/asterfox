@@ -38,7 +38,7 @@ class SongHistoryData {
     await saveData();
   }
 
-  static List<MusicData> getAll({bool isTemporary = false}) {
+  static List<MusicData> getAll({required bool isTemporary}) {
     final data = historyData.getValue("history") as List<dynamic>;
     return data
         .map((e) => MusicData.fromJson(

@@ -15,7 +15,7 @@ class MusicUrlUtils {
   static Future<MusicData> createMusicDataFromUrl({
     required String mediaUrl,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) async {
     if (!mediaUrl.isUrl) {
       throw ArgumentError.value(

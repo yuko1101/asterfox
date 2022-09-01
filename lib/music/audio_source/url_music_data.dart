@@ -16,7 +16,7 @@ class UrlMusicData extends MusicData {
     required int? songStoredAt,
     required int? size,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) : super(
           type: MusicType.url,
           remoteAudioUrl: remoteAudioUrl,
@@ -38,7 +38,7 @@ class UrlMusicData extends MusicData {
   factory UrlMusicData.fromJson({
     required Map<String, dynamic> json,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) {
     return UrlMusicData(
       key: key,

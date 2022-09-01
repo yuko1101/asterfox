@@ -22,7 +22,7 @@ class MusicData {
     required this.songStoredAt,
     required this.size,
     required this.key,
-    this.isTemporary = false,
+    required this.isTemporary,
   }) {
     print("MusicData created : temp = $isTemporary");
     if (isTemporary) return;
@@ -103,7 +103,7 @@ class MusicData {
   factory MusicData.fromJson({
     required Map<String, dynamic> json,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) {
     final type = MusicType.values
         .firstWhere((musicType) => musicType.name == json["type"] as String);

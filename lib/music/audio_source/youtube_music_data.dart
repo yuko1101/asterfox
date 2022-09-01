@@ -24,7 +24,7 @@ class YouTubeMusicData extends MusicData {
     required int? songStoredAt,
     required int? size,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) : super(
           type: MusicType.youtube,
           remoteAudioUrl: remoteUrl,
@@ -102,7 +102,7 @@ class YouTubeMusicData extends MusicData {
   factory YouTubeMusicData.fromJson({
     required Map<String, dynamic> json,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) {
     return YouTubeMusicData(
       key: key,

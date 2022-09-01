@@ -56,14 +56,16 @@ class YouTubeMusicUtils {
   static Future<YouTubeMusicData> getYouTubeAudio({
     required String videoId,
     required String key,
-    bool isTemporary = false,
+    required isTemporary,
   }) async {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isStored(audioId: videoId);
     if (local) {
       // throws LocalSongNotFoundException
-      return LocalMusicsData.getByAudioId(audioId: videoId, key: key)
-          as YouTubeMusicData;
+      return LocalMusicsData.getByAudioId(
+          audioId: videoId,
+          key: key,
+          isTemporary: isTemporary) as YouTubeMusicData;
     } else {
       // オンライン上から取得
 
@@ -98,7 +100,7 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   static Future<Pair<List<YouTubeMusicData>, List<Video>>> getPlaylist({
     required String playlistId,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) async {
     // インターネット接続確認
     NetworkCheck.check();
@@ -151,7 +153,7 @@ class YouTubeMusicUtils {
     required Video video,
     required StreamManifest manifest,
     required String key,
-    bool isTemporary = false,
+    required bool isTemporary,
   }) async {
     String imageUrl = video.thumbnails.maxResUrl;
     final imageRes = await http.get(Uri.parse(video.thumbnails.maxResUrl));

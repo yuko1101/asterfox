@@ -83,8 +83,11 @@ class HomeScreenMusicManager {
           if (musicData == null) {
             if (youtubeId != null) {
               try {
-                song = (await YouTubeMusicUtils.getYouTubeAudio(
-                    videoId: youtubeId, key: key));
+                song = await YouTubeMusicUtils.getYouTubeAudio(
+                  videoId: youtubeId,
+                  key: key,
+                  isTemporary: false,
+                );
               } on VideoUnplayableException {
                 Fluttertoast.showToast(
                     msg: Language.getText("song_unplayable"));
@@ -96,8 +99,8 @@ class HomeScreenMusicManager {
               }
             } else {
               try {
-                song = (await MusicUrlUtils.createMusicDataFromUrl(
-                    mediaUrl: mediaUrl!, key: key));
+                song = await MusicUrlUtils.createMusicDataFromUrl(
+                    mediaUrl: mediaUrl!, key: key, isTemporary: false);
               } on VideoUnplayableException {
                 Fluttertoast.showToast(
                     msg: Language.getText("song_unplayable"));
@@ -200,7 +203,9 @@ class HomeScreenMusicManager {
           } else {
             try {
               songs = (await YouTubeMusicUtils.getPlaylist(
-                      playlistId: youtubePlaylist!))
+                playlistId: youtubePlaylist!,
+                isTemporary: false,
+              ))
                   .first;
             } on NetworkException {
               Fluttertoast.showToast(
