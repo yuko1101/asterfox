@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:asterfox/utils/async_utils.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/pair.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
@@ -95,57 +97,117 @@ class YouTubeMusicUtils {
     }
   }
 
+  static Map<String, ValueNotifier<int>> playlistLoadingProgress = {};
+
   /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
   ///
   /// Throws [NetworkException] if the network is not accessible.
   static Future<Pair<List<YouTubeMusicData>, List<Video>>> getPlaylist({
     required String playlistId,
     required bool isTemporary,
+    String? processId,
   }) async {
     // インターネット接続確認
     NetworkCheck.check();
 
     final YoutubeExplode yt = YoutubeExplode();
     // final Playlist playlist = await yt.playlists.get(playlistId);
+
+    final loadFailedVideos = <Video>[];
+
     final List<Video> videos = await Future.sync(() {
       final completer = Completer<List<Video>>();
       final stream = yt.playlists.getVideos(playlistId);
-      final result = <Video>[];
-      stream.listen((event) {
-        result.add(event);
+
+      final List<Video> result = [];
+
+      stream.listen((video) {
+        result.add(video);
       }, onDone: () {
         completer.complete(result);
       });
       return completer.future;
     });
 
-    final unloadedVideos = <Video>[];
+    final result = await _getFromVideos(
+        videos: videos, yt: yt, isTemporary: isTemporary, processId: processId);
 
-    final List<Future<YouTubeMusicData?>> parsers = videos.map((video) async {
-      StreamManifest manifest;
-      try {
-        manifest = await yt.videos.streamsClient.getManifest(video.id);
-      } on VideoUnplayableException {
-        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
-        unloadedVideos.add(video);
-        return null;
+    yt.close();
+
+    return result;
+  }
+
+  static Future<Pair<List<YouTubeMusicData>, List<Video>>> _getFromVideos({
+    required List<Video> videos,
+    required YoutubeExplode yt,
+    required bool isTemporary,
+    required String? processId,
+  }) async {
+    final bool useProgress = processId != null;
+    if (useProgress) {
+      playlistLoadingProgress[processId] ??= ValueNotifier(0);
+    }
+    final ValueNotifier<int>? progressNotifier =
+        useProgress ? playlistLoadingProgress[processId]! : null;
+
+    final AsyncCore<YouTubeMusicData?> asyncCore = AsyncCore(limit: 20);
+
+    final List<Video> failedToLoad = [];
+
+    final futures = videos.map((video) async {
+      final song = await asyncCore.run(() async {
+        print("Loading ${videos.indexOf(video)}/${videos.length} (Playlist)");
+        return await _getFromVideoWithoutStreamManifest(
+          video: video,
+          yt: yt,
+          key: const Uuid().v4(),
+          isTemporary: isTemporary,
+        );
+      });
+      if (song == null) {
+        failedToLoad.add(video);
       }
-      return getFromVideo(
-        video: video,
-        key: const Uuid().v4(),
-        manifest: manifest,
-        isTemporary: isTemporary,
-      );
-    }).toList();
+      print(
+          "Complete ${videos.indexOf(video)}/${videos.length} (Playlist)${song == null ? " (Unplayable)" : ""}");
+      if (useProgress) progressNotifier!.value = progressNotifier.value + 1;
+      return song;
+    });
 
-    final List<YouTubeMusicData> loadedVideos = (await Future.wait(parsers))
+    final result = await Future.wait(futures);
+    final loaded = result
         .where((element) => element != null)
         .map((e) => e as YouTubeMusicData)
         .toList();
 
-    yt.close();
+    if (useProgress) playlistLoadingProgress.remove(processId);
 
-    return Pair(loadedVideos, unloadedVideos);
+    return Pair(loaded, failedToLoad);
+  }
+
+  static Future<YouTubeMusicData?> _getFromVideoWithoutStreamManifest({
+    required Video video,
+    required YoutubeExplode yt,
+    required String key,
+    required bool isTemporary,
+  }) async {
+    Future<StreamManifest?> fetch() async {
+      try {
+        return await yt.videos.streamsClient.getManifest(video.id);
+      } on VideoUnplayableException {
+        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
+        return null;
+      } catch (e) {
+        // if (e.toString().)
+        print("error: ${e}");
+        return null;
+      }
+    }
+
+    final StreamManifest? manifest = await fetch();
+    if (manifest == null) return null;
+
+    return await getFromVideo(
+        video: video, manifest: manifest, key: key, isTemporary: isTemporary);
   }
 
   // even if the song is stored, this fetches it from remote.

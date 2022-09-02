@@ -17,6 +17,7 @@ import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../screens/home_screen.dart';
 import '../music/utils/youtube_music_utils.dart';
+import '../widget/notifiers_widget.dart';
 import 'exceptions/network_exception.dart';
 
 class HomeScreenMusicManager {
@@ -140,58 +141,44 @@ class HomeScreenMusicManager {
     assert(count > 0);
     assert(musicDataList != null || youtubePlaylist != null);
 
+    // playlist loading progress
+    final String playlistProcessId = const Uuid().v4();
+    YouTubeMusicUtils.playlistLoadingProgress[playlistProcessId] =
+        ValueNotifier(0);
+    final ValueNotifier<int> playlistLoadingProgress =
+        YouTubeMusicUtils.playlistLoadingProgress[playlistProcessId]!;
+
+    // auto download progress
     final bool autoDownloadEnabled = SettingsData.getValue(key: "autoDownload");
 
-    final completer = Completer();
+    final notificationCompleter = Completer();
 
-    ValueNotifier<int>? progress;
-    ValueNotifier<bool>? isDownloadMode;
-    if (autoDownloadEnabled) {
-      progress = ValueNotifier<int>(0);
-      isDownloadMode = ValueNotifier<bool>(false);
-    }
+    ValueNotifier<int>? downloadProgress = ValueNotifier<int>(0);
+    ValueNotifier<bool>? isDownloadMode = ValueNotifier<bool>(false);
 
-    final Widget notification = autoDownloadEnabled
-        ? ValueListenableBuilder<int>(
-            valueListenable: progress!,
-            builder: (_, i, __) => Column(
-              children: [
-                ValueListenableBuilder<bool>(
-                  valueListenable: isDownloadMode!,
-                  builder: (_, value, __) {
-                    if (!value) {
-                      return Text(Language.getText("loading_songs")
-                          .replaceAll("{count}", "$count"));
-                    }
-                    return Text(
-                        "${Language.getText("downloading_automatically")} ($i/$count)");
-                  },
-                ),
-                SizedBox(
-                  width: 100,
-                  child: LinearProgressIndicator(
-                    minHeight: 8,
-                    value: i / count,
-                    color: CustomColors.getColor("accent"),
-                    backgroundColor:
-                        CustomColors.getColor("accent").withOpacity(0.1),
-                  ),
-                ),
-              ],
+    final Widget notification = TripleNotifierWidget<int, int, bool>(
+      notifier1: playlistLoadingProgress,
+      notifier2: downloadProgress,
+      notifier3: isDownloadMode,
+      builder: (_, loaded, downloaded, downloadMode, __) => Column(
+        children: [
+          !downloadMode
+              ? Text(Language.getText("loading_songs")
+                  .replaceAll("{count}", "$count"))
+              : Text(
+                  "${Language.getText("downloading_automatically")} ($downloaded/$count)"),
+          SizedBox(
+            width: 100,
+            child: LinearProgressIndicator(
+              minHeight: 8,
+              value: (downloadMode ? downloaded : loaded) / count,
+              color: CustomColors.getColor("accent"),
+              backgroundColor: CustomColors.getColor("accent").withOpacity(0.1),
             ),
-          )
-        : Row(
-            children: [
-              const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(),
-              ),
-              const SizedBox(width: 8),
-              Text(Language.getText("loading_songs")
-                  .replaceAll("{count}", "$count")),
-            ],
-          );
+          ),
+        ],
+      ),
+    );
 
     HomeScreen.homeNotification.pushNotification(
       NotificationData(
@@ -205,6 +192,7 @@ class HomeScreenMusicManager {
               songs = (await YouTubeMusicUtils.getPlaylist(
                 playlistId: youtubePlaylist!,
                 isTemporary: false,
+                processId: playlistProcessId,
               ))
                   .first;
             } on NetworkException {
@@ -215,11 +203,11 @@ class HomeScreenMusicManager {
           }
 
           if (autoDownloadEnabled) {
-            isDownloadMode!.value = true;
+            isDownloadMode.value = true;
             try {
               await Future.wait(songs.map((song) async {
                 await song.download(storeToJSON: false);
-                progress!.value = progress.value + 1;
+                downloadProgress.value = downloadProgress.value + 1;
               }));
               for (final song in songs) {
                 if (song.isStored) continue;
@@ -228,12 +216,12 @@ class HomeScreenMusicManager {
             } on NetworkException {
               Fluttertoast.showToast(
                   msg: Language.getText("network_not_accessible"));
-              completer.complete();
+              notificationCompleter.complete();
               return;
             }
           }
           await musicManager.addAll(songs);
-          completer.complete();
+          notificationCompleter.complete();
         },
       ),
     );
