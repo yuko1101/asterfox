@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/data/settings_data.dart';
+import 'package:asterfox/utils/map_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -60,7 +61,8 @@ class CloudFirestoreManager {
       print("database update (cache: ${snapshot.metadata.isFromCache})");
       if (data == null) return;
       LocalMusicsData.musicData.data = data["songs"];
-      SettingsData.settings.data = data["settings"];
+      SettingsData.settings.data = MapUtils.bindOptions(
+          SettingsData.settings.defaultValue, data["settings"]);
       await Future.wait([
         LocalMusicsData.saveData(upload: false),
         SettingsData.save(upload: false),
