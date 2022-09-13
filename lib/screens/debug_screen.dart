@@ -130,7 +130,7 @@ class DebugMainScreen extends StatelessWidget {
                                         "インストール中: $count/${futures.length}",
                                       ),
                                     ),
-                                    progress: () => Future.wait(futures),
+                                    progress: Future.wait(futures),
                                   ),
                                 );
                                 Navigator.pop(context);
@@ -177,7 +177,7 @@ class DebugMainScreen extends StatelessWidget {
                                         "アンインストール中: $count/${futures.length}",
                                       ),
                                     ),
-                                    progress: () => Future.wait(futures),
+                                    progress: Future.wait(futures),
                                   ),
                                 );
                                 Navigator.pop(context);

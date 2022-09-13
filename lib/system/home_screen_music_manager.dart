@@ -127,7 +127,7 @@ class HomeScreenMusicManager {
           }
           await musicManager.add(song);
           completer.complete();
-        },
+        }(),
       ),
     );
     return completer.future;
@@ -222,7 +222,7 @@ class HomeScreenMusicManager {
           }
           await musicManager.addAll(songs);
           notificationCompleter.complete();
-        },
+        }(),
       ),
     );
   }
@@ -310,7 +310,7 @@ class HomeScreenMusicManager {
             return;
           }
           completer.complete();
-        },
+        }(),
       ),
     );
     return completer.future;
