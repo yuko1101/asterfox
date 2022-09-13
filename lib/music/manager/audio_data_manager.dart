@@ -79,9 +79,9 @@ class AudioDataManager {
   }
 
   static int? getCurrentShuffledIndex(int? index,
-      List<IndexedAudioSource>? sequence, bool suffled, List<int>? indices) {
+      List<IndexedAudioSource>? sequence, bool shuffled, List<int>? indices) {
     final currentIndex = getCurrentIndex(index, sequence);
-    if (!suffled) return currentIndex;
+    if (!shuffled) return currentIndex;
     if (indices == null) return currentIndex;
     if (currentIndex == null) return null;
     return !indices.contains(currentIndex)
