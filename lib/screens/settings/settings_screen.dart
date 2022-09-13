@@ -3,13 +3,16 @@ import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
+import 'package:easy_app/utils/pair.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
 import '../../data/settings_data.dart';
+import '../../system/git.dart';
 import '../../system/theme/theme.dart';
 import 'theme_settings_screen.dart';
 
@@ -109,6 +112,31 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   GoogleSignInWidget.googleSignIn.disconnect();
                   FirebaseAuth.instance.signOut();
                 },
+              ),
+            ],
+          ),
+          SettingsSection(
+            tiles: [
+              SettingsTile(
+                title: Text(Language.getText("app_info")),
+                description: FutureBuilder<Pair<String, String>>(
+                  future: getGitInfo(),
+                  builder: (context, snapshot) {
+                    return snapshot.data == null
+                        ? const Text("")
+                        : GestureDetector(
+                            child: Text(
+                              "${snapshot.data!.first}/${snapshot.data!.second}",
+                            ),
+                            onLongPress: () {
+                              Clipboard.setData(
+                                ClipboardData(text: snapshot.data!.second),
+                              );
+                              Fluttertoast.showToast(
+                                  msg: Language.getText("copied_to_clipboard"));
+                            });
+                  },
+                ),
               ),
             ],
           ),
