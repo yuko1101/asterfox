@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:asterfox/screens/song_history_screen.dart';
+import 'package:asterfox/widget/toast/toast_widget.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'debug_screen.dart';
 import 'home_screen.dart';
@@ -23,14 +23,16 @@ class AsterfoxScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Main App Screen (with Login Screen)
         StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              Fluttertoast.showToast(
-                  msg: Language.getText("something_went_wrong"));
+              // TODO: show toast
+              // Fluttertoast.showToast(
+              //     msg: Language.getText("something_went_wrong"));
               return AuthScreen();
             } else if (!snapshot.hasData) {
               return AuthScreen();
@@ -47,6 +49,9 @@ class AsterfoxScreen extends StatelessWidget {
             }
           },
         ),
+        // Toast Message Overlay
+        const Toast(),
+        // Loading Overlay
         ValueListenableBuilder<bool>(
           valueListenable: loadingNotifier,
           builder: (context, visible, _) {
