@@ -50,7 +50,10 @@ class AsterfoxScreen extends StatelessWidget {
           },
         ),
         // Toast Message Overlay
-        const Toast(),
+        const DefaultTextStyle(
+          child: Toast(),
+          style: TextStyle(),
+        ),
         // Loading Overlay
         ValueListenableBuilder<bool>(
           valueListenable: loadingNotifier,
