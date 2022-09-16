@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:asterfox/screens/home_screen.dart';
-import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
@@ -13,10 +12,10 @@ import '../data/local_musics_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/manager/audio_data_manager.dart';
-import '../system/theme/theme.dart';
 import '../widget/music_widgets/music_thumbnail.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
+import '../widget/toast/toast_widget.dart';
 
 class DebugScreen extends ScaffoldScreen {
   const DebugScreen({
@@ -44,6 +43,36 @@ class DebugMainScreen extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
+                  IconButton(
+                    icon: const Icon(Icons.bug_report),
+                    onPressed: () async {
+                      await Toast.showToast(
+                        ToastData(
+                          message: const Text("aaaa"),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                      print("aaa end");
+                      Toast.showToast(
+                        ToastData(
+                          message: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                ),
+                                Text("bbbb", style: TextStyle(fontSize: 32)),
+                              ],
+                            ),
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
