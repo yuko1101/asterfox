@@ -1,10 +1,45 @@
+import 'dart:async';
+
+import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/material.dart';
 
 class Toast extends StatefulWidget {
   const Toast({Key? key}) : super(key: key);
 
-  static final ValueNotifier<ToastData?> toastMessageNotifier =
+  static final List<Pair<ToastData, Completer>> _queue = [];
+  static final ValueNotifier<ToastData?> _toastMessageNotifier =
       ValueNotifier(null);
+
+  /// Future ends when the toast begins to disappear.
+  static Future<void> showToast(ToastData toastData) async {
+    if (_toastMessageNotifier.value != null) {
+      final completer = Completer();
+      _queue.add(Pair(toastData, completer));
+      await completer.future;
+    } else {
+      await showForcedToast(toastData);
+    }
+  }
+
+  static Future<void> showForcedToast(ToastData toastData,
+      [Completer? completer]) async {
+    _toastMessageNotifier.value = toastData;
+    if (toastData.duration != null) {
+      await Future.delayed(toastData.duration!);
+    } else {
+      await toastData.wait;
+    }
+
+    completer?.complete();
+
+    // show next toast from queue
+    if (_queue.isNotEmpty) {
+      final next = _queue.removeAt(0);
+      showForcedToast(next.first, next.second);
+    } else {
+      _toastMessageNotifier.value = null;
+    }
+  }
 
   @override
   State<Toast> createState() => _ToastState();
@@ -42,13 +77,13 @@ class _ToastState extends State<Toast> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _progress,
       builder: (_, __) => ValueListenableBuilder<ToastData?>(
-          valueListenable: Toast.toastMessageNotifier,
+          valueListenable: Toast._toastMessageNotifier,
           builder: (_, value, __) {
-            print(_progress.value);
             if (value != _currentToast) {
               _lastToast = _currentToast;
               isReversing = true;
               _controller.reverse().then((_) {
+                if (value == null) return;
                 isReversing = false;
                 _controller.forward();
               });
