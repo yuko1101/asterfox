@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:asterfox/screens/home_screen.dart';
+import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
@@ -46,30 +47,16 @@ class DebugMainScreen extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.bug_report),
                     onPressed: () async {
-                      await Toast.showToast(
-                        ToastData(
-                          message: const Text("aaaa"),
-                          duration: const Duration(seconds: 3),
+                      await ToastManager.showSimpleToast(
+                        icon: Icon(
+                          Icons.check,
+                          color: Colors.green,
                         ),
-                      );
-                      print("aaa end");
-                      Toast.showToast(
-                        ToastData(
-                          message: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                ),
-                                Text("bbbb", style: TextStyle(fontSize: 32)),
-                              ],
-                            ),
-                          ),
-                          duration: const Duration(seconds: 2),
+                        msg: Text(
+                          "ログインしました",
+                          style: TextStyle(fontSize: 20),
                         ),
+                        context: context,
                       );
                     },
                   ),

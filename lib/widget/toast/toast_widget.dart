@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:asterfox/utils/math.dart';
 import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/material.dart';
 
@@ -90,15 +92,13 @@ class _ToastState extends State<Toast> with SingleTickerProviderStateMixin {
               _currentToast = value;
             }
 
-            final oldWidget = _lastToast != null
-                ? ToastMessageWidget(_lastToast!)
-                : Container();
-            final newWidget = _currentToast != null
-                ? ToastMessageWidget(_currentToast!)
-                : Container();
+            final oldWidget =
+                _lastToast != null ? _lastToast!.message : Container();
+            final newWidget =
+                _currentToast != null ? _currentToast!.message : Container();
 
             return Positioned(
-              bottom: _progress.value * 120 - 60,
+              bottom: MathUtils.log(_progress.value * 2, 2) * 120 - 60,
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Align(
@@ -108,28 +108,6 @@ class _ToastState extends State<Toast> with SingleTickerProviderStateMixin {
               ),
             );
           }),
-    );
-  }
-}
-
-class ToastMessageWidget extends StatelessWidget {
-  const ToastMessageWidget(this.toast, {Key? key}) : super(key: key);
-  final ToastData toast;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: toast.message,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).backgroundColor,
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
     );
   }
 }
