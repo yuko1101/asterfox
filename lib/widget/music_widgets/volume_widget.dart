@@ -134,9 +134,6 @@ class VolumeWidgetState extends State<VolumeWidget>
                     : null,
               ),
               InkWell(
-                onLongPress: () {
-                  musicManager.setMute(!mute);
-                },
                 onDoubleTap: () {
                   musicManager.setMute(!mute);
                 },
