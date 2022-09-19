@@ -305,6 +305,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     final songCount = queue.value.length;
     if (songCount == 0 && preQueue.isNotEmpty) {
       // remove music notification
+      await _player.seek(Duration.zero);
       await _player.stop();
       await _player.load();
     }
