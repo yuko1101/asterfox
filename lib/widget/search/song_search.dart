@@ -187,21 +187,6 @@ class SongSearch extends SearchDelegate<String> {
     }
   }
 
-  SongSearchTile _getSongSearchTile(SongSuggestion songSuggestion) {
-    bool isSameAudioId(SongSearchTile s) => (s.suggestion.musicData != null &&
-        songSuggestion.musicData != null &&
-        s.suggestion.musicData!.audioId == songSuggestion.musicData!.audioId);
-    bool isSameUrl(SongSearchTile s) => (s.suggestion.mediaUrl != null &&
-        s.suggestion.mediaUrl == songSuggestion.mediaUrl);
-    if (selectedTiles.any((s) => isSameAudioId(s) || isSameUrl(s))) {
-      final found =
-          selectedTiles.firstWhere((s) => isSameAudioId(s) || isSameUrl(s));
-      return found;
-    } else {
-      return SongSearchTile(suggestion: songSuggestion, parent: this);
-    }
-  }
-
   void loadOfflineSongs(String text) async {
     loading.value = true;
     print("loading offline songs");
@@ -230,6 +215,30 @@ class SongSearch extends SearchDelegate<String> {
     suggetionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
     loading.value = false;
   }
+
+  SongSearchTile _getSongSearchTile(SongSuggestion songSuggestion) {
+    if (selectedTiles
+        .any((s) => _isSameSuggetion(s.suggestion, songSuggestion))) {
+      final found = selectedTiles
+          .firstWhere((s) => _isSameSuggetion(s.suggestion, songSuggestion));
+      return found;
+    } else {
+      return SongSearchTile(suggestion: songSuggestion, parent: this);
+    }
+  }
+
+  bool _isSameAudioId(SongSuggestion s1, SongSuggestion s2) =>
+      (s1.musicData != null &&
+          s2.musicData != null &&
+          s1.musicData!.audioId == s2.musicData!.audioId);
+  bool _isSameUrl(SongSuggestion s1, SongSuggestion s2) =>
+      (s1.mediaUrl != null && s1.mediaUrl == s2.mediaUrl);
+
+  bool _isSameWord(SongSuggestion s1, SongSuggestion s2) =>
+      (s1.word != null && s1.word == s2.word);
+
+  bool _isSameSuggetion(SongSuggestion s1, SongSuggestion s2) =>
+      (_isSameAudioId(s1, s2) || _isSameUrl(s1, s2) || _isSameWord(s1, s2));
 
   void setQuery(newQuery) => query = newQuery;
 }
