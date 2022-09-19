@@ -17,6 +17,10 @@ import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
 
 class SongSearch extends SearchDelegate<String> {
+  final ValueNotifier<bool> multiSelectMode = ValueNotifier(false);
+
+  final List<SongSearchTile> selectedTiles = [];
+
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -82,8 +86,8 @@ class SongSearch extends SearchDelegate<String> {
     search(context, query);
   }
 
-  final ValueNotifier<List<SongSuggestion>> suggestions =
-      ValueNotifier<List<SongSuggestion>>([]);
+  final ValueNotifier<List<SongSearchTile>> suggetionTiles =
+      ValueNotifier<List<SongSearchTile>>([]);
 
   String? lastQuery;
 
@@ -116,14 +120,10 @@ class SongSearch extends SearchDelegate<String> {
 
       lastQuery = query;
     }
-    return ValueListenableBuilder<List<SongSuggestion>>(
-      valueListenable: suggestions,
+    return ValueListenableBuilder<List<SongSearchTile>>(
+      valueListenable: suggetionTiles,
       builder: (_, value, __) => ListView.builder(
-        itemBuilder: (context, index) => SongSearchTile(
-          suggestion: value[index],
-          setQuery: setQuery,
-          close: () => close(context, ""),
-        ),
+        itemBuilder: (context, index) => value[index],
         itemCount: value.length,
       ),
     );
@@ -182,8 +182,23 @@ class SongSearch extends SearchDelegate<String> {
     final result = [...videoResult, ...wordResult];
 
     if (time == null || (time >= searchedAt)) {
-      suggestions.value = result;
+      suggetionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
       loading.value = false;
+    }
+  }
+
+  SongSearchTile _getSongSearchTile(SongSuggestion songSuggestion) {
+    bool isSameAudioId(SongSearchTile s) => (s.suggestion.musicData != null &&
+        songSuggestion.musicData != null &&
+        s.suggestion.musicData!.audioId == songSuggestion.musicData!.audioId);
+    bool isSameUrl(SongSearchTile s) => (s.suggestion.mediaUrl != null &&
+        s.suggestion.mediaUrl == songSuggestion.mediaUrl);
+    if (selectedTiles.any((s) => isSameAudioId(s) || isSameUrl(s))) {
+      final found =
+          selectedTiles.firstWhere((s) => isSameAudioId(s) || isSameUrl(s));
+      return found;
+    } else {
+      return SongSearchTile(suggestion: songSuggestion, parent: this);
     }
   }
 
@@ -212,7 +227,7 @@ class SongSearch extends SearchDelegate<String> {
       list: list,
       filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
     );
-    suggestions.value = result;
+    suggetionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
     loading.value = false;
   }
 
