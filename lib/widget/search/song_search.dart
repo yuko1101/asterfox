@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/data/song_history_data.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
@@ -54,8 +56,14 @@ class SongSearch extends SearchDelegate<String> {
         color: Theme.of(context).textTheme.bodyText1?.color,
         tooltip: Language.getText("search"),
         onPressed: () {
-          if (query.isEmpty || query == "") return;
-          search(context, query);
+          if (multiSelectMode.value) {
+            addSuggestionsToQueue(
+                selectedTiles.map((tile) => tile.suggestion).toList());
+          } else {
+            if (query.isEmpty || query == "") return;
+            search(context, query);
+          }
+          close(context, "");
         },
       ),
     ];
@@ -83,7 +91,13 @@ class SongSearch extends SearchDelegate<String> {
 
   @override
   void showResults(BuildContext context) {
-    search(context, query);
+    if (multiSelectMode.value) {
+      addSuggestionsToQueue(
+          selectedTiles.map((tile) => tile.suggestion).toList());
+    } else {
+      search(context, query);
+    }
+    close(context, "");
   }
 
   final ValueNotifier<List<SongSearchTile>> suggestionTiles = ValueNotifier([]);
@@ -149,7 +163,6 @@ class SongSearch extends SearchDelegate<String> {
   }
 
   void search(BuildContext context, String text) async {
-    close(context, "");
     try {
       await HomeScreenMusicManager.addSongBySearch(text);
     } on NetworkException {
@@ -270,6 +283,17 @@ class SongSearch extends SearchDelegate<String> {
       (_isSameAudioId(s1, s2) || _isSameUrl(s1, s2) || _isSameWord(s1, s2));
 
   void setQuery(newQuery) => query = newQuery;
+
+  Future<void> addSuggestionsToQueue(List<SongSuggestion> suggestions) async {
+    // TODO: support media urls
+    await HomeScreenMusicManager.addSongs(
+        count: suggestions.length,
+        musicDataList: suggestions
+            .where((s) => s.musicData != null)
+            .map((s) =>
+                s.musicData!.renew(isTemporary: false, key: const Uuid().v4()))
+            .toList());
+  }
 }
 
 class SongSuggestion {
