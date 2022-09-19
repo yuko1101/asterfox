@@ -86,8 +86,9 @@ class SongSearch extends SearchDelegate<String> {
     search(context, query);
   }
 
-  final ValueNotifier<List<SongSearchTile>> suggetionTiles =
-      ValueNotifier<List<SongSearchTile>>([]);
+  final ValueNotifier<List<SongSearchTile>> suggestionTiles = ValueNotifier([]);
+  final ValueNotifier<List<SongSearchTile>> otherSelectedTilesNotifier =
+      ValueNotifier([]);
 
   String? lastQuery;
 
@@ -120,11 +121,29 @@ class SongSearch extends SearchDelegate<String> {
 
       lastQuery = query;
     }
-    return ValueListenableBuilder<List<SongSearchTile>>(
-      valueListenable: suggetionTiles,
-      builder: (_, value, __) => ListView.builder(
-        itemBuilder: (context, index) => value[index],
-        itemCount: value.length,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          ValueListenableBuilder<List<SongSearchTile>>(
+            valueListenable: otherSelectedTilesNotifier,
+            builder: (context, value, child) => Visibility(
+              visible: value.isNotEmpty,
+              child: ExpansionTile(
+                title: Text(Language.getText("selected_songs")),
+                children: value,
+              ),
+            ),
+          ),
+          ValueListenableBuilder<List<SongSearchTile>>(
+            valueListenable: suggestionTiles,
+            builder: (_, value, __) => ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemBuilder: (context, index) => value[index],
+              itemCount: value.length,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -182,7 +201,12 @@ class SongSearch extends SearchDelegate<String> {
     final result = [...videoResult, ...wordResult];
 
     if (time == null || (time >= searchedAt)) {
-      suggetionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
+      suggestionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
+      // suggetionTiles.valueに含まれていない、選択されたSongSearchTile
+      otherSelectedTilesNotifier.value = selectedTiles
+          .where((s1) => !suggestionTiles.value
+              .any((s2) => _isSameSuggetion(s1.suggestion, s2.suggestion)))
+          .toList();
       loading.value = false;
     }
   }
@@ -212,7 +236,12 @@ class SongSearch extends SearchDelegate<String> {
       list: list,
       filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
     );
-    suggetionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
+    suggestionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
+    // suggetionTiles.valueに含まれていない、選択されたSongSearchTile
+    otherSelectedTilesNotifier.value = selectedTiles
+        .where((s1) => !suggestionTiles.value
+            .any((s2) => _isSameSuggetion(s1.suggestion, s2.suggestion)))
+        .toList();
     loading.value = false;
   }
 

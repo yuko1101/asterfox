@@ -81,5 +81,6 @@
   "reset_password_email_sent": "Reset Password email has been sent",
   "sign_in_with_google": "Sign in with Google",
   "app_info": "App Information",
-  "copied_to_clipboard": "Copied to Clipboard"
+  "copied_to_clipboard": "Copied to Clipboard",
+  "selected_songs": "Selected Songs"
 }
