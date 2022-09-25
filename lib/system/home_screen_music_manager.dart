@@ -136,10 +136,13 @@ class HomeScreenMusicManager {
   static Future<void> addSongs({
     required int count,
     List<MusicData>? musicDataList,
+    List<String>? mediaUrlList,
     String? youtubePlaylist,
   }) async {
     assert(count > 0);
-    assert(musicDataList != null || youtubePlaylist != null);
+    assert(musicDataList != null ||
+        mediaUrlList != null ||
+        youtubePlaylist != null);
 
     // playlist loading progress
     final String playlistProcessId = const Uuid().v4();
@@ -184,17 +187,37 @@ class HomeScreenMusicManager {
       NotificationData(
         child: notification,
         progress: () async {
-          List<MusicData> songs;
+          List<MusicData> songs = [];
           if (musicDataList != null) {
-            songs = musicDataList;
-          } else {
+            songs.addAll(musicDataList);
+          }
+          if (mediaUrlList != null) {
+            List<MusicData> parsed;
             try {
-              songs = (await YouTubeMusicUtils.getPlaylist(
-                playlistId: youtubePlaylist!,
+              parsed = await Future.wait(
+                mediaUrlList
+                    .map((mediaUrl) => MusicUrlUtils.createMusicDataFromUrl(
+                          mediaUrl: mediaUrl,
+                          key: const Uuid().v4(),
+                          isTemporary: false,
+                        )),
+              );
+            } on NetworkException {
+              Fluttertoast.showToast(
+                  msg: Language.getText("network_not_accessible"));
+              return;
+            }
+
+            songs.addAll(parsed);
+          }
+          if (youtubePlaylist != null) {
+            try {
+              songs.addAll((await YouTubeMusicUtils.getPlaylist(
+                playlistId: youtubePlaylist,
                 isTemporary: false,
                 processId: playlistProcessId,
               ))
-                  .first;
+                  .first);
             } on NetworkException {
               Fluttertoast.showToast(
                   msg: Language.getText("network_not_accessible"));

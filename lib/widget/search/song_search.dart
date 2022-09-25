@@ -285,14 +285,20 @@ class SongSearch extends SearchDelegate<String> {
   void setQuery(newQuery) => query = newQuery;
 
   Future<void> addSuggestionsToQueue(List<SongSuggestion> suggestions) async {
-    // TODO: support media urls
     await HomeScreenMusicManager.addSongs(
-        count: suggestions.length,
-        musicDataList: suggestions
-            .where((s) => s.musicData != null)
-            .map((s) =>
-                s.musicData!.renew(isTemporary: false, key: const Uuid().v4()))
-            .toList());
+      count: suggestions.length,
+      musicDataList: suggestions
+          .where((s) => s.musicData != null)
+          .map(
+            (s) =>
+                s.musicData!.renew(isTemporary: false, key: const Uuid().v4()),
+          )
+          .toList(),
+      mediaUrlList: suggestions
+          .where((s) => s.mediaUrl != null && s.musicData == null)
+          .map((s) => s.mediaUrl!)
+          .toList(),
+    );
   }
 }
 
