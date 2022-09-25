@@ -2,7 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../utils/bubble_sort.dart';
+import '../../utils/selection_sort.dart';
 import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 
@@ -188,7 +188,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       await setShuffleMode(AudioServiceShuffleMode.none);
 
       // move original playlist to be in the same order as the shuffled playlist
-      await BubbleSort<MusicData>(
+      await SelectionSort<MusicData>(
         move: (currentIndex, newIndex) async {
           await _playlist.move(currentIndex, newIndex);
         },
