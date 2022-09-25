@@ -70,21 +70,22 @@ class SongSearchTile extends StatelessWidget {
       }
     }
 
-    return InkWell(
-      onTap: onTap,
-      onLongPress: () {
-        if (parent.multiSelectMode.value) return;
-        parent.multiSelectMode.value = true;
+    return DoubleNotifierWidget<bool, bool>(
+      notifier1: parent.multiSelectMode,
+      notifier2: selectedNotifier,
+      builder: (context, multiSelect, isSelected, child) {
+        return Visibility(
+          visible: !(suggestion.tags.contains(SongTag.word) && multiSelect),
+          child: InkWell(
+            onTap: onTap,
+            onLongPress: multiSelect
+                ? null
+                : () {
+                    parent.multiSelectMode.value = true;
 
-        selectedNotifier.value = true;
-        updateSelectedList();
-      },
-      child: DoubleNotifierWidget<bool, bool>(
-        notifier1: parent.multiSelectMode,
-        notifier2: selectedNotifier,
-        builder: (context, multiSelect, isSelected, child) {
-          return Visibility(
-            visible: !(suggestion.tags.contains(SongTag.word) && multiSelect),
+                    selectedNotifier.value = true;
+                    updateSelectedList();
+                  },
             child: Container(
               padding: const EdgeInsets.only(top: 8, bottom: 8),
               child: Row(
@@ -138,9 +139,9 @@ class SongSearchTile extends StatelessWidget {
                 ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
