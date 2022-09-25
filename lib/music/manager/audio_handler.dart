@@ -173,30 +173,29 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> move(int currentIndex, int newIndex) async {
     final bool shuffled = audioPlayer.shuffleModeEnabled;
     if (shuffled) {
-      final shuffledSongs = AudioDataManager.getShuffledPlaylist(
-          audioPlayer.sequence, shuffled, audioPlayer.shuffleIndices);
+      final shuffledSongs = [
+        ...AudioDataManager.getShuffledPlaylist(
+            audioPlayer.sequence, shuffled, audioPlayer.shuffleIndices)
+      ];
       final songs = AudioDataManager.getPlaylist(audioPlayer.sequence);
 
       // move song in shuffled playlist
       final move = shuffledSongs.removeAt(currentIndex);
       shuffledSongs.insert(newIndex, move);
-      final copy = [...songs];
+
+      print("shuffled: " + shuffledSongs.map((e) => e.title).toString());
 
       await setShuffleMode(AudioServiceShuffleMode.none);
 
       // move original playlist to be in the same order as the shuffled playlist
       await BubbleSort<MusicData>(
-        compare: (a, b) =>
-            shuffledSongs.indexWhere((s) => s.key == a.key) -
-            shuffledSongs.indexWhere((s) => s.key == b.key),
         move: (currentIndex, newIndex) async {
           await _playlist.move(currentIndex, newIndex);
-          final move = copy.removeAt(currentIndex);
-          copy.insert(newIndex, move);
-          return copy;
         },
-      ).sort(
-          songs, (song) => shuffledSongs.indexWhere((s) => s.key == song.key));
+      ).sortWithCorrector(
+        songs,
+        (song) => shuffledSongs.indexWhere((s) => s.key == song.key),
+      );
     } else {
       await _playlist.move(currentIndex, newIndex);
     }

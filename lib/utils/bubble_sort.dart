@@ -1,47 +1,51 @@
 import 'dart:async';
 
 class BubbleSort<T> {
+  /// `move` is just a move function, not a swap function.
   BubbleSort({
     required this.move,
-    required this.compare,
   });
-  final FutureOr<List<T>> Function(int, int) move;
-  final int Function(T, T) compare;
+  final dynamic Function(int, int) move;
 
-  FutureOr<List<T>> sort(List<T> list, [int Function(T)? corrector]) async {
-    List<T> result = list;
-    for (int i = 0; i < result.length - 1; i++) {
-      for (int j = i + 1; j < result.length; j++) {
+  Future<void> sort(List<T> list, int Function(T, T) compare,
+      [int Function(T)? corrector]) async {
+    for (int i = 0; i < list.length - 1; i++) {
+      for (int j = i + 1; j < list.length; j++) {
         // if (correct != null) {
-        //   print(result.map(correct).map((e) {
-        //     final index = result.map(correct).toList().indexOf(e);
+        //   print(list.map(correct).map((e) {
+        //     final index = list.map(correct).toList().indexOf(e);
         //     return (index == i || index == j) ? ">$e<" : "$e";
         //   }));
         // }
-        if (compare(result[i], result[j]) > 0) {
+        if (compare(list[i], list[j]) > 0) {
           // print("change ($i, $j) => ${compare(result[i], result[j])}");
-          result = await move(j, i);
+          await move(j, i);
         }
       }
     }
-    return result;
   }
 
-  FutureOr<List<T>> sortWithCorrector(
-      List<T> list, int Function(T) corrector) async {
-    List<T> result = list;
-    for (int i = 0; i < result.length - 1; i++) {
-      for (int j = i + 1; j < result.length; j++) {
-        // print(result.map(correct).map((e) {
-        //   final index = result.map(correct).toList().indexOf(e);
-        //   return (index == i || index == j) ? ">$e<" : "$e";
+  Future<void> sortWithCorrector(
+    List<T> list,
+    int Function(T) corrector,
+  ) async {
+    final dummyList = [...list];
+
+    for (int i = 0; i < dummyList.length - 1; i++) {
+      for (int j = i + 1; j < dummyList.length; j++) {
+        // print(dummyList.map(corrector).map((correctIndex) {
+        //   final currentIndex =
+        //       dummyList.map(corrector).toList().indexOf(correctIndex);
+        //   return (currentIndex == i || currentIndex == j)
+        //       ? ">$correctIndex<"
+        //       : "$correctIndex";
         // }));
-        if (corrector(result[i]) > corrector(result[j])) {
-          // print("change ($i, $j) => ${correct(result[i])} > ${correct(result[j])}");
-          result = await move(j, i);
+        if (corrector(dummyList[i]) > corrector(dummyList[j])) {
+          await move(j, i);
+          final temp = dummyList.removeAt(j);
+          dummyList.insert(i, temp);
         }
       }
     }
-    return result;
   }
 }
