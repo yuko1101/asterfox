@@ -1,4 +1,3 @@
-import 'package:asterfox/system/theme/theme_details.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/settings_data.dart';

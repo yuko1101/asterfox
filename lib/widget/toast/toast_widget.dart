@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:asterfox/utils/math.dart';
 import 'package:easy_app/utils/pair.dart';

@@ -113,8 +113,6 @@ class YouTubeMusicUtils {
     final YoutubeExplode yt = YoutubeExplode();
     // final Playlist playlist = await yt.playlists.get(playlistId);
 
-    final loadFailedVideos = <Video>[];
-
     final List<Video> videos = await Future.sync(() {
       final completer = Completer<List<Video>>();
       final stream = yt.playlists.getVideos(playlistId);
@@ -198,7 +196,7 @@ class YouTubeMusicUtils {
         return null;
       } catch (e) {
         // if (e.toString().)
-        print("error: ${e}");
+        print("error: $e");
         return null;
       }
     }

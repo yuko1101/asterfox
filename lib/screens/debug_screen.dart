@@ -16,7 +16,6 @@ import '../music/manager/audio_data_manager.dart';
 import '../widget/music_widgets/music_thumbnail.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
-import '../widget/toast/toast_widget.dart';
 
 class DebugScreen extends ScaffoldScreen {
   const DebugScreen({
@@ -48,11 +47,11 @@ class DebugMainScreen extends StatelessWidget {
                     icon: const Icon(Icons.bug_report),
                     onPressed: () async {
                       await ToastManager.showSimpleToast(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.check,
                           color: Colors.green,
                         ),
-                        msg: Text(
+                        msg: const Text(
                           "ログインしました",
                           style: TextStyle(fontSize: 20),
                         ),
