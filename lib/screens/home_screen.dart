@@ -87,6 +87,9 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final animatedMenuIconKey = GlobalKey<AnimatedMenuIconState>();
+    final animatedMenuIcon = AnimatedMenuIcon(key: animatedMenuIconKey);
+
     return AppBar(
       title: Row(
         children: [
@@ -105,7 +108,11 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-            onPressed: () => openSearch(context),
+            onPressed: () async {
+              animatedMenuIconKey.currentState?.controller.forward();
+              await showSearch(context: context, delegate: SongSearch());
+              animatedMenuIconKey.currentState?.controller.reverse();
+            },
             icon: const Icon(Icons.search)),
         // IconButton(
         //   onPressed: () async {
@@ -122,14 +129,10 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
       ],
       leading: IconButton(
         onPressed: () => AppDrawerController(context).openDrawer(),
-        icon: const Icon(Icons.menu),
+        icon: animatedMenuIcon,
         tooltip: Language.getText("menu"),
       ),
     );
-  }
-
-  openSearch(BuildContext context) {
-    showSearch(context: context, delegate: SongSearch());
   }
 }
 
@@ -151,5 +154,37 @@ class AppDrawerController {
       FocusScope.of(context).requestFocus(FocusNode());
       scaffoldState.openEndDrawer();
     }
+  }
+}
+
+class AnimatedMenuIcon extends StatefulWidget {
+  const AnimatedMenuIcon({Key? key}) : super(key: key);
+
+  @override
+  State<AnimatedMenuIcon> createState() => AnimatedMenuIconState();
+}
+
+class AnimatedMenuIconState extends State<AnimatedMenuIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedIcon(icon: AnimatedIcons.menu_arrow, progress: controller);
   }
 }
