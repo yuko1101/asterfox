@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+import '../../main.dart';
 import '../../data/custom_colors.dart';
 import '../../data/settings_data.dart';
 import '../../system/git.dart';
@@ -95,26 +96,27 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
               ),
             ],
           ),
-          SettingsSection(
-            tiles: [
-              SettingsTile(
-                title: Text(Language.getText("logout")),
-                description: Text(FirebaseAuth.instance.currentUser!.email ??
-                    FirebaseAuth.instance.currentUser!.displayName!),
-                leading: const Icon(Icons.logout),
-                onPressed: (context) {
-                  if (!NetworkUtils.networkConnected()) {
-                    // TODO: multi-lang
-                    Fluttertoast.showToast(
-                        msg: "You cannot sign out when offline.");
-                    return;
-                  }
-                  GoogleSignInWidget.googleSignIn.disconnect();
-                  FirebaseAuth.instance.signOut();
-                },
-              ),
-            ],
-          ),
+          if (shouldInitializeFirebase)
+            SettingsSection(
+              tiles: [
+                SettingsTile(
+                  title: Text(Language.getText("logout")),
+                  description: Text(FirebaseAuth.instance.currentUser!.email ??
+                      FirebaseAuth.instance.currentUser!.displayName!),
+                  leading: const Icon(Icons.logout),
+                  onPressed: (context) {
+                    if (!NetworkUtils.networkConnected()) {
+                      // TODO: multi-lang
+                      Fluttertoast.showToast(
+                          msg: "You cannot sign out when offline.");
+                      return;
+                    }
+                    GoogleSignInWidget.googleSignIn.disconnect();
+                    FirebaseAuth.instance.signOut();
+                  },
+                ),
+              ],
+            ),
           SettingsSection(
             tiles: [
               SettingsTile(

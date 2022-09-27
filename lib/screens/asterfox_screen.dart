@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:asterfox/main.dart';
 import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:asterfox/screens/song_history_screen.dart';
 import 'package:asterfox/widget/toast/toast_widget.dart';
@@ -24,31 +26,33 @@ class AsterfoxScreen extends StatelessWidget {
     return Stack(
       children: [
         // Main App Screen (with Login Screen)
-        StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              // TODO: show toast
-              // Fluttertoast.showToast(
-              //     msg: Language.getText("something_went_wrong"));
-              return AuthScreen();
-            } else if (!snapshot.hasData) {
-              return AuthScreen();
-            } else {
-              final User user = snapshot.data!;
+        shouldInitializeFirebase
+            ? StreamBuilder<User?>(
+                stream: FirebaseAuth.instance.authStateChanges(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    // TODO: show toast
+                    // Fluttertoast.showToast(
+                    //     msg: Language.getText("something_went_wrong"));
+                    return AuthScreen();
+                  } else if (!snapshot.hasData) {
+                    return AuthScreen();
+                  } else {
+                    final User user = snapshot.data!;
 
-              if (!user.emailVerified) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  showVerifyEmailDialog(context);
-                });
-              }
+                    if (!user.emailVerified) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        showVerifyEmailDialog(context);
+                      });
+                    }
 
-              return const AsterfoxMainScreen();
-            }
-          },
-        ),
+                    return const AsterfoxMainScreen();
+                  }
+                },
+              )
+            : const AsterfoxMainScreen(),
         // Toast Message Overlay
         const DefaultTextStyle(
           child: Toast(),

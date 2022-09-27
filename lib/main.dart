@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
@@ -22,6 +23,8 @@ import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
 
 late final MusicManager musicManager;
+final bool shouldInitializeFirebase =
+    Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,11 +35,14 @@ Future<void> main() async {
   await DeviceSettingsData.init();
 
   // Firebase set-up
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  if (!kDebugMode) {
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  if (shouldInitializeFirebase) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    if (!kDebugMode) {
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+    }
   }
 
   // run this before initializing HomeScreen
@@ -49,7 +55,7 @@ Future<void> main() async {
   await LocalMusicsData.init();
 
   // run this after initializing Firebase, LocalMusicsData, and SettingsData.
-  await CloudFirestoreManager.init();
+  if (shouldInitializeFirebase) await CloudFirestoreManager.init();
 
   await CustomColors.load();
   await SongHistoryData.init(musicManager);

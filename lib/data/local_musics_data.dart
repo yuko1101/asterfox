@@ -6,6 +6,7 @@ import 'package:easy_app/utils/config_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
+import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
@@ -26,7 +27,9 @@ class LocalMusicsData {
 
   static Future<void> saveData({bool upload = true}) async {
     await musicData.save(compact: _compact);
-    if (FirebaseAuth.instance.currentUser != null && upload) {
+    if (shouldInitializeFirebase &&
+        FirebaseAuth.instance.currentUser != null &&
+        upload) {
       await CloudFirestoreManager.update();
     }
   }

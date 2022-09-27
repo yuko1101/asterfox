@@ -45,7 +45,8 @@ dependencies:
   fluttertoast: ^8.0.8
 
   just_audio: ^0.9.20
-  just_audio_windows: ^0.1.0
+  # just_audio_windows: ^0.1.0
+  just_audio_libwinmedia: ^0.0.4+1 # Temporarily
 #  just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.4
 

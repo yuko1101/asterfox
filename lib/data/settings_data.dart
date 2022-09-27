@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:asterfox/main.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +23,9 @@ class SettingsData {
 
   static Future<void> save({bool upload = true}) async {
     await settings.save();
-    if (FirebaseAuth.instance.currentUser != null && upload) {
+    if (shouldInitializeFirebase &&
+        FirebaseAuth.instance.currentUser != null &&
+        upload) {
       await CloudFirestoreManager.update();
     }
   }

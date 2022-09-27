@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class CloudFirestoreManager {
   static Map<String, dynamic>? userData;
 
+  static bool _isInitialized = false;
+
   /// Must run after initializing FirebaseAuth, LocalMusicsData, SettingsData,
   /// and TemporaryData.
   static Future<void> init() async {
@@ -24,9 +26,11 @@ class CloudFirestoreManager {
       if (user == null) return;
       _listenDataUpdate();
     });
+    _isInitialized = true;
   }
 
   static Future<void> update() async {
+    if (!_isInitialized) return;
     final user = FirebaseAuth.instance.currentUser!;
     final Map<String, dynamic> data = {
       "songs": LocalMusicsData.musicData.data,

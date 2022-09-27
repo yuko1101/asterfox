@@ -5,7 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus_windows
   desktop_webview_auth
-  just_audio_windows
+  libwinmedia
   url_launcher_windows
 )
 
