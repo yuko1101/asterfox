@@ -27,53 +27,62 @@ final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await EasyApp.initializePath();
+  await runZonedGuarded<Future<void>>(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await EasyApp.initializePath();
 
-  await SettingsData.init();
+      await SettingsData.init();
 
-  await DeviceSettingsData.init();
+      await DeviceSettingsData.init();
 
-  // Firebase set-up
-  if (shouldInitializeFirebase) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    if (!kDebugMode) {
-      FlutterError.onError =
-          FirebaseCrashlytics.instance.recordFlutterFatalError;
-    }
-  }
+      // Firebase set-up
+      if (shouldInitializeFirebase) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        if (!kDebugMode) {
+          FlutterError.onError =
+              FirebaseCrashlytics.instance.recordFlutterFatalError;
+        }
+      }
 
-  // run this before initializing HomeScreen
-  musicManager = MusicManager(true);
-  await musicManager.init();
+      // run this before initializing HomeScreen
+      musicManager = MusicManager(true);
+      await musicManager.init();
 
-  // run this after initializing the music manager.
-  await DeviceSettingsData.applyMusicManagerSettings();
+      // run this after initializing the music manager.
+      await DeviceSettingsData.applyMusicManagerSettings();
 
-  await LocalMusicsData.init();
+      await LocalMusicsData.init();
 
-  // run this after initializing Firebase, LocalMusicsData, and SettingsData.
-  if (shouldInitializeFirebase) await CloudFirestoreManager.init();
+      // run this after initializing Firebase, LocalMusicsData, and SettingsData.
+      if (shouldInitializeFirebase) await CloudFirestoreManager.init();
 
-  await CustomColors.load();
-  await SongHistoryData.init(musicManager);
+      await CustomColors.load();
+      await SongHistoryData.init(musicManager);
 
-  HomeScreen.homeNotification = InAppNotification(
-    borderColor: CustomColors.getColor("accent"),
+      HomeScreen.homeNotification = InAppNotification(
+        borderColor: CustomColors.getColor("accent"),
+      );
+      await EasyApp.initialize(
+        homeScreen: HomeScreen(),
+        languages: [
+          "ja_JP",
+          "en_US",
+        ],
+        activateConnectionChecker: true,
+      );
+
+      init();
+      runApp(const AsterfoxApp());
+    },
+    (error, stack) {
+      if (shouldInitializeFirebase) {
+        FirebaseCrashlytics.instance.recordError(error, stack);
+      }
+    },
   );
-  await EasyApp.initialize(
-    homeScreen: HomeScreen(),
-    languages: [
-      "ja_JP",
-      "en_US",
-    ],
-    activateConnectionChecker: true,
-  );
-
-  init();
-  runApp(const AsterfoxApp());
 }
 
 void init() async {
