@@ -19,6 +19,9 @@ import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
 
 class SongSearch extends SearchDelegate<String> {
+  SongSearch({this.animationController});
+  final AnimationController? animationController;
+
   final ValueNotifier<bool> multiSelectMode = ValueNotifier(false);
 
   final List<SongSearchTile> selectedTiles = [];
@@ -74,7 +77,7 @@ class SongSearch extends SearchDelegate<String> {
     return IconButton(
       icon: AnimatedIcon(
         icon: AnimatedIcons.menu_arrow,
-        progress: transitionAnimation,
+        progress: animationController ?? transitionAnimation,
       ),
       color: Theme.of(context).textTheme.bodyText1?.color,
       tooltip: Language.getText("go_back"),
@@ -299,6 +302,12 @@ class SongSearch extends SearchDelegate<String> {
           .map((s) => s.mediaUrl!)
           .toList(),
     );
+  }
+
+  @override
+  void close(BuildContext context, String result) {
+    animationController?.reverse();
+    super.close(context, result);
   }
 }
 

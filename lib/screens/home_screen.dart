@@ -109,9 +109,11 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
       actions: [
         IconButton(
             onPressed: () async {
+              final searchDelegate = SongSearch(
+                  animationController:
+                      animatedMenuIconKey.currentState?.controller);
               animatedMenuIconKey.currentState?.controller.forward();
-              await showSearch(context: context, delegate: SongSearch());
-              animatedMenuIconKey.currentState?.controller.reverse();
+              await showSearch(context: context, delegate: searchDelegate);
             },
             icon: const Icon(Icons.search)),
       ],
@@ -161,7 +163,7 @@ class AnimatedMenuIconState extends State<AnimatedMenuIcon>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 350),
     );
   }
 
