@@ -146,6 +146,7 @@ class VolumeWidgetState extends State<VolumeWidget>
                   backgroundColor: Theme.of(context).backgroundColor,
                   foregroundColor: Theme.of(context).extraColors.primary,
                 ),
+                customBorder: const CircleBorder(),
               ),
             ],
           );
