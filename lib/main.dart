@@ -6,6 +6,7 @@ import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
+import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';

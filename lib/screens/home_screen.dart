@@ -1,3 +1,4 @@
+import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/languages.dart';
@@ -11,10 +12,13 @@ import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
 import '../widget/notifiers_widget.dart';
 import '../widget/playlist_widget.dart';
+import '../widget/process_notifications/process_notifications_button.dart';
 import '../widget/search/song_search.dart';
 
 class HomeScreen extends ScaffoldScreen {
+  static bool _isInitialized = false;
   static late InAppNotification homeNotification;
+  static late ProcessNotificationList processNotificationList;
   HomeScreen({
     Key? key,
   }) : super(
@@ -22,6 +26,19 @@ class HomeScreen extends ScaffoldScreen {
             builder: (context) {
               final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
               final volumeWidget = VolumeWidget(key: volumeWidgetKey);
+
+              final processNotificationsButtonKey =
+                  GlobalKey<ProcessNotificationsButtonState>();
+              final processNotificationsButton = ProcessNotificationsButton(
+                  key: processNotificationsButtonKey);
+              if (!_isInitialized) {
+                processNotificationList = ProcessNotificationList(
+                    buttonKey: processNotificationsButtonKey);
+                _isInitialized = true;
+              } else {
+                processNotificationList
+                    .setButtonKey(processNotificationsButtonKey);
+              }
 
               return Stack(
                 children: [
@@ -45,6 +62,7 @@ class HomeScreen extends ScaffoldScreen {
                     children: [
                       homeNotification,
                       const LyricsButton(),
+                      processNotificationsButton,
                     ],
                   ),
 
