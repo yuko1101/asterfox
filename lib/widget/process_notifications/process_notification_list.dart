@@ -4,15 +4,16 @@ import 'package:asterfox/widget/process_notifications/process_notifications_butt
 import 'package:flutter/cupertino.dart';
 
 class ProcessNotificationList {
-  ProcessNotificationList({
-    this.buttonKey,
-  });
   GlobalKey<ProcessNotificationsButtonState>? buttonKey;
 
-  final List<ProcessNotificationData> notificationList = [];
+  final ValueNotifier<List<ProcessNotificationData>> notificationsNotifier =
+      ValueNotifier([]);
 
   Future<void> push(ProcessNotificationData notificationData) async {
-    notificationList.add(notificationData);
+    notificationsNotifier.value = [
+      ...notificationsNotifier.value,
+      notificationData
+    ];
     if (notificationData.icon != null) {
       buttonKey?.currentState?.show(
         AnimatedProcessIcon(
@@ -21,6 +22,8 @@ class ProcessNotificationList {
       );
     }
     await notificationData.future;
+    notificationsNotifier.value = [...notificationsNotifier.value]
+      ..remove(notificationData);
   }
 
   void setButtonKey(GlobalKey<ProcessNotificationsButtonState>? key) {

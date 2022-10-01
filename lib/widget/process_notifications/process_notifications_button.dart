@@ -1,11 +1,16 @@
 import 'dart:math';
 
 import 'package:asterfox/screens/home_screen.dart';
+import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:flutter/material.dart';
 
 class ProcessNotificationsButton extends StatefulWidget {
-  const ProcessNotificationsButton({Key? key}) : super(key: key);
+  const ProcessNotificationsButton({
+    required this.notificationList,
+    Key? key,
+  }) : super(key: key);
+  final ProcessNotificationList notificationList;
 
   @override
   State<ProcessNotificationsButton> createState() =>
@@ -16,7 +21,8 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _runningController;
-  final ValueNotifier<Widget?> widgetToShowNotifier = ValueNotifier(null);
+  final ValueNotifier<Widget?> _widgetToShowNotifier = ValueNotifier(null);
+  final ValueNotifier<int> _processCountNotifier = ValueNotifier(0);
 
   @override
   void initState() {
@@ -29,6 +35,18 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
+
+    int preCount = widget.notificationList.notificationsNotifier.value.length;
+    _processCountNotifier.value = preCount;
+    widget.notificationList.notificationsNotifier.addListener(() async {
+      final diff =
+          widget.notificationList.notificationsNotifier.value.length - preCount;
+      preCount = widget.notificationList.notificationsNotifier.value.length;
+      if (diff > 0) {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+      _processCountNotifier.value = _processCountNotifier.value + diff;
+    });
   }
 
   @override
@@ -51,7 +69,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
             color: Colors.orange,
           ),
           child: ValueListenableBuilder<Widget?>(
-            valueListenable: widgetToShowNotifier,
+            valueListenable: _widgetToShowNotifier,
             builder: (context, widgetToShow, child) => ListView(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
@@ -63,32 +81,62 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
                   height: 60,
                   width: 60,
                   padding: const EdgeInsets.all(6.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).backgroundColor),
-                    child: AnimatedBuilder(
-                      animation: _runningController,
-                      builder: (context, child) => Transform.rotate(
-                        angle: _runningController.value * 2 * pi,
-                        child: IconButton(
-                          icon: const Icon(Icons.settings),
-                          onPressed: () {
-                            HomeScreen.processNotificationList.push(
-                              ProcessNotificationData(
-                                  title: const Text("a"),
-                                  icon: const Icon(Icons.download),
-                                  future: Future.delayed(
-                                      const Duration(milliseconds: 10000))),
-                            );
-                          },
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context).backgroundColor),
+                          child: AnimatedBuilder(
+                            animation: _runningController,
+                            builder: (context, child) => Transform.rotate(
+                              angle: _runningController.value * 2 * pi,
+                              child: IconButton(
+                                icon: const Icon(Icons.settings),
+                                onPressed: () {
+                                  HomeScreen.processNotificationList.push(
+                                    ProcessNotificationData(
+                                      title: const Text("a"),
+                                      icon: const Icon(Icons.download),
+                                      future: Future.delayed(
+                                        const Duration(milliseconds: 2000),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: ValueListenableBuilder(
+                          valueListenable: _processCountNotifier,
+                          builder: (_, count, __) => Visibility(
+                            visible: count != 0,
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                              child: FittedBox(
+                                child: Text("$count"),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 if (widgetToShow != null) ...[
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Opacity(
@@ -106,10 +154,12 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
   }
 
   Future<void> show(Widget widget) async {
-    widgetToShowNotifier.value = widget;
+    _widgetToShowNotifier.value = widget;
     await _controller.forward();
     await Future.delayed(const Duration(milliseconds: 600));
     await _controller.reverse();
-    if (widgetToShowNotifier.value == widget) widgetToShowNotifier.value = null;
+    if (_widgetToShowNotifier.value == widget) {
+      _widgetToShowNotifier.value = null;
+    }
   }
 }

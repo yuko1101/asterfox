@@ -27,18 +27,19 @@ class HomeScreen extends ScaffoldScreen {
               final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
               final volumeWidget = VolumeWidget(key: volumeWidgetKey);
 
+              if (!_isInitialized) {
+                processNotificationList = ProcessNotificationList();
+                _isInitialized = true;
+              }
+
               final processNotificationsButtonKey =
                   GlobalKey<ProcessNotificationsButtonState>();
               final processNotificationsButton = ProcessNotificationsButton(
-                  key: processNotificationsButtonKey);
-              if (!_isInitialized) {
-                processNotificationList = ProcessNotificationList(
-                    buttonKey: processNotificationsButtonKey);
-                _isInitialized = true;
-              } else {
-                processNotificationList
-                    .setButtonKey(processNotificationsButtonKey);
-              }
+                key: processNotificationsButtonKey,
+                notificationList: processNotificationList,
+              );
+              processNotificationList
+                  .setButtonKey(processNotificationsButtonKey);
 
               return Stack(
                 children: [
