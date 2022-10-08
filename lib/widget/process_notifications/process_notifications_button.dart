@@ -88,6 +88,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
                           decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Theme.of(context).backgroundColor),
+                          clipBehavior: Clip.antiAlias,
                           child: AnimatedBuilder(
                             animation: _runningController,
                             builder: (context, child) => Transform.rotate(
@@ -95,15 +96,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
                               child: IconButton(
                                 icon: const Icon(Icons.settings),
                                 onPressed: () {
-                                  HomeScreen.processNotificationList.push(
-                                    ProcessNotificationData(
-                                      title: const Text("a"),
-                                      icon: const Icon(Icons.download),
-                                      future: Future.delayed(
-                                        const Duration(milliseconds: 2000),
-                                      ),
-                                    ),
-                                  );
+                                  // TODO: open process list
                                 },
                               ),
                             ),

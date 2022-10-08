@@ -167,7 +167,7 @@ class SongSearch extends SearchDelegate<String> {
 
   void search(BuildContext context, String text) async {
     try {
-      await HomeScreenMusicManager.addSongBySearch(text);
+      await HomeScreenMusicManager.addSongBySearch(text, context: context);
     } on NetworkException {
       Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
     }

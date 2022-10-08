@@ -1,6 +1,5 @@
 import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +15,6 @@ import '../widget/process_notifications/process_notifications_button.dart';
 import '../widget/search/song_search.dart';
 
 class HomeScreen extends ScaffoldScreen {
-  static bool _isInitialized = false;
-  static late InAppNotification homeNotification;
   static late ProcessNotificationList processNotificationList;
   HomeScreen({
     Key? key,
@@ -26,11 +23,6 @@ class HomeScreen extends ScaffoldScreen {
             builder: (context) {
               final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
               final volumeWidget = VolumeWidget(key: volumeWidgetKey);
-
-              if (!_isInitialized) {
-                processNotificationList = ProcessNotificationList();
-                _isInitialized = true;
-              }
 
               final processNotificationsButtonKey =
                   GlobalKey<ProcessNotificationsButtonState>();
@@ -57,13 +49,17 @@ class HomeScreen extends ScaffoldScreen {
                       padding: const EdgeInsets.only(top: 15),
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  Row(
                     children: [
-                      homeNotification,
-                      const LyricsButton(),
-                      processNotificationsButton,
+                      const Spacer(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const LyricsButton(),
+                          processNotificationsButton,
+                        ],
+                      ),
                     ],
                   ),
 

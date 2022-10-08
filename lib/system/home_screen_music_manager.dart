@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/music/utils/muisc_url_utils.dart';
-import 'package:easy_app/utils/in_app_notification/notification_data.dart';
+import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,6 +18,7 @@ import '../music/music_downloader.dart';
 import '../screens/home_screen.dart';
 import '../music/utils/youtube_music_utils.dart';
 import '../widget/notifiers_widget.dart';
+import '../widget/process_notifications/process_notification_widget.dart';
 import 'exceptions/network_exception.dart';
 
 class HomeScreenMusicManager {
@@ -76,10 +77,11 @@ class HomeScreenMusicManager {
             ],
           );
 
-    HomeScreen.homeNotification.pushNotification(
-      NotificationData(
-        child: notification,
-        progress: () async {
+    HomeScreen.processNotificationList.push(
+      ProcessNotificationData(
+        title: notification,
+        icon: const Icon(Icons.music_note),
+        future: () async {
           MusicData song;
           if (musicData == null) {
             if (youtubeId != null) {
@@ -183,10 +185,11 @@ class HomeScreenMusicManager {
       ),
     );
 
-    HomeScreen.homeNotification.pushNotification(
-      NotificationData(
-        child: notification,
-        progress: () async {
+    HomeScreen.processNotificationList.push(
+      ProcessNotificationData(
+        title: notification,
+        icon: const Icon(Icons.queue_music),
+        future: () async {
           List<MusicData> songs = [];
           if (musicDataList != null) {
             songs.addAll(musicDataList);
@@ -250,26 +253,33 @@ class HomeScreenMusicManager {
     );
   }
 
-  static Future<void> addSongBySearch(String query) async {
+  static Future<void> addSongBySearch(String query,
+      {BuildContext? context, ThemeData? theme}) async {
     if (query.isUrl) {
-      await loadFromUrl(query);
+      await loadFromUrl(query, context: context, theme: theme);
       return;
     }
     final list = await YouTubeMusicUtils.searchYouTubeVideo(query);
     await addSong(key: const Uuid().v4(), youtubeId: list.first.id.value);
   }
 
-  static Future<void> loadFromUrl(String url) async {
-    final isPlaylist = await loadPlaylist(url);
+  static Future<void> loadFromUrl(String url,
+      {BuildContext? context, ThemeData? theme}) async {
+    final isPlaylist = await loadPlaylist(url, context: context, theme: theme);
     if (isPlaylist) return;
 
     VideoId id;
     try {
       id = VideoId(url);
     } on ArgumentError {
-      HomeScreen.homeNotification.pushNotification(NotificationData(
-        child: Text(Language.getText("invalid_url")),
-      ));
+      ToastManager.showSimpleToast(
+        msg: Text(Language.getText("invalid_url")),
+        icon: const Icon(
+          Icons.wifi_off,
+          color: Colors.red,
+        ),
+        context: context,
+      );
       return;
     }
     await addSong(key: const Uuid().v4(), youtubeId: id.value);
@@ -277,7 +287,8 @@ class HomeScreenMusicManager {
 
   static final RegExp playlistRegex =
       RegExp(r"^https?://(www.)?youtube.com/playlist\?((.+=.+&)*)list=([^&]+)");
-  static Future<bool> loadPlaylist(String text) async {
+  static Future<bool> loadPlaylist(String text,
+      {BuildContext? context, ThemeData? theme}) async {
     if (!playlistRegex.hasMatch(text)) {
       return false;
     }
@@ -286,9 +297,12 @@ class HomeScreenMusicManager {
     final yt = YoutubeExplode();
     final playlist = await yt.playlists.get(listId);
     if (playlist.videoCount == null || playlist.videoCount == 0) {
-      HomeScreen.homeNotification.pushNotification(NotificationData(
-        child: Text(Language.getText("external_playlist_empty")),
-      ));
+      ToastManager.showSimpleToast(
+        icon: const Icon(Icons.music_off_outlined, color: Colors.red),
+        msg: Text(Language.getText("external_playlist_empty")),
+        context: context,
+        theme: theme,
+      );
       return true;
     }
     await HomeScreenMusicManager.addSongs(
@@ -304,9 +318,9 @@ class HomeScreenMusicManager {
   ) async {
     final completer = Completer();
     downloadProgress[song.key] = ValueNotifier<int>(0);
-    HomeScreen.homeNotification.pushNotification(
-      NotificationData(
-        child: ValueListenableBuilder<int>(
+    HomeScreen.processNotificationList.push(
+      ProcessNotificationData(
+        title: ValueListenableBuilder<int>(
           valueListenable: downloadProgress[song.key]!,
           builder: (_, percentage, __) => Column(
             children: [
@@ -324,7 +338,8 @@ class HomeScreenMusicManager {
             ],
           ),
         ),
-        progress: () async {
+        icon: const Icon(Icons.download),
+        future: () async {
           try {
             await MusicDownloader.download(song);
           } on NetworkException {

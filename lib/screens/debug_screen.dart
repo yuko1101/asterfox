@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:asterfox/screens/home_screen.dart';
+import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:flutter/material.dart';
 
 import '../data/local_musics_data.dart';
@@ -137,15 +137,16 @@ class DebugMainScreen extends StatelessWidget {
                                               downloaded.value + 1;
                                         }())
                                     .toList();
-                                HomeScreen.homeNotification.pushNotification(
-                                  NotificationData(
-                                    child: ValueListenableBuilder(
+                                HomeScreen.processNotificationList.push(
+                                  ProcessNotificationData(
+                                    title: ValueListenableBuilder(
                                       valueListenable: downloaded,
                                       builder: (_, count, __) => Text(
                                         "インストール中: $count/${futures.length}",
                                       ),
                                     ),
-                                    progress: Future.wait(futures),
+                                    icon: const Icon(Icons.download),
+                                    future: Future.wait(futures),
                                   ),
                                 );
                                 Navigator.pop(context);
@@ -184,15 +185,16 @@ class DebugMainScreen extends StatelessWidget {
                                           deleted.value = deleted.value + 1;
                                         }())
                                     .toList();
-                                HomeScreen.homeNotification.pushNotification(
-                                  NotificationData(
-                                    child: ValueListenableBuilder(
+                                HomeScreen.processNotificationList.push(
+                                  ProcessNotificationData(
+                                    title: ValueListenableBuilder(
                                       valueListenable: deleted,
                                       builder: (_, count, __) => Text(
                                         "アンインストール中: $count/${futures.length}",
                                       ),
                                     ),
-                                    progress: Future.wait(futures),
+                                    icon: const Icon(Icons.file_download_off),
+                                    future: Future.wait(futures),
                                   ),
                                 );
                                 Navigator.pop(context);

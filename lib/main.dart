@@ -5,8 +5,6 @@ import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/utils/in_app_notification/in_app_notification.dart';
-import 'package:easy_app/utils/in_app_notification/notification_data.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -22,6 +20,7 @@ import 'music/manager/music_manager.dart';
 import 'screens/home_screen.dart';
 import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
+import 'widget/process_notifications/process_notification_list.dart';
 
 late final MusicManager musicManager;
 final bool shouldInitializeFirebase =
@@ -63,9 +62,7 @@ Future<void> main() async {
       await CustomColors.load();
       await SongHistoryData.init(musicManager);
 
-      HomeScreen.homeNotification = InAppNotification(
-        borderColor: CustomColors.getColor("accent"),
-      );
+      HomeScreen.processNotificationList = ProcessNotificationList();
       await EasyApp.initialize(
         homeScreen: HomeScreen(),
         languages: [

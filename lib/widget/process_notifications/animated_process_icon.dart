@@ -1,11 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/animation/animation_controller.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/ticker_provider.dart';
 
 class AnimatedProcessIcon extends StatefulWidget {
   const AnimatedProcessIcon({

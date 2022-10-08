@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:asterfox/main.dart';
 import 'package:asterfox/screens/settings/settings_screen.dart';
