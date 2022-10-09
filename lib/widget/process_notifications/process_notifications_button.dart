@@ -103,6 +103,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
                           ),
                         ),
                       ),
+                      // Notification Count Badge
                       Positioned(
                         right: 0,
                         top: 0,
@@ -118,7 +119,9 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
                                 color: Colors.red,
                               ),
                               child: FittedBox(
-                                child: Text("$count"),
+                                child: Text("$count",
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                                 fit: BoxFit.contain,
                               ),
                             ),
