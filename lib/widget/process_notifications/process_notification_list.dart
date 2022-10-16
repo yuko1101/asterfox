@@ -14,6 +14,9 @@ class ProcessNotificationList {
       ...notificationsNotifier.value,
       notificationData
     ];
+
+    final int startTime = DateTime.now().millisecondsSinceEpoch;
+
     if (notificationData.icon != null) {
       buttonKey?.currentState?.show(
         AnimatedProcessIcon(
@@ -22,8 +25,19 @@ class ProcessNotificationList {
       );
     }
     await notificationData.future;
-    notificationsNotifier.value = [...notificationsNotifier.value]
-      ..remove(notificationData);
+
+    () async {
+      final int endTime = DateTime.now().millisecondsSinceEpoch;
+      if (endTime - startTime <
+          ProcessNotificationsButton.notificationBadgeAddDelay.inMilliseconds) {
+        final Duration toWait =
+            ProcessNotificationsButton.notificationBadgeAddDelay -
+                Duration(milliseconds: endTime - startTime);
+        await Future.delayed(toWait);
+      }
+      notificationsNotifier.value = [...notificationsNotifier.value]
+        ..remove(notificationData);
+    }();
   }
 
   void setButtonKey(GlobalKey<ProcessNotificationsButtonState>? key) {

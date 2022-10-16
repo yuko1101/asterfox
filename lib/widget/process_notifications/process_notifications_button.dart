@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:asterfox/screens/home_screen.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:flutter/material.dart';
 
 class ProcessNotificationsButton extends StatefulWidget {
@@ -11,6 +9,9 @@ class ProcessNotificationsButton extends StatefulWidget {
     Key? key,
   }) : super(key: key);
   final ProcessNotificationList notificationList;
+
+  static Duration notificationBadgeAddDelay =
+      const Duration(milliseconds: 1000);
 
   @override
   State<ProcessNotificationsButton> createState() =>
@@ -43,7 +44,8 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
           widget.notificationList.notificationsNotifier.value.length - preCount;
       preCount = widget.notificationList.notificationsNotifier.value.length;
       if (diff > 0) {
-        await Future.delayed(const Duration(milliseconds: 1000));
+        await Future.delayed(
+            ProcessNotificationsButton.notificationBadgeAddDelay);
       }
       _processCountNotifier.value = _processCountNotifier.value + diff;
     });
