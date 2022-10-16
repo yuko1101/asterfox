@@ -148,7 +148,7 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
 msix_config:
-  display_name: Asterox
+  display_name: Asterfox
   publisher_display_name: asterium.net
 #  publisher: C = JP, ST = Hokkaido, L = Sapporo, O = Asterium Corp., OU = System Management Division, DC = asterium, DC = net, CN = asterium.net
   identity_name: net.asterfox.app
