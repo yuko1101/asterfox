@@ -1,13 +1,17 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
+import 'package:lyrics/lyrics.dart';
 
 import '../data/local_musics_data.dart';
 import 'audio_source/music_data.dart';
 
 class LyricsFinder {
   static Future<String> search(String title, String artist) async {
+    final google = await getFromGoogle(title, artist);
+    if (google.isNotEmpty) return google;
     final utaNet = await getFromUtaNet(title, artist);
-    return utaNet;
+    if (utaNet.isNotEmpty) return utaNet;
+    return "";
   }
 
   static Future<void> applyLyrics(MusicData song, String lyrics,
@@ -83,5 +87,13 @@ class LyricsFinder {
     print("lyrics = $lyrics");
 
     return lyrics;
+  }
+
+  static Future<String> getFromGoogle(String title, String artist) async {
+    try {
+      return await Lyrics().getLyrics(artist: artist, track: title);
+    } catch (e) {
+      return "";
+    }
   }
 }

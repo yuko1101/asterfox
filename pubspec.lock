@@ -571,6 +571,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  lyrics:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: e2d6f334fe3edd1612b6076da4be731be5f17143
+      url: "https://github.com/webrror/dart-lyrics.git"
+    source: git
+    version: "0.0.7"
   matcher:
     dependency: transitive
     description:

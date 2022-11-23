@@ -80,6 +80,11 @@ dependencies:
 
   google_sign_in: ^5.4.0
 
+  lyrics: #^0.0.7
+    git:
+      url: https://github.com/webrror/dart-lyrics.git
+      ref: main
+
   # Below are the dependencies for debugging, and don't need to be included in the release.
   colored_json: ^1.1.0
   
