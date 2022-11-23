@@ -188,6 +188,15 @@ class YouTubeMusicUtils {
     required String key,
     required bool isTemporary,
   }) async {
+    if (LocalMusicsData.isStored(audioId: video.id.value)) {
+      final song = LocalMusicsData.getByAudioId(
+        audioId: video.id.value,
+        key: key,
+        isTemporary: isTemporary,
+      ) as YouTubeMusicData;
+      if (!(await song.isAudioUrlAvailable())) await song.refreshAudioURL();
+      return song;
+    }
     Future<StreamManifest?> fetch() async {
       try {
         return await yt.videos.streamsClient.getManifest(video.id);
