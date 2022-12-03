@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:asterfox/screens/home_screen.dart';
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 import '../data/local_musics_data.dart';
 import '../main.dart';
@@ -203,6 +206,54 @@ class DebugMainScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.upload_file),
+                    onPressed: () async {
+                      final ClipboardData? cdata =
+                          await Clipboard.getData(Clipboard.kTextPlain);
+                      final String? data = cdata?.text;
+                      if (data == null || data.isEmpty) {
+                        ToastManager.showSimpleToast(
+                          msg: const Text("クリップボードが空です"),
+                          context: context,
+                        );
+                        return;
+                      }
+
+                      final res = await http.get(Uri.parse(data));
+                      final content =
+                          const Utf8Decoder().convert(res.bodyBytes);
+
+                      late final Map<String, dynamic> json;
+                      try {
+                        json = jsonDecode(content);
+                      } catch (e) {
+                        ToastManager.showSimpleToast(
+                          msg: const Text("JSONのパース中にエラーが発生しました"),
+                          context: context,
+                        );
+                        return;
+                      }
+
+                      ToastManager.showSimpleToast(
+                        msg: const Text("インポート中"),
+                        context: context,
+                      );
+                      try {
+                        await CloudFirestoreManager.importData(json);
+                      } catch (e) {
+                        ToastManager.showSimpleToast(
+                          msg: const Text("インポート中にエラーが発生しました"),
+                          context: context,
+                        );
+                        return;
+                      }
+                      ToastManager.showSimpleToast(
+                        msg: const Text("インポートが完了しました"),
+                        context: context,
                       );
                     },
                   ),

@@ -33,13 +33,26 @@ class CloudFirestoreManager {
   }
 
   static Future<void> importData(Map<String, dynamic> data) async {
-    // TODO: import from exported data
+    if (data.containsKey("songs")) {
+      LocalMusicsData.musicData.data = data["songs"];
+      await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
+      await CloudFirestoreManager.removeAllSongs();
+      await CloudFirestoreManager.addOrUpdateSongs(
+          LocalMusicsData.getAll(isTemporary: true));
+    }
+    if (data.containsKey("settings")) {
+      SettingsData.settings.data = MapUtils.bindOptions(
+          SettingsData.settings.defaultValue, data["settings"]);
+      await SettingsData.save(upload: false);
+      await SettingsData.applySettings();
+    }
   }
 
-  static Map<String, dynamic> exportData() {
+  static Map<String, dynamic> exportData(
+      {required bool songs, required bool settings}) {
     return {
-      "songs": LocalMusicsData.musicData.data,
-      "settings": SettingsData.settings.data,
+      if (songs) "songs": LocalMusicsData.musicData.data,
+      if (settings) "settings": SettingsData.settings.data,
     };
   }
 
