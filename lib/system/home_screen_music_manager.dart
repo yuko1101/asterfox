@@ -232,7 +232,7 @@ class HomeScreenMusicManager {
             isDownloadMode.value = true;
             try {
               await Future.wait(songs.map((song) async {
-                await song.download(storeToJSON: false);
+                await song.download();
                 downloadProgress.value = downloadProgress.value + 1;
               }));
               for (final song in songs) {
@@ -342,6 +342,7 @@ class HomeScreenMusicManager {
         future: () async {
           try {
             await MusicDownloader.download(song);
+            await LocalMusicsData.store(song);
           } on NetworkException {
             Fluttertoast.showToast(
                 msg: Language.getText("network_not_accessible"));

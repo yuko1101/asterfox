@@ -1,3 +1,4 @@
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:lyrics/lyrics.dart';
@@ -27,9 +28,11 @@ class LyricsFinder {
 
     // 保存されているデータを更新
     if (song.isStored) {
-      LocalMusicsData.musicData
-          .get([song.audioId]).set(key: "lyrics", value: lyrics);
-      await LocalMusicsData.saveData();
+      await LocalMusicsData.musicData
+          .get([song.audioId])
+          .set(key: "lyrics", value: lyrics)
+          .save(compact: LocalMusicsData.compact);
+      await CloudFirestoreManager.addOrUpdateSongs([song]);
     }
   }
 

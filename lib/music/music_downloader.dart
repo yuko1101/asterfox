@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +21,7 @@ final Map<String, ValueNotifier<int>> downloadProgress = {};
 
 class MusicDownloader {
   /// Throws [NetworkException] if network is not accessible.
-  static Future<void> download(MusicData? song,
-      {bool storeToJson = true}) async {
-    if (song == null) return;
+  static Future<void> download(MusicData song) async {
     if (song.isInstalled) return;
 
     NetworkCheck.check();
@@ -44,12 +44,12 @@ class MusicDownloader {
     song.size = await Directory(song.directoryPath).length;
     // if the song has already stored, update file size property and save.
     if (song.isStored) {
-      LocalMusicsData.musicData
-          .get([song.audioId]).set(key: "size", value: song.size);
-      await LocalMusicsData.saveData();
+      await LocalMusicsData.musicData
+          .get([song.audioId])
+          .set(key: "size", value: song.size)
+          .save(compact: LocalMusicsData.compact);
+      await CloudFirestoreManager.addOrUpdateSongs([song]);
     }
-
-    if (storeToJson) await LocalMusicsData.store(song);
 
     // インストールが完了してることが判断できるように空のテキストファイルを生成する
     File(song.installCompleteFilePath).createSync();

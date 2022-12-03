@@ -1,4 +1,5 @@
 import 'package:asterfox/data/local_musics_data.dart';
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -69,9 +70,11 @@ class YouTubeMusicData extends MusicData {
       final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(),
           forceRemote: true);
       remoteAudioUrl = url;
-      LocalMusicsData.musicData
-          .get([audioId]).set(key: "remoteAudioUrl", value: url);
-      await LocalMusicsData.saveData();
+      await LocalMusicsData.musicData
+          .get([audioId])
+          .set(key: "remoteAudioUrl", value: url)
+          .save(compact: LocalMusicsData.compact);
+      await CloudFirestoreManager.addOrUpdateSongs([this]);
       return url;
     } on NetworkException {
       throw RefreshUrlFailedException();

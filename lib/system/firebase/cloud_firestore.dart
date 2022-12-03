@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/data/settings_data.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/utils/map_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,60 +21,132 @@ class CloudFirestoreManager {
     );
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      _listenDataUpdate();
+      _listenUserDataUpdate();
+      _listenSongsUpdate();
     }
     FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user == null) return;
-      _listenDataUpdate();
+      _listenUserDataUpdate();
+      _listenSongsUpdate();
     });
     _isInitialized = true;
   }
 
-  static Future<void> update() async {
-    if (!_isInitialized) return;
-    final user = FirebaseAuth.instance.currentUser!;
-    final Map<String, dynamic> data = {
+  static Future<void> importData(Map<String, dynamic> data) async {
+    // TODO: import from exported data
+  }
+
+  static Map<String, dynamic> exportData() {
+    return {
       "songs": LocalMusicsData.musicData.data,
       "settings": SettingsData.settings.data,
     };
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
-        .set(data);
   }
 
-  static StreamSubscription? _streamSubscription;
-  static Future<void> _listenDataUpdate() async {
-    if (_streamSubscription != null) await _streamSubscription!.cancel();
+  // add or update songs
+  static Future<void> addOrUpdateSongs(List<MusicData> songs) async {
+    if (!_isInitialized) return;
+    final user = FirebaseAuth.instance.currentUser!;
+    final collection = FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .collection("songs");
+    final List<Future<void>> futures = [];
+    for (final song in songs) {
+      futures.add(collection.doc(song.audioId).set(song.toJson()));
+    }
+    await Future.wait(futures);
+  }
+
+  static Future<void> removeSongs(List<String> audioIds) async {
+    if (!_isInitialized) return;
+    final user = FirebaseAuth.instance.currentUser!;
+    final collection = FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .collection("songs");
+    final List<Future<void>> futures = [];
+    for (final audioId in audioIds) {
+      futures.add(collection.doc(audioId).delete());
+    }
+    await Future.wait(futures);
+  }
+
+  static Future<void> removeAllSongs() async {
+    if (!_isInitialized) return;
+    final user = FirebaseAuth.instance.currentUser!;
+    final collection = FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .collection("songs");
+
+    final songs = await collection.get();
+
+    final List<Future<void>> futures = [];
+    for (final docId in songs.docs.map((doc) => doc.id)) {
+      futures.add(collection.doc(docId).delete());
+    }
+    await Future.wait(futures);
+  }
+
+  static Future<void> updateUserData() async {
+    if (!_isInitialized) return;
+    final user = FirebaseAuth.instance.currentUser!;
+    final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
+
+    final Map<String, dynamic> data = {"settings": SettingsData.settings.data};
+
+    await doc.set(data);
+  }
+
+  static StreamSubscription? _userDataStreamSubscription;
+  static Future<void> _listenUserDataUpdate() async {
+    if (_userDataStreamSubscription != null) {
+      await _userDataStreamSubscription!.cancel();
+    }
     final user = FirebaseAuth.instance.currentUser!;
     final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
 
     final data = await doc.get();
     if (data.data() == null) {
-      LocalMusicsData.musicData.resetData();
       SettingsData.settings.resetData();
-      await Future.wait([LocalMusicsData.saveData(), SettingsData.save()]);
-      await update();
+      await SettingsData.save(upload: false);
+      await updateUserData();
     }
 
-    _streamSubscription = FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
-        .snapshots(includeMetadataChanges: true)
-        .listen((snapshot) async {
+    _userDataStreamSubscription =
+        doc.snapshots(includeMetadataChanges: true).listen((snapshot) async {
       final data = snapshot.data();
       print("database update (cache: ${snapshot.metadata.isFromCache})");
       if (data == null) return;
-      LocalMusicsData.musicData.data = data["songs"];
       SettingsData.settings.data = MapUtils.bindOptions(
           SettingsData.settings.defaultValue, data["settings"]);
-      await Future.wait([
-        LocalMusicsData.saveData(upload: false),
-        SettingsData.save(upload: false),
-      ]);
-      await Future.wait([
-        SettingsData.applySettings(),
-      ]);
+      await SettingsData.save(upload: false);
+      await SettingsData.applySettings();
+    });
+  }
+
+  static StreamSubscription? _songsStreamSubscription;
+  static Future<void> _listenSongsUpdate() async {
+    if (_songsStreamSubscription != null) _songsStreamSubscription!.cancel();
+    final user = FirebaseAuth.instance.currentUser!;
+    final collection = FirebaseFirestore.instance
+        .collection("users")
+        .doc(user.uid)
+        .collection("songs");
+
+    _songsStreamSubscription = collection.snapshots().listen((snapshot) async {
+      final changes = snapshot.docChanges;
+      if (changes.isEmpty) return;
+      for (final change in changes) {
+        final audioId = change.doc.id;
+        if (change.type == DocumentChangeType.removed) {
+          LocalMusicsData.musicData.delete(key: audioId);
+        } else {
+          LocalMusicsData.musicData.set(key: audioId, value: change.doc.data());
+        }
+      }
+      await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
     });
   }
 }

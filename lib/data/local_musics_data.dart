@@ -18,20 +18,11 @@ import '../system/firebase/cloud_firestore.dart';
 class LocalMusicsData {
   static late ConfigFile musicData;
 
-  static const bool _compact = false;
+  static const bool compact = false;
 
   static Future<void> init() async {
     musicData =
         await ConfigFile(File("${EasyApp.localPath}/music.json"), {}).load();
-  }
-
-  static Future<void> saveData({bool upload = true}) async {
-    await musicData.save(compact: _compact);
-    if (shouldInitializeFirebase &&
-        FirebaseAuth.instance.currentUser != null &&
-        upload) {
-      await CloudFirestoreManager.update();
-    }
   }
 
   static bool isStored({MusicData? song, String? audioId}) {
@@ -49,20 +40,22 @@ class LocalMusicsData {
   static Future<void> store(MusicData song) async {
     if (song.isStored) return;
     song.songStoredAt = DateTime.now().millisecondsSinceEpoch;
-    musicData.set(key: song.audioId, value: song.toJson());
-    await saveData();
+    await musicData
+        .set(key: song.audioId, value: song.toJson())
+        .save(compact: compact);
+    await CloudFirestoreManager.addOrUpdateSongs([song]);
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.
   static Future<void> install(MusicData song) async {
     if (!song.isStored) throw SongNotStoredException();
-    if (song.isInstalled) return;
-    await MusicDownloader.download(song, storeToJson: false);
+    await MusicDownloader.download(song);
   }
 
-  static Future<void> download(MusicData song,
-      {bool storeToJSON = true}) async {
-    await MusicDownloader.download(song, storeToJson: storeToJSON);
+  static Future<void> download(MusicData song) async {
+    await MusicDownloader.download(song);
+    // since song.size will be changed on download, store after download
+    await store(song);
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.
@@ -80,9 +73,12 @@ class LocalMusicsData {
 
   /// Throws [SongNotStoredException] if the song is not stored.
   static Future<void> delete(String audioId, {bool saveDataFile = true}) async {
-    deleteFromDataFile() async {
+    Future<void> deleteFromDataFile() async {
       musicData.delete(key: audioId);
-      if (saveDataFile) await saveData();
+      if (saveDataFile) {
+        await musicData.save(compact: compact);
+        await CloudFirestoreManager.removeSongs([audioId]);
+      }
     }
 
     await Future.wait([uninstall(audioId), deleteFromDataFile()]);
@@ -92,7 +88,8 @@ class LocalMusicsData {
   static Future<void> deleteSongs(List<String> audioIds) async {
     final futures = audioIds.map((id) => delete(id, saveDataFile: false));
     await Future.wait(futures);
-    await saveData();
+    await musicData.save(compact: compact);
+    await CloudFirestoreManager.removeSongs(audioIds);
   }
 
   static List<MusicData> getAll({required bool isTemporary}) {
@@ -132,8 +129,8 @@ class LocalMusicsData {
 
 extension LocalMusicsDataExtension on MusicData {
   /// Throws [NetworkException] if the network is not accessible.
-  Future<void> download({bool storeToJSON = true}) async {
-    await LocalMusicsData.download(this, storeToJSON: storeToJSON);
+  Future<void> download() async {
+    await LocalMusicsData.download(this);
   }
 
   Future<void> store() async {

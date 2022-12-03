@@ -76,6 +76,7 @@ Future<void> main() async {
       runApp(const AsterfoxApp());
     },
     (error, stack) {
+      if (kDebugMode) throw error;
       if (shouldInitializeFirebase) {
         FirebaseCrashlytics.instance.recordError(error, stack);
       }

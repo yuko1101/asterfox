@@ -26,7 +26,7 @@ class SettingsData {
     if (shouldInitializeFirebase &&
         FirebaseAuth.instance.currentUser != null &&
         upload) {
-      await CloudFirestoreManager.update();
+      await CloudFirestoreManager.updateUserData();
     }
   }
 
