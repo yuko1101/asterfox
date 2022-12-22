@@ -1,3 +1,15 @@
 {
-    "files.autoGuessEncoding": true
+    "files.autoGuessEncoding": true,
+    "cSpell.words": [
+        "asterfox",
+        "asterium",
+        "cupertino",
+        "firestore",
+        "fluttertoast",
+        "libwinmedia",
+        "msix",
+        "Schyler",
+        "themedata",
+        "toggleable"
+    ]
 }

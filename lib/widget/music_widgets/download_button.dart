@@ -1,4 +1,4 @@
-import 'package:asterfox/music/utils/muisc_url_utils.dart';
+import 'package:asterfox/music/utils/music_url_utils.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';

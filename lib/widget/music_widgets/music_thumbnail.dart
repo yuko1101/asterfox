@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:asterfox/music/utils/muisc_url_utils.dart';
+import 'package:asterfox/music/utils/music_url_utils.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 

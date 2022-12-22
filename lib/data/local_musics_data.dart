@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
-import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
@@ -143,7 +141,7 @@ extension LocalMusicsDataExtension on MusicData {
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.
-  Future<void> unistall() async {
+  Future<void> uninstall() async {
     await LocalMusicsData.uninstall(audioId);
   }
 

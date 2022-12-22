@@ -258,10 +258,10 @@ class SongSearch extends SearchDelegate<String> {
 
     if (time == null || (time >= searchedAt)) {
       suggestionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
-      // suggetionTiles.valueに含まれていない、選択されたSongSearchTile
+      // suggestionTiles.valueに含まれていない、選択されたSongSearchTile
       otherSelectedTilesNotifier.value = selectedTiles
           .where((s1) => !suggestionTiles.value
-              .any((s2) => _isSameSuggetion(s1.suggestion, s2.suggestion)))
+              .any((s2) => _isSameSuggestion(s1.suggestion, s2.suggestion)))
           .toList();
       loading.value = false;
     }
@@ -293,19 +293,19 @@ class SongSearch extends SearchDelegate<String> {
       filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
     );
     suggestionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
-    // suggetionTiles.valueに含まれていない、選択されたSongSearchTile
+    // suggestionTiles.valueに含まれていない、選択されたSongSearchTile
     otherSelectedTilesNotifier.value = selectedTiles
         .where((s1) => !suggestionTiles.value
-            .any((s2) => _isSameSuggetion(s1.suggestion, s2.suggestion)))
+            .any((s2) => _isSameSuggestion(s1.suggestion, s2.suggestion)))
         .toList();
     loading.value = false;
   }
 
   SongSearchTile _getSongSearchTile(SongSuggestion songSuggestion) {
     if (selectedTiles
-        .any((s) => _isSameSuggetion(s.suggestion, songSuggestion))) {
+        .any((s) => _isSameSuggestion(s.suggestion, songSuggestion))) {
       final found = selectedTiles
-          .firstWhere((s) => _isSameSuggetion(s.suggestion, songSuggestion));
+          .firstWhere((s) => _isSameSuggestion(s.suggestion, songSuggestion));
       return found;
     } else {
       return SongSearchTile(suggestion: songSuggestion, parent: this);
@@ -322,7 +322,7 @@ class SongSearch extends SearchDelegate<String> {
   bool _isSameWord(SongSuggestion s1, SongSuggestion s2) =>
       (s1.word != null && s1.word == s2.word);
 
-  bool _isSameSuggetion(SongSuggestion s1, SongSuggestion s2) =>
+  bool _isSameSuggestion(SongSuggestion s1, SongSuggestion s2) =>
       (_isSameAudioId(s1, s2) || _isSameUrl(s1, s2) || _isSameWord(s1, s2));
 
   void setQuery(newQuery) => query = newQuery;

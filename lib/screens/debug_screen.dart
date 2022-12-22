@@ -184,7 +184,7 @@ class DebugMainScreen extends StatelessWidget {
                                     ValueNotifier(0);
                                 final futures = songsToUninstall
                                     .map((song) => () async {
-                                          await song.unistall();
+                                          await song.uninstall();
                                           deleted.value = deleted.value + 1;
                                         }())
                                     .toList();

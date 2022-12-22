@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:asterfox/data/song_history_data.dart';
-import 'package:asterfox/music/utils/muisc_url_utils.dart';
+import 'package:asterfox/music/utils/music_url_utils.dart';
 import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
