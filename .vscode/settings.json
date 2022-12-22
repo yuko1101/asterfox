@@ -10,6 +10,7 @@
         "msix",
         "Schyler",
         "themedata",
-        "toggleable"
+        "toggleable",
+        "vsync"
     ]
 }
