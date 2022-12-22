@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:asterfox/data/custom_colors.dart';
 import 'package:asterfox/data/song_history_data.dart';
+import 'package:asterfox/system/theme/theme.dart';
+import 'package:asterfox/widget/option_widgets/option_switch.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,9 @@ class SongSearch extends SearchDelegate<String> {
   final ValueNotifier<bool> multiSelectMode = ValueNotifier(false);
 
   final List<SongSearchTile> selectedTiles = [];
+
+  // search options
+  bool forceOfflineSearch = false;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -52,6 +57,41 @@ class SongSearch extends SearchDelegate<String> {
         tooltip: Language.getText("clear"),
         onPressed: () {
           query = "";
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.tune),
+        color: Theme.of(context).textTheme.bodyText1?.color,
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 100),
+              child: Material(
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color:
+                    Theme.of(context).extraColors.themeColor.withOpacity(0.9),
+                clipBehavior: Clip.antiAlias,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: OptionSwitch(
+                          title: Text(Language.getText("offline_search")),
+                          value: forceOfflineSearch,
+                          onChanged: (from, to) {
+                            forceOfflineSearch = to;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
         },
       ),
       IconButton(
@@ -122,7 +162,7 @@ class SongSearch extends SearchDelegate<String> {
         timer!.cancel();
       }
 
-      if (NetworkUtils.networkAccessible()) {
+      if (NetworkUtils.networkAccessible() && !forceOfflineSearch) {
         if (query.isEmpty) {
           loadOfflineSongs(query);
         } else {

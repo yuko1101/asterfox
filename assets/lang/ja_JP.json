@@ -82,5 +82,6 @@
   "sign_in_with_google": "Google でログイン",
   "app_info": "アプリ情報",
   "copied_to_clipboard": "クリップボードにコピーしました",
-  "selected_songs": "選択中の曲"
+  "selected_songs": "選択中の曲",
+  "offline_search": "オフライン検索"
 }

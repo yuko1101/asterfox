@@ -82,5 +82,6 @@
   "sign_in_with_google": "Sign in with Google",
   "app_info": "App Information",
   "copied_to_clipboard": "Copied to Clipboard",
-  "selected_songs": "Selected Songs"
+  "selected_songs": "Selected Songs",
+  "offline_search": "Offline Search"
 }
