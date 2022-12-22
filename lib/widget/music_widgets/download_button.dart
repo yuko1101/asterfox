@@ -61,7 +61,7 @@ class DownloadButton extends StatelessWidget {
             if (downloadable) {
               return IconButton(
                   onPressed: () {
-                    HomeScreenMusicManager.download(song!);
+                    HomeScreenMusicManager.download(song);
                   },
                   icon: const Icon(Icons.file_download));
             }
