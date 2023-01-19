@@ -106,6 +106,17 @@ class MusicManager {
   Future<void> remove(String key) async {
     final int index =
         audioDataManager.playlist.indexWhere((song) => song.key == key);
+
+    // fix index (https://github.com/yuko1101/asterfox/issues/47)
+    final int? currentPlayingIndex = audioDataManager.currentIndex;
+    final bool isPlaying = audioDataManager.playingState == PlayingState.playing;
+    final int songsCount = audioDataManager.playlist.length;
+    final bool isCertainRepeatMode = audioDataManager.repeatState != RepeatState.all;
+
+    if (index == currentPlayingIndex && isPlaying && index == songsCount - 1 && isCertainRepeatMode && songsCount > 1) {
+      seek(Duration.zero, index: 0);
+    }
+
     if (index != -1) {
       await _audioHandler.removeQueueItemAt(index);
     }
