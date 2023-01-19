@@ -334,20 +334,14 @@ class SongSearch extends SearchDelegate<String> {
           .where((s) => s.musicData != null)
           .map(
             (s) =>
-                s.musicData!.renew(isTemporary: false, key: const Uuid().v4()),
-          )
+            s.musicData!.renew(isTemporary: false, key: const Uuid().v4()),
+      )
           .toList(),
       mediaUrlList: suggestions
           .where((s) => s.mediaUrl != null && s.musicData == null)
           .map((s) => s.mediaUrl!)
           .toList(),
     );
-  }
-
-  @override
-  void close(BuildContext context, String result) {
-    animationController?.reverse();
-    super.close(context, result);
   }
 }
 
