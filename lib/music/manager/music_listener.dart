@@ -36,6 +36,7 @@ class MusicListener {
     });
   }
 
+  int _lastPlaylistLength = 0;
   void _updatePlaylistAndIndex(SequenceState? sequenceState) {
     final sequence = sequenceState?.sequence;
 
@@ -81,14 +82,29 @@ class MusicListener {
     _musicManager.shuffleModeNotifier.notify();
 
     _musicManager.updateVolume();
+
+    // TODO: add to settings
+    if (_lastPlaylistLength == 0 && playlist.isNotEmpty) {
+      _autoPlay = true;
+    }
+    _lastPlaylistLength = playlist.length;
   }
 
+  bool _autoPlay = false;
   void _updatePlaybackState(PlayerState playerState) {
     final playingState = AudioDataManager.getPlayingState(
         playerState, _audioHandler.audioPlayer.sequence);
     if (playingState == PlayingState.unknown) {
       _audioHandler.seek(Duration.zero);
       _audioHandler.pause();
+    }
+    if (_autoPlay) {
+      if (playingState == PlayingState.paused) {
+        _musicManager.play();
+        _autoPlay = false;
+      } else if (playingState == PlayingState.playing) {
+        _autoPlay = false;
+      }
     }
     _musicManager.playingStateNotifier.value = playingState;
   }
