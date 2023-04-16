@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/utils/languages.dart';
