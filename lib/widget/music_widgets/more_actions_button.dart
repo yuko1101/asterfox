@@ -1,6 +1,14 @@
+import 'dart:io';
+
+import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/music/music_downloader.dart';
+import 'package:asterfox/system/theme/theme.dart';
+import 'package:asterfox/widget/asterfox_dialog.dart';
+import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,10 +28,57 @@ class MoreActionsButton extends StatelessWidget {
       id: "share",
       icon: Icons.share,
       title: Language.getText("share"),
-      onTap: (context) async {
-        final MusicData song = musicManager.audioDataManager.currentSong!;
-        Share.share(song.mediaURL, subject: song.title);
+      onTap: (song, context) async {
+        Share.share(song!.mediaURL, subject: song.title);
         Navigator.pop(context);
+      },
+      songFilter: (MusicData? song) => song != null,
+    ),
+    _Action(
+      id: "share",
+      icon: Icons.share,
+      title: Language.getText("share_mp3"),
+      onTap: (song, context) async {
+        Navigator.pop(context);
+        if (!song!.isInstalled) {
+          final key = "share-${song.key}";
+          final downloadPath =
+              "${(await getTemporaryDirectory()).path}/share_files/${song.key}.mp3";
+          final downloadFuture =
+              MusicDownloader.downloadMp3(song, downloadPath, key);
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              (() async {
+                await downloadFuture;
+                downloadProgress.remove(key);
+                Navigator.of(context).pop();
+                await Share.shareFiles([downloadPath]);
+              })();
+              return AsterfoxDialog(
+                canPop: false,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: downloadProgress["share-${song.key}"]!,
+                  builder: (context, value, child) {
+                    return SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: CustomColors.getColor("accent"),
+                          value: value.toDouble() / 100,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        } else {
+          await Share.shareFiles([song.audioSavePath]);
+        }
       },
       songFilter: (MusicData? song) => song != null,
     ),
@@ -31,9 +86,8 @@ class MoreActionsButton extends StatelessWidget {
       id: "youtube",
       icon: Icons.open_in_new,
       title: Language.getText("open_in_youtube"),
-      onTap: (context) async {
-        final launched = await launchUrl(
-            Uri.parse(musicManager.audioDataManager.currentSong!.mediaURL),
+      onTap: (song, context) async {
+        final launched = await launchUrl(Uri.parse(song!.mediaURL),
             mode: LaunchMode.externalNonBrowserApplication);
         if (!launched) {
           Fluttertoast.showToast(msg: Language.getText("launch_url_error"));
@@ -46,7 +100,7 @@ class MoreActionsButton extends StatelessWidget {
       id: "export",
       icon: Icons.file_download,
       title: Language.getText("export_as_mp3"),
-      onTap: (context) {
+      onTap: (song, context) {
         Navigator.pop(context);
       },
       songFilter: (MusicData? song) => song != null,
@@ -55,7 +109,7 @@ class MoreActionsButton extends StatelessWidget {
       id: "delete_from_local",
       icon: Icons.delete_forever,
       title: Language.getText("delete_from_local"),
-      onTap: (context) {
+      onTap: (song, context) {
         Navigator.pop(context);
         showDialog(
           context: context,
@@ -72,7 +126,7 @@ class MoreActionsButton extends StatelessWidget {
                 child: Text(Language.getText("delete")),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  musicManager.audioDataManager.currentSong!.delete();
+                  song!.delete();
                 },
               ),
             ],
@@ -85,7 +139,7 @@ class MoreActionsButton extends StatelessWidget {
       id: "refresh_all",
       icon: Icons.refresh,
       title: Language.getText("refresh_all"),
-      onTap: (context) {
+      onTap: (song, context) {
         musicManager.refreshSongs();
         Navigator.pop(context);
       },
@@ -177,7 +231,7 @@ class _Action extends StatelessWidget {
   final String id;
   final IconData icon;
   final String title;
-  final void Function(BuildContext) onTap;
+  final void Function(MusicData?, BuildContext) onTap;
   final bool Function(MusicData?) songFilter;
 
   @override
@@ -188,7 +242,7 @@ class _Action extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon),
         title: Text(title),
-        onTap: () => onTap(context),
+        onTap: () => onTap(musicManager.audioDataManager.currentSong, context),
         tileColor: Theme.of(context).backgroundColor,
       ),
     );

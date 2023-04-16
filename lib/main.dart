@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'data/custom_colors.dart';
 import 'data/local_musics_data.dart';
@@ -71,6 +72,9 @@ Future<void> main() async {
         ],
         activateConnectionChecker: true,
       );
+
+      Directory("${(await getTemporaryDirectory()).path}/share_files")
+          .delete(recursive: true);
 
       init();
       runApp(const AsterfoxApp());

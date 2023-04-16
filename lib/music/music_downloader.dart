@@ -31,12 +31,7 @@ class MusicDownloader {
     downloadProgress[song.key] ??= ValueNotifier<int>(0);
     downloading.value = [...downloading.value, song.key];
 
-    if (song is YouTubeMusicData) {
-      await _downloadFromYouTube(song);
-    } else {
-      await _downloadMp3(
-          await song.getAvailableAudioUrl(), song.audioSavePath, song.key);
-    }
+    await downloadMp3(song, song.audioSavePath, song.key, false);
 
     await _saveImage(song);
 
@@ -62,11 +57,31 @@ class MusicDownloader {
     downloading.value = preDownloading;
   }
 
-  static Future<void> _downloadFromYouTube(YouTubeMusicData song) async {
-    final String id = song.id;
-    final String downloadPath = song.audioSavePath;
-    final String key = song.key;
+  static Future<void> downloadMp3(
+      MusicData song, String downloadPath, String key,
+      [bool manageDownload = true]) async {
+    if (manageDownload) {
+      if (downloading.value.contains(song.key)) return;
+      downloadProgress[key] ??= ValueNotifier<int>(0);
+      downloading.value = [...downloading.value, key];
+    }
 
+    if (song is YouTubeMusicData) {
+      await _downloadFromYouTube(song.id, downloadPath, key);
+    } else {
+      await _downloadMp3(await song.getAvailableAudioUrl(), downloadPath, key);
+    }
+
+    if (manageDownload) {
+      downloadProgress.remove(song.key);
+      final List<String> preDownloading = [...downloading.value]; // immutable
+      preDownloading.remove(song.key);
+      downloading.value = preDownloading;
+    }
+  }
+
+  static Future<void> _downloadFromYouTube(
+      String id, String downloadPath, String key) async {
     final File file = File(downloadPath);
     if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
 
@@ -81,7 +96,7 @@ class MusicDownloader {
     var len = audio.size.totalBytes;
     var count = 0;
 
-    var msg = "Downloading ${song.title}";
+    var msg = "Downloading $id from youtube";
     stdout.writeln(msg);
     await for (final data in audioStream) {
       count += data.length;
