@@ -1,12 +1,12 @@
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-Future<bool> defaultOnWillPop() async => true;
+Future<bool> _defaultOnWillPop() async => true;
 
 class AsterfoxDialog extends StatelessWidget {
   const AsterfoxDialog({
     required this.child,
-    this.onWillPop = defaultOnWillPop,
+    this.onWillPop = _defaultOnWillPop,
     super.key,
   });
   final Widget child;
