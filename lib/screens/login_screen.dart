@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/theme/theme.dart';
+import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,30 +36,32 @@ class AuthScreen extends StatefulWidget {
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
 
-    AsterfoxScreen.loadingNotifier.value = true;
-
-    try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == "network-request-failed") {
-        Fluttertoast.showToast(msg: Language.getText("network_not_connected"));
-      } else if (e.code == "invalid-email" ||
-          e.code == "user-not-found" ||
-          e.code == "wrong-password") {
-        emailController.clear();
-        passwordController.clear();
-        Fluttertoast.showToast(
-            msg: Language.getText("invalid_email_or_password"));
-      } else if (e.code == "user-disabled") {
-        emailController.clear();
-        passwordController.clear();
-        Fluttertoast.showToast(msg: Language.getText("disabled_user"));
-      } else {
-        rethrow;
+    final future = (() async {
+      try {
+        await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == "network-request-failed") {
+          Fluttertoast.showToast(
+              msg: Language.getText("network_not_connected"));
+        } else if (e.code == "invalid-email" ||
+            e.code == "user-not-found" ||
+            e.code == "wrong-password") {
+          emailController.clear();
+          passwordController.clear();
+          Fluttertoast.showToast(
+              msg: Language.getText("invalid_email_or_password"));
+        } else if (e.code == "user-disabled") {
+          emailController.clear();
+          passwordController.clear();
+          Fluttertoast.showToast(msg: Language.getText("disabled_user"));
+        } else {
+          rethrow;
+        }
       }
-    }
-    AsterfoxScreen.loadingNotifier.value = false;
+    })();
+
+    await LoadingDialog.showLoading(context: context, future: future);
   }
 
   static Future<void> signUp(
@@ -70,28 +73,29 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
-    AsterfoxScreen.loadingNotifier.value = true;
-
-    try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == "email-already-in-use") {
-        emailController.clear();
-        passwordController.clear();
-        Fluttertoast.showToast(msg: Language.getText("email_already_in_use"));
-      } else if (e.code == "invalid-email") {
-        emailController.clear();
-        passwordController.clear();
-        Fluttertoast.showToast(msg: Language.getText("invalid_email"));
-      } else if (e.code == "weak-password") {
-        passwordController.clear();
-        Fluttertoast.showToast(msg: Language.getText("weak_password"));
-      } else {
-        rethrow;
+    final future = (() async {
+      try {
+        await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == "email-already-in-use") {
+          emailController.clear();
+          passwordController.clear();
+          Fluttertoast.showToast(msg: Language.getText("email_already_in_use"));
+        } else if (e.code == "invalid-email") {
+          emailController.clear();
+          passwordController.clear();
+          Fluttertoast.showToast(msg: Language.getText("invalid_email"));
+        } else if (e.code == "weak-password") {
+          passwordController.clear();
+          Fluttertoast.showToast(msg: Language.getText("weak_password"));
+        } else {
+          rethrow;
+        }
       }
-    }
-    AsterfoxScreen.loadingNotifier.value = false;
+    })();
+
+    await LoadingDialog.showLoading(context: context, future: future);
   }
 }
 
@@ -550,11 +554,12 @@ class ForgotPassword extends StatelessWidget {
             onPressed: () async {
               if (!formKey.currentState!.validate()) return;
               Navigator.pop(context);
-              AsterfoxScreen.loadingNotifier.value = true;
+
               // TODO: handle [There is no user record corresponding to this identifier. The user may have been deleted.]
-              await FirebaseAuth.instance
+              final future = FirebaseAuth.instance
                   .sendPasswordResetEmail(email: controller.text);
-              AsterfoxScreen.loadingNotifier.value = false;
+              await LoadingDialog.showLoading(context: context, future: future);
+
               Fluttertoast.showToast(
                   msg: Language.getText("reset_password_email_sent"));
             },
@@ -609,7 +614,7 @@ class GoogleSignInWidget extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  googleLogin();
+                  googleLogin(context);
                 },
                 child: Container(),
               ),
@@ -621,22 +626,22 @@ class GoogleSignInWidget extends StatelessWidget {
   }
 
   static final GoogleSignIn googleSignIn = GoogleSignIn();
-  static Future<void> googleLogin() async {
-    AsterfoxScreen.loadingNotifier.value = true;
+  static Future<void> googleLogin(BuildContext context) async {
+    final future = (() async {
+      final googleUser = await googleSignIn.signIn();
 
-    final googleUser = await googleSignIn.signIn();
+      if (googleUser != null) {
+        final googleAuth = await googleUser.authentication;
 
-    if (googleUser != null) {
-      final googleAuth = await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      }
+    })();
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    }
-
-    AsterfoxScreen.loadingNotifier.value = false;
+    await LoadingDialog.showLoading(context: context, future: future);
   }
 }

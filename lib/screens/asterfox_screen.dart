@@ -18,8 +18,6 @@ import 'login_screen.dart';
 class AsterfoxScreen extends StatelessWidget {
   const AsterfoxScreen({Key? key}) : super(key: key);
 
-  static final ValueNotifier<bool> loadingNotifier = ValueNotifier(false);
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -56,24 +54,6 @@ class AsterfoxScreen extends StatelessWidget {
         const DefaultTextStyle(
           child: Toast(),
           style: TextStyle(),
-        ),
-        // Loading Overlay
-        ValueListenableBuilder<bool>(
-          valueListenable: loadingNotifier,
-          builder: (context, visible, _) {
-            final screenSize = MediaQuery.of(context).size;
-            return Visibility(
-              visible: visible,
-              child: Container(
-                height: screenSize.height,
-                width: screenSize.width,
-                color: Colors.black45,
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            );
-          },
         ),
       ],
     );

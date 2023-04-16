@@ -47,22 +47,15 @@ class MoreActionsButton extends StatelessWidget {
               "${(await getTemporaryDirectory()).path}/share_files/${song.key}.mp3";
           final downloadFuture =
               MusicDownloader.downloadMp3(song, downloadPath, key);
-          showDialog(
+          await LoadingDialog.showLoading(
             context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              (() async {
-                await downloadFuture;
-                downloadProgress.remove(key);
-                Navigator.of(context).pop();
-                await Share.shareFiles([downloadPath]);
-              })();
-              return LoadingDialog(
-                onWillPop: () async => false,
-                percentageNotifier: downloadProgress[key],
-              );
-            },
+            future: (() async {
+              await downloadFuture;
+              downloadProgress.remove(key);
+            })(),
+            percentageNotifier: downloadProgress[key],
           );
+          await Share.shareFiles([downloadPath]);
         } else {
           await Share.shareFiles([song.audioSavePath]);
         }
