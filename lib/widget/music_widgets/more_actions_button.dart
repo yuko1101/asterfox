@@ -4,6 +4,7 @@ import 'package:asterfox/data/custom_colors.dart';
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/widget/asterfox_dialog.dart';
+import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
@@ -56,23 +57,9 @@ class MoreActionsButton extends StatelessWidget {
                 Navigator.of(context).pop();
                 await Share.shareFiles([downloadPath]);
               })();
-              return AsterfoxDialog(
-                canPop: false,
-                child: ValueListenableBuilder<int>(
-                  valueListenable: downloadProgress["share-${song.key}"]!,
-                  builder: (context, value, child) {
-                    return SizedBox(
-                      height: 60,
-                      width: 60,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: CustomColors.getColor("accent"),
-                          value: value.toDouble() / 100,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              return LoadingDialog(
+                onWillPop: () async => false,
+                percentageNotifier: downloadProgress[key],
               );
             },
           );
