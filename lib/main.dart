@@ -73,8 +73,9 @@ Future<void> main() async {
         activateConnectionChecker: true,
       );
 
-      Directory("${(await getTemporaryDirectory()).path}/share_files")
-          .delete(recursive: true);
+      final shareFilesDir =
+          Directory("${(await getTemporaryDirectory()).path}/share_files");
+      if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
       init();
       runApp(const AsterfoxApp());
