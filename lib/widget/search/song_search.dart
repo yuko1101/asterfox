@@ -199,7 +199,6 @@ class SongSearch extends SearchDelegate<String> {
             builder: (_, value, __) => ListView.builder(
               shrinkWrap: false,
               itemBuilder: (context, index) {
-                print(index);
                 return value[index];
               },
               itemCount: value.length,
