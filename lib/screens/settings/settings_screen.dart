@@ -116,8 +116,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
 
                     final future = (() async {
                       await CloudFirestoreManager.cancelListeners();
-                      await GoogleSignInWidget.googleSignIn.disconnect();
-                      await FirebaseAuth.instance.signOut();
+                      GoogleSignInWidget.googleSignIn.disconnect();
+                      FirebaseAuth.instance.signOut();
                     })();
 
                     await LoadingDialog.showLoading(
