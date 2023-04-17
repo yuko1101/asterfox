@@ -141,7 +141,9 @@ class CloudFirestoreManager {
 
   static StreamSubscription? _songsStreamSubscription;
   static Future<void> _listenSongsUpdate() async {
-    if (_songsStreamSubscription != null) _songsStreamSubscription!.cancel();
+    if (_songsStreamSubscription != null) {
+      await _songsStreamSubscription!.cancel();
+    }
     final user = FirebaseAuth.instance.currentUser!;
     final collection = FirebaseFirestore.instance
         .collection("users")
@@ -151,6 +153,8 @@ class CloudFirestoreManager {
     _songsStreamSubscription = collection.snapshots().listen((snapshot) async {
       final changes = snapshot.docChanges;
       if (changes.isEmpty) return;
+      print(
+          "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length}");
       for (final change in changes) {
         final audioId = change.doc.id;
         if (change.type == DocumentChangeType.removed) {
@@ -161,5 +165,17 @@ class CloudFirestoreManager {
       }
       await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
     });
+  }
+
+  static Future<void> cancelListeners() async {
+    final List<Future> futures = [];
+    if (_userDataStreamSubscription != null) {
+      futures.add(_userDataStreamSubscription!.cancel());
+    }
+    if (_songsStreamSubscription != null) {
+      futures.add(_songsStreamSubscription!.cancel());
+    }
+
+    await Future.wait(futures);
   }
 }

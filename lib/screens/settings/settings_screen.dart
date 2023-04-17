@@ -1,4 +1,6 @@
 import 'package:asterfox/screens/login_screen.dart';
+import 'package:asterfox/system/firebase/cloud_firestore.dart';
+import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
@@ -104,15 +106,24 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   description: Text(FirebaseAuth.instance.currentUser!.email ??
                       FirebaseAuth.instance.currentUser!.displayName!),
                   leading: const Icon(Icons.logout),
-                  onPressed: (context) {
+                  onPressed: (context) async {
                     if (!NetworkUtils.networkConnected()) {
                       // TODO: multi-lang
                       Fluttertoast.showToast(
                           msg: "You cannot sign out when offline.");
                       return;
                     }
-                    GoogleSignInWidget.googleSignIn.disconnect();
-                    FirebaseAuth.instance.signOut();
+
+                    final future = (() async {
+                      await CloudFirestoreManager.cancelListeners();
+                      await GoogleSignInWidget.googleSignIn.disconnect();
+                      await FirebaseAuth.instance.signOut();
+                    })();
+
+                    await LoadingDialog.showLoading(
+                      context: context,
+                      future: future,
+                    );
                   },
                 ),
               ],
