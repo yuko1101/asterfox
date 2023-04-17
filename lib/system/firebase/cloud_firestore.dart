@@ -21,15 +21,20 @@ class CloudFirestoreManager {
     );
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      _listenUserDataUpdate();
-      _listenSongsUpdate();
+      _onUserUpdate();
     }
     FirebaseAuth.instance.authStateChanges().listen((user) async {
       if (user == null) return;
-      _listenUserDataUpdate();
-      _listenSongsUpdate();
+      _onUserUpdate();
     });
     _isInitialized = true;
+  }
+
+  static void _onUserUpdate() {
+    LocalMusicsData.musicData.resetData();
+    SettingsData.settings.resetData();
+    _listenUserDataUpdate();
+    _listenSongsUpdate();
   }
 
   static Future<void> importData(Map<String, dynamic> data) async {
@@ -154,7 +159,7 @@ class CloudFirestoreManager {
       final changes = snapshot.docChanges;
       if (changes.isEmpty) return;
       print(
-          "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length}");
+          "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} songs.");
       for (final change in changes) {
         final audioId = change.doc.id;
         if (change.type == DocumentChangeType.removed) {
