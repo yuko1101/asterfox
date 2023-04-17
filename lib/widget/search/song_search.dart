@@ -178,30 +178,35 @@ class SongSearch extends SearchDelegate<String> {
 
       lastQuery = query;
     }
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          ValueListenableBuilder<List<SongSearchTile>>(
-            valueListenable: otherSelectedTilesNotifier,
-            builder: (context, value, child) => Visibility(
-              visible: value.isNotEmpty,
-              child: ExpansionTile(
-                title: Text(Language.getText("selected_songs")),
-                children: value,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ValueListenableBuilder<List<SongSearchTile>>(
+          valueListenable: otherSelectedTilesNotifier,
+          builder: (context, value, child) => Visibility(
+            visible: value.isNotEmpty,
+            child: ExpansionTile(
+              title: Text(
+                "${Language.getText("selected_songs")} (${value.length})",
               ),
+              children: value,
             ),
           ),
-          ValueListenableBuilder<List<SongSearchTile>>(
+        ),
+        Expanded(
+          child: ValueListenableBuilder<List<SongSearchTile>>(
             valueListenable: suggestionTiles,
             builder: (_, value, __) => ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (context, index) => value[index],
+              shrinkWrap: false,
+              itemBuilder: (context, index) {
+                print(index);
+                return value[index];
+              },
               itemCount: value.length,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -267,7 +272,7 @@ class SongSearch extends SearchDelegate<String> {
     }
   }
 
-  void loadOfflineSongs(String text) async {
+  Future<void> loadOfflineSongs(String text) async {
     loading.value = true;
     print("loading offline songs");
     final List<SongSuggestion> list = [];
@@ -334,8 +339,8 @@ class SongSearch extends SearchDelegate<String> {
           .where((s) => s.musicData != null)
           .map(
             (s) =>
-            s.musicData!.renew(isTemporary: false, key: const Uuid().v4()),
-      )
+                s.musicData!.renew(isTemporary: false, key: const Uuid().v4()),
+          )
           .toList(),
       mediaUrlList: suggestions
           .where((s) => s.mediaUrl != null && s.musicData == null)
