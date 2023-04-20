@@ -109,11 +109,17 @@ class MusicManager {
 
     // fix index (https://github.com/yuko1101/asterfox/issues/47)
     final int? currentPlayingIndex = audioDataManager.currentIndex;
-    final bool isPlaying = audioDataManager.playingState == PlayingState.playing;
+    final bool isPlaying =
+        audioDataManager.playingState == PlayingState.playing;
     final int songsCount = audioDataManager.playlist.length;
-    final bool isCertainRepeatMode = audioDataManager.repeatState != RepeatState.all;
+    final bool isCertainRepeatMode =
+        audioDataManager.repeatState != RepeatState.all;
 
-    if (index == currentPlayingIndex && isPlaying && index == songsCount - 1 && isCertainRepeatMode && songsCount > 1) {
+    if (index == currentPlayingIndex &&
+        isPlaying &&
+        index == songsCount - 1 &&
+        isCertainRepeatMode &&
+        songsCount > 1) {
       seek(Duration.zero, index: 0);
     }
 
@@ -194,10 +200,10 @@ class MusicManager {
 
       // while removing the song, refresh the song.
       final completer = Completer();
-      (() async {
+      () async {
         await _audioHandler.removeQueueItemAt(index);
         completer.complete();
-      })();
+      }();
 
       // if removing is not finished, wait for it to finish
       if (!completer.isCompleted) await completer.future;

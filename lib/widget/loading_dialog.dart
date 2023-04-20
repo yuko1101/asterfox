@@ -19,11 +19,11 @@ class LoadingDialog extends StatelessWidget {
       context: context,
       barrierDismissible: barrierDismissible,
       builder: (context) {
-        (() async {
+        () async {
           await future;
           Navigator.of(context).pop();
           completer.complete();
-        })();
+        }();
         return LoadingDialog(
           onWillPop: onWillPop,
           percentageNotifier: percentageNotifier,

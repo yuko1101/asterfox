@@ -49,10 +49,10 @@ class MoreActionsButton extends StatelessWidget {
               MusicDownloader.downloadMp3(song, downloadPath, key);
           await LoadingDialog.showLoading(
             context: context,
-            future: (() async {
+            future: () async {
               await downloadFuture;
               downloadProgress.remove(key);
-            })(),
+            }(),
             percentageNotifier: downloadProgress[key],
           );
           await Share.shareFiles([downloadPath]);

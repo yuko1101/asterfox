@@ -35,7 +35,7 @@ class AuthScreen extends StatefulWidget {
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
 
-    final future = (() async {
+    final future = () async {
       try {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
@@ -58,7 +58,7 @@ class AuthScreen extends StatefulWidget {
           rethrow;
         }
       }
-    })();
+    }();
 
     await LoadingDialog.showLoading(context: context, future: future);
   }
@@ -72,7 +72,7 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
-    final future = (() async {
+    final future = () async {
       try {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
@@ -92,7 +92,7 @@ class AuthScreen extends StatefulWidget {
           rethrow;
         }
       }
-    })();
+    }();
 
     await LoadingDialog.showLoading(context: context, future: future);
   }
@@ -626,7 +626,7 @@ class GoogleSignInWidget extends StatelessWidget {
 
   static final GoogleSignIn googleSignIn = GoogleSignIn();
   static Future<void> googleLogin(BuildContext context) async {
-    final future = (() async {
+    final future = () async {
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser != null) {
@@ -639,7 +639,7 @@ class GoogleSignInWidget extends StatelessWidget {
 
         await FirebaseAuth.instance.signInWithCredential(credential);
       }
-    })();
+    }();
 
     await LoadingDialog.showLoading(context: context, future: future);
   }

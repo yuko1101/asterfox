@@ -114,11 +114,11 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                       return;
                     }
 
-                    final future = (() async {
+                    final future = () async {
                       await CloudFirestoreManager.cancelListeners();
                       GoogleSignInWidget.googleSignIn.disconnect();
                       FirebaseAuth.instance.signOut();
-                    })();
+                    }();
 
                     await LoadingDialog.showLoading(
                       context: context,
