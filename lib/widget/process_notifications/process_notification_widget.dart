@@ -1,19 +1,27 @@
+import 'package:asterfox/data/custom_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class ProcessNotificationData<T> {
+class ProcessNotificationData {
   ProcessNotificationData({
     required this.title,
     this.description,
     this.icon,
     required this.future,
     this.progressListenable,
-  });
+    this.progressInPercentage = false,
+    this.maxProgress,
+  }) {
+    assert((progressListenable != null && maxProgress != null) ||
+        progressListenable == null);
+  }
   final Widget title;
   final Widget? description;
   final Widget? icon;
   final Future future;
-  final ValueListenable<T>? progressListenable;
+  final ValueListenable<int>? progressListenable;
+  final bool progressInPercentage;
+  final int? maxProgress;
 }
 
 class ProcessNotificationWidget extends StatelessWidget {
@@ -25,8 +33,37 @@ class ProcessNotificationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: notificationData.title,
+    return InkWell(
+      child: SizedBox(
+        height: 80,
+        child: (notificationData.progressListenable != null)
+            ? Column(
+                // with progress
+                children: [
+                  Flexible(
+                    child: Row(
+                      children: [
+                        notificationData.title,
+                      ],
+                    ),
+                  ),
+                  ValueListenableBuilder<int>(
+                    valueListenable: notificationData.progressListenable!,
+                    builder: (context, value, child) => LinearProgressIndicator(
+                      color: CustomColors.getColor("accent"),
+                      value: value.toDouble() /
+                          notificationData.maxProgress!.toDouble(),
+                    ),
+                  )
+                ],
+              )
+            : Row(
+                // without progress
+                children: [
+                  notificationData.title,
+                ],
+              ),
+      ),
     );
   }
 }

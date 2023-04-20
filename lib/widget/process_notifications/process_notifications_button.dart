@@ -1,6 +1,11 @@
 import 'dart:math';
 
+import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/widget/asterfox_dialog.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
+import 'package:asterfox/widget/process_notifications/process_notification_screen.dart';
+import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
+import 'package:easy_app/easy_app.dart';
 import 'package:flutter/material.dart';
 
 class ProcessNotificationsButton extends StatefulWidget {
@@ -98,7 +103,12 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
                               child: IconButton(
                                 icon: const Icon(Icons.settings),
                                 onPressed: () {
-                                  // TODO: open process list
+                                  EasyApp.pushPage(
+                                    context,
+                                    ProcessNotificationScreen(
+                                      widget.notificationList,
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -159,5 +169,26 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
     if (_widgetToShowNotifier.value == widget) {
       _widgetToShowNotifier.value = null;
     }
+  }
+}
+
+class ProcessDialog extends StatelessWidget {
+  const ProcessDialog(this.processNotificationList, {super.key});
+  final ProcessNotificationList processNotificationList;
+
+  @override
+  Widget build(BuildContext context) {
+    return AsterfoxDialog(
+      child: Flexible(
+        child: ValueListenableBuilder<List<ProcessNotificationData>>(
+          valueListenable: processNotificationList.notificationsNotifier,
+          builder: (context, value, child) => ListView.builder(
+            itemBuilder: (context, index) =>
+                ProcessNotificationWidget(notificationData: value[index]),
+            itemCount: value.length,
+          ),
+        ),
+      ),
+    );
   }
 }
