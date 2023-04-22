@@ -12,8 +12,10 @@ class ProcessNotificationData {
     this.progressListenable,
     this.progressInPercentage = false,
     this.maxProgress,
+    this.maxProgressListenable,
   }) {
-    assert((progressListenable != null && maxProgress != null) ||
+    assert((progressListenable != null &&
+            (maxProgress != null || maxProgressListenable != null)) ||
         progressListenable == null);
   }
   final Widget title;
@@ -23,6 +25,7 @@ class ProcessNotificationData {
   final ValueListenable<int>? progressListenable;
   final bool progressInPercentage;
   final int? maxProgress;
+  final ValueListenable<int>? maxProgressListenable;
 }
 
 class ProcessNotificationWidget extends StatelessWidget {
@@ -56,15 +59,15 @@ class ProcessNotificationWidget extends StatelessWidget {
                             children: [
                               notificationData.title,
                               const Spacer(),
-                              Text(
-                                notificationData.progressInPercentage
-                                    ? "$value%"
-                                    : "$value/${notificationData.maxProgress}",
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).extraColors.secondary,
-                                ),
-                              )
+                              notificationData.maxProgressListenable != null
+                                  ? ValueListenableBuilder<int>(
+                                      valueListenable: notificationData
+                                          .maxProgressListenable!,
+                                      builder: (context, max, child) =>
+                                          _getProgressText(value, max, context),
+                                    )
+                                  : _getProgressText(value,
+                                      notificationData.maxProgress!, context),
                             ],
                           ),
                         ),
@@ -74,12 +77,23 @@ class ProcessNotificationWidget extends StatelessWidget {
                             child: notificationData.description!,
                           ),
                         const Spacer(),
-                        LinearProgressIndicator(
-                          color: CustomColors.getColor("accent"),
-                          value: value.toDouble() /
-                              notificationData.maxProgress!.toDouble(),
-                          backgroundColor: Colors.black12,
-                        ),
+                        notificationData.maxProgressListenable != null
+                            ? ValueListenableBuilder<int>(
+                                valueListenable:
+                                    notificationData.maxProgressListenable!,
+                                builder: (context, max, child) =>
+                                    LinearProgressIndicator(
+                                  color: CustomColors.getColor("accent"),
+                                  value: value.toDouble() / max.toDouble(),
+                                  backgroundColor: Colors.black12,
+                                ),
+                              )
+                            : LinearProgressIndicator(
+                                color: CustomColors.getColor("accent"),
+                                value: value.toDouble() /
+                                    notificationData.maxProgress!.toDouble(),
+                                backgroundColor: Colors.black12,
+                              ),
                       ],
                     ),
                   ),
@@ -91,6 +105,17 @@ class ProcessNotificationWidget extends StatelessWidget {
                   ],
                 ),
         ),
+      ),
+    );
+  }
+
+  Text _getProgressText(int value, int max, BuildContext context) {
+    return Text(
+      notificationData.progressInPercentage
+          ? "${(value.toDouble() / max.toDouble() * 100).toInt()}%"
+          : "$value/$max",
+      style: TextStyle(
+        color: Theme.of(context).extraColors.secondary,
       ),
     );
   }

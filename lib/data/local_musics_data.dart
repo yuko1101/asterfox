@@ -60,7 +60,7 @@ class LocalMusicsData {
   static Future<void> uninstall(String audioId) async {
     if (!isStored(audioId: audioId)) throw SongNotStoredException();
     final dir = Directory(MusicData.getDirectoryPath(audioId));
-    await dir.delete(recursive: true);
+    if (dir.existsSync()) await dir.delete(recursive: true);
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.

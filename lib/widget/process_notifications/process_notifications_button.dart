@@ -29,6 +29,8 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
   final ValueNotifier<Widget?> _widgetToShowNotifier = ValueNotifier(null);
   final ValueNotifier<int> _processCountNotifier = ValueNotifier(0);
   late VoidCallback _spinIfProcessNotEmpty;
+  bool _disposed = false;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +88,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
 
   @override
   void dispose() {
+    _disposed = true;
     _controller.dispose();
     _runningController.dispose();
     widget.notificationList.notificationsNotifier
@@ -192,6 +195,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
   }
 
   Future<void> show(Widget widget) async {
+    if (_disposed) return;
     _widgetToShowNotifier.value = widget;
     await _controller.forward();
     await Future.delayed(const Duration(milliseconds: 600));

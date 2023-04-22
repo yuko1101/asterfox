@@ -106,6 +106,7 @@ class YouTubeMusicUtils {
     required String playlistId,
     required bool isTemporary,
     String? processId,
+    ValueNotifier<int>? maxCountListenable,
   }) async {
     // インターネット接続確認
     NetworkCheck.check();
@@ -127,8 +128,15 @@ class YouTubeMusicUtils {
       return completer.future;
     });
 
+    if (maxCountListenable != null) maxCountListenable.value = videos.length;
+
     final result = await _getFromVideos(
-        videos: videos, yt: yt, isTemporary: isTemporary, processId: processId);
+      videos: videos,
+      yt: yt,
+      isTemporary: isTemporary,
+      processId: processId,
+      maxCountListenable: maxCountListenable,
+    );
 
     yt.close();
 
@@ -140,6 +148,7 @@ class YouTubeMusicUtils {
     required YoutubeExplode yt,
     required bool isTemporary,
     required String? processId,
+    required ValueNotifier<int>? maxCountListenable,
   }) async {
     final bool useProgress = processId != null;
     if (useProgress) {
@@ -164,10 +173,17 @@ class YouTubeMusicUtils {
       });
       if (song == null) {
         failedToLoad.add(video);
+        if (maxCountListenable != null) {
+          maxCountListenable.value = maxCountListenable.value - 1;
+        }
+      } else if (useProgress && maxCountListenable != null) {
+        progressNotifier!.value = progressNotifier.value + 1;
       }
       print(
           "Complete ${videos.indexOf(video)}/${videos.length} (Playlist)${song == null ? " (Unplayable)" : ""}");
-      if (useProgress) progressNotifier!.value = progressNotifier.value + 1;
+      if (useProgress && maxCountListenable == null) {
+        progressNotifier!.value = progressNotifier.value + 1;
+      }
       return song;
     });
 
