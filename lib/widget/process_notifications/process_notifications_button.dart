@@ -28,7 +28,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
   late AnimationController _runningController;
   final ValueNotifier<Widget?> _widgetToShowNotifier = ValueNotifier(null);
   final ValueNotifier<int> _processCountNotifier = ValueNotifier(0);
-
+  late VoidCallback _spinIfProcessNotEmpty;
   @override
   void initState() {
     super.initState();
@@ -69,7 +69,7 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
         _runningController.animateTo(animateTo);
       }
     });
-    widget.notificationList.notificationsNotifier.addListener(() {
+    _spinIfProcessNotEmpty = () {
       if (_runningController.status == AnimationStatus.completed &&
           widget.notificationList.notificationsNotifier.value.isNotEmpty) {
         double animateTo = _runningController.value + 1 / 6;
@@ -79,13 +79,17 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
         }
         _runningController.animateTo(animateTo);
       }
-    });
+    };
+    widget.notificationList.notificationsNotifier
+        .addListener(_spinIfProcessNotEmpty);
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _runningController.dispose();
+    widget.notificationList.notificationsNotifier
+        .removeListener(_spinIfProcessNotEmpty);
     super.dispose();
   }
 
