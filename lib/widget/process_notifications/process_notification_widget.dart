@@ -37,25 +37,29 @@ class ProcessNotificationWidget extends StatelessWidget {
       child: SizedBox(
         height: 80,
         child: (notificationData.progressListenable != null)
-            ? Column(
-                // with progress
-                children: [
-                  Flexible(
-                    child: Row(
-                      children: [
-                        notificationData.title,
-                      ],
+            ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  // with progress
+                  children: [
+                    Flexible(
+                      child: Row(
+                        children: [
+                          notificationData.title,
+                        ],
+                      ),
                     ),
-                  ),
-                  ValueListenableBuilder<int>(
-                    valueListenable: notificationData.progressListenable!,
-                    builder: (context, value, child) => LinearProgressIndicator(
-                      color: CustomColors.getColor("accent"),
-                      value: value.toDouble() /
-                          notificationData.maxProgress!.toDouble(),
-                    ),
-                  )
-                ],
+                    ValueListenableBuilder<int>(
+                      valueListenable: notificationData.progressListenable!,
+                      builder: (context, value, child) =>
+                          LinearProgressIndicator(
+                        color: CustomColors.getColor("accent"),
+                        value: value.toDouble() /
+                            notificationData.maxProgress!.toDouble(),
+                      ),
+                    )
+                  ],
+                ),
               )
             : Row(
                 // without progress

@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:asterfox/data/custom_colors.dart';
 import 'package:asterfox/widget/asterfox_dialog.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_screen.dart';
@@ -44,6 +43,8 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
 
     int preCount = widget.notificationList.notificationsNotifier.value.length;
     _processCountNotifier.value = preCount;
+
+    // update process counter badge
     widget.notificationList.notificationsNotifier.addListener(() async {
       final diff =
           widget.notificationList.notificationsNotifier.value.length - preCount;
@@ -53,6 +54,31 @@ class ProcessNotificationsButtonState extends State<ProcessNotificationsButton>
             ProcessNotificationsButton.notificationBadgeAddDelay);
       }
       _processCountNotifier.value = _processCountNotifier.value + diff;
+    });
+
+    // spin gear icon while running
+    _runningController.animateTo(_runningController.value + 1 / 6);
+    _runningController.addStatusListener((status) {
+      if (status == AnimationStatus.completed &&
+          widget.notificationList.notificationsNotifier.value.isNotEmpty) {
+        double animateTo = _runningController.value + 1 / 6;
+        if (animateTo > 1) {
+          animateTo = animateTo - 1;
+          _runningController.reset();
+        }
+        _runningController.animateTo(animateTo);
+      }
+    });
+    widget.notificationList.notificationsNotifier.addListener(() {
+      if (_runningController.status == AnimationStatus.completed &&
+          widget.notificationList.notificationsNotifier.value.isNotEmpty) {
+        double animateTo = _runningController.value + 1 / 6;
+        if (animateTo > 1) {
+          animateTo = animateTo - 1;
+          _runningController.reset();
+        }
+        _runningController.animateTo(animateTo);
+      }
     });
   }
 
