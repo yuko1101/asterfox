@@ -1,4 +1,5 @@
 import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/system/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -33,40 +34,63 @@ class ProcessNotificationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: SizedBox(
-        height: 80,
-        child: (notificationData.progressListenable != null)
-            ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  // with progress
-                  children: [
-                    Flexible(
-                      child: Row(
-                        children: [
-                          notificationData.title,
-                        ],
-                      ),
+    return Container(
+      margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
+      child: Material(
+        elevation: 5,
+        color: Theme.of(context).extraColors.themeColor,
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        clipBehavior: Clip.antiAlias,
+        child: SizedBox(
+          height: 80,
+          child: (notificationData.progressListenable != null)
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: notificationData.progressListenable!,
+                    builder: (context, value, child) => Column(
+                      // with progress
+                      children: [
+                        Flexible(
+                          child: Row(
+                            children: [
+                              notificationData.title,
+                              const Spacer(),
+                              Text(
+                                notificationData.progressInPercentage
+                                    ? "$value%"
+                                    : "$value/${notificationData.maxProgress}",
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).extraColors.secondary,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        if (notificationData.description != null)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: notificationData.description!,
+                          ),
+                        const Spacer(),
+                        LinearProgressIndicator(
+                          color: CustomColors.getColor("accent"),
+                          value: value.toDouble() /
+                              notificationData.maxProgress!.toDouble(),
+                          backgroundColor: Colors.black12,
+                        ),
+                      ],
                     ),
-                    ValueListenableBuilder<int>(
-                      valueListenable: notificationData.progressListenable!,
-                      builder: (context, value, child) =>
-                          LinearProgressIndicator(
-                        color: CustomColors.getColor("accent"),
-                        value: value.toDouble() /
-                            notificationData.maxProgress!.toDouble(),
-                      ),
-                    )
+                  ),
+                )
+              : Row(
+                  // without progress
+                  children: [
+                    notificationData.title,
                   ],
                 ),
-              )
-            : Row(
-                // without progress
-                children: [
-                  notificationData.title,
-                ],
-              ),
+        ),
       ),
     );
   }
