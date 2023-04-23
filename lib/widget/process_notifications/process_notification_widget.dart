@@ -1,5 +1,7 @@
 import 'package:asterfox/data/custom_colors.dart';
 import 'package:asterfox/system/theme/theme.dart';
+import 'package:asterfox/utils/result.dart';
+import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,7 @@ class ProcessNotificationData {
     this.progressInPercentage = false,
     this.maxProgress,
     this.maxProgressListenable,
+    this.errorListNotifier,
   }) {
     assert((progressListenable != null &&
             (maxProgress != null || maxProgressListenable != null)) ||
@@ -26,6 +29,7 @@ class ProcessNotificationData {
   final bool progressInPercentage;
   final int? maxProgress;
   final ValueListenable<int>? maxProgressListenable;
+  final ValueListenable<List<ResultFailedReason>>? errorListNotifier;
 }
 
 class ProcessNotificationWidget extends StatelessWidget {
@@ -44,66 +48,65 @@ class ProcessNotificationWidget extends StatelessWidget {
         color: Theme.of(context).extraColors.themeColor,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          height: 80,
-          child: (notificationData.progressListenable != null)
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: notificationData.progressListenable!,
-                    builder: (context, value, child) => Column(
-                      // with progress
+        child: NullableNotifierWidget<List<ResultFailedReason>>(
+          notifier: notificationData.errorListNotifier,
+          builder: (context, errorList, child) => Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: NullableNotifierWidget<int>(
+              notifier: notificationData.progressListenable,
+              builder: (context, value, child) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Row(
                       children: [
-                        Flexible(
-                          child: Row(
-                            children: [
-                              notificationData.title,
-                              const Spacer(),
-                              notificationData.maxProgressListenable != null
-                                  ? ValueListenableBuilder<int>(
-                                      valueListenable: notificationData
-                                          .maxProgressListenable!,
-                                      builder: (context, max, child) =>
-                                          _getProgressText(value, max, context),
-                                    )
-                                  : _getProgressText(value,
-                                      notificationData.maxProgress!, context),
-                            ],
-                          ),
-                        ),
-                        if (notificationData.description != null)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: notificationData.description!,
-                          ),
+                        notificationData.title,
                         const Spacer(),
-                        notificationData.maxProgressListenable != null
-                            ? ValueListenableBuilder<int>(
-                                valueListenable:
-                                    notificationData.maxProgressListenable!,
-                                builder: (context, max, child) =>
-                                    LinearProgressIndicator(
-                                  color: CustomColors.getColor("accent"),
-                                  value: value.toDouble() / max.toDouble(),
-                                  backgroundColor: Colors.black12,
-                                ),
-                              )
-                            : LinearProgressIndicator(
-                                color: CustomColors.getColor("accent"),
-                                value: value.toDouble() /
-                                    notificationData.maxProgress!.toDouble(),
-                                backgroundColor: Colors.black12,
-                              ),
+                        if (value != null)
+                          NullableNotifierWidget<int>(
+                            notifier: notificationData.maxProgressListenable,
+                            builder: (context, max, widget) {
+                              max ??= notificationData.maxProgress!;
+                              return _getProgressText(value, max, context);
+                            },
+                          ),
                       ],
                     ),
                   ),
-                )
-              : Row(
-                  // without progress
-                  children: [
-                    notificationData.title,
-                  ],
-                ),
+                  notificationData.description != null
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: notificationData.description!,
+                        )
+                      : const SizedBox(
+                          height: 30,
+                        ),
+                  if (value != null)
+                    NullableNotifierWidget<int>(
+                      notifier: notificationData.maxProgressListenable!,
+                      builder: (context, max, child) {
+                        max ??= notificationData.maxProgress!;
+                        return LinearProgressIndicator(
+                          color: CustomColors.getColor("accent"),
+                          value: value.toDouble() / max.toDouble(),
+                          backgroundColor: Colors.black12,
+                        );
+                      },
+                    ),
+                  if (errorList != null && errorList.isNotEmpty)
+                    ExpansionTile(
+                      title: const Text("Errors"), // TODO: l10n
+                      children: errorList
+                          .map((e) => ExpansionTile(
+                                title: Text(e.title),
+                                children: [Text(e.description)],
+                              ))
+                          .toList(),
+                    )
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

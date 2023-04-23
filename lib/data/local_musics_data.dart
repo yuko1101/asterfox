@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
+import 'package:asterfox/utils/result.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
@@ -44,12 +46,13 @@ class LocalMusicsData {
     await CloudFirestoreManager.addOrUpdateSongs([song]);
   }
 
-  /// Throws [SongNotStoredException] if the song is not stored.
+  /// Throws [VideoUnplayableException], [NetworkException] and [SongNotStoredException].
   static Future<void> install(MusicData song) async {
     if (!song.isStored) throw SongNotStoredException();
     await MusicDownloader.download(song);
   }
 
+  /// Throws [VideoUnplayableException] and [NetworkException].
   static Future<void> download(MusicData song) async {
     await MusicDownloader.download(song);
     // since song.size will be changed on download, store after download
@@ -126,18 +129,38 @@ class LocalMusicsData {
 }
 
 extension LocalMusicsDataExtension on MusicData {
-  /// Throws [NetworkException] if the network is not accessible.
-  Future<void> download() async {
-    await LocalMusicsData.download(this);
+  Future<Result<void>> download() async {
+    try {
+      await LocalMusicsData.download(this);
+      return Result.successful(null);
+    } on Exception catch (e, stacktrace) {
+      return Result.failed(
+        ResultFailedReason(
+          cause: e,
+          title: e.toString(),
+          description: stacktrace.toString(),
+        ),
+      );
+    }
   }
 
   Future<void> store() async {
     await LocalMusicsData.store(this);
   }
 
-  /// Throws [SongNotStoredException] if the song is not stored.
-  Future<void> install() async {
-    await LocalMusicsData.install(this);
+  Future<Result<void>> install() async {
+    try {
+      await LocalMusicsData.install(this);
+      return Result.successful(null);
+    } on Exception catch (e, stacktrace) {
+      return Result.failed(
+        ResultFailedReason(
+          cause: e,
+          title: e.toString(),
+          description: stacktrace.toString(),
+        ),
+      );
+    }
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.

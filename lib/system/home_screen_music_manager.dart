@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/music/utils/music_url_utils.dart';
+import 'package:asterfox/utils/result.dart';
 import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:easy_app/utils/languages.dart';
@@ -11,7 +12,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import '../data/custom_colors.dart';
 import '../data/local_musics_data.dart';
 import '../data/settings_data.dart';
 import '../main.dart';
@@ -47,6 +47,8 @@ class HomeScreenMusicManager {
     if (autoDownloadEnabled) downloadProgress[key] = ValueNotifier<int>(0);
 
     final ValueNotifier<String?> songTitleNotifier = ValueNotifier(null);
+    final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
+        ValueNotifier<List<ResultFailedReason>>([]);
     HomeScreen.processNotificationList.push(
       ProcessNotificationData(
         title: Text(autoDownloadEnabled
@@ -66,6 +68,7 @@ class HomeScreenMusicManager {
         progressInPercentage: true,
         maxProgress: 100,
         progressListenable: downloadProgress[key],
+        errorListNotifier: errorListNotifier,
         future: () async {
           MusicData song;
           if (musicData == null) {
@@ -105,12 +108,17 @@ class HomeScreenMusicManager {
           songTitleNotifier.value = song.title;
 
           if (autoDownloadEnabled) {
-            try {
-              await song.download();
-            } on NetworkException {
-              Fluttertoast.showToast(
-                  msg: Language.getText("network_not_accessible"));
-              return;
+            final result = await song.download();
+            if (result.status == ResultStatus.failed) {
+              errorListNotifier.value = errorListNotifier.value.toList()
+                ..add(result.getReason());
+              ToastManager.showSimpleToast(
+                msg: Text(Language.getText("song_unplayable")),
+                icon: const Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                ),
+              );
             }
           }
           await musicManager.add(song);
@@ -145,6 +153,8 @@ class HomeScreenMusicManager {
     final ValueNotifier<int> progressNotifier =
         YouTubeMusicUtils.playlistLoadingProgress[playlistProcessId]!;
     final ValueNotifier<int> maxProgressNotifier = ValueNotifier<int>(count);
+    final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
+        ValueNotifier<List<ResultFailedReason>>([]);
 
     await HomeScreen.processNotificationList.push(
       ProcessNotificationData(
@@ -160,6 +170,7 @@ class HomeScreenMusicManager {
         ),
         maxProgressListenable: maxProgressNotifier,
         progressListenable: progressNotifier,
+        errorListNotifier: errorListNotifier,
         icon: const Icon(Icons.queue_music),
         future: () async {
           List<MusicData> songs = [];
@@ -177,7 +188,7 @@ class HomeScreenMusicManager {
                           isTemporary: false,
                         )),
               );
-            } on NetworkException {
+            } on NetworkException catch (e) {
               Fluttertoast.showToast(
                   msg: Language.getText("network_not_accessible"));
               return;
@@ -194,7 +205,10 @@ class HomeScreenMusicManager {
                 maxCountListenable: maxProgressNotifier,
               ))
                   .first);
-            } on NetworkException {
+            } on NetworkException catch (e) {
+              errorListNotifier.value = errorListNotifier.value.toList()
+                ..add(ResultFailedReason(
+                    cause: e, title: e.title, description: e.description));
               Fluttertoast.showToast(
                   msg: Language.getText("network_not_accessible"));
               return;
@@ -204,19 +218,17 @@ class HomeScreenMusicManager {
           if (autoDownloadEnabled) {
             downloadModeNotifier.value = true;
             progressNotifier.value = 0;
-            try {
-              await Future.wait(songs.map((song) async {
-                await song.download();
-                progressNotifier.value = progressNotifier.value + 1;
-              }));
-              for (final song in songs) {
-                if (song.isStored) continue;
-                await LocalMusicsData.store(song);
+            await Future.wait(songs.map((song) async {
+              final result = await song.download();
+              if (result.status == ResultStatus.failed) {
+                errorListNotifier.value = errorListNotifier.value.toList()
+                  ..add(result.getReason());
               }
-            } on NetworkException {
-              Fluttertoast.showToast(
-                  msg: Language.getText("network_not_accessible"));
-              return;
+              progressNotifier.value = progressNotifier.value + 1;
+            }));
+            for (final song in songs) {
+              if (song.isStored) continue;
+              await LocalMusicsData.store(song);
             }
           }
           await musicManager.addAll(songs);

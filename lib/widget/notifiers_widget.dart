@@ -1,6 +1,26 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+class NullableNotifierWidget<T> extends StatelessWidget {
+  const NullableNotifierWidget({
+    required this.notifier,
+    required this.builder,
+    super.key,
+  });
+
+  final ValueListenable<T>? notifier;
+  final Widget Function(BuildContext, T?, Widget?) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (notifier == null) return builder(context, null, null);
+    return ValueListenableBuilder<T>(
+      valueListenable: notifier!,
+      builder: builder,
+    );
+  }
+}
+
 class SingleNotifierWidget<T> extends StatelessWidget {
   const SingleNotifierWidget({
     required this.notifier,

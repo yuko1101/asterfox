@@ -21,6 +21,7 @@ final Map<String, ValueNotifier<int>> downloadProgress = {};
 
 class MusicDownloader {
   /// Throws [NetworkException] if network is not accessible.
+  /// Throws [VideoUnplayableException]
   static Future<void> download(MusicData song) async {
     if (song.isInstalled) return;
 
@@ -57,6 +58,7 @@ class MusicDownloader {
     downloading.value = preDownloading;
   }
 
+  /// Throws [VideoUnplayableException]
   static Future<void> downloadMp3(
       MusicData song, String downloadPath, String key,
       [bool manageDownload = true]) async {
@@ -80,6 +82,7 @@ class MusicDownloader {
     }
   }
 
+  /// Throws [VideoUnplayableException]
   static Future<void> _downloadFromYouTube(
       String id, String downloadPath, String key) async {
     final File file = File(downloadPath);

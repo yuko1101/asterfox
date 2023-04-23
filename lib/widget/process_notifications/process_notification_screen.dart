@@ -1,3 +1,4 @@
+import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:easy_app/easy_app.dart';
@@ -21,13 +22,23 @@ class _MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: main screen
     return SafeArea(
-      child: ValueListenableBuilder<List<ProcessNotificationData>>(
-        valueListenable: processNotificationList.notificationsNotifier,
-        builder: (context, value, child) => ListView.builder(
-          itemBuilder: (context, index) => ProcessNotificationWidget(
-            notificationData: value[index],
-          ),
-          itemCount: value.length,
+      child: DoubleNotifierWidget<List<ProcessNotificationData>,
+          List<ProcessNotificationData>>(
+        notifier1: processNotificationList.notificationsNotifier,
+        notifier2: processNotificationList.erroredProcessList,
+        builder: (context, running, errored, child) => ListView.builder(
+          itemBuilder: (context, index) {
+            if (running.length == index) {
+              return ExpansionTile(
+                title: const Text("Errored Processes"), // TODO: l10n
+                children: errored
+                    .map((e) => ProcessNotificationWidget(notificationData: e))
+                    .toList(),
+              );
+            }
+            return ProcessNotificationWidget(notificationData: running[index]);
+          },
+          itemCount: running.length + (errored.isNotEmpty ? 1 : 0),
         ),
       ),
     );

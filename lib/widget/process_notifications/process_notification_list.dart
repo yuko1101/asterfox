@@ -9,6 +9,9 @@ class ProcessNotificationList {
   final ValueNotifier<List<ProcessNotificationData>> notificationsNotifier =
       ValueNotifier([]);
 
+  final ValueNotifier<List<ProcessNotificationData>> erroredProcessList =
+      ValueNotifier([]);
+
   Future<void> push(ProcessNotificationData notificationData) async {
     notificationsNotifier.value = [
       ...notificationsNotifier.value,
@@ -37,6 +40,12 @@ class ProcessNotificationList {
       }
       notificationsNotifier.value = [...notificationsNotifier.value]
         ..remove(notificationData);
+
+      if (notificationData.errorListNotifier != null &&
+          notificationData.errorListNotifier!.value.isNotEmpty) {
+        erroredProcessList.value = erroredProcessList.value.toList()
+          ..add(notificationData);
+      }
     }();
   }
 
