@@ -334,7 +334,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> _activateAudioSession() async {
     final audioChannel = SettingsData.getValue(key: "audioChannel") as String;
     final usage = audioChannel == "call"
-        ? AndroidAudioUsage.voiceCommunication
+        ? AndroidAudioUsage.voiceCommunicationSignalling
         : audioChannel == "notification"
             ? AndroidAudioUsage.notification
             : audioChannel == "alarm"
