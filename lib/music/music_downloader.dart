@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
