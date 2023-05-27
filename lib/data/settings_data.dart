@@ -13,6 +13,8 @@ class SettingsData {
   static const Map<String, dynamic> defaultData = {
     "theme": "dark",
     "autoDownload": false,
+    "disableInterruptions": false,
+    "audioChannel": "media",
   };
   static Future<void> init() async {
     settings = await ConfigFile(

@@ -84,5 +84,13 @@
   "copied_to_clipboard": "クリップボードにコピーしました",
   "selected_songs": "選択中の曲",
   "offline_search": "オフライン検索",
-  "share_mp3": "MP3ファイルを共有"
+  "share_mp3": "MP3ファイルを共有",
+  "disable_interruptions": "音楽の妨害を阻止",
+  "disable_interruptions_description": "他のアプリによる音楽の一時停止などの妨害を無効化します。",
+  "restart_required": "このオプションを適用するにはアプリの再起動が必要です。",
+  "audio_channel": "オーディオチャンネル",
+  "audio_channel_media": "メディア",
+  "audio_channel_call": "通話",
+  "audio_channel_notification": "着信音と通知",
+  "audio_channel_alarm": "アラーム"
 }

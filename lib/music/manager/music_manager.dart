@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:asterfox/data/device_settings_data.dart';
+import 'package:asterfox/data/settings_data.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
@@ -46,9 +47,11 @@ class MusicManager {
   final muteNotifier = ValueNotifier<bool>(false); // sync fast
 
   Future<void> init() async {
+    final bool handleInterruptions =
+        !SettingsData.getValue(key: "disableInterruptions");
     if (!windowsMode && showNotification) {
       _audioHandler = await AudioService.init(
-          builder: () => SessionAudioHandler(true),
+          builder: () => SessionAudioHandler(true, handleInterruptions),
           config: const AudioServiceConfig(
             androidNotificationChannelId: 'net.asterfox.app.channel.audio',
             androidNotificationChannelName: 'Asterfox Music',
@@ -58,7 +61,7 @@ class MusicManager {
           ));
     } else {
       print("windowsMode");
-      _audioHandler = SessionAudioHandler(false);
+      _audioHandler = SessionAudioHandler(false, handleInterruptions);
     }
     MusicListener(this, _audioHandler).init();
     audioDataManager = AudioDataManager(_audioHandler.audioPlayer);

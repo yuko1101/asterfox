@@ -49,6 +49,7 @@ dependencies:
   just_audio_libwinmedia: ^0.0.4+1 # Temporarily
 #  just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.9
+  audio_session: ^0.1.14
 
   youtube_explode_dart: ^1.12.4
 

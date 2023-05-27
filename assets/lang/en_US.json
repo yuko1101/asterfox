@@ -84,5 +84,13 @@
   "copied_to_clipboard": "Copied to Clipboard",
   "selected_songs": "Selected Songs",
   "offline_search": "Offline Search",
-  "share_mp3": "Share MP3 File"
+  "share_mp3": "Share MP3 File",
+  "disable_interruptions": "Disable music interruptions",
+  "disable_interruptions_description": "Protects music from being interrupted by other applications.",
+  "restart_required": "Changing this option requires a restart to take effect.",
+  "audio_channel": "Audio Channel",
+  "audio_channel_media": "Media",
+  "audio_channel_call": "Call",
+  "audio_channel_notification": "Ring & notification",
+  "audio_channel_alarm": "Alarm"
 }

@@ -1,4 +1,5 @@
 import 'package:asterfox/screens/login_screen.dart';
+import 'package:asterfox/screens/settings/audio_channel_settings_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/easy_app.dart';
@@ -60,6 +61,11 @@ class _MainSettingsScreen extends StatefulWidget {
 class _MainSettingsScreenState extends State<_MainSettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    final restartRequiredText = TextSpan(
+      text: Language.getText("restart_required"),
+      style: const TextStyle(color: Colors.red),
+    );
+
     return Scaffold(
       body: SettingsList(
         sections: [
@@ -96,6 +102,47 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   });
                 },
               ),
+              SettingsTile.switchTile(
+                title: Text(Language.getText("disable_interruptions")),
+                description: RichText(
+                  text: TextSpan(
+                    text:
+                        Language.getText("disable_interruptions_description") +
+                            "\n",
+                    children: [
+                      restartRequiredText,
+                    ],
+                  ),
+                ),
+                initialValue:
+                    SettingsData.getValue(key: "disableInterruptions"),
+                activeSwitchColor: CustomColors.getColor("accent"),
+                onToggle: (value) {
+                  setState(() {
+                    SettingsData.settings
+                        .set(key: "disableInterruptions", value: value);
+                    SettingsData.save();
+                  });
+                },
+              ),
+              SettingsTile.navigation(
+                title: Text(Language.getText("audio_channel")),
+                description: RichText(
+                  text: TextSpan(
+                    text: Language.getText(
+                          "audio_channel_${SettingsData.getValue(key: "audioChannel")}",
+                        ) +
+                        "\n",
+                    children: [
+                      restartRequiredText,
+                    ],
+                  ),
+                ),
+                onPressed: (context) {
+                  EasyApp.pushPage(context, const AudioChannelSettingsScreen());
+                },
+                trailing: const Icon(Icons.keyboard_arrow_right),
+              )
             ],
           ),
           if (shouldInitializeFirebase)

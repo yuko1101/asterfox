@@ -1,4 +1,6 @@
+import 'package:asterfox/data/settings_data.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -15,18 +17,30 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   // fix that the audio player is not working when the empty playlist is added
   final fix = OS.getOS() == OSType.windows;
   final bool useSession;
+  final bool handleInterruptions;
 
   /// Initialize the audio handler.
-  SessionAudioHandler(this.useSession) {
+  SessionAudioHandler(this.useSession, this.handleInterruptions) {
     _androidEnhancer.setEnabled(true);
     _pipeline = AudioPipeline(androidAudioEffects: [_androidEnhancer]);
-    _player = AudioPlayer(audioPipeline: _pipeline);
+    _player = AudioPlayer(
+      audioPipeline: _pipeline,
+      handleInterruptions: handleInterruptions,
+      handleAudioSessionActivation: handleInterruptions,
+    );
 
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
     if (useSession) {
       _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
+      _activateAudioSession();
+    }
+
+    // Disabling handleInterruptions also cause to disable listening becomingNoisyEventStream.
+    // So this listens instead.
+    if (!handleInterruptions) {
+      _listenBecomingNoisyEventStream();
     }
 
     // _notifyAudioHandlerAboutPlaybackEvents();
@@ -315,5 +329,34 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       await _player.seek(Duration.zero);
       await _player.load();
     }
+  }
+
+  Future<void> _activateAudioSession() async {
+    final audioChannel = SettingsData.getValue(key: "audioChannel") as String;
+    final usage = audioChannel == "call"
+        ? AndroidAudioUsage.voiceCommunication
+        : audioChannel == "notification"
+            ? AndroidAudioUsage.notification
+            : audioChannel == "alarm"
+                ? AndroidAudioUsage.alarm
+                : AndroidAudioUsage.media;
+
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.music,
+        usage: usage,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+    ));
+  }
+
+  Future<void> _listenBecomingNoisyEventStream() async {
+    final session = await AudioSession.instance;
+    session.becomingNoisyEventStream.listen((_) {
+      _player.pause();
+    });
   }
 }
