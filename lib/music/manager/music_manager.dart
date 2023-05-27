@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/data/settings_data.dart';
+import 'package:asterfox/utils/math.dart';
+import 'package:asterfox/widget/music_widgets/volume_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
@@ -236,7 +238,8 @@ class MusicManager {
         baseVolumeNotifier.value *
         audioDataManager.currentSongVolume;
     if (OS.getOS() == OSType.android) {
-      _audioHandler.androidEnhancer.setTargetGain(max((volume - 1) * 3, 0));
+      _audioHandler.androidEnhancer
+          .setTargetGain(max(MathUtils.log(volume, VolumeWidget.base), 0));
     }
     await _audioHandler.audioPlayer.setVolume(volume);
   }
