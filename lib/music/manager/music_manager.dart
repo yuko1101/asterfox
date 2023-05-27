@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:asterfox/data/device_settings_data.dart';
 import 'package:audio_service/audio_service.dart';
@@ -228,9 +229,13 @@ class MusicManager {
   }
 
   Future<void> updateVolume() async {
-    await _audioHandler.audioPlayer.setVolume((muteNotifier.value ? 0 : 1) *
+    final volume = (muteNotifier.value ? 0 : 1) *
         baseVolumeNotifier.value *
-        audioDataManager.currentSongVolume);
+        audioDataManager.currentSongVolume;
+    if (OS.getOS() == OSType.android) {
+      _audioHandler.androidEnhancer.setTargetGain(max((volume - 1) * 3, 0));
+    }
+    await _audioHandler.audioPlayer.setVolume(volume);
   }
 
   Future<void> setMute(bool mute) async {

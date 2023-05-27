@@ -7,15 +7,21 @@ import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
-  final _player = AudioPlayer();
+  final _androidEnhancer = AndroidLoudnessEnhancer();
+  late final AudioPipeline _pipeline;
+  late final AudioPlayer _player;
   var _playlist = ConcatenatingAudioSource(children: []);
 
   // fix that the audio player is not working when the empty playlist is added
   final fix = OS.getOS() == OSType.windows;
   final bool useSession;
 
-  /// Initialise the audio handler.
+  /// Initialize the audio handler.
   SessionAudioHandler(this.useSession) {
+    _androidEnhancer.setEnabled(true);
+    _pipeline = AudioPipeline(androidAudioEffects: [_androidEnhancer]);
+    _player = AudioPlayer(audioPipeline: _pipeline);
+
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
@@ -213,6 +219,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   AudioPlayer get audioPlayer => _player;
+  AndroidLoudnessEnhancer get androidEnhancer => _androidEnhancer;
 
   /// Transform a just_audio event into an audio_service state.
   ///
