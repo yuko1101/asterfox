@@ -92,7 +92,7 @@ class HomeScreen extends ScaffoldScreen {
         );
 }
 
-class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
+class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeScreenAppBar({
     Key? key,
   }) : super(key: key);
@@ -124,7 +124,8 @@ class HomeScreenAppBar extends StatelessWidget with PreferredSizeWidget {
               final searchDelegate =
                   SongSearch(animationController: _menuIconAnimationController);
               _menuIconAnimationController.forward();
-              await showSearch(context: context, delegate: searchDelegate).then((value) {
+              await showSearch(context: context, delegate: searchDelegate)
+                  .then((value) {
                 _menuIconAnimationController.reverse();
               });
             },

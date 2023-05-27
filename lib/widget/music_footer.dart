@@ -10,7 +10,7 @@ import 'music_widgets/repeat_button.dart';
 import 'music_widgets/song_text.dart';
 import 'music_widgets/time_text.dart';
 
-class MusicFooter extends StatelessWidget with PreferredSizeWidget {
+class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
   const MusicFooter({Key? key}) : super(key: key);
 
   @override
@@ -19,36 +19,36 @@ class MusicFooter extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     if (!Responsive.isMobile(context)) {
-      return SizedBox(
+      return const SizedBox(
         height: 75,
         child: Column(
           children: [
-            const Expanded(
+            Expanded(
               child: AudioProgressBar(),
             ),
             Row(
               children: [
-                const PreviousSongButton(),
-                const PlayButton(),
-                const NextSongButton(),
-                const SizedBox(width: 30),
-                const TimeText(),
-                const Spacer(),
-                const MusicThumbnail(),
-                const SizedBox(width: 30),
+                PreviousSongButton(),
+                PlayButton(),
+                NextSongButton(),
+                SizedBox(width: 30),
+                TimeText(),
+                Spacer(),
+                MusicThumbnail(),
+                SizedBox(width: 30),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     CurrentSongTitle(),
                     CurrentSongAuthor(),
                   ],
                 ),
-                const Spacer(),
-                const RepeatButton(),
-                const ShuffleButton(),
-                const DownloadButton(),
-                const MoreActionsButton(),
+                Spacer(),
+                RepeatButton(),
+                ShuffleButton(),
+                DownloadButton(),
+                MoreActionsButton(),
               ],
             ),
           ],

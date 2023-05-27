@@ -29,7 +29,7 @@ class SettingsScreen extends ScaffoldScreen {
         );
 }
 
-class _AppBar extends StatelessWidget with PreferredSizeWidget {
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   const _AppBar({
     Key? key,
   }) : super(key: key);

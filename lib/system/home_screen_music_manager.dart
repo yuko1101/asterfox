@@ -188,7 +188,7 @@ class HomeScreenMusicManager {
                           isTemporary: false,
                         )),
               );
-            } on NetworkException catch (e) {
+            } on NetworkException {
               Fluttertoast.showToast(
                   msg: Language.getText("network_not_accessible"));
               return;

@@ -18,7 +18,7 @@ class SongHistoryScreen extends ScaffoldScreen {
         );
 }
 
-class SongHistoryAppBar extends StatelessWidget with PreferredSizeWidget {
+class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SongHistoryAppBar({
     Key? key,
   }) : super(key: key);
