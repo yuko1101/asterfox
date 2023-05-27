@@ -334,12 +334,16 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> _activateAudioSession() async {
     final audioChannel = SettingsData.getValue(key: "audioChannel") as String;
     final usage = audioChannel == "call"
-        ? AndroidAudioUsage.voiceCommunicationSignalling
-        : audioChannel == "notification"
-            ? AndroidAudioUsage.notification
-            : audioChannel == "alarm"
-                ? AndroidAudioUsage.alarm
-                : AndroidAudioUsage.media;
+        ? AndroidAudioUsage.voiceCommunication
+        : audioChannel == "call_speaker"
+            ? AndroidAudioUsage.voiceCommunication
+            : audioChannel == "notification"
+                ? AndroidAudioUsage.notification
+                : audioChannel == "alarm"
+                    ? AndroidAudioUsage.alarm
+                    : AndroidAudioUsage.media;
+
+    final isCallSpeaker = audioChannel == "call_speaker";
 
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration(
@@ -348,6 +352,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       androidAudioAttributes: AndroidAudioAttributes(
         contentType: AndroidAudioContentType.music,
         usage: usage,
+        flags: isCallSpeaker
+            ? AndroidAudioFlags.audibilityEnforced
+            : AndroidAudioFlags.none,
       ),
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
     ));

@@ -91,6 +91,7 @@
   "audio_channel": "Audio Channel",
   "audio_channel_media": "Media",
   "audio_channel_call": "Call",
+  "audio_channel_call_speaker": "Call (Speaker)",
   "audio_channel_notification": "Ring & notification",
   "audio_channel_alarm": "Alarm"
 }

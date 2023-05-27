@@ -48,10 +48,17 @@ class _AudioChannelChoice extends StatefulWidget {
 }
 
 final audioChannels = [
-  {"name": "media", "icon": Icons.music_note},
+  {
+    "name": "media",
+    "icon": Icons.music_note,
+  },
   {
     "name": "call",
     "icon": Icons.call,
+  },
+  {
+    "name": "call_speaker",
+    "icon": Icons.speaker,
   },
   {
     "name": "notification",
