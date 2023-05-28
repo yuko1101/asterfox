@@ -10,6 +10,7 @@ import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:wear/wear.dart';
 
 import 'debug_screen.dart';
@@ -131,7 +132,22 @@ class AsterfoxMainScreen extends StatelessWidget {
           SideMenuItem(
             title: const Text("Playlist"),
             icon: const Icon(Icons.playlist_play),
-            onPressed: () {},
+            onPressed: () async {
+              if (await FlutterOverlayWindow.isActive()) {
+                await FlutterOverlayWindow.closeOverlay();
+                return;
+              }
+              await FlutterOverlayWindow.showOverlay(
+                enableDrag: true,
+                overlayTitle: "Asterfox Music",
+                overlayContent: "Overlay Enabled",
+                flag: OverlayFlag.defaultFlag,
+                visibility: NotificationVisibility.visibilityPublic,
+                positionGravity: PositionGravity.none,
+                height: 300,
+                width: 300,
+              );
+            },
           ),
           SideMenuItem(
             title: const Text("History"),

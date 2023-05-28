@@ -158,6 +158,17 @@ void init() async {
   }
 }
 
+@pragma("vm:entry-point")
+void overlayMain() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: DefaultTextStyle(
+      style: TextStyle(),
+      child: AsterfoxMainWatchScreen(WearShape.square),
+    ),
+  ));
+}
+
 class AsterfoxApp extends StatelessWidget {
   const AsterfoxApp({Key? key}) : super(key: key);
 
