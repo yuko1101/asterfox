@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/screens/settings/settings_screen.dart';
 import 'package:asterfox/screens/song_history_screen.dart';
+import 'package:asterfox/system/home_screen_music_manager.dart';
+import 'package:asterfox/widget/music_widgets/music_buttons.dart';
+import 'package:asterfox/widget/music_widgets/music_thumbnail.dart';
 import 'package:asterfox/widget/toast/toast_widget.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
@@ -10,7 +13,7 @@ import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:uuid/uuid.dart';
 import 'package:wear/wear.dart';
 
 import 'debug_screen.dart';
@@ -171,11 +174,33 @@ class AsterfoxMainWatchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.blue,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.expand(),
-        child: Center(child: Text(shape.name)),
+    return Material(
+      child: Container(
+        color: Theme.of(context).backgroundColor,
+        child: ConstrainedBox(
+            constraints: const BoxConstraints.expand(),
+            child: Stack(
+              children: [
+                const MusicThumbnail(),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // CurrentSongTitle(),
+                    // CurrentSongAuthor(),
+                    const PlayButton(),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        HomeScreenMusicManager.addSong(
+                          key: const Uuid().v4(),
+                          youtubeId: "ZRtdQ81jPUQ",
+                        );
+                      },
+                    ),
+                  ],
+                )
+              ],
+            )),
       ),
     );
   }

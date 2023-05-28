@@ -92,11 +92,11 @@ class MobileMusicFooter extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                 ),
               ),
-              Expanded(
+              const Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     CurrentSongTitle(),
                     CurrentSongAuthor(),
                   ],
@@ -107,8 +107,8 @@ class MobileMusicFooter extends StatelessWidget {
           ),
           Container(
             margin: const EdgeInsets.only(left: 20, right: 20),
-            child: Column(
-              children: const [
+            child: const Column(
+              children: [
                 Align(
                   child: TimeText(),
                   alignment: Alignment.bottomRight,
@@ -117,24 +117,24 @@ class MobileMusicFooter extends StatelessWidget {
               ],
             ),
           ),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: const [
+                  children: [
                     ShuffleButton(),
                     RepeatButton(),
                     PreviousSongButton(),
                   ],
                 ),
               ),
-              const PlayButton(),
+              PlayButton(),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     NextSongButton(),
                     DownloadButton(),
                     MoreActionsButton(),

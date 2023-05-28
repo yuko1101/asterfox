@@ -5,6 +5,7 @@ import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
+import 'package:easy_app/screen/base_screens/widget_screen.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -24,7 +25,7 @@ import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
 import 'widget/process_notifications/process_notification_list.dart';
 
-late final MusicManager musicManager;
+final MusicManager musicManager = MusicManager(true);
 late final bool isWearOS;
 final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
@@ -57,7 +58,6 @@ Future<void> main() async {
       }
 
       // run this before initializing HomeScreen
-      musicManager = MusicManager(true);
       await musicManager.init();
 
       // run this after initializing the music manager.
@@ -73,7 +73,8 @@ Future<void> main() async {
 
       HomeScreen.processNotificationList = ProcessNotificationList();
       await EasyApp.initialize(
-        homeScreen: HomeScreen(),
+        homeScreen:
+            isWearOS ? const WidgetScreen(child: SizedBox()) : HomeScreen(),
         languages: [
           "ja_JP",
           "en_US",
