@@ -132,22 +132,7 @@ class AsterfoxMainScreen extends StatelessWidget {
           SideMenuItem(
             title: const Text("Playlist"),
             icon: const Icon(Icons.playlist_play),
-            onPressed: () async {
-              if (await FlutterOverlayWindow.isActive()) {
-                await FlutterOverlayWindow.closeOverlay();
-                return;
-              }
-              await FlutterOverlayWindow.showOverlay(
-                enableDrag: true,
-                overlayTitle: "Asterfox Music",
-                overlayContent: "Overlay Enabled",
-                flag: OverlayFlag.defaultFlag,
-                visibility: NotificationVisibility.visibilityPublic,
-                positionGravity: PositionGravity.none,
-                height: 300,
-                width: 300,
-              );
-            },
+            onPressed: () async {},
           ),
           SideMenuItem(
             title: const Text("History"),
