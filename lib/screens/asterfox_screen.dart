@@ -10,6 +10,7 @@ import 'package:easy_app/screen/main_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wear/wear.dart';
 
 import 'debug_screen.dart';
 import 'home_screen.dart';
@@ -104,6 +105,13 @@ class AsterfoxMainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isWearOS) {
+      return DefaultTextStyle(
+        style: const TextStyle(),
+        child: WatchShape(
+            builder: (_, shape, __) => AsterfoxMainWatchScreen(shape)),
+      );
+    }
     return MainScreen(
       sideMenu: SideMenu(
         appIcon: Image.asset(
@@ -150,6 +158,23 @@ class AsterfoxMainScreen extends StatelessWidget {
             },
           )
         ],
+      ),
+    );
+  }
+}
+
+class AsterfoxMainWatchScreen extends StatelessWidget {
+  const AsterfoxMainWatchScreen(this.shape, {super.key});
+
+  final WearShape shape;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.blue,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints.expand(),
+        child: Center(child: Text(shape.name)),
       ),
     );
   }

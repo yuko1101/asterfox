@@ -575,38 +575,47 @@ class GoogleSignInWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final compactMode = width < 500; // mostly for watches
     // TODO: Rippleエフェクトを修正したままで、各言語での「Sign in with Google」の長さに応じてボタンのサイズが変わるようにする
     return Container(
       height: 40,
-      margin: const EdgeInsets.only(left: 40, right: 40),
+      margin:
+          !compactMode ? EdgeInsets.symmetric(horizontal: width * 0.05) : null,
       color: Colors.white,
+      width: compactMode ? 40 : null,
       child: Stack(
         children: [
           Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8, right: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
+            child: !compactMode
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 8, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/images/btn_google_light_normal_ios.svg",
+                          fit: BoxFit.fitWidth,
+                        ),
+                        const SizedBox(
+                          width: 24,
+                        ),
+                        Text(
+                          Language.getText("sign_in_with_google"),
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        const SizedBox(
+                          width: 40,
+                        ),
+                      ],
+                    ),
+                  )
+                : SvgPicture.asset(
                     "assets/images/btn_google_light_normal_ios.svg",
                     fit: BoxFit.fitWidth,
                   ),
-                  const SizedBox(
-                    width: 24,
-                  ),
-                  Text(
-                    Language.getText("sign_in_with_google"),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  const SizedBox(
-                    width: 40,
-                  ),
-                ],
-              ),
-            ),
           ),
           Positioned.fill(
             child: Material(

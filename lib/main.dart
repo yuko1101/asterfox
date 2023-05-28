@@ -11,6 +11,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:wear/wear.dart';
 
 import 'data/custom_colors.dart';
 import 'data/local_musics_data.dart';
@@ -24,6 +25,7 @@ import 'system/theme/theme.dart';
 import 'widget/process_notifications/process_notification_list.dart';
 
 late final MusicManager musicManager;
+late final bool isWearOS;
 final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 
@@ -31,6 +33,12 @@ Future<void> main() async {
   await runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+      try {
+        await Wear.instance.getShape();
+        isWearOS = true;
+      } on Exception {
+        isWearOS = false;
+      }
       await EasyApp.initializePath();
 
       await SettingsData.init();
