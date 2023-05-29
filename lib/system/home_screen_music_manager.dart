@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/music/utils/music_url_utils.dart';
+import 'package:asterfox/utils/overlay_utils.dart';
 import 'package:asterfox/utils/result.dart';
 import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:asterfox/widget/toast/toast_manager.dart';
@@ -29,6 +30,15 @@ class HomeScreenMusicManager {
     MusicData? musicData,
     String? mediaUrl,
   }) async {
+    if (isOverlay) {
+      if (youtubeId != null && mediaUrl != null) {
+        throw Exception("musicData is not supported in overlay");
+      }
+      return await OverlayUtils.requestAction(
+        RequestActionType.addSong,
+        [key, youtubeId, null, mediaUrl],
+      );
+    }
     assert(youtubeId != null || musicData != null || mediaUrl != null);
     if (musicData != null) assert(musicData.isTemporary == true);
 

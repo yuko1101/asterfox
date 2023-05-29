@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
+import 'package:asterfox/utils/overlay_utils.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/widget_screen.dart';
 import 'package:easy_app/utils/os.dart';
@@ -30,63 +31,16 @@ late final bool isWearOS;
 final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 
+late final bool isOverlay;
+
 Future<void> main() async {
+  isOverlay = false;
   await runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-      try {
-        await Wear.instance.getShape();
-        isWearOS = true;
-      } on Exception {
-        isWearOS = false;
-      }
-      await EasyApp.initializePath();
 
-      await SettingsData.init();
+      await init();
 
-      await DeviceSettingsData.init();
-
-      // Firebase set-up
-      if (shouldInitializeFirebase) {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        if (!kDebugMode) {
-          FlutterError.onError =
-              FirebaseCrashlytics.instance.recordFlutterFatalError;
-        }
-      }
-
-      // run this before initializing HomeScreen
-      await musicManager.init();
-
-      // run this after initializing the music manager.
-      await DeviceSettingsData.applyMusicManagerSettings();
-
-      await LocalMusicsData.init();
-
-      // run this after initializing Firebase, LocalMusicsData, and SettingsData.
-      if (shouldInitializeFirebase) await CloudFirestoreManager.init();
-
-      await CustomColors.load();
-      await SongHistoryData.init(musicManager);
-
-      HomeScreen.processNotificationList = ProcessNotificationList();
-      await EasyApp.initialize(
-        homeScreen:
-            isWearOS ? const WidgetScreen(child: SizedBox()) : HomeScreen(),
-        languages: [
-          "ja_JP",
-          "en_US",
-        ],
-        activateConnectionChecker: true,
-      );
-
-      final shareFilesDir =
-          Directory("${(await getTemporaryDirectory()).path}/share_files");
-      if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
-
-      init();
       runApp(const AsterfoxApp());
 
       // void notify() async {
@@ -152,22 +106,94 @@ Future<void> main() async {
   );
 }
 
-void init() async {
+Future<void> init() async {
+  OverlayUtils.init();
+
+  try {
+    await Wear.instance.getShape();
+    isWearOS = true;
+  } on Exception {
+    isWearOS = false;
+  }
+  await EasyApp.initializePath();
+
+  await SettingsData.init();
+
+  await DeviceSettingsData.init();
+
+  // Firebase set-up
+  if (shouldInitializeFirebase) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    if (!kDebugMode) {
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+    }
+  }
+
+  // run this before initializing HomeScreen
+  if (!isOverlay) await musicManager.init();
+
+  // run this after initializing the music manager.
+  if (!isOverlay) {
+    await DeviceSettingsData.applyMusicManagerSettings();
+  }
+
+  await LocalMusicsData.init();
+
+  // run this after initializing Firebase, LocalMusicsData, and SettingsData.
+  if (shouldInitializeFirebase && !isOverlay) {
+    await CloudFirestoreManager.init();
+  }
+
+  await CustomColors.load();
+  await SongHistoryData.init(musicManager);
+
+  if (!isOverlay) {
+    HomeScreen.processNotificationList = ProcessNotificationList();
+  }
+  await EasyApp.initialize(
+    homeScreen: isWearOS || isOverlay
+        ? const WidgetScreen(child: SizedBox())
+        : HomeScreen(),
+    languages: [
+      "ja_JP",
+      "en_US",
+    ],
+    activateConnectionChecker: true,
+  );
+
+  final shareFilesDir =
+      Directory("${(await getTemporaryDirectory()).path}/share_files");
+  if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
+
   debugPrint("localPath: ${EasyApp.localPath}");
-  if (OS.isMobile()) {
+  if (OS.isMobile() && !isOverlay) {
     SharingIntent.init();
   }
 }
 
 @pragma("vm:entry-point")
-void overlayMain() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: DefaultTextStyle(
-      style: TextStyle(),
-      child: AsterfoxMainWatchScreen(WearShape.square),
+void overlayMain() async {
+  isOverlay = true;
+  WidgetsFlutterBinding.ensureInitialized();
+  await init();
+  // await syncWithMainApp(); // TODO: fix this
+  runApp(
+    const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: DefaultTextStyle(
+          style: TextStyle(), child: AsterfoxMainWatchScreen(WearShape.square)),
     ),
-  ));
+  );
+}
+
+Future<void> syncWithMainApp() async {
+  print("request start");
+  final data = await OverlayUtils.requestData(RequestDataType.settings);
+  print(data);
+  SettingsData.settings.data = data;
 }
 
 class AsterfoxApp extends StatelessWidget {
