@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/main.dart';
@@ -9,7 +11,8 @@ import 'package:uuid/uuid.dart';
 final Map<String, void Function(Response)> _registered = {};
 
 void _listener(data) async {
-  if (data["isFromOverlay"] == isOverlay) return;
+  if (data["isFromOverlay"] == isOverlay) return; // just in case
+  print("catch request on overlay: $isOverlay");
   if (data["data"] != null) {
     final request = _registered[data["id"]];
     if (request != null) {
@@ -25,7 +28,7 @@ void _listener(data) async {
         break;
     }
 
-    FlutterOverlayWindow.shareData(
+    OverlayUtils.sendData(
       DataGetResponse(
               data: responseData, id: request.id, isFromOverlay: isOverlay)
           .toJson(),
@@ -46,7 +49,7 @@ void _listener(data) async {
 
     final result = await future;
 
-    FlutterOverlayWindow.shareData(
+    OverlayUtils.sendData(
       ActionCompletedResponse(
               result: result, id: request.id, isFromOverlay: isOverlay)
           .toJson(),
@@ -55,8 +58,17 @@ void _listener(data) async {
 }
 
 class OverlayUtils {
+  static String portName = "asterfox_main";
+
   static void init() {
-    FlutterOverlayWindow.overlayListener.listen(_listener);
+    print("initialized overlay utils on overlay: $isOverlay");
+    if (isOverlay) {
+      FlutterOverlayWindow.overlayListener.listen(_listener);
+    } else {
+      final receivePort = ReceivePort();
+      IsolateNameServer.registerPortWithName(receivePort.sendPort, portName);
+      receivePort.listen(_listener);
+    }
   }
 
   static Future<dynamic> requestData(RequestDataType type) async {
@@ -66,7 +78,7 @@ class OverlayUtils {
       response as DataGetResponse;
       completer.complete(response.data);
     };
-    FlutterOverlayWindow.shareData(
+    sendData(
       DataGetRequest(type: type, id: requestId, isFromOverlay: isOverlay)
           .toJson(),
     );
@@ -81,7 +93,7 @@ class OverlayUtils {
       response as ActionCompletedResponse;
       completer.complete(response.result);
     };
-    FlutterOverlayWindow.shareData(
+    sendData(
       ActionRequest(
               action: action,
               args: args,
@@ -91,6 +103,16 @@ class OverlayUtils {
     );
 
     return completer.future;
+  }
+
+  static SendPort? mainServer;
+  static void sendData(dynamic data) {
+    if (isOverlay) {
+      mainServer ??= IsolateNameServer.lookupPortByName(portName);
+      mainServer?.send(data);
+    } else {
+      FlutterOverlayWindow.shareData(data);
+    }
   }
 }
 
