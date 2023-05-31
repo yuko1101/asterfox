@@ -30,8 +30,7 @@ void _listener(data) async {
 
     OverlayUtils.sendData(
       DataGetResponse(
-              data: responseData, id: request.id, isFromOverlay: isOverlay)
-          .toJson(),
+          data: responseData, id: request.id, isFromOverlay: isOverlay),
     );
   } else if (data["action"] != null) {
     final request = ActionRequest.fromJson(data);
@@ -51,8 +50,7 @@ void _listener(data) async {
 
     OverlayUtils.sendData(
       ActionCompletedResponse(
-              result: result, id: request.id, isFromOverlay: isOverlay)
-          .toJson(),
+          result: result, id: request.id, isFromOverlay: isOverlay),
     );
   }
 }
@@ -79,8 +77,7 @@ class OverlayUtils {
       completer.complete(response.data);
     };
     sendData(
-      DataGetRequest(type: type, id: requestId, isFromOverlay: isOverlay)
-          .toJson(),
+      DataGetRequest(type: type, id: requestId, isFromOverlay: isOverlay),
     );
 
     return completer.future;
@@ -95,37 +92,37 @@ class OverlayUtils {
     };
     sendData(
       ActionRequest(
-              action: action,
-              args: args,
-              id: requestId,
-              isFromOverlay: isOverlay)
-          .toJson(),
+          action: action, args: args, id: requestId, isFromOverlay: isOverlay),
     );
 
     return completer.future;
   }
 
   static SendPort? mainServer;
-  static void sendData(dynamic data) {
+  static void sendData(DataSharing data) {
     if (isOverlay) {
       mainServer ??= IsolateNameServer.lookupPortByName(portName);
-      mainServer?.send(data);
+      mainServer?.send(data.toJson());
     } else {
-      FlutterOverlayWindow.shareData(data);
+      FlutterOverlayWindow.shareData(data.toJson());
     }
   }
 }
 
-class Response {
-  Response({required this.id, required this.isFromOverlay});
+abstract class DataSharing {
+  DataSharing({required this.id, required this.isFromOverlay});
   final String id;
   final bool isFromOverlay;
+
+  Map<String, dynamic> toJson();
 }
 
-class Request {
-  Request({required this.id, required this.isFromOverlay});
-  final String id;
-  final bool isFromOverlay;
+abstract class Response extends DataSharing {
+  Response({required super.id, required super.isFromOverlay});
+}
+
+abstract class Request extends DataSharing {
+  Request({required super.id, required super.isFromOverlay});
 }
 
 class DataGetRequest extends Request {
@@ -142,6 +139,7 @@ class DataGetRequest extends Request {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       "type": type.name,
@@ -164,6 +162,7 @@ class DataGetResponse extends Response {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       "data": data,
@@ -192,6 +191,7 @@ class ActionRequest extends Request {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       "action": action.name,
@@ -215,6 +215,7 @@ class ActionCompletedResponse extends Response {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       "result": result,
