@@ -10,14 +10,18 @@ import 'package:uuid/uuid.dart';
 
 final Map<String, void Function(Response)> _registered = {};
 
-void _listener(data) async {
+void _requestListener(data) async {
   if (data["isFromOverlay"] == isOverlay) return; // just in case
-  print("catch request on overlay: $isOverlay");
+  print("catch request on overlay: $isOverlay, $data");
   if (data["data"] != null) {
     final request = _registered[data["id"]];
     if (request != null) {
-      _registered.remove(data["id"]);
-      request.call(DataGetResponse.fromJson(data));
+      final isListening = data["isListenDataResponse"] == true;
+      if (!isListening) _registered.remove(data["id"]);
+      final response = isListening
+          ? ListenDataResponse.fromJson(data)
+          : DataGetResponse.fromJson(data);
+      request.call(response);
     }
   } else if (data["type"] != null) {
     final request = DataGetRequest.fromJson(data);
@@ -26,6 +30,8 @@ void _listener(data) async {
       case RequestDataType.settings:
         responseData = SettingsData.settings.data;
         break;
+      default:
+        throw UnimplementedError();
     }
 
     OverlayUtils.sendData(
@@ -44,6 +50,14 @@ void _listener(data) async {
           mediaUrl: request.args[3],
         );
         break;
+      case RequestActionType.play:
+        future = musicManager.play();
+        break;
+      case RequestActionType.pause:
+        future = musicManager.pause();
+        break;
+      default:
+        throw UnimplementedError();
     }
 
     final result = await future;
@@ -52,6 +66,25 @@ void _listener(data) async {
       ActionCompletedResponse(
           result: result, id: request.id, isFromOverlay: isOverlay),
     );
+  } else if (data["listenDataType"] != null) {
+    final request = ListenDataRequest.fromJson(data);
+
+    switch (request.listenDataType) {
+      case ListenDataType.playingState:
+        musicManager.playingStateNotifier.addListener(() {
+          final playingState = musicManager.playingStateNotifier.value;
+          OverlayUtils.sendData(
+            ListenDataResponse(
+              data: playingState.name,
+              id: request.id,
+              isFromOverlay: isOverlay,
+            ),
+          );
+        });
+        break;
+      default:
+        throw UnimplementedError();
+    }
   }
 }
 
@@ -61,11 +94,11 @@ class OverlayUtils {
   static void init() {
     print("initialized overlay utils on overlay: $isOverlay");
     if (isOverlay) {
-      FlutterOverlayWindow.overlayListener.listen(_listener);
+      FlutterOverlayWindow.overlayListener.listen(_requestListener);
     } else {
       final receivePort = ReceivePort();
       IsolateNameServer.registerPortWithName(receivePort.sendPort, portName);
-      receivePort.listen(_listener);
+      receivePort.listen(_requestListener);
     }
   }
 
@@ -83,7 +116,7 @@ class OverlayUtils {
     return completer.future;
   }
 
-  static Future requestAction(RequestActionType action, List<dynamic> args) {
+  static Future requestAction(RequestActionType action, [List<dynamic>? args]) {
     final requestId = const Uuid().v4();
     final completer = Completer();
     _registered[requestId] = (Response response) {
@@ -92,10 +125,32 @@ class OverlayUtils {
     };
     sendData(
       ActionRequest(
-          action: action, args: args, id: requestId, isFromOverlay: isOverlay),
+        action: action,
+        args: args ?? [],
+        id: requestId,
+        isFromOverlay: isOverlay,
+      ),
     );
 
     return completer.future;
+  }
+
+  static void listenData({
+    required ListenDataType type,
+    required Function(ListenDataResponse) callback,
+  }) {
+    final requestId = const Uuid().v4();
+    _registered[requestId] = (Response response) {
+      callback(response as ListenDataResponse);
+    };
+
+    sendData(
+      ListenDataRequest(
+        listenDataType: type,
+        id: requestId,
+        isFromOverlay: isOverlay,
+      ),
+    );
   }
 
   static SendPort? mainServer;
@@ -225,6 +280,65 @@ class ActionCompletedResponse extends Response {
   }
 }
 
+class ListenDataRequest extends Request {
+  ListenDataRequest({
+    required this.listenDataType,
+    required super.id,
+    required super.isFromOverlay,
+  });
+  final ListenDataType listenDataType;
+
+  factory ListenDataRequest.fromJson(Map<String, dynamic> json) {
+    return ListenDataRequest(
+      listenDataType: ListenDataType.values
+          .firstWhere((type) => type.name == json["listenDataType"]),
+      id: json["id"],
+      isFromOverlay: json["isFromOverlay"],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "listenDataType": listenDataType.name,
+      "id": id,
+      "isFromOverlay": isFromOverlay,
+    };
+  }
+}
+
+class ListenDataResponse extends Response {
+  ListenDataResponse({
+    required this.data,
+    required super.id,
+    required super.isFromOverlay,
+  });
+  final dynamic data;
+
+  factory ListenDataResponse.fromJson(Map<String, dynamic> json) {
+    if (json["isListenDataResponse"] != true) {
+      throw Exception("Cannot parse the json in unknown format.");
+    }
+    return ListenDataResponse(
+      data: json["data"],
+      id: json["id"],
+      isFromOverlay: json["isFromOverlay"],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "data": data,
+      "id": id,
+      "isFromOverlay": isFromOverlay,
+      "isListenDataResponse": true,
+    };
+  }
+}
+
 enum RequestDataType { settings }
 
-enum RequestActionType { addSong }
+enum RequestActionType { addSong, play, pause }
+
+enum ListenDataType { playingState }

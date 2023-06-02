@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:asterfox/data/device_settings_data.dart';
+import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:asterfox/utils/overlay_utils.dart';
@@ -175,6 +176,15 @@ void overlayMain() async {
   isOverlay = true;
   WidgetsFlutterBinding.ensureInitialized();
   OverlayUtils.init();
+
+  OverlayUtils.listenData(
+    type: ListenDataType.playingState,
+    callback: (res) {
+      musicManager.playingStateNotifier.value = PlayingState.values
+          .firstWhere((playingState) => playingState.name == res.data);
+    },
+  );
+
   runApp(
     const MaterialApp(
       debugShowCheckedModeBanner: false,

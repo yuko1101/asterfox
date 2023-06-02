@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:asterfox/data/device_settings_data.dart';
 import 'package:asterfox/data/settings_data.dart';
+import 'package:asterfox/main.dart';
 import 'package:asterfox/utils/math.dart';
+import 'package:asterfox/utils/overlay_utils.dart';
 import 'package:asterfox/widget/music_widgets/volume_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
@@ -70,12 +72,21 @@ class MusicManager {
   }
 
   Future<void> play() async {
+    if (isOverlay) {
+      print("Played from overlay");
+      await OverlayUtils.requestAction(RequestActionType.play);
+      return;
+    }
     print(
         "Played a playlist: ${audioDataManager.playlist.length.toString()} songs");
     await _audioHandler.play();
   }
 
   Future<void> pause() async {
+    if (isOverlay) {
+      await OverlayUtils.requestAction(RequestActionType.pause);
+      return;
+    }
     await _audioHandler.pause();
   }
 
