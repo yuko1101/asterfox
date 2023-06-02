@@ -576,7 +576,7 @@ class GoogleSignInWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final compactMode = width < 500; // mostly for watches
+    final compactMode = width < 300; // mostly for watches
     // TODO: Rippleエフェクトを修正したままで、各言語での「Sign in with Google」の長さに応じてボタンのサイズが変わるようにする
     return Container(
       height: 40,
