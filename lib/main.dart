@@ -173,6 +173,7 @@ Future<void> main() async {
 
 @pragma("vm:entry-point")
 void overlayMain() async {
+  if (isWearOS) return;
   isOverlay = true;
   WidgetsFlutterBinding.ensureInitialized();
   OverlayUtils.init();
