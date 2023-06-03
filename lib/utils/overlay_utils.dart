@@ -11,9 +11,10 @@ import 'package:uuid/uuid.dart';
 final Map<String, void Function(Response)> _registered = {};
 
 void _requestListener(data) async {
+  data as Map<String, dynamic>;
   if (data["isFromOverlay"] == isOverlay) return; // just in case
   print("catch request on overlay: $isOverlay, $data");
-  if (data["data"] != null) {
+  if (data.containsKey("data")) {
     final request = _registered[data["id"]];
     if (request != null) {
       final isListening = data["isListenDataResponse"] == true;
@@ -29,6 +30,9 @@ void _requestListener(data) async {
     switch (request.type) {
       case RequestDataType.settings:
         responseData = SettingsData.settings.data;
+        break;
+      case RequestDataType.response:
+        responseData = null;
         break;
       default:
         throw UnimplementedError();
@@ -153,8 +157,23 @@ class OverlayUtils {
     );
   }
 
+  static Future<void> waitForResponse(int timeout) async {
+    bool responded = false;
+    () async {
+      await requestData(RequestDataType.response);
+      responded = true;
+    }();
+    await Future.delayed(Duration(milliseconds: timeout));
+    if (responded) {
+      return;
+    }
+    _registered.clear();
+    await waitForResponse(timeout);
+  }
+
   static SendPort? mainServer;
   static void sendData(DataSharing data) {
+    print("send data to overlay: ${!isOverlay} ${data.toJson()}");
     if (isOverlay) {
       mainServer ??= IsolateNameServer.lookupPortByName(portName);
       mainServer?.send(data.toJson());
@@ -337,7 +356,7 @@ class ListenDataResponse extends Response {
   }
 }
 
-enum RequestDataType { settings }
+enum RequestDataType { settings, response }
 
 enum RequestActionType { addSong, play, pause }
 

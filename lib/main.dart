@@ -40,15 +40,25 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      OverlayUtils.init();
-
       try {
         await Wear.instance.getShape();
         isWearOS = true;
       } on Exception {
         isWearOS = false;
       }
+
+      if (OS.getOS() == OSType.android && !isWearOS) {
+        OverlayUtils.init();
+      }
+
       await EasyApp.initializePath();
+      final wearOSCheckFile = File("${EasyApp.localPath}/wear_os");
+      final wearOSCheckFileExists = wearOSCheckFile.existsSync();
+      if (isWearOS && !wearOSCheckFileExists) {
+        wearOSCheckFile.createSync();
+      } else if (!isWearOS && wearOSCheckFileExists) {
+        wearOSCheckFile.deleteSync();
+      }
 
       await SettingsData.init();
 
@@ -173,10 +183,18 @@ Future<void> main() async {
 
 @pragma("vm:entry-point")
 void overlayMain() async {
-  if (isWearOS) return;
+  print("overlayMain");
   isOverlay = true;
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyApp.initializePath();
+  final wearOSCheckFile = File("${EasyApp.localPath}/wear_os");
+  if (wearOSCheckFile.existsSync()) return;
+  print("overlayMain passed");
+
   OverlayUtils.init();
+
+  // wait for main app's OverlayUtils ready.
+  await OverlayUtils.waitForResponse(1000);
 
   OverlayUtils.listenData(
     type: ListenDataType.playingState,
