@@ -205,10 +205,17 @@ void overlayMain() async {
   );
 
   runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DefaultTextStyle(
-          style: TextStyle(), child: AsterfoxMainWatchScreen(WearShape.square)),
+    ValueListenableBuilder<ThemeData>(
+      valueListenable: AppTheme.themeNotifier,
+      builder: (context, theme, child) => MaterialApp(
+        title: "Asterfox Overlay",
+        debugShowCheckedModeBanner: false,
+        theme: theme,
+        home: const DefaultTextStyle(
+          style: TextStyle(),
+          child: AsterfoxMainWatchScreen(WearShape.square),
+        ),
+      ),
     ),
   );
 }
@@ -220,15 +227,15 @@ class AsterfoxApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeData>(
+      valueListenable: AppTheme.themeNotifier,
       builder: (context, theme, child) {
         return MaterialApp(
-          title: 'Asterfox',
+          title: "Asterfox",
           theme: theme,
           home: const AsterfoxScreen(),
           debugShowCheckedModeBanner: false,
         );
       },
-      valueListenable: AppTheme.themeNotifier,
     );
   }
 }
