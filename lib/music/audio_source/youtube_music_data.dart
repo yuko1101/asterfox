@@ -118,7 +118,7 @@ class YouTubeMusicData extends MusicData {
       authorId: json["authorId"] as String,
       duration: Duration(milliseconds: json["duration"] as int),
       keywords: (json["keywords"] as List).map((e) => e as String).toList(),
-      volume: json["volume"] as double,
+      volume: (json["volume"] as num).toDouble(),
       lyrics: json["lyrics"] as String,
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,

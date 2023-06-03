@@ -182,22 +182,47 @@ class AsterfoxMainWatchScreen extends StatelessWidget {
             child: Stack(
               children: [
                 const MusicThumbnail(),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // CurrentSongTitle(),
-                    // CurrentSongAuthor(),
-                    const PlayButton(),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
-                        HomeScreenMusicManager.addSong(
-                          key: const Uuid().v4(),
-                          youtubeId: "ZRtdQ81jPUQ",
-                        );
-                      },
-                    ),
-                  ],
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // CurrentSongTitle(),
+                      // CurrentSongAuthor(),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          HomeScreenMusicManager.addSong(
+                            key: const Uuid().v4(),
+                            youtubeId: "ZRtdQ81jPUQ",
+                          );
+                        },
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // 高さ40に対してボタンのサイズを合わせ、横幅を10にすることで、ボタンアイコンの左右の余白を潰せる。
+                          SizedBox(
+                            width: 10,
+                            height: 40,
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: PreviousSongButton(),
+                            ),
+                          ),
+                          PlayButton(),
+                          SizedBox(
+                            width: 10,
+                            height: 40,
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: NextSongButton(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 )
               ],
             )),

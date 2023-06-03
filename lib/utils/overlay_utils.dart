@@ -60,6 +60,16 @@ void _requestListener(data) async {
       case RequestActionType.pause:
         future = musicManager.pause();
         break;
+      case RequestActionType.playback:
+        future = request.args.isEmpty
+            ? musicManager.playback()
+            : musicManager.playback(request.args[0]);
+        break;
+      case RequestActionType.next:
+        future = request.args.isEmpty
+            ? musicManager.next()
+            : musicManager.next(request.args[0]);
+        break;
       default:
         throw UnimplementedError();
     }
@@ -84,6 +94,26 @@ void _requestListener(data) async {
               isFromOverlay: isOverlay,
             ),
           );
+        });
+        break;
+      case ListenDataType.hasNext:
+        musicManager.hasNextNotifier.addListener(() {
+          final hasNext = musicManager.hasNextNotifier.value;
+          OverlayUtils.sendData(ListenDataResponse(
+            data: hasNext,
+            id: request.id,
+            isFromOverlay: isOverlay,
+          ));
+        });
+        break;
+      case ListenDataType.currentSong:
+        musicManager.currentSongNotifier.addListener(() {
+          final currentSong = musicManager.currentSongNotifier.value;
+          OverlayUtils.sendData(ListenDataResponse(
+            data: {"song": currentSong?.toJson(), "key": currentSong?.key},
+            id: request.id,
+            isFromOverlay: isOverlay,
+          ));
         });
         break;
       default:
@@ -358,6 +388,12 @@ class ListenDataResponse extends Response {
 
 enum RequestDataType { settings, response }
 
-enum RequestActionType { addSong, play, pause }
+enum RequestActionType {
+  addSong,
+  play,
+  pause,
+  playback,
+  next,
+}
 
-enum ListenDataType { playingState }
+enum ListenDataType { playingState, hasNext, currentSong }

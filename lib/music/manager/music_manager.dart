@@ -104,6 +104,11 @@ class MusicManager {
   }
 
   Future<void> next([bool force = false]) async {
+    if (isOverlay) {
+      await OverlayUtils.requestAction(RequestActionType.next, [force]);
+      return;
+    }
+
     if (force) {
       await _audioHandler.skipToNext();
     } else {
@@ -159,6 +164,11 @@ class MusicManager {
   }
 
   Future<void> playback([bool force = false]) async {
+    if (isOverlay) {
+      await OverlayUtils.requestAction(RequestActionType.playback, [force]);
+      return;
+    }
+
     // if current progress is less than 5 sec, skip previous. if not, replay the current song.
     if (audioDataManager.progress.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.

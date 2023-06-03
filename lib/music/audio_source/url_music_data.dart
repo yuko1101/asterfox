@@ -49,7 +49,7 @@ class UrlMusicData extends MusicData {
       author: json["author"] as String,
       keywords: (json["keywords"] as List).map((e) => e as String).toList(),
       duration: Duration(milliseconds: json["duration"] as int),
-      volume: json["volume"] as double,
+      volume: (json["volume"] as num).toDouble(),
       lyrics: json["lyrics"] as String,
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:asterfox/data/device_settings_data.dart';
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/music/manager/audio_data_manager.dart';
 import 'package:asterfox/screens/asterfox_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
@@ -204,6 +205,27 @@ void overlayMain() async {
     },
   );
 
+  OverlayUtils.listenData(
+    type: ListenDataType.hasNext,
+    callback: (res) {
+      musicManager.hasNextNotifier.value = res.data;
+    },
+  );
+
+  OverlayUtils.listenData(
+    type: ListenDataType.currentSong,
+    callback: (res) {
+      musicManager.currentSongNotifier.value = res.data["song"] != null
+          ? MusicData.fromJson(
+              json: res.data["song"],
+              key: res.data["key"],
+              isTemporary: false,
+            )
+          : null;
+
+      musicManager.currentSongNotifier.notify();
+    },
+  );
   runApp(
     ValueListenableBuilder<ThemeData>(
       valueListenable: AppTheme.themeNotifier,
