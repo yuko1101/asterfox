@@ -5,5 +5,5 @@ class InvalidTypeOfMediaUrlException extends AsterfoxException {
       : super(title: "InvalidTypeOfMediaUrlException", description: mediaUrl);
   final String mediaUrl;
   @override
-  String toString() => 'InvalidTypeOfMediaUrlException: $mediaUrl';
+  String toString() => "InvalidTypeOfMediaUrlException: $mediaUrl";
 }

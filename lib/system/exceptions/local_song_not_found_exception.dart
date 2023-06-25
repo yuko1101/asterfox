@@ -5,5 +5,5 @@ class LocalSongNotFoundException extends AsterfoxException {
       : super(title: "LocalSongNotFoundException", description: audioId);
   final String audioId;
   @override
-  String toString() => 'LocalSongNotFoundException: $audioId';
+  String toString() => "LocalSongNotFoundException: $audioId";
 }

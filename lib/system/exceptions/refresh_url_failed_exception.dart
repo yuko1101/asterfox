@@ -4,5 +4,5 @@ class RefreshUrlFailedException extends AsterfoxException {
   RefreshUrlFailedException()
       : super(title: "RefreshUrlFailedException", description: "");
   @override
-  String toString() => 'RefreshUrlFailedException';
+  String toString() => "RefreshUrlFailedException";
 }

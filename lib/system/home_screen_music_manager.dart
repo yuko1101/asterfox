@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/music/utils/music_url_utils.dart';
+import 'package:asterfox/system/exceptions/unable_to_load_from_playlist_exception.dart';
 import 'package:asterfox/utils/overlay_utils.dart';
 import 'package:asterfox/utils/result.dart';
 import 'package:asterfox/widget/notifiers_widget.dart';
@@ -26,32 +26,33 @@ import 'exceptions/network_exception.dart';
 class HomeScreenMusicManager {
   static Future<void> addSong({
     required String key,
-    String? youtubeId,
+    String? audioId,
     MusicData? musicData,
     String? mediaUrl,
   }) async {
     if (isOverlay) {
-      if (youtubeId != null && mediaUrl != null) {
+      if (audioId != null && mediaUrl != null) {
         // TODO: implement musicData support
         throw Exception("musicData is not supported in overlay");
       }
       return await OverlayUtils.requestAction(
         RequestActionType.addSong,
-        [key, youtubeId, null, mediaUrl],
+        [key, audioId, null, mediaUrl],
       );
     }
-    assert(youtubeId != null || musicData != null || mediaUrl != null);
+    assert(audioId != null || musicData != null || mediaUrl != null);
     if (musicData != null) assert(musicData.isTemporary == true);
 
     // the auto downloader works only for remote music
     final bool autoDownloadEnabled =
         SettingsData.getValue(key: "autoDownload") &&
-            (!LocalMusicsData.isInstalled(
-                audioId: youtubeId ??
-                    (mediaUrl != null
-                        ? MusicUrlUtils.getAudioIdFromUrl(mediaUrl)
-                        : null),
-                song: musicData));
+            !LocalMusicsData.isInstalled(
+              audioId: audioId ??
+                  (mediaUrl != null
+                      ? MusicUrlUtils.getAudioIdFromUrl(mediaUrl)
+                      : null),
+              song: musicData,
+            );
 
     final completer = Completer();
 
@@ -82,39 +83,21 @@ class HomeScreenMusicManager {
         errorListNotifier: errorListNotifier,
         future: () async {
           MusicData song;
-          if (musicData == null) {
-            if (youtubeId != null) {
-              try {
-                song = await YouTubeMusicUtils.getYouTubeAudio(
-                  videoId: youtubeId,
-                  key: key,
-                  isTemporary: false,
-                );
-              } on VideoUnplayableException {
-                Fluttertoast.showToast(
-                    msg: Language.getText("song_unplayable"));
-                return;
-              } on NetworkException {
-                Fluttertoast.showToast(
-                    msg: Language.getText("network_not_accessible"));
-                return;
-              }
-            } else {
-              try {
-                song = await MusicUrlUtils.createMusicDataFromUrl(
-                    mediaUrl: mediaUrl!, key: key, isTemporary: false);
-              } on VideoUnplayableException {
-                Fluttertoast.showToast(
-                    msg: Language.getText("song_unplayable"));
-                return;
-              } on NetworkException {
-                Fluttertoast.showToast(
-                    msg: Language.getText("network_not_accessible"));
-                return;
-              }
-            }
-          } else {
-            song = musicData.renew(key: key, isTemporary: false);
+          try {
+            song = await MusicData.get(
+              audioId: audioId,
+              mediaUrl: mediaUrl,
+              musicData: musicData,
+              key: key,
+              isTemporary: false,
+            );
+          } on VideoUnplayableException {
+            Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
+            return;
+          } on NetworkException {
+            Fluttertoast.showToast(
+                msg: Language.getText("network_not_accessible"));
+            return;
           }
           songTitleNotifier.value = song.title;
 
@@ -185,46 +168,32 @@ class HomeScreenMusicManager {
         icon: const Icon(Icons.queue_music),
         future: () async {
           List<MusicData> songs = [];
-          if (musicDataList != null) {
-            songs.addAll(musicDataList);
-          }
-          if (mediaUrlList != null) {
-            List<MusicData> parsed;
-            try {
-              parsed = await Future.wait(
-                mediaUrlList
-                    .map((mediaUrl) => MusicUrlUtils.createMusicDataFromUrl(
-                          mediaUrl: mediaUrl,
-                          key: const Uuid().v4(),
-                          isTemporary: false,
-                        )),
-              );
-            } on NetworkException {
-              Fluttertoast.showToast(
-                  msg: Language.getText("network_not_accessible"));
-              return;
-            }
 
-            songs.addAll(parsed);
-          }
-          if (youtubePlaylist != null) {
-            try {
-              songs.addAll((await YouTubeMusicUtils.getPlaylist(
-                playlistId: youtubePlaylist,
-                isTemporary: false,
-                processId: playlistProcessId,
-                maxCountListenable: maxProgressNotifier,
-              ))
-                  .first);
-            } on NetworkException catch (e) {
-              errorListNotifier.value = errorListNotifier.value.toList()
-                ..add(ResultFailedReason(
-                    cause: e, title: e.title, description: e.description));
-              Fluttertoast.showToast(
-                  msg: Language.getText("network_not_accessible"));
-              return;
-            }
-          }
+          final songStream = MusicData.getList(
+            musicDataList: musicDataList,
+            mediaUrlList: mediaUrlList,
+            youtubePlaylist: youtubePlaylist,
+            isTemporary: false,
+          );
+
+          final completer = Completer();
+
+          songStream.listen((song) {
+            songs.add(song);
+            progressNotifier.value = progressNotifier.value + 1;
+          }, onError: (e) {
+            e as UnableToLoadFromPlaylistException;
+            errorListNotifier.value = errorListNotifier.value.toList()
+              ..add(
+                ResultFailedReason(
+                  cause: e,
+                  title: e.title,
+                  description: e.description,
+                ),
+              );
+          }, onDone: completer.complete);
+
+          await completer.future;
 
           if (autoDownloadEnabled) {
             downloadModeNotifier.value = true;
@@ -255,7 +224,7 @@ class HomeScreenMusicManager {
       return;
     }
     final list = await YouTubeMusicUtils.searchYouTubeVideo(query);
-    await addSong(key: const Uuid().v4(), youtubeId: list.first.id.value);
+    await addSong(key: const Uuid().v4(), audioId: list.first.id.value);
   }
 
   static Future<void> loadFromUrl(String url,
@@ -277,7 +246,7 @@ class HomeScreenMusicManager {
       );
       return;
     }
-    await addSong(key: const Uuid().v4(), youtubeId: id.value);
+    await addSong(key: const Uuid().v4(), audioId: id.value);
   }
 
   static final RegExp playlistRegex =

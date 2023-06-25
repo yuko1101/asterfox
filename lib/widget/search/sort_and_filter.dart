@@ -26,7 +26,7 @@ class YouTubeFilter extends FilterSorting {
   }
 }
 
-class StoredFliter extends FilterSorting {
+class StoredFilter extends FilterSorting {
   @override
   List<SongSuggestion> apply(List<SongSuggestion> list) {
     return list

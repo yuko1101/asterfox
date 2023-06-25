@@ -1,10 +1,7 @@
 import 'dart:async';
 
-import 'package:asterfox/utils/async_utils.dart';
-import 'package:easy_app/utils/languages.dart';
-import 'package:easy_app/utils/pair.dart';
+import 'package:asterfox/system/exceptions/unable_to_load_from_playlist_exception.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -102,103 +99,57 @@ class YouTubeMusicUtils {
   /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
   ///
   /// Throws [NetworkException] if the network is not accessible.
-  static Future<Pair<List<YouTubeMusicData>, List<Video>>> getPlaylist({
+  static Stream<YouTubeMusicData> getMusicDataFromPlaylist({
     required String playlistId,
     required bool isTemporary,
-    String? processId,
-    ValueNotifier<int>? maxCountListenable,
-  }) async {
+  }) {
     // インターネット接続確認
     NetworkCheck.check();
 
+    final controller = StreamController<YouTubeMusicData>();
     final YoutubeExplode yt = YoutubeExplode();
-    // final Playlist playlist = await yt.playlists.get(playlistId);
+    final videoStream = yt.playlists.getVideos(playlistId);
 
-    final List<Video> videos = await Future.sync(() {
-      final completer = Completer<List<Video>>();
-      final stream = yt.playlists.getVideos(playlistId);
+    int processingCount = 0;
+    bool done = false;
 
-      final List<Video> result = [];
-
-      stream.listen((video) {
-        result.add(video);
-      }, onDone: () {
-        completer.complete(result);
-      });
-      return completer.future;
-    });
-
-    if (maxCountListenable != null) maxCountListenable.value = videos.length;
-
-    final result = await _getFromVideos(
-      videos: videos,
-      yt: yt,
-      isTemporary: isTemporary,
-      processId: processId,
-      maxCountListenable: maxCountListenable,
-    );
-
-    yt.close();
-
-    return result;
-  }
-
-  static Future<Pair<List<YouTubeMusicData>, List<Video>>> _getFromVideos({
-    required List<Video> videos,
-    required YoutubeExplode yt,
-    required bool isTemporary,
-    required String? processId,
-    required ValueNotifier<int>? maxCountListenable,
-  }) async {
-    final bool useProgress = processId != null;
-    if (useProgress) {
-      playlistLoadingProgress[processId] ??= ValueNotifier(0);
+    void close() {
+      controller.sink.close();
+      yt.close();
     }
-    final ValueNotifier<int>? progressNotifier =
-        useProgress ? playlistLoadingProgress[processId]! : null;
 
-    final AsyncCore<YouTubeMusicData?> asyncCore = AsyncCore(limit: 20);
-
-    final List<Video> failedToLoad = [];
-
-    final futures = videos.map((video) async {
-      final song = await asyncCore.run(() async {
-        print("Loading ${videos.indexOf(video)}/${videos.length} (Playlist)");
-        return await _getFromVideoWithoutStreamManifest(
+    videoStream.listen((video) async {
+      processingCount++;
+      try {
+        final musicData = await _getFromVideoWithoutStreamManifest(
           video: video,
           yt: yt,
           key: const Uuid().v4(),
           isTemporary: isTemporary,
         );
-      });
-      if (song == null) {
-        failedToLoad.add(video);
-        if (maxCountListenable != null) {
-          maxCountListenable.value = maxCountListenable.value - 1;
-        }
-      } else if (useProgress && maxCountListenable != null) {
-        progressNotifier!.value = progressNotifier.value + 1;
+        controller.sink.add(musicData);
+      } catch (e, stacktrace) {
+        controller.sink.addError(
+          UnableToLoadFromPlaylistException(video: video, cause: e),
+          stacktrace,
+        );
       }
-      print(
-          "Complete ${videos.indexOf(video)}/${videos.length} (Playlist)${song == null ? " (Unplayable)" : ""}");
-      if (useProgress && maxCountListenable == null) {
-        progressNotifier!.value = progressNotifier.value + 1;
+      processingCount--;
+      if (processingCount == 0 && done) {
+        close();
       }
-      return song;
+    }, onDone: () {
+      if (processingCount > 0) {
+        done = true;
+      } else {
+        close();
+      }
     });
 
-    final result = await Future.wait(futures);
-    final loaded = result
-        .where((element) => element != null)
-        .map((e) => e as YouTubeMusicData)
-        .toList();
-
-    if (useProgress) playlistLoadingProgress.remove(processId);
-
-    return Pair(loaded, failedToLoad);
+    return controller.stream;
   }
 
-  static Future<YouTubeMusicData?> _getFromVideoWithoutStreamManifest({
+  static Future<YouTubeMusicData> _getFromVideoWithoutStreamManifest({
     required Video video,
     required YoutubeExplode yt,
     required String key,
@@ -213,24 +164,16 @@ class YouTubeMusicUtils {
       if (!(await song.isAudioUrlAvailable())) await song.refreshAudioURL();
       return song;
     }
-    Future<StreamManifest?> fetch() async {
-      try {
-        return await yt.videos.streamsClient.getManifest(video.id);
-      } on VideoUnplayableException {
-        Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
-        return null;
-      } catch (e) {
-        // if (e.toString().)
-        print("error: $e");
-        return null;
-      }
-    }
 
-    final StreamManifest? manifest = await fetch();
-    if (manifest == null) return null;
+    final StreamManifest manifest =
+        await yt.videos.streamsClient.getManifest(video.id);
 
     return await getFromVideo(
-        video: video, manifest: manifest, key: key, isTemporary: isTemporary);
+      video: video,
+      manifest: manifest,
+      key: key,
+      isTemporary: isTemporary,
+    );
   }
 
   // even if the song is stored, this fetches it from remote.

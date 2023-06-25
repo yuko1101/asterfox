@@ -1,7 +1,15 @@
+import 'dart:async';
+
+import 'package:asterfox/data/song_history_data.dart';
 import 'package:asterfox/music/audio_source/url_music_data.dart';
+import 'package:asterfox/music/utils/music_url_utils.dart';
+import 'package:asterfox/music/utils/youtube_music_utils.dart';
+import 'package:asterfox/system/exceptions/network_exception.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:uuid/uuid.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import 'youtube_music_data.dart';
 import '../../data/local_musics_data.dart';
@@ -174,20 +182,104 @@ class MusicData {
   static void deleteCreated(String key) {
     _created.removeWhere((song) => song.key == key);
   }
+
+  /// Throws [VideoUnplayableException], [NetworkException]
+  static Future<MusicData> getByAudioId({
+    required String audioId,
+    required String key,
+    required bool isTemporary,
+  }) async {
+    return await YouTubeMusicUtils.getYouTubeAudio(
+      videoId: audioId,
+      key: key,
+      isTemporary: isTemporary,
+    );
+  }
+
+  static Future<MusicData> get({
+    String? audioId,
+    String? mediaUrl,
+    MusicData? musicData,
+    required String key,
+    required bool isTemporary,
+  }) async {
+    assert(audioId != null || mediaUrl != null || musicData != null);
+
+    if (musicData != null) {
+      return musicData.renew(key: key, isTemporary: isTemporary);
+    }
+
+    final id = audioId ?? MusicUrlUtils.getAudioIdFromUrl(mediaUrl!);
+
+    return await getByAudioId(audioId: id, key: key, isTemporary: isTemporary);
+  }
+
+  static Stream<MusicData> getList({
+    List<MusicData>? musicDataList,
+    List<String>? mediaUrlList,
+    String? youtubePlaylist,
+    required bool isTemporary,
+  }) {
+    final controller = StreamController<MusicData>();
+
+    int remaining = (musicDataList?.length ?? 0) + (mediaUrlList?.length ?? 0);
+    bool isYouTubePlaylistDone = youtubePlaylist == null;
+
+    if (remaining == 0 && isYouTubePlaylistDone) {
+      controller.sink.close();
+    }
+
+    void add(MusicData event) {
+      controller.sink.add(event);
+      remaining--;
+      if (remaining == 0 && isYouTubePlaylistDone) {
+        controller.sink.close();
+      }
+    }
+
+    if (musicDataList != null) {
+      for (final musicData in musicDataList) {
+        add(musicData.renew(
+          key: const Uuid().v4(),
+          isTemporary: isTemporary,
+        ));
+      }
+    }
+    if (mediaUrlList != null) {
+      for (final mediaUrl in mediaUrlList) {
+        MusicData.get(
+          mediaUrl: mediaUrl,
+          key: const Uuid().v4(),
+          isTemporary: isTemporary,
+        ).then(add);
+      }
+    }
+    if (youtubePlaylist != null) {
+      final playlistStream = YouTubeMusicUtils.getMusicDataFromPlaylist(
+        playlistId: youtubePlaylist,
+        isTemporary: isTemporary,
+      );
+
+      playlistStream.listen(
+        controller.sink.add,
+        onError: (e) {
+          controller.sink.addError(e);
+        },
+        onDone: () {
+          if (remaining > 0) {
+            isYouTubePlaylistDone = true;
+          } else {
+            controller.sink.close();
+          }
+        },
+      );
+    }
+
+    return controller.stream;
+  }
 }
 
 enum MusicType { youtube, url }
-
-extension MusicTypeExtension on MusicType {
-  String get name {
-    switch (this) {
-      case MusicType.youtube:
-        return "youtube";
-      case MusicType.url:
-        return "raw";
-    }
-  }
-}
 
 extension MediaItemParseMusicData on MediaItem {
   MusicData toMusicData() {

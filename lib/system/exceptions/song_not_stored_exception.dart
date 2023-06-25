@@ -4,5 +4,5 @@ class SongNotStoredException extends AsterfoxException {
   SongNotStoredException()
       : super(title: "SongNotStoredException", description: "");
   @override
-  String toString() => 'SongNotStoredException';
+  String toString() => "SongNotStoredException";
 }

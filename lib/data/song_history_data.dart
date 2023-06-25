@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
-import 'package:uuid/uuid.dart';
 
 import '../music/audio_source/music_data.dart';
 import '../music/manager/music_manager.dart';
@@ -30,36 +29,33 @@ class SongHistoryData {
 
   static Future<void> addAndSave(MusicData song) async {
     final data = historyData.getValue("history") as List<dynamic>;
-    data.removeWhere((element) => element["id"] == song.audioId);
-    final toSave = song.toJson();
-    toSave["last_played"] = DateTime.now().millisecondsSinceEpoch;
+    data.removeWhere((element) => element["audioId"] == song.audioId);
+    final toSave = {
+      "audioId": song.audioId,
+      "title": song.title,
+      "author": song.author,
+      "last_played": DateTime.now().millisecondsSinceEpoch,
+    };
     data.add(toSave);
     historyData.set(key: "history", value: data);
     await saveData();
   }
 
-  static List<MusicData> getAll({required bool isTemporary}) {
-    final data = historyData.getValue("history") as List<dynamic>;
-    return data
-        .map((e) => MusicData.fromJson(
-              json: e,
-              key: const Uuid().v4(),
-              isTemporary: isTemporary,
-            ))
-        .toList();
+  static List<Map<String, dynamic>> getAll({required bool isTemporary}) {
+    final data = historyData.getValue("history") as List<Map<String, dynamic>>;
+    return data.toList();
   }
 
-  static Future<void> removeFromHistory(MusicData song) async {
+  static Future<void> removeFromHistory(String audioId) async {
     final data = historyData.getValue("history") as List<dynamic>;
-    data.removeWhere((element) => element["audioId"] == song.audioId);
+    data.removeWhere((element) => element["audioId"] == audioId);
     historyData.set(key: "history", value: data);
     await saveData();
   }
 
-  static Future<void> removeAllFromHistory(List<MusicData> songs) async {
+  static Future<void> removeAllFromHistory(List<String> audioIds) async {
     final data = historyData.getValue("history") as List<dynamic>;
-    data.removeWhere(
-        (element) => songs.any((e) => e.audioId == element["audioId"]));
+    data.removeWhere((element) => audioIds.contains(element["audioId"]));
     historyData.set(key: "history", value: data);
     await saveData();
   }

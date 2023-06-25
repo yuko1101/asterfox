@@ -65,8 +65,8 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
               itemBuilder: (context, index) {
                 final song = songs[index];
                 return ListTile(
-                  title: Text(song.title),
-                  subtitle: Text(song.author),
+                  title: Text(song["title"]),
+                  subtitle: Text(song["author"]),
                   trailing: IconButton(
                     icon: const Icon(Icons.close),
                     tooltip: Language.getText("delete_from_history"),
@@ -87,7 +87,8 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                             TextButton(
                               onPressed: () {
                                 setState(() {
-                                  SongHistoryData.removeFromHistory(song);
+                                  SongHistoryData.removeFromHistory(
+                                      song["audioId"]);
                                   Navigator.pop(context);
                                 });
                               },
@@ -100,7 +101,10 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                   ),
                   onTap: () async {
                     final key = const Uuid().v4();
-                    HomeScreenMusicManager.addSong(key: key, musicData: song);
+                    HomeScreenMusicManager.addSong(
+                      key: key,
+                      audioId: song["audioId"],
+                    );
                     EasyApp.popPage(context);
                   },
                 );

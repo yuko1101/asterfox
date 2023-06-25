@@ -49,7 +49,7 @@ void _requestListener(data) async {
       case RequestActionType.addSong:
         future = HomeScreenMusicManager.addSong(
           key: request.args[0],
-          youtubeId: request.args[1],
+          audioId: request.args[1],
           musicData: request.args[2],
           mediaUrl: request.args[3],
         );
