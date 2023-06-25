@@ -32,24 +32,24 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  flutter_svg: ^1.1.1+1
+  cupertino_icons: ^1.0.5
+  flutter_svg: ^2.0.7
 
   easy_app:
     path: ../EasyApp
 
-  path_provider: ^2.0.14
+  path_provider: ^2.0.15
   provider: ^6.0.5
   uuid: ^3.0.7
 
-  fluttertoast: ^8.2.1
+  fluttertoast: ^8.2.2
 
-  just_audio: ^0.9.32
+  just_audio: ^0.9.34
   # just_audio_windows: ^0.2.0
   just_audio_libwinmedia: ^0.0.4+1 # Temporarily
 #  just_audio_background: ^0.0.1-beta.5
-  audio_service: ^0.18.9
-  audio_session: ^0.1.14
+  audio_service: ^0.18.10
+  audio_session: ^0.1.16
 
   youtube_explode_dart: ^1.12.4
 
@@ -58,16 +58,16 @@ dependencies:
   receive_sharing_intent: ^1.4.5
 
   share_plus: ^4.5.3
-  url_launcher: ^6.1.10
+  url_launcher: ^6.1.11
 
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^2.13.1
-  firebase_crashlytics: ^3.3.2
-  firebase_analytics: ^10.4.2
-  firebase_auth: ^4.6.2
-  cloud_firestore: ^4.8.0
+  firebase_core: ^2.14.0
+  firebase_crashlytics: ^3.3.3
+  firebase_analytics: ^10.4.3
+  firebase_auth: ^4.6.3
+  cloud_firestore: ^4.8.1
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -75,7 +75,7 @@ dependencies:
   # # TODO: support Firestore for desktop os
 
 
-  google_sign_in: ^6.1.0
+  google_sign_in: ^6.1.4
 
   wear: ^1.1.0
 
