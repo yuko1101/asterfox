@@ -42,8 +42,8 @@ class SongHistoryData {
   }
 
   static List<Map<String, dynamic>> getAll({required bool isTemporary}) {
-    final data = historyData.getValue("history") as List<Map<String, dynamic>>;
-    return data.toList();
+    final data = historyData.getValue("history") as List;
+    return data.map((e) => e as Map<String, dynamic>).toList();
   }
 
   static Future<void> removeFromHistory(String audioId) async {
