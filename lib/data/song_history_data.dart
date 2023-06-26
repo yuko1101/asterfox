@@ -34,7 +34,7 @@ class SongHistoryData {
       "audioId": song.audioId,
       "title": song.title,
       "author": song.author,
-      "last_played": DateTime.now().millisecondsSinceEpoch,
+      "lastPlayed": DateTime.now().millisecondsSinceEpoch,
     };
     data.add(toSave);
     historyData.set(key: "history", value: data);
@@ -73,7 +73,7 @@ extension SongHistoryDataExtension on MusicData {
     final song = data.firstWhere((element) => element["audioId"] == audioId,
         orElse: () => null);
     if (song == null) return null;
-    return song["last_played"] as int;
+    return song["lastPlayed"] as int;
   }
 
   MusicData renew({required String key, required bool? isTemporary}) {
