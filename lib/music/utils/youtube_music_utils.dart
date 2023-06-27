@@ -161,7 +161,7 @@ class YouTubeMusicUtils {
         key: key,
         isTemporary: isTemporary,
       ) as YouTubeMusicData;
-      if (!(await song.isAudioUrlAvailable())) await song.refreshAudioURL();
+      if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
       return song;
     }
 

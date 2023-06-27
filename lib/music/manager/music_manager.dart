@@ -117,12 +117,19 @@ class MusicManager {
   }
 
   Future<void> add(MusicData song) async {
+    if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
     await _audioHandler.addQueueItem(await song.toMediaItem());
   }
 
   Future<void> addAll(List<MusicData> songs) async {
-    await _audioHandler
-        .addQueueItems(await Future.wait(songs.map((e) => e.toMediaItem())));
+    await _audioHandler.addQueueItems(
+      await Future.wait(
+        songs.map((e) => (MusicData e) async {
+              if (!(await e.isAudioUrlAvailable())) await e.refreshAudioUrl();
+              return e.toMediaItem();
+            }(e)),
+      ),
+    );
   }
 
   Future<void> remove(String key) async {

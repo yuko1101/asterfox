@@ -12,20 +12,22 @@ class ProcessNotificationData {
     this.icon,
     required this.future,
     this.progressListenable,
+    this.progressStream,
     this.progressInPercentage = false,
     this.maxProgress,
     this.maxProgressListenable,
     this.errorListNotifier,
   }) {
-    assert((progressListenable != null &&
-            (maxProgress != null || maxProgressListenable != null)) ||
-        progressListenable == null);
+    if (progressListenable != null || progressStream != null) {
+      assert(maxProgress != null || maxProgressListenable != null);
+    }
   }
   final Widget title;
   final Widget? description;
   final Widget? icon;
   final Future future;
   final ValueListenable<int>? progressListenable;
+  final Stream<int>? progressStream;
   final bool progressInPercentage;
   final int? maxProgress;
   final ValueListenable<int>? maxProgressListenable;
@@ -49,12 +51,15 @@ class ProcessNotificationWidget extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         clipBehavior: Clip.antiAlias,
         child: NullableNotifierWidget<List<ResultFailedReason>>(
+          initialData: const [],
           notifier: notificationData.errorListNotifier,
-          builder: (context, errorList, child) => Padding(
+          builder: (context, errorList) => Padding(
             padding: const EdgeInsets.all(8.0),
             child: NullableNotifierWidget<int>(
+              initialData: 0,
+              stream: notificationData.progressStream,
               notifier: notificationData.progressListenable,
-              builder: (context, value, child) => Column(
+              builder: (context, value) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Flexible(
@@ -62,14 +67,14 @@ class ProcessNotificationWidget extends StatelessWidget {
                       children: [
                         notificationData.title,
                         const Spacer(),
-                        if (value != null)
-                          NullableNotifierWidget<int>(
-                            notifier: notificationData.maxProgressListenable,
-                            builder: (context, max, widget) {
-                              max ??= notificationData.maxProgress!;
-                              return _getProgressText(value, max, context);
-                            },
-                          ),
+                        NullableNotifierWidget<int?>(
+                          initialData: null,
+                          notifier: notificationData.maxProgressListenable,
+                          builder: (context, max) {
+                            max ??= notificationData.maxProgress!;
+                            return _getProgressText(value, max, context);
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -81,19 +86,19 @@ class ProcessNotificationWidget extends StatelessWidget {
                       : const SizedBox(
                           height: 30,
                         ),
-                  if (value != null)
-                    NullableNotifierWidget<int>(
-                      notifier: notificationData.maxProgressListenable!,
-                      builder: (context, max, child) {
-                        max ??= notificationData.maxProgress!;
-                        return LinearProgressIndicator(
-                          color: CustomColors.getColor("accent"),
-                          value: value.toDouble() / max.toDouble(),
-                          backgroundColor: Colors.black12,
-                        );
-                      },
-                    ),
-                  if (errorList != null && errorList.isNotEmpty)
+                  NullableNotifierWidget<int?>(
+                    initialData: null,
+                    notifier: notificationData.maxProgressListenable,
+                    builder: (context, max) {
+                      max ??= notificationData.maxProgress!;
+                      return LinearProgressIndicator(
+                        color: CustomColors.getColor("accent"),
+                        value: value.toDouble() / max.toDouble(),
+                        backgroundColor: Colors.black12,
+                      );
+                    },
+                  ),
+                  if (errorList.isNotEmpty)
                     ExpansionTile(
                       title: const Text("Errors"), // TODO: l10n
                       children: errorList

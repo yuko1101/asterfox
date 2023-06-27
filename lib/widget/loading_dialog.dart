@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:asterfox/data/custom_colors.dart';
+import 'package:asterfox/utils/async_utils.dart';
 import 'package:asterfox/widget/asterfox_dialog.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Future<bool> _defaultOnWillPop() async => false;
@@ -11,7 +13,7 @@ class LoadingDialog extends StatelessWidget {
     required BuildContext context,
     required Future future,
     Future<bool> Function() onWillPop = _defaultOnWillPop,
-    ValueNotifier<int>? percentageNotifier,
+    ValueListenable<int>? percentageNotifier,
     bool barrierDismissible = false,
   }) async {
     final completer = Completer();
@@ -33,6 +35,30 @@ class LoadingDialog extends StatelessWidget {
     await completer.future;
   }
 
+  static Future<void> showStreamLoading({
+    required BuildContext context,
+    required Stream<int> stream,
+    Future<bool> Function() onWillPop = _defaultOnWillPop,
+    bool barrierDismissible = false,
+  }) async {
+    final completer = Completer();
+    showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (context) {
+        stream.listen((event) {}, onDone: () {
+          Navigator.of(context).pop();
+          completer.complete();
+        });
+        return LoadingDialog(
+          onWillPop: onWillPop,
+          percentageNotifier: stream.toValueNotifier(0),
+        );
+      },
+    );
+    await completer.future;
+  }
+
   const LoadingDialog({
     this.onWillPop = _defaultOnWillPop,
     this.percentageNotifier,
@@ -40,7 +66,7 @@ class LoadingDialog extends StatelessWidget {
   });
 
   final Future<bool> Function() onWillPop;
-  final ValueNotifier<int>? percentageNotifier;
+  final ValueListenable<int>? percentageNotifier;
 
   @override
   Widget build(BuildContext context) {

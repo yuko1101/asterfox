@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:asterfox/system/exceptions/song_already_installed_exception.dart';
+import 'package:asterfox/system/exceptions/song_already_installing_exception.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
+import 'package:asterfox/utils/async_utils.dart';
+import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,28 +19,44 @@ import '../utils/network_check.dart';
 import 'audio_source/music_data.dart';
 import 'audio_source/youtube_music_data.dart';
 
-final ValueNotifier<List<String>> downloading = ValueNotifier<List<String>>([]);
-final Map<String, ValueNotifier<int>> downloadProgress = {};
+class DownloadManager {
+  static final Map<String, Pair<ValueNotifier<bool>, ValueNotifier<int>>>
+      _downloadingState = {};
 
-class MusicDownloader {
-  /// Throws [NetworkException] if network is not accessible.
-  /// Throws [VideoUnplayableException]
-  static Future<void> download(MusicData song) async {
-    if (song.isInstalled) return;
+  static final ValueNotifier<List<String>> downloadingNotifier =
+      ValueNotifier([]);
+
+  /// If `customPath` provided, this method doesn't download the thumbnail of the song.
+  static Future<void> download(
+    MusicData song, {
+    File? customPath,
+    String? customDownloadKey,
+  }) async {
+    final String downloadKey = customDownloadKey ?? song.audioId;
+
+    if (song.isInstalled) {
+      throw SongAlreadyInstalledException();
+    }
+    if (isDownloading(downloadKey)) {
+      throw SongAlreadyInstallingException();
+    }
 
     NetworkCheck.check();
 
-    if (downloading.value.contains(song.key)) return;
+    _downloadStarted(downloadKey);
+    final notifiers = _getNotifiers(downloadKey);
 
-    downloadProgress[song.key] ??= ValueNotifier<int>(0);
-    downloading.value = [...downloading.value, song.key];
+    if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
 
-    await downloadMp3(song, song.audioSavePath, song.key, false);
-
-    await _saveImage(song);
+    // download
+    await for (final progress
+        in _MusicDownloader.download(song, customPath: customPath)) {
+      notifiers.second.value = progress;
+    }
 
     // save file size
-    song.size = await Directory(song.directoryPath).length;
+    song.size =
+        await Directory(customPath?.parent.path ?? song.directoryPath).length;
     // if the song has already stored, update file size property and save.
     if (song.isStored) {
       await LocalMusicsData.musicData
@@ -46,44 +66,70 @@ class MusicDownloader {
       await CloudFirestoreManager.addOrUpdateSongs([song]);
     }
 
-    // インストールが完了してることが判断できるように空のテキストファイルを生成する
-    File(song.installCompleteFilePath).createSync();
+    _downloadFinished(downloadKey);
+  }
+
+  static Pair<ReadonlyValueNotifier<bool>, ReadonlyValueNotifier<int>>
+      getNotifiers(String key) {
+    final pair = _getNotifiers(key);
+    return Pair(pair.first.toReadonly(), pair.second.toReadonly());
+  }
+
+  static Pair<ValueNotifier<bool>, ValueNotifier<int>> _getNotifiers(
+      String key) {
+    if (!_downloadingState.containsKey(key)) {
+      _downloadingState
+          .addAll({key: Pair(ValueNotifier(false), ValueNotifier(0))});
+    }
+    return _downloadingState[key]!;
+  }
+
+  static bool isDownloading(String key) {
+    return _downloadingState.containsKey(key) &&
+        _downloadingState[key]!.first.value;
+  }
+
+  static _downloadStarted(String key) {
+    final notifiers = _getNotifiers(key);
+    notifiers.first.value = true;
+
+    downloadingNotifier.value = downloadingNotifier.value.toList()..add(key);
+  }
+
+  static _downloadFinished(String key) {
+    _downloadingState.remove(key);
+
+    downloadingNotifier.value = downloadingNotifier.value.toList()..remove(key);
+  }
+}
+
+class _MusicDownloader {
+  /// Throws [NetworkException] if network is not accessible.
+  /// Throws [VideoUnplayableException]
+  static Stream<int> download(MusicData song, {File? customPath}) async* {
+    yield* downloadMp3(song, customPath?.path ?? song.audioSavePath);
+
+    if (customPath == null) {
+      await _saveImage(song);
+      // インストールが完了してることが判断できるように空のテキストファイルを生成する
+      File(song.installCompleteFilePath).createSync();
+    }
 
     print("finished!");
-
-    downloadProgress.remove(song.key);
-    final List<String> preDownloading = [...downloading.value]; // immutable
-    preDownloading.remove(song.key);
-    downloading.value = preDownloading;
   }
 
   /// Throws [VideoUnplayableException]
-  static Future<void> downloadMp3(
-      MusicData song, String downloadPath, String key,
-      [bool manageDownload = true]) async {
-    if (manageDownload) {
-      if (downloading.value.contains(song.key)) return;
-      downloadProgress[key] ??= ValueNotifier<int>(0);
-      downloading.value = [...downloading.value, key];
-    }
-
+  static Stream<int> downloadMp3(MusicData song, String downloadPath) async* {
     if (song is YouTubeMusicData) {
-      await _downloadFromYouTube(song.id, downloadPath, key);
+      yield* _downloadFromYouTube(song.id, downloadPath);
     } else {
-      await _downloadMp3(await song.getAvailableAudioUrl(), downloadPath, key);
-    }
-
-    if (manageDownload) {
-      downloadProgress.remove(song.key);
-      final List<String> preDownloading = [...downloading.value]; // immutable
-      preDownloading.remove(song.key);
-      downloading.value = preDownloading;
+      yield* _downloadMp3(await song.getAvailableAudioUrl(), downloadPath);
     }
   }
 
   /// Throws [VideoUnplayableException]
-  static Future<void> _downloadFromYouTube(
-      String id, String downloadPath, String key) async {
+  static Stream<int> _downloadFromYouTube(
+      String id, String downloadPath) async* {
     final File file = File(downloadPath);
     if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
 
@@ -95,16 +141,21 @@ class MusicDownloader {
     final audioStream = yt.videos.streamsClient.get(audio);
     final output = file.openWrite(mode: FileMode.writeOnlyAppend);
 
-    var len = audio.size.totalBytes;
+    final len = audio.size.totalBytes;
     var count = 0;
 
-    var msg = "Downloading $id from youtube";
+    final msg = "Downloading $id from youtube";
     stdout.writeln(msg);
+
+    int preProgress = 0;
     await for (final data in audioStream) {
       count += data.length;
-      var progress = ((count / len) * 100).ceil();
-      downloadProgress[key]!.value = progress;
       output.add(data);
+      final progress = ((count / len) * 100).ceil();
+      if (progress != preProgress) {
+        yield progress;
+        preProgress = progress;
+      }
     }
     await output.close();
 
@@ -112,10 +163,7 @@ class MusicDownloader {
   }
 
   // TODO: add startsAt and endsAt as parameters to download a part of the song
-  static Future<String> _downloadMp3(
-      String url, String downloadPath, String key) async {
-    var completer = Completer<String>();
-
+  static Stream<int> _downloadMp3(String url, String downloadPath) async* {
     final request = Request('GET', Uri.parse(url));
     final StreamedResponse response = await Client().send(request);
 
@@ -129,27 +177,23 @@ class MusicDownloader {
 
     print("downloading...");
 
-    response.stream.listen(
-      (List<int> newBytes) {
+    int preProgress = 0;
+    try {
+      await for (final newBytes in response.stream) {
         bytes.addAll(newBytes);
         final downloadedLength = bytes.length;
-        final percentage = (downloadedLength / contentLength! * 100).ceil();
-        downloadProgress[key]!.value = percentage;
-        print(percentage);
-      },
-      onDone: () async {
-        await file.writeAsBytes(bytes);
-        completer.complete("done");
-        print("completed!");
-      },
-      onError: (e) {
-        completer.complete("error");
-        print(e);
-      },
-      cancelOnError: true,
-    );
-
-    return completer.future;
+        final progress = (downloadedLength / contentLength! * 100).ceil();
+        if (progress != preProgress) {
+          yield progress;
+          preProgress = progress;
+          print(progress);
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+    await file.writeAsBytes(bytes);
+    print("completed!");
   }
 
   static Future<void> _saveImage(MusicData song) async {

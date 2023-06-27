@@ -49,12 +49,12 @@ class LocalMusicsData {
   /// Throws [VideoUnplayableException], [NetworkException] and [SongNotStoredException].
   static Future<void> install(MusicData song) async {
     if (!song.isStored) throw SongNotStoredException();
-    await MusicDownloader.download(song);
+    await DownloadManager.download(song);
   }
 
   /// Throws [VideoUnplayableException] and [NetworkException].
   static Future<void> download(MusicData song) async {
-    await MusicDownloader.download(song);
+    await DownloadManager.download(song);
     // since song.size will be changed on download, store after download
     await store(song);
   }

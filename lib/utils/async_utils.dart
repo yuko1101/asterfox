@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_app/utils/pair.dart';
+import 'package:flutter/foundation.dart';
 
 /// `limit` - Maximum number of futures to be executed at the same time
 class AsyncCore<T> {
@@ -32,5 +33,46 @@ class AsyncCore<T> {
     });
     _running.add(future);
     completer.complete(await future);
+  }
+}
+
+class ReadonlyValueNotifier<T> extends ChangeNotifier
+    implements ValueListenable<T> {
+  ReadonlyValueNotifier(
+    this._notifier,
+  ) {
+    _updateValue();
+
+    _notifier.addListener(_updateValue);
+  }
+
+  final ValueNotifier _notifier;
+  late T _value;
+
+  @override
+  T get value => _value;
+
+  void _updateValue() {
+    _value = _notifier.value;
+    notifyListeners();
+  }
+}
+
+extension StreamToValueNotifier<T> on Stream<T> {
+  ValueNotifier<T> toValueNotifier(T initialValue) {
+    final valueNotifier = ValueNotifier<T>(initialValue);
+    listen((event) {
+      valueNotifier.value = event;
+    }, onDone: () {
+      valueNotifier.dispose();
+    });
+
+    return valueNotifier;
+  }
+}
+
+extension ValueNotifierToReadonly<T> on ValueNotifier<T> {
+  ReadonlyValueNotifier<T> toReadonly() {
+    return ReadonlyValueNotifier(this);
   }
 }

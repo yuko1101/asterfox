@@ -18,11 +18,11 @@ class DownloadButton extends StatelessWidget {
       valueListenable: musicManager.currentSongNotifier,
       builder: (_, song, __) {
         return ValueListenableBuilder<List<String>>(
-          valueListenable: downloading,
+          valueListenable: DownloadManager.downloadingNotifier,
           builder: (_, downloadingSongs, __) {
             print("download changed!");
             final downloadable = song != null && !song.isInstalled;
-            final isDownloading = downloadingSongs.contains(song?.key);
+            final isDownloading = downloadingSongs.contains(song?.audioId);
 
             final List<IndexedAudioSource?> songs =
                 musicManager.audioHandler.audioPlayer.sequence ?? [];
@@ -36,16 +36,13 @@ class DownloadButton extends StatelessWidget {
                 (audioSource.tag["url"] as String).isUrl;
 
             if (isDownloading) {
-              return ValueListenableBuilder<int>(
-                valueListenable: downloadProgress[song!.key]!,
-                builder: (_, percentage, __) => Container(
-                  height: 24,
-                  width: 24,
-                  margin: const EdgeInsets.only(right: 12, left: 12),
-                  child: Tooltip(
-                    child: const CircularProgressIndicator(),
-                    message: "${Language.getText("saving")}: $percentage%",
-                  ),
+              return Container(
+                height: 24,
+                width: 24,
+                margin: const EdgeInsets.only(right: 12, left: 12),
+                child: Tooltip(
+                  child: const CircularProgressIndicator(),
+                  message: Language.getText("saving"),
                 ),
               );
             }

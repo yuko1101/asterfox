@@ -3,21 +3,33 @@ import 'package:flutter/material.dart';
 
 class NullableNotifierWidget<T> extends StatelessWidget {
   const NullableNotifierWidget({
-    required this.notifier,
+    required this.initialData,
+    this.notifier,
+    this.stream,
     required this.builder,
     super.key,
   });
 
   final ValueListenable<T>? notifier;
-  final Widget Function(BuildContext, T?, Widget?) builder;
+  final Stream<T>? stream;
+  final T initialData;
+  final Widget Function(BuildContext, T) builder;
 
   @override
   Widget build(BuildContext context) {
-    if (notifier == null) return builder(context, null, null);
-    return ValueListenableBuilder<T>(
-      valueListenable: notifier!,
-      builder: builder,
-    );
+    if (notifier != null) {
+      return ValueListenableBuilder<T>(
+        valueListenable: notifier!,
+        builder: (context, value, _) => builder(context, value),
+      );
+    }
+    if (stream != null) {
+      return StreamBuilder<T>(
+        initialData: initialData,
+        builder: (context, snapshot) => builder(context, snapshot.data!),
+      );
+    }
+    return builder(context, initialData);
   }
 }
 

@@ -64,7 +64,7 @@ class YouTubeMusicData extends MusicData {
 
   /// Throws [RefreshUrlFailedException] if failed to refresh the url.
   @override
-  Future<String> refreshAudioURL() async {
+  Future<String> refreshAudioUrl() async {
     print("refreshing youtube audio url...");
     try {
       final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(),

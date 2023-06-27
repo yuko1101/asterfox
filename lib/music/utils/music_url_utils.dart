@@ -1,7 +1,17 @@
+import 'package:asterfox/music/audio_source/music_data.dart';
 import 'package:asterfox/system/exceptions/invalid_type_of_media_url_exception.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MusicUrlUtils {
+  static String getAudioId({
+    String? audioId,
+    String? mediaUrl,
+    MusicData? musicData,
+  }) {
+    assert(audioId != null || mediaUrl != null || musicData != null);
+    return audioId ?? musicData?.audioId ?? getAudioIdFromUrl(mediaUrl!);
+  }
+
   static String getAudioIdFromUrl(String mediaUrl) {
     if (!mediaUrl.isUrl) {
       throw ArgumentError.value(

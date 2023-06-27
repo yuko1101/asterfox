@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:asterfox/music/music_downloader.dart';
 import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/utils/languages.dart';
@@ -37,19 +39,19 @@ class MoreActionsButton extends StatelessWidget {
         Navigator.pop(context);
         if (!song!.isInstalled) {
           final key = "share-${song.key}";
-          final downloadPath =
-              "${(await getTemporaryDirectory()).path}/share_files/${song.key}.mp3";
-          final downloadFuture =
-              MusicDownloader.downloadMp3(song, downloadPath, key);
+          final downloadPath = File(
+              "${(await getTemporaryDirectory()).path}/share_files/${song.key}.mp3");
+          final downloadFuture = DownloadManager.download(song,
+              customPath: downloadPath, customDownloadKey: key);
+
           await LoadingDialog.showLoading(
             context: context,
             future: () async {
               await downloadFuture;
-              downloadProgress.remove(key);
             }(),
-            percentageNotifier: downloadProgress[key],
+            percentageNotifier: DownloadManager.getNotifiers(key).second,
           );
-          await Share.shareFiles([downloadPath]);
+          await Share.shareFiles([downloadPath.path]);
         } else {
           await Share.shareFiles([song.audioSavePath]);
         }

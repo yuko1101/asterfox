@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:asterfox/music/utils/music_url_utils.dart';
 import 'package:asterfox/system/exceptions/unable_to_load_from_playlist_exception.dart';
+import 'package:asterfox/utils/async_utils.dart';
 import 'package:asterfox/utils/overlay_utils.dart';
 import 'package:asterfox/utils/result.dart';
 import 'package:asterfox/widget/notifiers_widget.dart';
@@ -43,20 +44,15 @@ class HomeScreenMusicManager {
     assert(audioId != null || musicData != null || mediaUrl != null);
     if (musicData != null) assert(musicData.isTemporary == true);
 
+    audioId = MusicUrlUtils.getAudioId(
+        audioId: audioId, mediaUrl: mediaUrl, musicData: musicData);
+
     // the auto downloader works only for remote music
     final bool autoDownloadEnabled =
         SettingsData.getValue(key: "autoDownload") &&
-            !LocalMusicsData.isInstalled(
-              audioId: audioId ??
-                  (mediaUrl != null
-                      ? MusicUrlUtils.getAudioIdFromUrl(mediaUrl)
-                      : null),
-              song: musicData,
-            );
+            !LocalMusicsData.isInstalled(audioId: audioId);
 
     final completer = Completer();
-
-    if (autoDownloadEnabled) downloadProgress[key] = ValueNotifier<int>(0);
 
     final ValueNotifier<String?> songTitleNotifier = ValueNotifier(null);
     final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
@@ -79,15 +75,14 @@ class HomeScreenMusicManager {
         icon: const Icon(Icons.music_note),
         progressInPercentage: true,
         maxProgress: 100,
-        progressListenable: downloadProgress[key],
+        progressListenable: DownloadManager.getNotifiers(audioId).second,
         errorListNotifier: errorListNotifier,
         future: () async {
           MusicData song;
           try {
             song = await MusicData.get(
-              audioId: audioId,
-              mediaUrl: mediaUrl,
               musicData: musicData,
+              audioId: audioId,
               key: key,
               isTemporary: false,
             );
@@ -106,6 +101,8 @@ class HomeScreenMusicManager {
             if (result.status == ResultStatus.failed) {
               errorListNotifier.value = errorListNotifier.value.toList()
                 ..add(result.getReason());
+
+              // TODO: pass context
               ToastManager.showSimpleToast(
                 msg: Text(Language.getText("song_unplayable")),
                 icon: const Icon(
@@ -198,8 +195,11 @@ class HomeScreenMusicManager {
           if (autoDownloadEnabled) {
             downloadModeNotifier.value = true;
             progressNotifier.value = 0;
+
+            final asyncCore = AsyncCore<Result<void>>(limit: 10);
+
             await Future.wait(songs.map((song) async {
-              final result = await song.download();
+              final result = await asyncCore.run(song.download);
               if (result.status == ResultStatus.failed) {
                 errorListNotifier.value = errorListNotifier.value.toList()
                   ..add(result.getReason());
@@ -281,7 +281,10 @@ class HomeScreenMusicManager {
     MusicData song,
   ) async {
     final completer = Completer();
-    downloadProgress[song.key] = ValueNotifier<int>(0);
+
+    final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
+        ValueNotifier([]);
+
     HomeScreen.processNotificationList.push(
       ProcessNotificationData(
         title: Text(
@@ -290,16 +293,14 @@ class HomeScreenMusicManager {
         description: Text(song.title),
         maxProgress: 100,
         progressInPercentage: true,
-        progressListenable: downloadProgress[song.key]!,
+        progressListenable: DownloadManager.getNotifiers(song.audioId).second,
+        errorListNotifier: errorListNotifier,
         icon: const Icon(Icons.download),
         future: () async {
-          try {
-            await MusicDownloader.download(song);
-            await LocalMusicsData.store(song);
-          } on NetworkException {
-            Fluttertoast.showToast(
-                msg: Language.getText("network_not_accessible"));
-            return;
+          final result = await song.download();
+          if (result.status == ResultStatus.failed) {
+            errorListNotifier.value = errorListNotifier.value.toList()
+              ..add(result.getReason());
           }
           completer.complete();
         }(),

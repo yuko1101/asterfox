@@ -148,7 +148,7 @@ class MusicData {
     }
   }
 
-  Future<String> refreshAudioURL() async {
+  Future<String> refreshAudioUrl() async {
     return remoteAudioUrl;
   }
 
@@ -158,7 +158,7 @@ class MusicData {
 
   Future<String> getAvailableAudioUrl() async {
     if (await isAudioUrlAvailable()) return remoteAudioUrl;
-    return await refreshAudioURL();
+    return await refreshAudioUrl();
   }
 
   static String getDirectoryPath(String audioId) =>
