@@ -40,40 +40,38 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           "You can't use onRemove or onTap if you use songWidgetBuilder.");
     }
 
-    return SizedBox(
-      child: ReorderableListView.builder(
-        padding: widget.padding,
-        physics: const BouncingScrollPhysics(),
-        itemBuilder: widget.songWidgetBuilder ??
-            (context, index) => MusicCardWidget(
-                  song: widget.songs[index],
-                  isPlaying: widget.songs[index].key == widget.playing?.key &&
-                      widget.isLinked,
-                  key: Key(widget.songs[index].key),
-                  isLinked: widget.isLinked,
-                  index: index,
-                  onTap: widget.onTap,
-                  onRemove: widget.onRemove,
-                ),
-        itemCount: widget.songs.length,
-        onReorder: (oldIndex, newIndex) async {
-          if (oldIndex < newIndex) newIndex -= 1;
+    return ReorderableListView.builder(
+      padding: widget.padding,
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: widget.songWidgetBuilder ??
+          (context, index) => MusicCardWidget(
+                song: widget.songs[index],
+                isPlaying: widget.songs[index].key == widget.playing?.key &&
+                    widget.isLinked,
+                key: Key(widget.songs[index].key),
+                isLinked: widget.isLinked,
+                index: index,
+                onTap: widget.onTap,
+                onRemove: widget.onRemove,
+              ),
+      itemCount: widget.songs.length,
+      onReorder: (oldIndex, newIndex) async {
+        if (oldIndex < newIndex) newIndex -= 1;
 
-          print("oldIndex: $oldIndex, newIndex: $newIndex");
+        print("oldIndex: $oldIndex, newIndex: $newIndex");
 
-          if (widget.isLinked && widget.onMove == null) {
-            await musicManager.move(oldIndex, newIndex);
+        if (widget.isLinked && widget.onMove == null) {
+          await musicManager.move(oldIndex, newIndex);
+        }
+        setState(() {
+          if (!widget.isLinked) {
+            final song = widget.songs.removeAt(oldIndex);
+            widget.songs.insert(newIndex, song);
           }
-          setState(() {
-            if (!widget.isLinked) {
-              final song = widget.songs.removeAt(oldIndex);
-              widget.songs.insert(newIndex, song);
-            }
 
-            if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
-          });
-        },
-      ),
+          if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
+        });
+      },
     );
   }
 }

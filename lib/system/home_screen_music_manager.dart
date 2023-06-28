@@ -48,9 +48,8 @@ class HomeScreenMusicManager {
         audioId: audioId, mediaUrl: mediaUrl, musicData: musicData);
 
     // the auto downloader works only for remote music
-    final bool autoDownloadEnabled =
-        SettingsData.getValue(key: "autoDownload") &&
-            !LocalMusicsData.isInstalled(audioId: audioId);
+    final bool autoDownload = SettingsData.getValue(key: "autoDownload") &&
+        !LocalMusicsData.isInstalled(audioId: audioId);
 
     final completer = Completer();
 
@@ -59,7 +58,7 @@ class HomeScreenMusicManager {
         ValueNotifier<List<ResultFailedReason>>([]);
     HomeScreen.processNotificationList.push(
       ProcessNotificationData(
-        title: Text(autoDownloadEnabled
+        title: Text(autoDownload
             ? Language.getText("downloading_automatically")
             : Language.getText("loading_songs").replaceAll("{count}", "1")),
         description: ValueListenableBuilder<String?>(
@@ -96,7 +95,7 @@ class HomeScreenMusicManager {
           }
           songTitleNotifier.value = song.title;
 
-          if (autoDownloadEnabled) {
+          if (autoDownload) {
             final result = await song.download();
             if (result.status == ResultStatus.failed) {
               errorListNotifier.value = errorListNotifier.value.toList()
@@ -177,7 +176,7 @@ class HomeScreenMusicManager {
 
           songStream.listen((song) {
             songs.add(song);
-            progressNotifier.value = progressNotifier.value + 1;
+            progressNotifier.value = songs.length;
           }, onError: (e) {
             e as UnableToLoadFromPlaylistException;
             errorListNotifier.value = errorListNotifier.value.toList()
@@ -188,6 +187,7 @@ class HomeScreenMusicManager {
                   description: e.description,
                 ),
               );
+            maxProgressNotifier.value = maxProgressNotifier.value - 1;
           }, onDone: completer.complete);
 
           await completer.future;
@@ -195,10 +195,15 @@ class HomeScreenMusicManager {
           if (autoDownloadEnabled) {
             downloadModeNotifier.value = true;
             progressNotifier.value = 0;
+            maxProgressNotifier.value = songs.length;
 
             final asyncCore = AsyncCore<Result<void>>(limit: 10);
 
             await Future.wait(songs.map((song) async {
+              if (song.isInstalled) {
+                maxProgressNotifier.value = maxProgressNotifier.value - 1;
+                return;
+              }
               final result = await asyncCore.run(song.download);
               if (result.status == ResultStatus.failed) {
                 errorListNotifier.value = errorListNotifier.value.toList()
@@ -206,10 +211,6 @@ class HomeScreenMusicManager {
               }
               progressNotifier.value = progressNotifier.value + 1;
             }));
-            for (final song in songs) {
-              if (song.isStored) continue;
-              await LocalMusicsData.store(song);
-            }
           }
           await musicManager.addAll(songs);
         }(),
