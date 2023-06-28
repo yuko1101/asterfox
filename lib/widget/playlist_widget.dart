@@ -20,7 +20,7 @@ class PlaylistWidget extends StatefulWidget {
   final List<MusicData> songs;
   final MusicData? playing;
   final bool isLinked;
-  final EdgeInsetsGeometry? padding;
+  final EdgeInsets? padding;
   final Widget Function(BuildContext, int)? songWidgetBuilder;
 
   final dynamic Function(int, int)? onMove;
@@ -41,41 +41,38 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     }
 
     return SizedBox(
-      child: SingleChildScrollView(
+      child: ReorderableListView.builder(
         padding: widget.padding,
-        child: ReorderableListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: widget.songWidgetBuilder ??
-              (context, index) => MusicCardWidget(
-                    song: widget.songs[index],
-                    isPlaying: widget.songs[index].key == widget.playing?.key &&
-                        widget.isLinked,
-                    key: Key(widget.songs[index].key),
-                    isLinked: widget.isLinked,
-                    index: index,
-                    onTap: widget.onTap,
-                    onRemove: widget.onRemove,
-                  ),
-          itemCount: widget.songs.length,
-          onReorder: (oldIndex, newIndex) async {
-            if (oldIndex < newIndex) newIndex -= 1;
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: widget.songWidgetBuilder ??
+            (context, index) => MusicCardWidget(
+                  song: widget.songs[index],
+                  isPlaying: widget.songs[index].key == widget.playing?.key &&
+                      widget.isLinked,
+                  key: Key(widget.songs[index].key),
+                  isLinked: widget.isLinked,
+                  index: index,
+                  onTap: widget.onTap,
+                  onRemove: widget.onRemove,
+                ),
+        itemCount: widget.songs.length,
+        onReorder: (oldIndex, newIndex) async {
+          if (oldIndex < newIndex) newIndex -= 1;
 
-            print("oldIndex: $oldIndex, newIndex: $newIndex");
+          print("oldIndex: $oldIndex, newIndex: $newIndex");
 
-            if (widget.isLinked && widget.onMove == null) {
-              await musicManager.move(oldIndex, newIndex);
+          if (widget.isLinked && widget.onMove == null) {
+            await musicManager.move(oldIndex, newIndex);
+          }
+          setState(() {
+            if (!widget.isLinked) {
+              final song = widget.songs.removeAt(oldIndex);
+              widget.songs.insert(newIndex, song);
             }
-            setState(() {
-              if (!widget.isLinked) {
-                final song = widget.songs.removeAt(oldIndex);
-                widget.songs.insert(newIndex, song);
-              }
 
-              if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
-            });
-          },
-        ),
+            if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
+          });
+        },
       ),
     );
   }
