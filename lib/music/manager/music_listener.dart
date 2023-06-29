@@ -126,6 +126,6 @@ class MusicListener {
 
   void _updateVolume(double volume) {
     _musicManager.volumeNotifier.value = volume;
-    print("volume: $volume");
+    // print("volume: $volume");
   }
 }

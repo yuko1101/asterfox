@@ -18,9 +18,7 @@ import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 import 'audio_handler.dart';
 import 'music_listener.dart';
-import 'notifiers/data_notifier.dart';
-import 'notifiers/playlist_notifier.dart';
-import 'notifiers/song_notifier.dart';
+import '../../utils/data_notifier.dart';
 
 class MusicManager {
   MusicManager(this.showNotification);
@@ -35,9 +33,9 @@ class MusicManager {
   // notifiers
   // sync fast notifier can be used as notifier.value to get the value.
   final progressNotifier = ProgressNotifier();
-  final playlistNotifier = PlaylistNotifier([]);
-  final shuffledPlaylistNotifier = PlaylistNotifier([]);
-  final currentSongNotifier = SongNotifier(null);
+  final playlistNotifier = DataNotifier<List<MusicData>>([]);
+  final shuffledPlaylistNotifier = DataNotifier<List<MusicData>>([]);
+  final currentSongNotifier = DataNotifier<MusicData?>(null);
   final playingStateNotifier =
       ValueNotifier<PlayingState>(PlayingState.disabled);
   final currentIndexNotifier = DataNotifier<int?>(null); // シャッフルない状態でのindex
