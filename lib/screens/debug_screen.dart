@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:asterfox/screens/home_screen.dart';
 import 'package:asterfox/system/firebase/cloud_firestore.dart';
+import 'package:asterfox/utils/async_utils.dart';
+import 'package:asterfox/utils/result.dart';
 import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:colored_json/colored_json.dart';
@@ -16,9 +18,6 @@ import 'package:http/http.dart' as http;
 import '../data/local_musics_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
-import '../music/manager/audio_data_manager.dart';
-import '../widget/music_widgets/music_thumbnail.dart';
-import '../widget/playlist_widget.dart';
 import '../widget/search/song_search.dart';
 
 class DebugScreen extends ScaffoldScreen {
@@ -132,11 +131,22 @@ class DebugMainScreen extends StatelessWidget {
                             TextButton(
                               child: const Text("ダウンロード"),
                               onPressed: () {
+                                final asyncCore =
+                                    AsyncCore<Result<void>>(limit: 5);
                                 final ValueNotifier<int> downloaded =
                                     ValueNotifier(0);
+                                final ValueNotifier<List<ResultFailedReason>>
+                                    errorListNotifier = ValueNotifier([]);
                                 final futures = songsToInstall
                                     .map((song) => () async {
-                                          await song.install();
+                                          final result =
+                                              await asyncCore.run(song.install);
+                                          if (result.status ==
+                                              ResultStatus.failed) {
+                                            errorListNotifier.value =
+                                                errorListNotifier.value.toList()
+                                                  ..add(result.getReason());
+                                          }
                                           downloaded.value =
                                               downloaded.value + 1;
                                         }())
@@ -149,6 +159,9 @@ class DebugMainScreen extends StatelessWidget {
                                         "インストール中: $count/${futures.length}",
                                       ),
                                     ),
+                                    maxProgress: futures.length,
+                                    progressListenable: downloaded,
+                                    errorListNotifier: errorListNotifier,
                                     icon: const Icon(Icons.download),
                                     future: Future.wait(futures),
                                   ),

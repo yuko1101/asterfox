@@ -144,7 +144,7 @@ class HomeScreenMusicManager {
         YouTubeMusicUtils.playlistLoadingProgress[playlistProcessId]!;
     final ValueNotifier<int> maxProgressNotifier = ValueNotifier<int>(count);
     final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
-        ValueNotifier<List<ResultFailedReason>>([]);
+        ValueNotifier([]);
 
     await HomeScreen.processNotificationList.push(
       ProcessNotificationData(
