@@ -4,7 +4,6 @@ import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
-import '../../utils/selection_sort.dart';
 import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 

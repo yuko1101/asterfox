@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:asterfox/data/device_settings_data.dart';
+import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/data/settings_data.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/utils/math.dart';
@@ -115,7 +116,9 @@ class MusicManager {
   }
 
   Future<void> add(MusicData song) async {
-    if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
+    if (!song.isInstalled && !(await song.isAudioUrlAvailable())) {
+      await song.refreshAudioUrl();
+    }
     await _audioHandler.addQueueItem(await song.toMediaItem());
   }
 
@@ -123,7 +126,9 @@ class MusicManager {
     await _audioHandler.addQueueItems(
       await Future.wait(
         songs.map((e) => (MusicData e) async {
-              if (!(await e.isAudioUrlAvailable())) await e.refreshAudioUrl();
+              if (!e.isInstalled && !(await e.isAudioUrlAvailable())) {
+                await e.refreshAudioUrl();
+              }
               return e.toMediaItem();
             }(e)),
       ),
