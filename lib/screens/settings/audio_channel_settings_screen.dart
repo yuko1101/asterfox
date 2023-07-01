@@ -1,11 +1,11 @@
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/data/settings_data.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+import '../../data/custom_colors.dart';
+import '../../data/settings_data.dart';
 import 'settings_screen.dart';
 
 class AudioChannelSettingsScreen extends ScaffoldScreen {

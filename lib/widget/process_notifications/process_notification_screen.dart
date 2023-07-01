@@ -1,9 +1,10 @@
-import 'package:asterfox/widget/notifiers_widget.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../notifiers_widget.dart';
+import 'process_notification_list.dart';
+import 'process_notification_widget.dart';
 
 class ProcessNotificationScreen extends ScaffoldScreen {
   ProcessNotificationScreen(ProcessNotificationList processNotificationList,

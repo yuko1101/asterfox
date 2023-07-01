@@ -1,4 +1,3 @@
-import 'package:asterfox/music/utils/music_url_utils.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -7,6 +6,7 @@ import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/music_downloader.dart';
+import '../../music/utils/music_url_utils.dart';
 import '../../system/home_screen_music_manager.dart';
 
 class DownloadButton extends StatelessWidget {

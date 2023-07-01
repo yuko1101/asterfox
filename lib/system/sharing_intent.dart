@@ -1,7 +1,7 @@
-import 'package:asterfox/system/theme/theme.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'home_screen_music_manager.dart';
+import 'theme/theme.dart';
 
 class SharingIntent {
   static void init() {

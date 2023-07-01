@@ -1,11 +1,12 @@
 import 'dart:async';
 
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/utils/map_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../data/local_musics_data.dart';
+import '../../data/settings_data.dart';
+import '../../music/audio_source/music_data.dart';
+import '../../utils/map_utils.dart';
 
 class CloudFirestoreManager {
   static Map<String, dynamic>? userData;

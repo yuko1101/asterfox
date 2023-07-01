@@ -1,11 +1,12 @@
 import 'dart:math';
 
-import 'package:asterfox/widget/asterfox_dialog.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_screen.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:flutter/material.dart';
+
+import '../asterfox_dialog.dart';
+import 'process_notification_list.dart';
+import 'process_notification_screen.dart';
+import 'process_notification_widget.dart';
 
 class ProcessNotificationsButton extends StatefulWidget {
   const ProcessNotificationsButton({

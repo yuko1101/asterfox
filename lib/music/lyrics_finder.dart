@@ -1,9 +1,9 @@
-import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:lyrics/lyrics.dart';
 
 import '../data/local_musics_data.dart';
+import '../system/firebase/cloud_firestore.dart';
 import 'audio_source/music_data.dart';
 
 class LyricsFinder {

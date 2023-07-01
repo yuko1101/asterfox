@@ -1,10 +1,11 @@
-import 'package:asterfox/main.dart';
-import 'package:asterfox/music/audio_source/music_data.dart';
-import 'package:asterfox/music/lyrics_finder.dart';
-import 'package:asterfox/system/theme/theme.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../../main.dart';
+import '../../music/audio_source/music_data.dart';
+import '../../music/lyrics_finder.dart';
+import '../../system/theme/theme.dart';
 
 class LyricsButton extends StatelessWidget {
   const LyricsButton({Key? key}) : super(key: key);

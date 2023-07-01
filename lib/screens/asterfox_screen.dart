@@ -1,12 +1,5 @@
 import 'dart:async';
 
-import 'package:asterfox/main.dart';
-import 'package:asterfox/screens/settings/settings_screen.dart';
-import 'package:asterfox/screens/song_history_screen.dart';
-import 'package:asterfox/system/home_screen_music_manager.dart';
-import 'package:asterfox/widget/music_widgets/music_buttons.dart';
-import 'package:asterfox/widget/music_widgets/music_thumbnail.dart';
-import 'package:asterfox/widget/toast/toast_widget.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
@@ -16,9 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wear/wear.dart';
 
+import '../main.dart';
+import '../system/home_screen_music_manager.dart';
+import '../widget/music_widgets/music_buttons.dart';
+import '../widget/music_widgets/music_thumbnail.dart';
+import '../widget/toast/toast_widget.dart';
 import 'debug_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
+import 'settings/settings_screen.dart';
+import 'song_history_screen.dart';
 
 class AsterfoxScreen extends StatelessWidget {
   const AsterfoxScreen({Key? key}) : super(key: key);

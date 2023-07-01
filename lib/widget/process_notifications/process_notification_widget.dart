@@ -1,9 +1,10 @@
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/utils/result.dart';
-import 'package:asterfox/widget/notifiers_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../../data/custom_colors.dart';
+import '../../system/theme/theme.dart';
+import '../../utils/result.dart';
+import '../notifiers_widget.dart';
 
 class ProcessNotificationData {
   ProcessNotificationData({

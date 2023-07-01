@@ -1,4 +1,3 @@
-import 'package:asterfox/widget/process_notifications/process_notification_list.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
 import '../widget/notifiers_widget.dart';
 import '../widget/playlist_widget.dart';
+import '../widget/process_notifications/process_notification_list.dart';
 import '../widget/process_notifications/process_notifications_button.dart';
 import '../widget/search/song_search.dart';
 

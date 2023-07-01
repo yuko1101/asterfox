@@ -1,7 +1,8 @@
-import 'package:asterfox/widget/process_notifications/animated_process_icon.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
-import 'package:asterfox/widget/process_notifications/process_notifications_button.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'animated_process_icon.dart';
+import 'process_notification_widget.dart';
+import 'process_notifications_button.dart';
 
 class ProcessNotificationList {
   GlobalKey<ProcessNotificationsButtonState>? buttonKey;

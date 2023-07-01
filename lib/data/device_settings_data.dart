@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:asterfox/main.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 
+import '../main.dart';
 import '../widget/music_widgets/repeat_button.dart';
 
 class DeviceSettingsData {

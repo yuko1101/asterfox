@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 
-import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/system/home_screen_music_manager.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:uuid/uuid.dart';
+
+import '../data/settings_data.dart';
+import '../main.dart';
+import '../system/home_screen_music_manager.dart';
 
 final Map<String, void Function(Response)> _registered = {};
 

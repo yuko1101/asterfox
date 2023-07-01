@@ -1,7 +1,3 @@
-import 'package:asterfox/screens/login_screen.dart';
-import 'package:asterfox/screens/settings/audio_channel_settings_screen.dart';
-import 'package:asterfox/system/firebase/cloud_firestore.dart';
-import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
@@ -16,8 +12,12 @@ import 'package:settings_ui/settings_ui.dart';
 import '../../main.dart';
 import '../../data/custom_colors.dart';
 import '../../data/settings_data.dart';
+import '../../system/firebase/cloud_firestore.dart';
 import '../../system/git.dart';
 import '../../system/theme/theme.dart';
+import '../../widget/loading_dialog.dart';
+import '../login_screen.dart';
+import 'audio_channel_settings_screen.dart';
 import 'theme_settings_screen.dart';
 
 class SettingsScreen extends ScaffoldScreen {

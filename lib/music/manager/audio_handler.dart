@@ -1,9 +1,9 @@
-import 'package:asterfox/data/settings_data.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../data/settings_data.dart';
 import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 

@@ -1,13 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:asterfox/music/utils/music_url_utils.dart';
-import 'package:asterfox/system/exceptions/unable_to_load_from_playlist_exception.dart';
-import 'package:asterfox/utils/async_utils.dart';
-import 'package:asterfox/utils/overlay_utils.dart';
-import 'package:asterfox/utils/result.dart';
-import 'package:asterfox/widget/notifiers_widget.dart';
-import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -19,10 +12,17 @@ import '../data/settings_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
+import '../music/utils/music_url_utils.dart';
 import '../screens/home_screen.dart';
 import '../music/utils/youtube_music_utils.dart';
+import '../utils/async_utils.dart';
+import '../utils/overlay_utils.dart';
+import '../utils/result.dart';
+import '../widget/notifiers_widget.dart';
 import '../widget/process_notifications/process_notification_widget.dart';
+import '../widget/toast/toast_manager.dart';
 import 'exceptions/network_exception.dart';
+import 'exceptions/unable_to_load_from_playlist_exception.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSong({

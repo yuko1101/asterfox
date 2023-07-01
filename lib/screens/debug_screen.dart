@@ -1,12 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:asterfox/screens/home_screen.dart';
-import 'package:asterfox/system/firebase/cloud_firestore.dart';
-import 'package:asterfox/utils/async_utils.dart';
-import 'package:asterfox/utils/result.dart';
-import 'package:asterfox/widget/process_notifications/process_notification_widget.dart';
-import 'package:asterfox/widget/toast/toast_manager.dart';
 import 'package:colored_json/colored_json.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
@@ -18,7 +12,13 @@ import 'package:http/http.dart' as http;
 import '../data/local_musics_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
+import '../system/firebase/cloud_firestore.dart';
+import '../utils/async_utils.dart';
+import '../utils/result.dart';
+import '../widget/process_notifications/process_notification_widget.dart';
 import '../widget/search/song_search.dart';
+import '../widget/toast/toast_manager.dart';
+import 'home_screen.dart';
 
 class DebugScreen extends ScaffoldScreen {
   const DebugScreen({

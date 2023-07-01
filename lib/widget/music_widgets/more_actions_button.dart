@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:asterfox/music/music_downloader.dart';
-import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,6 +11,8 @@ import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/audio_source/youtube_music_data.dart';
+import '../../music/music_downloader.dart';
+import '../loading_dialog.dart';
 
 class MoreActionsButton extends StatelessWidget {
   const MoreActionsButton({

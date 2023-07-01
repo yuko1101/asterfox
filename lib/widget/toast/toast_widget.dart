@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:asterfox/utils/math.dart';
 import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/math.dart';
 
 class Toast extends StatefulWidget {
   const Toast({Key? key}) : super(key: key);

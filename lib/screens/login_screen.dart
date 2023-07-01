@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../system/theme/theme.dart';
+import '../widget/loading_dialog.dart';
 
 // TODO: alert users to connect to the Internet when offline
 class AuthScreen extends StatefulWidget {
