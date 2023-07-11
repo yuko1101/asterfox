@@ -1,11 +1,11 @@
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/system/firebase/cloud_firestore.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../../data/local_musics_data.dart';
 import '../../system/exceptions/network_exception.dart';
 import '../../system/exceptions/refresh_url_failed_exception.dart';
+import '../../system/firebase/cloud_firestore.dart';
 import '../utils/youtube_music_utils.dart';
 import 'music_data.dart';
 

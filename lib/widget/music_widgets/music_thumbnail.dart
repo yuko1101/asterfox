@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:asterfox/music/utils/music_url_utils.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
+import '../../music/utils/music_url_utils.dart';
 
 final Image defaultImage = Image.asset("assets/images/asterfox-no-image.png");
 

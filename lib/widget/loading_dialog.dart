@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:asterfox/data/custom_colors.dart';
-import 'package:asterfox/utils/async_utils.dart';
-import 'package:asterfox/widget/asterfox_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../data/custom_colors.dart';
+import '../utils/async_utils.dart';
+import 'asterfox_dialog.dart';
 
 Future<bool> _defaultOnWillPop() async => false;
 

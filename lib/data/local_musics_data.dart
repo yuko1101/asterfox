@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:asterfox/system/exceptions/song_not_stored_exception.dart';
-import 'package:asterfox/utils/result.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
@@ -11,7 +9,9 @@ import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
 import '../system/exceptions/network_exception.dart';
+import '../system/exceptions/song_not_stored_exception.dart';
 import '../system/firebase/cloud_firestore.dart';
+import '../utils/result.dart';
 
 // TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
 // TODO: move `remoteAudioUrl` into TemporaryData

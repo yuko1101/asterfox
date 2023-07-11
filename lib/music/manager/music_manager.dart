@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:asterfox/data/device_settings_data.dart';
-import 'package:asterfox/data/local_musics_data.dart';
-import 'package:asterfox/data/settings_data.dart';
-import 'package:asterfox/main.dart';
-import 'package:asterfox/utils/math.dart';
-import 'package:asterfox/utils/overlay_utils.dart';
-import 'package:asterfox/widget/music_widgets/volume_widget.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../data/device_settings_data.dart';
+import '../../data/local_musics_data.dart';
+import '../../data/settings_data.dart';
+import '../../main.dart';
+import '../../utils/math.dart';
+import '../../utils/overlay_utils.dart';
 import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
+import '../../widget/music_widgets/volume_widget.dart';
 import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 import 'audio_handler.dart';

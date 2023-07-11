@@ -1,5 +1,6 @@
-import 'package:asterfox/system/exceptions/asterfox_exception.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+
+import 'asterfox_exception.dart';
 
 class UnableToLoadFromPlaylistException extends AsterfoxException {
   UnableToLoadFromPlaylistException({

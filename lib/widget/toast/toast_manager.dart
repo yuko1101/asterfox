@@ -1,5 +1,6 @@
-import 'package:asterfox/widget/toast/toast_widget.dart';
 import 'package:flutter/material.dart';
+
+import 'toast_widget.dart';
 
 class ToastManager {
   static Future<void> showSimpleToast({

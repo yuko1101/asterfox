@@ -1,4 +1,4 @@
-import 'package:asterfox/system/exceptions/asterfox_exception.dart';
+import 'asterfox_exception.dart';
 
 class NetworkException extends AsterfoxException {
   NetworkException() : super(title: "NetworkException", description: "");

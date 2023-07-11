@@ -1,16 +1,15 @@
 import 'dart:async';
 
-import 'package:asterfox/data/song_history_data.dart';
-import 'package:asterfox/music/audio_source/url_music_data.dart';
-import 'package:asterfox/music/utils/music_url_utils.dart';
-import 'package:asterfox/music/utils/youtube_music_utils.dart';
-import 'package:asterfox/system/exceptions/network_exception.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../../data/song_history_data.dart';
+import '../utils/music_url_utils.dart';
+import '../utils/youtube_music_utils.dart';
+import 'url_music_data.dart';
 import 'youtube_music_data.dart';
 import '../../data/local_musics_data.dart';
 

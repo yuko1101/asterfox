@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:asterfox/music/audio_source/music_data.dart';
+import 'music_data.dart';
 
 class UrlMusicData extends MusicData {
   UrlMusicData({

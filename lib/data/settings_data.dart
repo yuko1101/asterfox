@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:asterfox/main.dart';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/utils/config_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../main.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../system/theme/theme.dart';
 

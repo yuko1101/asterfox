@@ -1,5 +1,6 @@
-import 'package:asterfox/system/theme/theme.dart';
 import 'package:flutter/material.dart';
+
+import '../system/theme/theme.dart';
 
 Future<bool> _defaultOnWillPop() async => true;
 
