@@ -58,7 +58,6 @@ class MusicManager {
           config: const AudioServiceConfig(
             androidNotificationChannelId: 'net.asterfox.app.channel.audio',
             androidNotificationChannelName: 'Asterfox Music',
-            androidNotificationOngoing: true,
             androidStopForegroundOnPause: true,
             androidShowNotificationBadge: true,
           ));

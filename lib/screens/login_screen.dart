@@ -1,9 +1,7 @@
-import 'dart:io';
-
+import 'package:asterfox/main.dart';
 import 'package:asterfox/system/theme/theme.dart';
 import 'package:asterfox/widget/loading_dialog.dart';
 import 'package:easy_app/utils/languages.dart';
-import 'package:easy_app/utils/os.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -118,13 +116,7 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Icon(Icons.exit_to_app),
             quarterTurns: 2,
           ),
-          onPressed: () {
-            if (OS.getOS() == OSType.android) {
-              SystemNavigator.pop();
-            } else {
-              exit(0);
-            }
-          },
+          onPressed: exitApp,
         ),
       ),
       body: Center(

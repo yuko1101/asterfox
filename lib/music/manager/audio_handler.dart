@@ -1,4 +1,5 @@
 import 'package:asterfox/data/settings_data.dart';
+import 'package:asterfox/main.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:easy_app/utils/os.dart';
@@ -174,8 +175,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> onNotificationDeleted() async {
-    await _player.stop();
-    return super.onNotificationDeleted();
+    // TODO: safe exit
+    exitApp(true);
   }
 
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
