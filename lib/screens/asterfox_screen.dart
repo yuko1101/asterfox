@@ -13,6 +13,7 @@ import '../main.dart';
 import '../system/home_screen_music_manager.dart';
 import '../widget/music_widgets/music_buttons.dart';
 import '../widget/music_widgets/music_thumbnail.dart';
+import '../widget/toast/toast_manager.dart';
 import '../widget/toast/toast_widget.dart';
 import 'debug_screen.dart';
 import 'home_screen.dart';
@@ -77,7 +78,18 @@ class AsterfoxScreen extends StatelessWidget {
             TextButton(
               child: Text(Language.getText("send")),
               onPressed: () {
-                FirebaseAuth.instance.currentUser!.sendEmailVerification();
+                FirebaseAuth.instance.currentUser!
+                    .sendEmailVerification()
+                    .catchError((e) {
+                  ToastManager.showSimpleToast(
+                    // TODO: better message (such as "Too many request")
+                    msg: Text(e.toString()),
+                    icon: const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                    ),
+                  );
+                });
               },
             ),
             TextButton(
@@ -94,8 +106,9 @@ class AsterfoxScreen extends StatelessWidget {
     // check email verification every 2 seconds
     Timer.periodic(const Duration(seconds: 2), (timer) {
       Future.sync(() async {
-        await FirebaseAuth.instance.currentUser!.reload();
-        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+        final user = FirebaseAuth.instance.currentUser;
+        await user?.reload();
+        if (user != null && user.emailVerified) {
           timer.cancel();
           Navigator.pop(context);
         }

@@ -278,6 +278,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       print("index:$index");
       final playlist = queue.value;
       if (index == null || playlist.isEmpty) return;
+      // TODO: avoid out of range error
       mediaItem.add(playlist[index]);
     });
   }
