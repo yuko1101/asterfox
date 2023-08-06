@@ -170,6 +170,7 @@ class HomeScreenMusicManager {
             mediaUrlList: mediaUrlList,
             youtubePlaylist: youtubePlaylist,
             isTemporary: false,
+            renew: false,
           );
 
           final completer = Completer();

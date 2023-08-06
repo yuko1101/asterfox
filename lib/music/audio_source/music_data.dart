@@ -213,11 +213,13 @@ class MusicData {
     return await getByAudioId(audioId: id, key: key, isTemporary: isTemporary);
   }
 
+  /// if renew is false, musicData in musicDataList won't be renewed by MusicData#renew().
   static Stream<MusicData> getList({
     List<MusicData>? musicDataList,
     List<String>? mediaUrlList,
     String? youtubePlaylist,
     required bool isTemporary,
+    required bool renew,
   }) {
     final controller = StreamController<MusicData>();
 
@@ -238,10 +240,14 @@ class MusicData {
 
     if (musicDataList != null) {
       for (final musicData in musicDataList) {
-        add(musicData.renew(
-          key: const Uuid().v4(),
-          isTemporary: isTemporary,
-        ));
+        add(
+          renew
+              ? musicData.renew(
+                  key: const Uuid().v4(),
+                  isTemporary: isTemporary,
+                )
+              : musicData,
+        );
       }
     }
     if (mediaUrlList != null) {
