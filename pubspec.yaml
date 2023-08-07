@@ -55,23 +55,23 @@ dependencies:
   audio_service: ^0.18.10
   audio_session: ^0.1.16
 
-  youtube_explode_dart: ^1.12.4
+  youtube_explode_dart: ^2.0.1
 
   audio_video_progress_bar: ^1.0.1
 
   receive_sharing_intent: ^1.4.5
 
   share_plus: ^4.5.3
-  url_launcher: ^6.1.11
+  url_launcher: ^6.1.12
 
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^2.14.0
-  firebase_crashlytics: ^3.3.3
-  firebase_analytics: ^10.4.3
-  firebase_auth: ^4.6.3
-  cloud_firestore: ^4.8.1
+  firebase_core: ^2.15.0
+  firebase_crashlytics: ^3.3.4
+  firebase_analytics: ^10.4.4
+  firebase_auth: ^4.7.2
+  cloud_firestore: ^4.8.4
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -88,7 +88,7 @@ dependencies:
 
   lyrics: #^0.0.7
     git:
-      url: https://github.com/webrror/dart-lyrics.git
+      url: https://github.com/yuko1101/dart-lyrics.git
       ref: main
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
@@ -105,9 +105,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
-  msix: ^3.1.0
-  flutter_launcher_icons: ^0.9.2
-  flutter_native_splash: ^2.1.6
+  msix: ^3.16.1
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
