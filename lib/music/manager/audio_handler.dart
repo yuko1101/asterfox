@@ -264,6 +264,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.durationStream.listen((duration) {
       var index = _player.currentIndex;
       final newQueue = queue.value;
+      // TODO: if index is >= newQueue.length, **maybe** show warning or something that indicates something is wrong
       if (index == null || newQueue.isEmpty || index >= newQueue.length) return;
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
@@ -277,8 +278,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.currentIndexStream.listen((index) {
       print("index:$index");
       final playlist = queue.value;
-      if (index == null || playlist.isEmpty) return;
-      // TODO: avoid out of range error
+      // TODO: if index is >= playlist.length, show warning or something that indicates something is wrong
+      if (index == null || playlist.isEmpty || index >= playlist.length) return;
       mediaItem.add(playlist[index]);
     });
   }
