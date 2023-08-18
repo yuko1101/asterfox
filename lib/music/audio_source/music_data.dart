@@ -54,6 +54,10 @@ class MusicData {
   final bool isTemporary;
 
   Future<MediaItem> toMediaItem() async {
+    return toMediaItemWithUrl(await audioUrl);
+  }
+
+  MediaItem toMediaItemWithUrl(String url) {
     return MediaItem(
       id: key,
       title: title,
@@ -62,7 +66,7 @@ class MusicData {
       duration: duration,
       displayDescription: description,
       extras: {
-        "url": await audioUrl,
+        "url": url,
       },
     );
   }

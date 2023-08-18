@@ -6,7 +6,6 @@ import 'package:just_audio/just_audio.dart';
 import '../../data/settings_data.dart';
 import '../../main.dart';
 import '../audio_source/music_data.dart';
-import 'audio_data_manager.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   final _androidEnhancer = AndroidLoudnessEnhancer();
@@ -190,6 +189,11 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     );
   }
 
+  MediaItem _createMediaItem(IndexedAudioSource audioSource) {
+    final MusicData musicData = audioSource.toMusicData();
+    return musicData.toMediaItemWithUrl(audioSource.tag["url"]);
+  }
+
   Future<void> move(int currentIndex, int newIndex) async {
     final bool shuffled = audioPlayer.shuffleModeEnabled;
     if (shuffled) {
@@ -264,8 +268,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.durationStream.listen((duration) {
       var index = _player.currentIndex;
       final newQueue = queue.value;
-      // TODO: if index is >= newQueue.length, **maybe** show warning or something that indicates something is wrong
-      if (index == null || newQueue.isEmpty || index >= newQueue.length) return;
+      if (index == null || newQueue.isEmpty) return;
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
       newQueue[index] = newMediaItem;
@@ -278,8 +281,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.currentIndexStream.listen((index) {
       print("index:$index");
       final playlist = queue.value;
-      // TODO: if index is >= playlist.length, show warning or something that indicates something is wrong
-      if (index == null || playlist.isEmpty || index >= playlist.length) return;
+      if (index == null || playlist.isEmpty) return;
       mediaItem.add(playlist[index]);
     });
   }
@@ -289,9 +291,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
       var sequence = sequenceState?.sequence;
       if (sequence == null || sequence.isEmpty) sequence = [];
-      final List<MusicData> playlist = AudioDataManager.getPlaylist(sequence);
-      final items =
-          await Future.wait(playlist.map((song) => song.toMediaItem()));
+      final items = sequence.map(_createMediaItem);
       // print(items.length.toString() + " added songs");
       setQueueItems(items.toList());
     });
