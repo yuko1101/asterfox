@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../data/settings_data.dart';
 import '../../main.dart';
 import '../audio_source/music_data.dart';
+import 'notifiers/audio_state_notifier.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   final _androidEnhancer = AndroidLoudnessEnhancer();
@@ -194,16 +195,44 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     return musicData.toMediaItemWithUrl(audioSource.tag["url"]);
   }
 
-  Future<void> move(int currentIndex, int newIndex) async {
+  Future<void> move(
+      int oldIndex, int newIndex, MainAudioStateNotifier? mainNotifier) async {
     final bool shuffled = audioPlayer.shuffleModeEnabled;
     if (shuffled) {
       final shuffleIndices = _playlist.shuffleOrder.indices;
-      shuffleIndices.insert(newIndex, shuffleIndices.removeAt(currentIndex));
+      shuffleIndices.insert(newIndex, shuffleIndices.removeAt(oldIndex));
 
       // add nothing to update playlist with new shuffle order
       await _playlist.addAll([]);
     } else {
-      await _playlist.move(currentIndex, newIndex);
+      final currentIndex = _player.currentIndex;
+      final newCurrentIndex = () {
+        if (currentIndex == null) return null;
+        if (oldIndex == newIndex) return currentIndex;
+        if (currentIndex == oldIndex) return newIndex;
+
+        if (oldIndex < newIndex) {
+          if (currentIndex > oldIndex && currentIndex <= newIndex) {
+            return currentIndex - 1;
+          } else {
+            return currentIndex;
+          }
+        }
+
+        if (currentIndex >= newIndex && currentIndex < oldIndex) {
+          return currentIndex + 1;
+        } else {
+          return currentIndex;
+        }
+      }();
+      if (mainNotifier != null) {
+        mainNotifier.update({"currentIndex": newCurrentIndex});
+        mainNotifier.pauseChange("currentIndex");
+      }
+      await _playlist.move(oldIndex, newIndex);
+      if (mainNotifier != null) {
+        mainNotifier.resumeChange("currentIndex");
+      }
     }
   }
 

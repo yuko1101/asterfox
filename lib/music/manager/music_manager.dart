@@ -138,7 +138,11 @@ class MusicManager {
 
   Future<void> move(int currentIndex, int newIndex) async {
     // await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
-    await _audioHandler.move(currentIndex, newIndex);
+    await _audioHandler.move(
+      currentIndex,
+      newIndex,
+      audioStateManager.mainNotifier,
+    );
   }
 
   void stop() {

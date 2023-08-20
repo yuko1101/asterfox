@@ -30,7 +30,7 @@ class MusicListener {
       _updateLoopMode(loopMode);
     });
     _audioHandler.audioPlayer.volumeStream.listen((volume) {
-      _updateBaseVolume(volume);
+      _updateVolume(volume);
     });
   }
 
@@ -84,7 +84,7 @@ class MusicListener {
     _musicManager.audioStateManager.mainNotifier.update({"loopMode": loopMode});
   }
 
-  void _updateBaseVolume(double volume) {
-    _musicManager.audioStateManager.mainNotifier.update({"baseVolume": volume});
+  void _updateVolume(double volume) {
+    _musicManager.audioStateManager.mainNotifier.update({"volume": volume});
   }
 }

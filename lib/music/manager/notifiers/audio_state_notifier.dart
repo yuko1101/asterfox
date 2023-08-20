@@ -48,8 +48,7 @@ class AudioState extends AudioDataContainer {
           : $playerState,
       $loopMode:
           map.containsKey("loopMode") ? map["loopMode"] as LoopMode : $loopMode,
-      $volume:
-          map.containsKey("baseVolume") ? map["baseVolume"] as double : $volume,
+      $volume: map.containsKey("volume") ? map["volume"] as double : $volume,
     );
   }
 
@@ -62,6 +61,59 @@ class AudioState extends AudioDataContainer {
     $loopMode: LoopMode.off,
     $volume: 1.0,
   );
+}
+
+class MainAudioStateNotifier extends AudioStateNotifier {
+  MainAudioStateNotifier(
+    AudioState value,
+    Set<AudioStateChange> targetChanges,
+  ) : super(value, targetChanges);
+
+  /// Paused changes are changes that are not notified to listeners.
+  /// The integer value is the number of processes pausing the change right now.
+  final Map<String, int> _pausedChanges = {};
+
+  void pauseChange(String change) {
+    _pausedChanges[change] = (_pausedChanges[change] ?? 0) + 1;
+    print("pausing $change");
+  }
+
+  void resumeChange(String change) {
+    final pausingProcesses = _pausedChanges[change];
+    if (pausingProcesses == null) return;
+    if (pausingProcesses == 1) {
+      // all processes have resumed
+
+      _pausedChanges.remove(change);
+
+      notifyListeners();
+    } else {
+      _pausedChanges[change] = pausingProcesses - 1;
+    }
+    print("resuming $change");
+  }
+
+  bool isChangePaused(String change) {
+    final pausingProcesses = _pausedChanges[change];
+    return pausingProcesses != null && pausingProcesses > 0;
+  }
+
+  AudioState getAppliedPaused(
+      AudioState oldAudioState, AudioState newAudioState) {
+    return newAudioState.copyWith({
+      if (isChangePaused("sequence")) "sequence": oldAudioState.$sequence,
+      if (isChangePaused("currentIndex"))
+        "currentIndex": oldAudioState.$currentIndex,
+      if (isChangePaused("shuffleMode"))
+        "shuffleMode": oldAudioState.$shuffleMode,
+      if (isChangePaused("shuffleIndices"))
+        "shuffleIndices": oldAudioState.$shuffleIndices,
+      if (isChangePaused("playerState"))
+        "playerState": oldAudioState.$playerState,
+      if (isChangePaused("loopMode")) "loopMode": oldAudioState.$loopMode,
+      if (isChangePaused("volume")) "volume": oldAudioState.$volume,
+    });
+  }
 }
 
 class AudioStateNotifier extends ChangeNotifier
@@ -78,6 +130,7 @@ class AudioStateNotifier extends ChangeNotifier
   AudioState get value => _value;
   set value(newAudioState) {
     final changes = <AudioStateChange>[];
+
     if (newAudioState.playlist != _value.playlist) {
       changes.add(AudioStateChange.playlist);
     }
@@ -131,16 +184,22 @@ class AudioStateManager {
   AudioStateManager() {
     mainNotifier.addListener(() {
       final value = mainNotifier.value;
-      songsNotifier.value = value;
-      currentSongNotifier.value = value;
-      playingStateNotifier.value = value;
-      repeatModeNotifier.value = value;
-      hasNextNotifier.value = value;
-      isShuffledNotifier.value = value;
+      songsNotifier.value =
+          mainNotifier.getAppliedPaused(songsNotifier.value, value);
+      currentSongNotifier.value =
+          mainNotifier.getAppliedPaused(currentSongNotifier.value, value);
+      playingStateNotifier.value =
+          mainNotifier.getAppliedPaused(playingStateNotifier.value, value);
+      repeatModeNotifier.value =
+          mainNotifier.getAppliedPaused(repeatModeNotifier.value, value);
+      hasNextNotifier.value =
+          mainNotifier.getAppliedPaused(hasNextNotifier.value, value);
+      isShuffledNotifier.value =
+          mainNotifier.getAppliedPaused(isShuffledNotifier.value, value);
     });
   }
 
-  final AudioStateNotifier mainNotifier = AudioStateNotifier(
+  final MainAudioStateNotifier mainNotifier = MainAudioStateNotifier(
     AudioState.defaultState,
     AudioStateChange.values.toSet(),
   );
