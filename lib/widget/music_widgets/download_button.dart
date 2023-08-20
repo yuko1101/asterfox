@@ -4,7 +4,7 @@ import 'package:just_audio/just_audio.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
-import '../../music/audio_source/music_data.dart';
+import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../music/music_downloader.dart';
 import '../../music/utils/music_url_utils.dart';
 import '../../system/home_screen_music_manager.dart';
@@ -14,9 +14,10 @@ class DownloadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<MusicData?>(
-      valueListenable: musicManager.currentSongNotifier,
-      builder: (_, song, __) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.currentSongNotifier,
+      builder: (_, audioState, __) {
+        final song = audioState.currentSong;
         return ValueListenableBuilder<List<String>>(
           valueListenable: DownloadManager.downloadingNotifier,
           builder: (_, downloadingSongs, __) {

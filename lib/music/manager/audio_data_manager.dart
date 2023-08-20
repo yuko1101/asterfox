@@ -1,51 +1,35 @@
+import 'dart:math';
+
 import 'package:just_audio/just_audio.dart';
 
 import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
 import '../audio_source/music_data.dart';
 
-class AudioDataManager {
+class AudioDataManager extends AudioDataContainer {
   AudioDataManager(this.audioPlayer);
   final AudioPlayer audioPlayer;
 
-  List<MusicData> get playlist =>
-      AudioDataManager.getPlaylist(audioPlayer.sequence);
-  List<MusicData> get shuffledPlaylist => AudioDataManager.getShuffledPlaylist(
-      audioPlayer.sequence,
-      audioPlayer.shuffleModeEnabled,
-      audioPlayer.shuffleIndices);
-  int? get currentIndex =>
-      getCurrentIndex(audioPlayer.currentIndex, audioPlayer.sequence);
-  int? get currentShuffledIndex => getCurrentShuffledIndex(
-      audioPlayer.currentIndex,
-      audioPlayer.sequence,
-      audioPlayer.shuffleModeEnabled,
-      audioPlayer.shuffleIndices);
-  MusicData? get currentSong =>
-      getCurrentSong(audioPlayer.currentIndex, audioPlayer.sequence);
-  PlayingState get playingState =>
-      getPlayingState(audioPlayer.playerState, audioPlayer.sequence);
-  ProgressBarState get progress => getProgress(audioPlayer.position,
-      audioPlayer.bufferedPosition, audioPlayer.duration ?? Duration.zero);
-  RepeatState get repeatState => getRepeatState(audioPlayer.loopMode);
-  bool get shuffled => audioPlayer.shuffleModeEnabled;
-  bool get hasNext => getHasNext(
-      audioPlayer.currentIndex,
-      audioPlayer.sequence,
-      audioPlayer.loopMode,
-      audioPlayer.shuffleModeEnabled,
-      audioPlayer.shuffleIndices);
-  double get volume => audioPlayer.volume;
-  double get currentSongVolume => currentSong?.volume ?? 1.0;
+  @override
+  List<IndexedAudioSource>? get $sequence => audioPlayer.sequence;
+  @override
+  int? get $currentIndex => audioPlayer.currentIndex;
+  @override
+  bool get $shuffleMode => audioPlayer.shuffleModeEnabled;
+  @override
+  List<int>? get $shuffleIndices => audioPlayer.shuffleIndices;
+  @override
+  PlayerState get $playerState => audioPlayer.playerState;
+  @override
+  LoopMode get $loopMode => audioPlayer.loopMode;
+  @override
+  double get $volume => audioPlayer.volume;
 
-  List<int>? get shuffledIndices => audioPlayer.shuffleIndices;
-
-  int getShuffledIndex(int normalIndex) =>
-      AudioDataManager.normalIndexToShuffledIndex(
-          normalIndex, shuffled, shuffledIndices);
-  int getNormalIndex(int shuffledIndex) =>
-      AudioDataManager.shuffledIndexToNormalIndex(
-          shuffledIndex, shuffled, shuffledIndices);
+  ProgressBarState get progress => AudioDataManager.getProgress(
+        audioPlayer.position,
+        audioPlayer.bufferedPosition,
+        audioPlayer.duration ?? Duration.zero,
+      );
 
   static List<MusicData> getPlaylist(List<IndexedAudioSource>? sequence) {
     final playlist = sequence ?? [];
@@ -74,8 +58,11 @@ class AudioDataManager {
   }
 
   static int? getCurrentIndex(int? index, List<IndexedAudioSource>? sequence) {
-    if ((sequence ?? []).isEmpty) return null;
-    return index;
+    final queue = sequence ?? [];
+    if (queue.isEmpty) return null;
+    if (queue.isNotEmpty && index == null) return 0;
+    if (index == null) return null;
+    return min(index, queue.length - 1);
   }
 
   static int? getCurrentShuffledIndex(int? index,
@@ -160,6 +147,43 @@ class AudioDataManager {
         "normal: $index to shuffled: ${indices.indexOf(index)} by indices: $indices");
     return indices.indexOf(index);
   }
+}
+
+abstract class AudioDataContainer {
+  List<IndexedAudioSource>? get $sequence;
+  int? get $currentIndex;
+  bool get $shuffleMode;
+  List<int>? get $shuffleIndices;
+  PlayerState get $playerState;
+  LoopMode get $loopMode;
+  double get $volume;
+
+  List<MusicData> get playlist => AudioDataManager.getPlaylist($sequence);
+  List<MusicData> get shuffledPlaylist => AudioDataManager.getShuffledPlaylist(
+      $sequence, $shuffleMode, $shuffleIndices);
+  int? get currentIndex =>
+      AudioDataManager.getCurrentIndex($currentIndex, $sequence);
+  int? get currentShuffledIndex => AudioDataManager.getCurrentShuffledIndex(
+      $currentIndex, $sequence, $shuffleMode, $shuffleIndices);
+  MusicData? get currentSong =>
+      AudioDataManager.getCurrentSong($currentIndex, $sequence);
+  PlayingState get playingState =>
+      AudioDataManager.getPlayingState($playerState, $sequence);
+  RepeatState get repeatState => AudioDataManager.getRepeatState($loopMode);
+  bool get isShuffled => $shuffleMode;
+  bool get hasNext => AudioDataManager.getHasNext(
+      $currentIndex, $sequence, $loopMode, $shuffleMode, $shuffleIndices);
+  double get currentSongVolume => currentSong?.volume ?? 1.0;
+  double get volume => $volume;
+
+  List<int>? get shuffledIndices => $shuffleIndices;
+
+  int getShuffledIndex(int normalIndex) =>
+      AudioDataManager.normalIndexToShuffledIndex(
+          normalIndex, isShuffled, shuffledIndices);
+  int getNormalIndex(int shuffledIndex) =>
+      AudioDataManager.shuffledIndexToNormalIndex(
+          shuffledIndex, isShuffled, shuffledIndices);
 }
 
 enum PlayingState { paused, playing, loading, disabled, unknown }

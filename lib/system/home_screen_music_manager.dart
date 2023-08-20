@@ -16,7 +16,6 @@ import '../music/utils/music_url_utils.dart';
 import '../screens/home_screen.dart';
 import '../music/utils/youtube_music_utils.dart';
 import '../utils/async_utils.dart';
-import '../utils/overlay_utils.dart';
 import '../utils/result.dart';
 import '../widget/notifiers_widget.dart';
 import '../widget/process_notifications/process_notification_widget.dart';
@@ -31,16 +30,6 @@ class HomeScreenMusicManager {
     MusicData? musicData,
     String? mediaUrl,
   }) async {
-    if (isOverlay) {
-      if (audioId != null && mediaUrl != null) {
-        // TODO: implement musicData support
-        throw Exception("musicData is not supported in overlay");
-      }
-      return await OverlayUtils.requestAction(
-        RequestActionType.addSong,
-        [key, audioId, null, mediaUrl],
-      );
-    }
     assert(audioId != null || musicData != null || mediaUrl != null);
     if (musicData != null) assert(musicData.isTemporary == true);
 

@@ -9,9 +9,7 @@ import 'package:flutter/cupertino.dart';
 import '../../data/device_settings_data.dart';
 import '../../data/local_musics_data.dart';
 import '../../data/settings_data.dart';
-import '../../main.dart';
 import '../../utils/math.dart';
-import '../../utils/overlay_utils.dart';
 import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
 import '../../widget/music_widgets/volume_widget.dart';
@@ -19,7 +17,7 @@ import '../audio_source/music_data.dart';
 import 'audio_data_manager.dart';
 import 'audio_handler.dart';
 import 'music_listener.dart';
-import '../../utils/data_notifier.dart';
+import 'notifiers/audio_state_notifier.dart';
 
 class MusicManager {
   MusicManager(this.showNotification);
@@ -32,22 +30,11 @@ class MusicManager {
   static bool windowsMode = OS.getOS() == OSType.windows;
 
   // notifiers
-  // sync fast notifier can be used as notifier.value to get the value.
-  final progressNotifier = ProgressNotifier();
-  final playlistNotifier = DataNotifier<List<MusicData>>([]);
-  final shuffledPlaylistNotifier = DataNotifier<List<MusicData>>([]);
-  final currentSongNotifier = DataNotifier<MusicData?>(null);
-  final playingStateNotifier =
-      ValueNotifier<PlayingState>(PlayingState.disabled);
-  final currentIndexNotifier = DataNotifier<int?>(null); // シャッフルない状態でのindex
-  final currentShuffledIndexNotifier = DataNotifier<int?>(null); // シャッフル対応index
+  final audioStateManager = AudioStateManager();
 
-  final hasNextNotifier = ValueNotifier<bool>(false);
-  final repeatModeNotifier = ValueNotifier<RepeatState>(RepeatState.none);
-  final shuffleModeNotifier = DataNotifier<bool>(false);
-  final volumeNotifier = ValueNotifier<num>(1.0);
-  final baseVolumeNotifier = ValueNotifier<num>(1.0); // sync fast
-  final muteNotifier = ValueNotifier<bool>(false); // sync fast
+  final progressNotifier = ProgressNotifier();
+  final muteNotifier = ValueNotifier<bool>(false);
+  final baseVolumeNotifier = ValueNotifier<double>(1.0);
 
   Future<void> init() async {
     final bool handleInterruptions =
@@ -70,21 +57,12 @@ class MusicManager {
   }
 
   Future<void> play() async {
-    if (isOverlay) {
-      print("Played from overlay");
-      await OverlayUtils.requestAction(RequestActionType.play);
-      return;
-    }
     print(
         "Played a playlist: ${audioDataManager.playlist.length.toString()} songs");
     await _audioHandler.play();
   }
 
   Future<void> pause() async {
-    if (isOverlay) {
-      await OverlayUtils.requestAction(RequestActionType.pause);
-      return;
-    }
     await _audioHandler.pause();
   }
 
@@ -102,11 +80,6 @@ class MusicManager {
   }
 
   Future<void> next([bool force = false]) async {
-    if (isOverlay) {
-      await OverlayUtils.requestAction(RequestActionType.next, [force]);
-      return;
-    }
-
     if (force) {
       await _audioHandler.skipToNext();
     } else {
@@ -173,11 +146,6 @@ class MusicManager {
   }
 
   Future<void> playback([bool force = false]) async {
-    if (isOverlay) {
-      await OverlayUtils.requestAction(RequestActionType.playback, [force]);
-      return;
-    }
-
     // if current progress is less than 5 sec, skip previous. if not, replay the current song.
     if (audioDataManager.progress.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.
@@ -214,7 +182,7 @@ class MusicManager {
   }
 
   Future<void> toggleShuffle() async {
-    final enable = !audioDataManager.shuffled;
+    final enable = !audioDataManager.isShuffled;
     _audioHandler.setShuffleMode(
         enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }
@@ -256,11 +224,11 @@ class MusicManager {
   }
 
   Future<void> setBaseVolume(double volume) async {
-    baseVolumeNotifier.value = volume;
-    DeviceSettingsData.data.set(key: "volume", value: volume);
-    await DeviceSettingsData.save();
     print("setBaseVolume: " + volume.toString());
+    baseVolumeNotifier.value = volume;
+    DeviceSettingsData.data.set(key: "baseVolume", value: volume);
     await updateVolume();
+    await DeviceSettingsData.save();
   }
 
   Future<void> updateVolume() async {

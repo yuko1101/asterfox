@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../../music/audio_source/music_data.dart';
+import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class CurrentSongTitle extends StatelessWidget {
   const CurrentSongTitle({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<MusicData?>(
-      valueListenable: musicManager.currentSongNotifier,
-      builder: (_, musicData, __) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.currentSongNotifier,
+      builder: (_, audioState, __) {
+        final musicData = audioState.currentSong;
         return Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: SingleChildScrollView(
@@ -32,9 +33,10 @@ class CurrentSongAuthor extends StatelessWidget {
   const CurrentSongAuthor({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<MusicData?>(
-      valueListenable: musicManager.currentSongNotifier,
-      builder: (_, musicData, __) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.currentSongNotifier,
+      builder: (_, audioState, __) {
+        final musicData = audioState.currentSong;
         return Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: SingleChildScrollView(

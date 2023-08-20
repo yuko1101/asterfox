@@ -4,13 +4,14 @@ import '../data/local_musics_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/manager/audio_data_manager.dart';
+import '../music/manager/notifiers/audio_state_notifier.dart';
 import '../system/theme/theme.dart';
 import 'music_widgets/music_thumbnail.dart';
 
 class MusicCardWidget extends StatelessWidget {
   const MusicCardWidget({
     required this.song,
-    this.isPlaying = false,
+    this.isCurrentSong = false,
     this.isLinked = false,
     required this.index,
     this.onTap,
@@ -19,7 +20,7 @@ class MusicCardWidget extends StatelessWidget {
   }) : super(key: key);
 
   final MusicData song;
-  final bool isPlaying;
+  final bool isCurrentSong;
   final bool isLinked;
   final int index;
 
@@ -44,7 +45,7 @@ class MusicCardWidget extends StatelessWidget {
                 height: 60,
                 child: MusicCardLeading(
                   song: song,
-                  playing: isPlaying,
+                  isCurrentSong: isCurrentSong,
                 ),
               ),
               Flexible(
@@ -104,12 +105,12 @@ class MusicCardWidget extends StatelessWidget {
 class MusicCardLeading extends StatelessWidget {
   const MusicCardLeading({
     required this.song,
-    required this.playing,
+    required this.isCurrentSong,
     Key? key,
   }) : super(key: key);
 
   final MusicData song;
-  final bool playing;
+  final bool isCurrentSong;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +118,7 @@ class MusicCardLeading extends StatelessWidget {
       children: [
         Center(
           child: Opacity(
-            opacity: playing ? 0.3 : 1.0,
+            opacity: isCurrentSong ? 0.3 : 1.0,
             child: SizedBox(
               height: 60,
               width: 60,
@@ -129,14 +130,16 @@ class MusicCardLeading extends StatelessWidget {
             ),
           ),
         ),
-        if (playing)
+        if (isCurrentSong)
           Center(
             child: SizedBox(
               height: 25,
               width: 25,
-              child: ValueListenableBuilder<PlayingState>(
-                valueListenable: musicManager.playingStateNotifier,
-                builder: (_, playingState, __) {
+              child: ValueListenableBuilder<AudioState>(
+                valueListenable:
+                    musicManager.audioStateManager.playingStateNotifier,
+                builder: (_, audioState, __) {
+                  final PlayingState playingState = audioState.playingState;
                   if (playingState == PlayingState.playing) {
                     return Image.asset(
                       "assets/images/playing.gif",

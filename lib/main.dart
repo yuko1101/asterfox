@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/widget_screen.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -19,15 +18,12 @@ import 'data/local_musics_data.dart';
 import 'data/settings_data.dart';
 import 'data/song_history_data.dart';
 import 'firebase_options.dart';
-import 'music/audio_source/music_data.dart';
-import 'music/manager/audio_data_manager.dart';
 import 'music/manager/music_manager.dart';
 import 'screens/asterfox_screen.dart';
 import 'screens/home_screen.dart';
 import 'system/firebase/cloud_firestore.dart';
 import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
-import 'utils/overlay_utils.dart';
 import 'widget/process_notifications/process_notification_list.dart';
 
 final List<String> supportedLanguages = [
@@ -40,10 +36,7 @@ late final bool isWearOS;
 final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 
-late final bool isOverlay;
-
 Future<void> main() async {
-  isOverlay = false;
   await runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
@@ -53,10 +46,6 @@ Future<void> main() async {
         isWearOS = true;
       } on Exception {
         isWearOS = false;
-      }
-
-      if (OS.getOS() == OSType.android && !isWearOS) {
-        OverlayUtils.init();
       }
 
       await EasyApp.initializePath();
@@ -84,30 +73,26 @@ Future<void> main() async {
       }
 
       // run this before initializing HomeScreen
-      if (!isOverlay) await musicManager.init();
+      await musicManager.init();
 
       // run this after initializing the music manager.
-      if (!isOverlay) {
-        await DeviceSettingsData.applyMusicManagerSettings();
-      }
+      await DeviceSettingsData.applyMusicManagerSettings();
 
       await LocalMusicsData.init();
 
       // run this after initializing Firebase, LocalMusicsData, and SettingsData.
-      if (shouldInitializeFirebase && !isOverlay) {
+      if (shouldInitializeFirebase) {
         await CloudFirestoreManager.init();
       }
 
       await CustomColors.load();
       await SongHistoryData.init(musicManager);
 
-      if (!isOverlay) {
-        HomeScreen.processNotificationList = ProcessNotificationList();
-      }
+      HomeScreen.processNotificationList = ProcessNotificationList();
+
       await EasyApp.initialize(
-        homeScreen: isWearOS || isOverlay
-            ? const WidgetScreen(child: SizedBox())
-            : HomeScreen(),
+        homeScreen:
+            isWearOS ? const WidgetScreen(child: SizedBox()) : HomeScreen(),
         languages: supportedLanguages,
         activateConnectionChecker: true,
       );
@@ -117,7 +102,7 @@ Future<void> main() async {
       if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
       debugPrint("localPath: ${EasyApp.localPath}");
-      if (OS.isMobile() && !isOverlay) {
+      if (OS.isMobile()) {
         SharingIntent.init();
       }
 
@@ -183,68 +168,6 @@ Future<void> main() async {
         FirebaseCrashlytics.instance.recordError(error, stack);
       }
     },
-  );
-}
-
-@pragma("vm:entry-point")
-void overlayMain() async {
-  print("overlayMain");
-  isOverlay = true;
-  WidgetsFlutterBinding.ensureInitialized();
-  await EasyApp.initializePath();
-  final wearOSCheckFile = File("${EasyApp.localPath}/wear_os");
-  if (wearOSCheckFile.existsSync()) return;
-  print("overlayMain passed");
-
-  await Language.init(supportedLanguages);
-
-  OverlayUtils.init();
-
-  // wait for main app's OverlayUtils ready.
-  await OverlayUtils.waitForResponse(1000);
-
-  OverlayUtils.listenData(
-    type: ListenDataType.playingState,
-    callback: (res) {
-      musicManager.playingStateNotifier.value = PlayingState.values
-          .firstWhere((playingState) => playingState.name == res.data);
-    },
-  );
-
-  OverlayUtils.listenData(
-    type: ListenDataType.hasNext,
-    callback: (res) {
-      musicManager.hasNextNotifier.value = res.data;
-    },
-  );
-
-  OverlayUtils.listenData(
-    type: ListenDataType.currentSong,
-    callback: (res) {
-      musicManager.currentSongNotifier.value = res.data["song"] != null
-          ? MusicData.fromJson(
-              json: res.data["song"],
-              key: res.data["key"],
-              isTemporary: false,
-            )
-          : null;
-
-      musicManager.currentSongNotifier.notify();
-    },
-  );
-  runApp(
-    ValueListenableBuilder<ThemeData>(
-      valueListenable: AppTheme.themeNotifier,
-      builder: (context, theme, child) => MaterialApp(
-        title: "Asterfox Overlay",
-        debugShowCheckedModeBanner: false,
-        theme: theme,
-        home: const DefaultTextStyle(
-          style: TextStyle(),
-          child: AsterfoxMainWatchScreen(WearShape.square),
-        ),
-      ),
-    ),
   );
 }
 

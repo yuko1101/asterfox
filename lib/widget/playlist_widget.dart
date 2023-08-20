@@ -7,7 +7,7 @@ import 'music_card.dart';
 class PlaylistWidget extends StatefulWidget {
   const PlaylistWidget({
     required this.songs,
-    this.playing,
+    this.currentSong,
     this.isLinked = false,
     this.padding,
     this.songWidgetBuilder,
@@ -18,7 +18,7 @@ class PlaylistWidget extends StatefulWidget {
   }) : super(key: key);
 
   final List<MusicData> songs;
-  final MusicData? playing;
+  final MusicData? currentSong;
   final bool isLinked;
   final EdgeInsets? padding;
   final Widget Function(BuildContext, int)? songWidgetBuilder;
@@ -46,8 +46,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       itemBuilder: widget.songWidgetBuilder ??
           (context, index) => MusicCardWidget(
                 song: widget.songs[index],
-                isPlaying: widget.songs[index].key == widget.playing?.key &&
-                    widget.isLinked,
+                isCurrentSong:
+                    widget.songs[index].key == widget.currentSong?.key &&
+                        widget.isLinked,
                 key: Key(widget.songs[index].key),
                 isLinked: widget.isLinked,
                 index: index,

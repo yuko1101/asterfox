@@ -83,9 +83,6 @@ dependencies:
 
   wear: ^1.1.0
 
-  # If `flutter_floatwing` fixed, use it instead of this. (Since it is able to handle overlay position and more advanced.)
-  flutter_overlay_window: ^0.4.3
-
   lyrics: #^0.0.7
     git:
       url: https://github.com/yuko1101/dart-lyrics.git

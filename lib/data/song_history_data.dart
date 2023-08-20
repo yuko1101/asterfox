@@ -16,7 +16,7 @@ class SongHistoryData {
         File("${EasyApp.localPath}/history.json"), {"history": []}).load();
 
     // when song is played, add it to history.
-    manager.currentSongNotifier.addListener(() {
+    manager.audioStateManager.currentSongNotifier.addListener(() {
       if (manager.audioDataManager.currentSong != null) {
         addAndSave(manager.audioDataManager.currentSong!);
       }

@@ -3,12 +3,10 @@ import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
-import '../music/audio_source/music_data.dart';
-import '../music/manager/audio_data_manager.dart';
+import '../music/manager/notifiers/audio_state_notifier.dart';
 import '../widget/music_footer.dart';
 import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
-import '../widget/notifiers_widget.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/process_notifications/process_notification_list.dart';
 import '../widget/process_notifications/process_notifications_button.dart';
@@ -35,16 +33,12 @@ class HomeScreen extends ScaffoldScreen {
 
               return Stack(
                 children: [
-                  TripleNotifierWidget<PlayingState, List<MusicData>,
-                      MusicData?>(
-                    notifier1: musicManager.playingStateNotifier,
-                    notifier2: musicManager.shuffledPlaylistNotifier,
-                    notifier3: musicManager.currentSongNotifier,
-                    builder:
-                        (context, playingState, playlist, currentSong, child) =>
-                            PlaylistWidget(
-                      songs: playlist,
-                      playing: currentSong,
+                  ValueListenableBuilder<AudioState>(
+                    valueListenable:
+                        musicManager.audioStateManager.songsNotifier,
+                    builder: (context, audioState, child) => PlaylistWidget(
+                      songs: audioState.shuffledPlaylist,
+                      currentSong: audioState.currentSong,
                       isLinked: true,
                       padding: const EdgeInsets.only(top: 15),
                     ),

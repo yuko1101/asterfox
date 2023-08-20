@@ -6,12 +6,12 @@ import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:http/http.dart' as http;
 
 import '../data/local_musics_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
+import '../music/manager/notifiers/audio_state_notifier.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../utils/async_utils.dart';
 import '../utils/result.dart';
@@ -271,31 +271,14 @@ class DebugMainScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.window),
-                    onPressed: () async {
-                      if (await FlutterOverlayWindow.isActive()) {
-                        await FlutterOverlayWindow.closeOverlay();
-                        return;
-                      }
-                      await FlutterOverlayWindow.showOverlay(
-                        enableDrag: true,
-                        overlayTitle: "Asterfox Music",
-                        overlayContent: "Overlay Enabled",
-                        flag: OverlayFlag.defaultFlag,
-                        visibility: NotificationVisibility.visibilityPublic,
-                        positionGravity: PositionGravity.none,
-                        height: 300,
-                        width: 300,
-                      );
-                    },
-                  ),
                 ],
               ),
             ),
-            ValueListenableBuilder<MusicData?>(
-              valueListenable: musicManager.currentSongNotifier,
-              builder: (_, song, __) {
+            ValueListenableBuilder<AudioState>(
+              valueListenable:
+                  musicManager.audioStateManager.currentSongNotifier,
+              builder: (_, audioState, __) {
+                final song = audioState.currentSong;
                 if (song == null) {
                   return Container();
                 }

@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/lyrics_finder.dart';
+import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../system/theme/theme.dart';
 
 class LyricsButton extends StatelessWidget {
@@ -12,33 +13,35 @@ class LyricsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<MusicData?>(
-      valueListenable: musicManager.currentSongNotifier,
-      builder: (context, song, _) => IconButton(
-        icon: Icon(
-          Icons.lyrics_outlined,
-          shadows: [
-            BoxShadow(
-              color: Theme.of(context).backgroundColor,
-              offset: const Offset(0, 0),
-              blurRadius: 10,
+    return ValueListenableBuilder<AudioState>(
+        valueListenable: musicManager.audioStateManager.currentSongNotifier,
+        builder: (context, audioState, _) {
+          final song = audioState.currentSong;
+          return IconButton(
+            icon: Icon(
+              Icons.lyrics_outlined,
+              shadows: [
+                BoxShadow(
+                  color: Theme.of(context).backgroundColor,
+                  offset: const Offset(0, 0),
+                  blurRadius: 10,
+                ),
+              ],
             ),
-          ],
-        ),
-        onPressed: song == null
-            ? null
-            : () {
-                if (song.lyrics.isNotEmpty) {
-                  showLyrics(song, context);
-                  return;
-                }
-                final FindLyricsDialog findLyricsDialog =
-                    FindLyricsDialog(song);
-                showDialog(
-                    context: context, builder: findLyricsDialog.pages[0]);
-              },
-      ),
-    );
+            onPressed: song == null
+                ? null
+                : () {
+                    if (song.lyrics.isNotEmpty) {
+                      showLyrics(song, context);
+                      return;
+                    }
+                    final FindLyricsDialog findLyricsDialog =
+                        FindLyricsDialog(song);
+                    showDialog(
+                        context: context, builder: findLyricsDialog.pages[0]);
+                  },
+          );
+        });
   }
 
   static void showLyrics(MusicData song, BuildContext context) {

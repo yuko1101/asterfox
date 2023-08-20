@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:just_audio/just_audio.dart';
 import 'audio_data_manager.dart';
 import 'audio_handler.dart';
@@ -32,68 +30,36 @@ class MusicListener {
       _updateLoopMode(loopMode);
     });
     _audioHandler.audioPlayer.volumeStream.listen((volume) {
-      _updateVolume(volume);
+      _updateBaseVolume(volume);
     });
   }
 
   int _lastPlaylistLength = 0;
   void _updatePlaylistAndIndex(SequenceState? sequenceState) {
     final sequence = sequenceState?.sequence;
+    final currentIndex = sequenceState?.currentIndex;
 
-    final playlist = AudioDataManager.getPlaylist(sequence);
-
-    var currentIndex =
-        AudioDataManager.getCurrentIndex(sequenceState?.currentIndex, sequence);
-    if (playlist.isNotEmpty && currentIndex == null) {
-      currentIndex = 0;
-    }
-    currentIndex =
-        currentIndex != null ? min(currentIndex, playlist.length - 1) : null;
-
-    _musicManager.playlistNotifier.value = playlist;
-    _musicManager.shuffledPlaylistNotifier.value =
-        AudioDataManager.getShuffledPlaylist(
-      sequence,
-      _audioHandler.audioPlayer.shuffleModeEnabled,
-      _audioHandler.audioPlayer.shuffleIndices,
-    );
-    _musicManager.currentIndexNotifier.value = currentIndex;
-    _musicManager.currentShuffledIndexNotifier.value =
-        AudioDataManager.getCurrentShuffledIndex(
-      sequenceState?.currentIndex,
-      sequence,
-      sequenceState?.shuffleModeEnabled ?? false,
-      sequenceState?.shuffleIndices,
-    );
-    _musicManager.currentSongNotifier.value =
-        playlist.isNotEmpty ? playlist[currentIndex!] : null;
-    _musicManager.shuffleModeNotifier.value =
-        sequenceState?.shuffleModeEnabled ?? false;
-
-    _updateHasNextNotifier();
-    _updateProgress();
-
-    // notify after all notifiers are updated
-    _musicManager.playlistNotifier.notify();
-    _musicManager.shuffledPlaylistNotifier.notify();
-    _musicManager.currentIndexNotifier.notify();
-    _musicManager.currentShuffledIndexNotifier.notify();
-    _musicManager.currentSongNotifier.notify();
-    _musicManager.shuffleModeNotifier.notify();
-
-    _musicManager.updateVolume();
+    _musicManager.audioStateManager.mainNotifier.update({
+      "sequence": sequence,
+      "currentIndex": currentIndex,
+      "shuffleMode": sequenceState?.shuffleModeEnabled ?? false,
+      "shuffleIndices": sequenceState?.shuffleIndices,
+      "loopMode": sequenceState?.loopMode ?? LoopMode.off,
+    });
 
     // TODO: add to settings
-    if (_lastPlaylistLength == 0 && playlist.isNotEmpty) {
+    if (_lastPlaylistLength == 0 && (sequence ?? []).isNotEmpty) {
       _autoPlay = true;
     }
-    _lastPlaylistLength = playlist.length;
+    _lastPlaylistLength = (sequence ?? []).length;
   }
 
   bool _autoPlay = false;
   void _updatePlaybackState(PlayerState playerState) {
-    final playingState = AudioDataManager.getPlayingState(
-        playerState, _audioHandler.audioPlayer.sequence);
+    final newAudioState = _musicManager.audioStateManager.mainNotifier.value
+        .copyWith({"playerState": playerState});
+
+    final playingState = newAudioState.playingState;
     if (playingState == PlayingState.unknown) {
       _audioHandler.seek(Duration.zero);
       _audioHandler.pause();
@@ -106,7 +72,8 @@ class MusicListener {
         _autoPlay = false;
       }
     }
-    _musicManager.playingStateNotifier.value = playingState;
+
+    _musicManager.audioStateManager.mainNotifier.value = newAudioState;
   }
 
   void _updateProgress() {
@@ -114,18 +81,10 @@ class MusicListener {
   }
 
   void _updateLoopMode(LoopMode loopMode) {
-    _musicManager.repeatModeNotifier.value =
-        AudioDataManager.getRepeatState(loopMode);
-    _updateHasNextNotifier();
+    _musicManager.audioStateManager.mainNotifier.update({"loopMode": loopMode});
   }
 
-  void _updateHasNextNotifier() {
-    final hasNext = _audioDataManager.hasNext;
-    _musicManager.hasNextNotifier.value = hasNext;
-  }
-
-  void _updateVolume(double volume) {
-    _musicManager.volumeNotifier.value = volume;
-    // print("volume: $volume");
+  void _updateBaseVolume(double volume) {
+    _musicManager.audioStateManager.mainNotifier.update({"baseVolume": volume});
   }
 }

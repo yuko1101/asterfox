@@ -11,7 +11,7 @@ class DeviceSettingsData {
 
   static const Map<String, dynamic> defaultData = {
     "repeatMode": "none",
-    "volume": 1.0,
+    "baseVolume": 1.0,
   };
 
   static Future<void> init() async {
@@ -42,7 +42,7 @@ class DeviceSettingsData {
   static bool _initializedRepeatListener = false;
   static Future<void> applyMusicManagerSettings() async {
     if (!_initializedRepeatListener) {
-      musicManager.repeatModeNotifier.addListener(() {
+      musicManager.audioStateManager.repeatModeNotifier.addListener(() {
         print("repeatModeNotifier.addListener");
         data.set(
           key: "repeatMode",
@@ -52,12 +52,13 @@ class DeviceSettingsData {
       });
       _initializedRepeatListener = true;
     }
-    if (repeatStateToString(musicManager.repeatModeNotifier.value) !=
+    if (repeatStateToString(musicManager
+            .audioStateManager.repeatModeNotifier.value.repeatState) !=
         getValue(key: "repeatMode") as String) {
       musicManager.setRepeatMode(
           repeatStateFromString(getValue(key: "repeatMode") as String));
     }
-    musicManager.baseVolumeNotifier.value = getValue(key: "volume");
-    await musicManager.updateVolume();
+
+    await musicManager.setBaseVolume(getValue(key: "baseVolume") as double);
   }
 }

@@ -11,6 +11,7 @@ import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/audio_source/youtube_music_data.dart';
+import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../music/music_downloader.dart';
 import '../loading_dialog.dart';
 
@@ -125,9 +126,10 @@ class MoreActionsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<MusicData?>(
-      valueListenable: musicManager.currentSongNotifier,
-      builder: (context, song, child) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.currentSongNotifier,
+      builder: (context, state, child) {
+        final song = state.currentSong;
         return IconButton(
           icon: const Icon(Icons.more_vert),
           tooltip: Language.getText("more_actions"),

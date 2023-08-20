@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../main.dart';
+import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class RepeatButton extends StatelessWidget {
   const RepeatButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<RepeatState>(
-      valueListenable: musicManager.repeatModeNotifier,
-      builder: (context, value, child) {
-        switch (value) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.repeatModeNotifier,
+      builder: (context, audioState, child) {
+        switch (audioState.repeatState) {
           case RepeatState.none:
             return IconButton(
               icon: Icon(Icons.repeat, color: Theme.of(context).disabledColor),

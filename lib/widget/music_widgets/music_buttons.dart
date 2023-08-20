@@ -2,18 +2,19 @@ import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../../music/audio_source/music_data.dart';
 import '../../music/manager/audio_data_manager.dart';
+import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class ShuffleButton extends StatelessWidget {
   const ShuffleButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: musicManager.shuffleModeNotifier,
-      builder: (context, isEnabled, child) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.isShuffledNotifier,
+      builder: (context, audioState, child) {
+        final isEnabled = audioState.isShuffled;
         return IconButton(
-          icon: (isEnabled)
+          icon: isEnabled
               ? const Icon(Icons.shuffle)
               : Icon(Icons.shuffle, color: Theme.of(context).disabledColor),
           onPressed: () {
@@ -30,12 +31,13 @@ class PreviousSongButton extends StatelessWidget {
   const PreviousSongButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<MusicData?>(
-      valueListenable: musicManager.currentSongNotifier,
-      builder: (_, song, __) => IconButton(
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.currentSongNotifier,
+      builder: (_, audioState, __) => IconButton(
         icon: const Icon(Icons.skip_previous),
-        onPressed:
-            song == null ? null : () async => await musicManager.playback(true),
+        onPressed: audioState.currentSong == null
+            ? null
+            : () async => await musicManager.playback(true),
         tooltip: Language.getText("play_previous_song"),
       ),
     );
@@ -46,10 +48,10 @@ class PlayButton extends StatelessWidget {
   const PlayButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<PlayingState>(
-      valueListenable: musicManager.playingStateNotifier,
-      builder: (_, value, __) {
-        switch (value) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.playingStateNotifier,
+      builder: (_, audioState, __) {
+        switch (audioState.playingState) {
           case PlayingState.disabled:
             return IconButton(
               icon: const Icon(Icons.play_arrow),
@@ -95,12 +97,12 @@ class NextSongButton extends StatelessWidget {
   const NextSongButton({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: musicManager.hasNextNotifier,
-      builder: (_, hasNext, __) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.hasNextNotifier,
+      builder: (_, audioState, __) {
         return IconButton(
           icon: const Icon(Icons.skip_next),
-          onPressed: (hasNext) ? () => musicManager.next(true) : null,
+          onPressed: audioState.hasNext ? () => musicManager.next(true) : null,
           tooltip: Language.getText("play_next_song"),
         );
       },
