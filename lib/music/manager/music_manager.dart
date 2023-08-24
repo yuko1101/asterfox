@@ -124,6 +124,7 @@ class MusicManager {
         index == songsCount - 1 &&
         isCertainRepeatMode &&
         songsCount > 1) {
+      pause();
       seek(Duration.zero, index: 0);
     }
 
@@ -145,8 +146,8 @@ class MusicManager {
     );
   }
 
-  void stop() {
-    _audioHandler.stop();
+  Future<void> stop() async {
+    await _audioHandler.stop();
   }
 
   Future<void> playback([bool force = false]) async {
@@ -164,11 +165,7 @@ class MusicManager {
     }
   }
 
-  final repeatModes = [
-    RepeatState.none,
-    RepeatState.all,
-    RepeatState.one,
-  ];
+  final repeatModes = RepeatState.values;
 
   Future<void> setRepeatMode(RepeatState mode) async {
     await _audioHandler

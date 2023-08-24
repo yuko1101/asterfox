@@ -75,7 +75,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> stop() async {
     await _player.stop();
-    return super.stop();
+    return await super.stop();
   }
 
   // forced skip
