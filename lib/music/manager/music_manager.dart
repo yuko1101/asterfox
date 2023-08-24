@@ -124,7 +124,7 @@ class MusicManager {
         index == songsCount - 1 &&
         isCertainRepeatMode &&
         songsCount > 1) {
-      pause();
+      if (audioDataManager.repeatState == RepeatState.none) pause();
       seek(Duration.zero, index: 0);
     }
 
