@@ -203,16 +203,7 @@ class MusicManager {
     } else {
       final MusicData song = audioDataManager.playlist[index];
 
-      // while removing the song, refresh the song.
-      final completer = Completer();
-      () async {
-        await _audioHandler.removeQueueItemAt(index);
-        completer.complete();
-      }();
-
-      // if removing is not finished, wait for it to finish
-      if (!completer.isCompleted) await completer.future;
-
+      await _audioHandler.removeQueueItemAt(index);
       await _audioHandler.insertQueueItem(index, await song.toMediaItem());
     }
     await seek(
