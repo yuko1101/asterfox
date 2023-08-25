@@ -111,6 +111,8 @@ class MusicManager {
     final int index =
         audioDataManager.playlist.indexWhere((song) => song.key == key);
 
+    if (index == -1) return;
+
     // fix index (https://github.com/yuko1101/asterfox/issues/47)
     final int? currentPlayingIndex = audioDataManager.currentIndex;
     final bool isPlaying =
@@ -128,7 +130,18 @@ class MusicManager {
       seek(Duration.zero, index: 0);
     }
 
-    if (index != -1) {
+    // https://github.com/yuko1101/asterfox/issues/56
+    if (currentPlayingIndex != null &&
+        index < currentPlayingIndex &&
+        currentPlayingIndex + 1 < songsCount) {
+      audioStateManager.mainNotifier
+          .update({"currentIndex": currentPlayingIndex - 1});
+      audioStateManager.mainNotifier.pauseChange("currentIndex");
+
+      await _audioHandler.removeQueueItemAt(index);
+
+      audioStateManager.mainNotifier.resumeChange("currentIndex");
+    } else {
       await _audioHandler.removeQueueItemAt(index);
     }
   }
