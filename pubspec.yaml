@@ -81,6 +81,8 @@ dependencies:
 
   google_sign_in: ^6.1.4
 
+  flutter_displaymode: ^0.6.0
+
   wear: ^1.1.0
 
   lyrics: #^0.0.7

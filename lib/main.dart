@@ -9,6 +9,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wear/wear.dart';
 
@@ -46,6 +47,12 @@ Future<void> main() async {
         isWearOS = true;
       } on Exception {
         isWearOS = false;
+      }
+
+      if (OS.getOS() == OSType.android) {
+        final modes = await FlutterDisplayMode.supported;
+        modes.forEach(print);
+        await FlutterDisplayMode.setHighRefreshRate();
       }
 
       await EasyApp.initializePath();
