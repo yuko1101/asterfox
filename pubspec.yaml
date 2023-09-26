@@ -44,14 +44,14 @@ dependencies:
 
   fluttertoast: ^8.2.2
 
-  just_audio: # ^0.9.34
+  just_audio: # ^0.9.35
     git:
       url: https://github.com/yuko1101/just_audio.git
       ref: minor
       path: just_audio
   # just_audio_windows: ^0.2.0
   just_audio_libwinmedia: ^0.0.4+1 # Temporarily
-#  just_audio_background: ^0.0.1-beta.5
+  #  just_audio_background: ^0.0.1-beta.5
   audio_service: ^0.18.10
   audio_session: ^0.1.16
 

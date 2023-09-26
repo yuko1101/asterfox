@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:easy_app/easy_app.dart';
@@ -165,13 +166,17 @@ class MusicData {
   }
 
   static String getDirectoryPath(String audioId) =>
-      "${EasyApp.localPath}/music/$audioId";
+      "${EasyApp.localPath}/music/$audioId"
+          .replaceAll("/", Platform.pathSeparator);
   static String getAudioSavePath(String audioId) =>
-      "${getDirectoryPath(audioId)}/audio.mp3";
+      "${getDirectoryPath(audioId)}/audio.mp3"
+          .replaceAll("/", Platform.pathSeparator);
   static String getImageSavePath(String audioId) =>
-      "${getDirectoryPath(audioId)}/image.png";
+      "${getDirectoryPath(audioId)}/image.png"
+          .replaceAll("/", Platform.pathSeparator);
   static String getInstallCompleteFilePath(String audioId) =>
-      "${getDirectoryPath(audioId)}/installed.txt";
+      "${getDirectoryPath(audioId)}/installed.txt"
+          .replaceAll("/", Platform.pathSeparator);
 
   static final List<MusicData> _created = [];
   static List<MusicData> getCreated() {

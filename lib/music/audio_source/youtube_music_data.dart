@@ -1,4 +1,3 @@
-import 'package:easy_app/easy_app.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -46,12 +45,6 @@ class YouTubeMusicData extends MusicData {
 
   final String id;
   final String authorId;
-
-  @override
-  String get audioSavePath => "${EasyApp.localPath}/music/$id/audio.mp3";
-
-  @override
-  String get imageSavePath => "${EasyApp.localPath}/music/$id/image.png";
 
   @override
   String get mediaURL => "https://www.youtube.com/watch?v=$id";
