@@ -162,17 +162,27 @@ msix_config:
   publisher_display_name: asterium.net
 #  publisher: C = JP, ST = Hokkaido, L = Sapporo, O = Asterium Ltd, OU = System Management Division, DC = asterium, DC = net, CN = asterium.net
   identity_name: net.asterfox.app
-  msix_version: 1.0.1.0
+  msix_version: 1.0.2.0
   logo_path: C:\Users\Public\workspace\asterfox\assets\images\asterfox.png
   capabilities: "internetClient"
 
-flutter_icons:
-  ios: true
+flutter_launcher_icons:
   android: true
+  ios: true
   image_path: "assets/images/asterfox-icon.png"
-  adaptive_icon_background: "assets/images/background.png"
-  adaptive_icon_foreground: "assets/images/asterfox-icon.png"
-  remove_alpha_ios: true
+  min_sdk_android: 28 # android min sdk min:16, default 21
+  web:
+    generate: false
+    image_path: "assets/images/asterfox-icon.png"
+    background_color: "#212332"
+    theme_color: "#212332"
+  windows:
+    generate: true
+    image_path: "assets/images/asterfox-icon.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/asterfox-icon.png"
 
 flutter_native_splash:
   image: "assets/images/asterfox-icon.png"
