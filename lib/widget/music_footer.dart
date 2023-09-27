@@ -36,11 +36,7 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
                 Spacer(),
                 SizedBox(
                   height: 50,
-                  child: FittedBox(
-                    fit: BoxFit.fitHeight,
-                    clipBehavior: Clip.antiAlias,
-                    child: MusicThumbnail(),
-                  ),
+                  child: MusicThumbnail(fit: BoxFit.fitHeight),
                 ),
                 SizedBox(width: 30),
                 Column(
@@ -93,11 +89,7 @@ class MobileMusicFooter extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
                 height: 70,
                 width: 70,
-                child: const FittedBox(
-                  fit: BoxFit.fitHeight,
-                  clipBehavior: Clip.antiAlias,
-                  child: MusicThumbnail(),
-                ),
+                child: const MusicThumbnail(fit: BoxFit.fitHeight),
               ),
               const Expanded(
                 child: Column(
