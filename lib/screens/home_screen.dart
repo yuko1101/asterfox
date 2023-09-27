@@ -1,5 +1,6 @@
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
+import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
@@ -58,23 +59,25 @@ class HomeScreen extends ScaffoldScreen {
                   ),
 
                   // <------ Volume Button ------>
-                  ValueListenableBuilder<bool>(
-                    valueListenable: volumeWidget.openedNotifier,
-                    builder: (context, opened, _) {
-                      if (opened) {
-                        return GestureDetector(
-                          onTap: volumeWidgetKey.currentState?.close,
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                  ),
-                  Positioned(
-                    bottom: 5,
-                    left: 5,
-                    child: volumeWidget,
-                  ),
+                  if (Responsive.isMobile(context))
+                    ValueListenableBuilder<bool>(
+                      valueListenable: volumeWidget.openedNotifier,
+                      builder: (context, opened, _) {
+                        if (opened) {
+                          return GestureDetector(
+                            onTap: volumeWidgetKey.currentState?.close,
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+                  if (Responsive.isMobile(context))
+                    Positioned(
+                      bottom: 5,
+                      left: 5,
+                      child: volumeWidget,
+                    ),
                   // <----------------------------->
                 ],
               );

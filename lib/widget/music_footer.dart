@@ -57,6 +57,7 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 SizedBox(width: 30),
+                // TODO: add volume widget
                 RepeatButton(),
                 ShuffleButton(),
                 DownloadButton(),
