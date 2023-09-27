@@ -34,7 +34,14 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
                 SizedBox(width: 30),
                 TimeText(),
                 Spacer(),
-                MusicThumbnail(),
+                SizedBox(
+                  height: 50,
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    clipBehavior: Clip.antiAlias,
+                    child: MusicThumbnail(),
+                  ),
+                ),
                 SizedBox(width: 30),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -87,9 +94,9 @@ class MobileMusicFooter extends StatelessWidget {
                 height: 70,
                 width: 70,
                 child: const FittedBox(
-                  child: MusicThumbnail(),
                   fit: BoxFit.fitHeight,
                   clipBehavior: Clip.antiAlias,
+                  child: MusicThumbnail(),
                 ),
               ),
               const Expanded(
@@ -110,8 +117,8 @@ class MobileMusicFooter extends StatelessWidget {
             child: const Column(
               children: [
                 Align(
-                  child: TimeText(),
                   alignment: Alignment.bottomRight,
+                  child: TimeText(),
                 ),
                 AudioProgressBar(),
               ],
