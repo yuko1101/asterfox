@@ -33,21 +33,28 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
                 NextSongButton(),
                 SizedBox(width: 30),
                 TimeText(),
-                Spacer(),
-                SizedBox(
-                  height: 50,
-                  child: MusicThumbnail(fit: BoxFit.fitHeight),
+                Flexible(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 50,
+                        child: MusicThumbnail(fit: BoxFit.fitHeight),
+                      ),
+                      SizedBox(width: 30),
+                      Flexible(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CurrentSongTitle(),
+                            CurrentSongAuthor(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(width: 30),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CurrentSongTitle(),
-                    CurrentSongAuthor(),
-                  ],
-                ),
-                Spacer(),
                 RepeatButton(),
                 ShuffleButton(),
                 DownloadButton(),
