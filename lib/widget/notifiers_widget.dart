@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'non_null_stream_builder.dart';
+
 class NullableNotifierWidget<T> extends StatelessWidget {
   const NullableNotifierWidget({
     required this.initialData,
@@ -24,9 +26,10 @@ class NullableNotifierWidget<T> extends StatelessWidget {
       );
     }
     if (stream != null) {
-      return StreamBuilder<T>(
+      return NonNullStreamBuilder<T>(
         initialData: initialData,
-        builder: (context, snapshot) => builder(context, snapshot.data!),
+        stream: stream!,
+        builder: (context, data) => builder(context, data),
       );
     }
     return builder(context, initialData);
