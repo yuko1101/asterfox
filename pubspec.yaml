@@ -67,11 +67,11 @@ dependencies:
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^2.16.0
-  firebase_crashlytics: ^3.3.6
-  firebase_analytics: ^10.5.0
-  firebase_auth: ^4.10.0
-  cloud_firestore: ^4.9.2
+  firebase_core: ^2.17.0
+  firebase_crashlytics: ^3.3.7
+  firebase_analytics: ^10.5.1
+  firebase_auth: ^4.10.1
+  cloud_firestore: ^4.9.3
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -106,7 +106,7 @@ dev_dependencies:
   flutter_lints: ^2.0.3
   msix: ^3.16.4
   flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.3.2
+  flutter_native_splash: ^2.3.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -173,16 +173,16 @@ flutter_launcher_icons:
   min_sdk_android: 28 # android min sdk min:16, default 21
   web:
     generate: false
-    image_path: "assets/images/asterfox-icon.png"
+    image_path: "assets/images/asterfox.png"
     background_color: "#212332"
     theme_color: "#212332"
   windows:
     generate: true
-    image_path: "assets/images/asterfox-icon.png"
+    image_path: "assets/images/asterfox.png"
     icon_size: 48 # min:48, max:256, default: 48
   macos:
     generate: true
-    image_path: "assets/images/asterfox-icon.png"
+    image_path: "assets/images/asterfox.png"
 
 flutter_native_splash:
   image: "assets/images/asterfox-icon.png"
