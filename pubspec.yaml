@@ -78,8 +78,10 @@ dependencies:
   # firebase_auth_desktop: ^1.0.2
   # # TODO: support Firestore for desktop os
 
+  googleapis: ^11.4.0
 
   google_sign_in: ^6.1.5
+  extension_google_sign_in_as_googleapis_auth: ^2.0.10
 
   flutter_displaymode: ^0.6.0
 

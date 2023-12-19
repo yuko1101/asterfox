@@ -205,6 +205,7 @@ class YouTubeMusicUtils {
       songStoredAt: null,
       size: null,
       isTemporary: isTemporary,
+      backupLocation: null,
     );
   }
 

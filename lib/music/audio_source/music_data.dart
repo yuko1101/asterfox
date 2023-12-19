@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/song_history_data.dart';
+import '../../system/backup/backup_manager.dart';
 import '../utils/music_url_utils.dart';
 import '../utils/youtube_music_utils.dart';
 import 'url_music_data.dart';
@@ -31,6 +32,7 @@ class MusicData {
     required this.size,
     required this.key,
     required this.isTemporary,
+    required this.backupLocation,
   }) {
     print("MusicData created : temp = $isTemporary");
     if (isTemporary) return;
@@ -51,6 +53,7 @@ class MusicData {
   final String key;
   String remoteAudioUrl;
   String remoteImageUrl;
+  BackupLocation? backupLocation;
 
   final bool isTemporary;
 
@@ -103,6 +106,7 @@ class MusicData {
       "lyrics": lyrics,
       "songStoredAt": songStoredAt,
       "size": size,
+      "backupLocation": backupLocation?.toJson(),
     };
     jsonExtras.forEach((key, value) {
       json[key] = value;

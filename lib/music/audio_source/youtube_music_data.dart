@@ -2,9 +2,11 @@ import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
+import '../../system/backup/backup_manager.dart';
 import '../../system/exceptions/network_exception.dart';
 import '../../system/exceptions/refresh_url_failed_exception.dart';
 import '../../system/firebase/cloud_firestore.dart';
+import '../../utils/extension_utils.dart';
 import '../utils/youtube_music_utils.dart';
 import 'music_data.dart';
 
@@ -25,6 +27,7 @@ class YouTubeMusicData extends MusicData {
     required int? size,
     required String key,
     required bool isTemporary,
+    required BackupLocation? backupLocation,
   }) : super(
           type: MusicType.youtube,
           remoteAudioUrl: remoteUrl,
@@ -41,6 +44,7 @@ class YouTubeMusicData extends MusicData {
           size: size,
           key: key,
           isTemporary: isTemporary,
+          backupLocation: backupLocation,
         );
 
   final String id;
@@ -116,6 +120,8 @@ class YouTubeMusicData extends MusicData {
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,
       isTemporary: isTemporary,
+      backupLocation: (json["backupLocation"] as Map<String, dynamic>?)
+          ?.let((it) => BackupLocation.fromJson(it)),
     );
   }
 }

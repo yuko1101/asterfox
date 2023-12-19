@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../../system/backup/backup_manager.dart';
+import '../../utils/extension_utils.dart';
 import 'music_data.dart';
 
 class UrlMusicData extends MusicData {
@@ -17,6 +19,7 @@ class UrlMusicData extends MusicData {
     required int? size,
     required String key,
     required bool isTemporary,
+    required BackupLocation? backupLocation,
   }) : super(
           type: MusicType.url,
           remoteAudioUrl: remoteAudioUrl,
@@ -33,6 +36,7 @@ class UrlMusicData extends MusicData {
           size: size,
           key: key,
           isTemporary: isTemporary,
+          backupLocation: backupLocation,
         );
 
   factory UrlMusicData.fromJson({
@@ -54,6 +58,8 @@ class UrlMusicData extends MusicData {
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,
       isTemporary: isTemporary,
+      backupLocation: (json["backupLocation"] as Map<String, dynamic>?)
+          ?.let((it) => BackupLocation.fromJson(it)),
     );
   }
 }
