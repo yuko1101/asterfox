@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../data/settings_data.dart';
 import '../../utils/color_utils.dart';
@@ -14,8 +15,15 @@ class AppTheme {
     // light
     ThemeData(
       brightness: Brightness.light,
-      appBarTheme:
-          const AppBarTheme(color: Colors.white, foregroundColor: Colors.black),
+      appBarTheme: const AppBarTheme(
+        color: Colors.white,
+        foregroundColor: Colors.black,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.white,
+          statusBarIconBrightness: Brightness.dark,
+          systemNavigationBarColor: Colors.white,
+        ),
+      ),
       backgroundColor: Colors.white,
       drawerTheme: const DrawerThemeData(backgroundColor: Colors.white),
       extensions: <ThemeExtension<dynamic>>[
@@ -35,7 +43,13 @@ class AppTheme {
     // dark
     ThemeData(
       brightness: Brightness.dark,
-      appBarTheme: AppBarTheme(color: getMaterialColor(Colors.black87)),
+      appBarTheme: AppBarTheme(
+          color: getMaterialColor(Colors.black87),
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: getMaterialColor(Colors.black87),
+            statusBarIconBrightness: Brightness.light,
+            systemNavigationBarColor: getGrey(20),
+          )),
       backgroundColor: getGrey(20),
       scaffoldBackgroundColor: getGrey(20),
       dialogBackgroundColor: getGrey(20),
