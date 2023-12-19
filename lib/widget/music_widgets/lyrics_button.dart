@@ -1,5 +1,6 @@
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../main.dart';
@@ -110,19 +111,6 @@ class LyricsButton extends StatelessWidget {
 
 class FindLyricsDialog {
   FindLyricsDialog(this.song) {
-    Future<void> finish(BuildContext context) async {
-      // TODO: make better (like progress indicator)
-      final lyrics = await LyricsFinder.search(songTitle, songArtist);
-      if (lyrics.isEmpty) {
-        Fluttertoast.showToast(msg: Language.getText("lyrics_not_found"));
-        Navigator.pop(context);
-        return;
-      }
-      await LyricsFinder.applyLyrics(song, lyrics, true);
-      Navigator.pop(context);
-      LyricsButton.showLyrics(song, context);
-    }
-
     pages = [
       // Song Title
       (context) {
@@ -161,6 +149,7 @@ class FindLyricsDialog {
           ),
           actions: [
             cancelButton(context),
+            fromClipboardButton(context),
             nextButton(context),
           ],
         );
@@ -220,6 +209,7 @@ class FindLyricsDialog {
 
   String songTitle = "";
   String songArtist = "";
+  String? lyrics;
 
   void goTo(int page, BuildContext context) {
     if (page > pages.length - 1 || page < 0) {
@@ -228,6 +218,19 @@ class FindLyricsDialog {
     currentPage = page;
     Navigator.pop(context);
     showDialog(context: context, builder: pages[page]);
+  }
+
+  Future<void> finish(BuildContext context) async {
+    // TODO: make better (like progress indicator)
+    lyrics ??= await LyricsFinder.search(songTitle, songArtist);
+    if (lyrics == null || lyrics!.isEmpty) {
+      Fluttertoast.showToast(msg: Language.getText("lyrics_not_found"));
+      Navigator.pop(context);
+      return;
+    }
+    await LyricsFinder.applyLyrics(song, lyrics!, true);
+    Navigator.pop(context);
+    LyricsButton.showLyrics(song, context);
   }
 
   TextButton cancelButton(BuildContext context) => TextButton(
@@ -246,6 +249,26 @@ class FindLyricsDialog {
         child: Text(Language.getText("next")),
         onPressed: () {
           goTo(currentPage + 1, context);
+        },
+      );
+
+  TextButton fromClipboardButton(BuildContext context) => TextButton(
+        child: Text(Language.getText("from_clipboard")),
+        onPressed: () async {
+          final clipboardData = await Clipboard.getData("text/plain");
+          if (clipboardData == null) {
+            Fluttertoast.showToast(
+                msg: Language.getText("no_text_in_clipboard"));
+            return;
+          }
+          final text = clipboardData.text;
+          if (text == null) {
+            Fluttertoast.showToast(
+                msg: Language.getText("no_text_in_clipboard"));
+            return;
+          }
+          lyrics = text;
+          finish(context);
         },
       );
 }

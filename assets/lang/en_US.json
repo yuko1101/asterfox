@@ -93,5 +93,7 @@
   "audio_channel_call": "Call",
   "audio_channel_call_speaker": "Call (Speaker)",
   "audio_channel_notification": "Ring & notification",
-  "audio_channel_alarm": "Alarm"
+  "audio_channel_alarm": "Alarm",
+  "from_clipboard": "From Clipboard",
+  "no_text_in_clipboard": "No text in clipboard"
 }

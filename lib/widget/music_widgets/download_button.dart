@@ -42,8 +42,8 @@ class DownloadButton extends StatelessWidget {
                 width: 24,
                 margin: const EdgeInsets.only(right: 12, left: 12),
                 child: Tooltip(
-                  child: const CircularProgressIndicator(),
                   message: Language.getText("saving"),
+                  child: const CircularProgressIndicator(),
                 ),
               );
             }

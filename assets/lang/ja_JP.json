@@ -93,5 +93,7 @@
   "audio_channel_call": "通話",
   "audio_channel_call_speaker": "通話 (スピーカー)",
   "audio_channel_notification": "着信音と通知",
-  "audio_channel_alarm": "アラーム"
+  "audio_channel_alarm": "アラーム",
+  "from_clipboard": "クリップボードから",
+  "no_text_in_clipboard": "クリップボードにテキストがありません"
 }
