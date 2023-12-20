@@ -99,13 +99,18 @@ class SongSearchTile extends StatelessWidget {
                         : Checkbox(
                             value: isSelected,
                             onChanged: (value) => onTap(),
-                            fillColor: MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.disabled)) {
-                                return icon.color!.withOpacity(0.32);
-                              }
-                              return icon.color!;
-                            }),
+                            side: BorderSide(
+                              color: icon.color!,
+                              width: 2,
+                            ),
+                            fillColor: MaterialStateProperty.resolveWith(
+                              (states) {
+                                if (!states.contains(MaterialState.selected)) {
+                                  return Colors.transparent;
+                                }
+                                return icon.color!;
+                              },
+                            ),
                           ),
                   ),
                   Flexible(
