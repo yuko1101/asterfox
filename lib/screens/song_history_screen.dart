@@ -50,66 +50,66 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
   @override
   Widget build(BuildContext context) {
     final songs = SongHistoryData.getAll(isTemporary: true).reversed.toList();
-    return SafeArea(
-      child: songs.isEmpty
-          ? Center(
-              child: Text(
-                Language.getText("no_song_history"),
-                style: TextStyle(
-                  color: Theme.of(context).extraColors.secondary,
+    if (songs.isEmpty) {
+      return Center(
+        child: Text(
+          Language.getText("no_song_history"),
+          style: TextStyle(
+            color: Theme.of(context).extraColors.secondary,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: songs.length,
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      itemBuilder: (context, index) {
+        final song = songs[index];
+        return ListTile(
+          title: Text(song["title"]),
+          subtitle: Text(song["author"]),
+          trailing: IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: Language.getText("delete_from_history"),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(Language.getText("delete_from_history")),
+                  content: Text(
+                      Language.getText("delete_from_history_confirm_message")),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(Language.getText("cancel")),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          SongHistoryData.removeFromHistory(song["audioId"]);
+                          Navigator.pop(context);
+                        });
+                      },
+                      child: Text(Language.getText("delete")),
+                    ),
+                  ],
                 ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: songs.length,
-              itemBuilder: (context, index) {
-                final song = songs[index];
-                return ListTile(
-                  title: Text(song["title"]),
-                  subtitle: Text(song["author"]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.close),
-                    tooltip: Language.getText("delete_from_history"),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(Language.getText("delete_from_history")),
-                          content: Text(Language.getText(
-                              "delete_from_history_confirm_message")),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(Language.getText("cancel")),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  SongHistoryData.removeFromHistory(
-                                      song["audioId"]);
-                                  Navigator.pop(context);
-                                });
-                              },
-                              child: Text(Language.getText("delete")),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  onTap: () async {
-                    final key = const Uuid().v4();
-                    HomeScreenMusicManager.addSong(
-                      key: key,
-                      audioId: song["audioId"],
-                    );
-                    EasyApp.popPage(context);
-                  },
-                );
-              },
-            ),
+              );
+            },
+          ),
+          onTap: () async {
+            final key = const Uuid().v4();
+            HomeScreenMusicManager.addSong(
+              key: key,
+              audioId: song["audioId"],
+            );
+            EasyApp.popPage(context);
+          },
+        );
+      },
     );
   }
 }

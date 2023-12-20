@@ -347,6 +347,18 @@ class SongSearch extends SearchDelegate<String> {
           .toList(),
     );
   }
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    final theme = super.appBarTheme(context);
+    final fixedAppBarTheme = theme.appBarTheme.copyWith(
+      systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
+    );
+
+    return theme.copyWith(
+      appBarTheme: fixedAppBarTheme,
+    );
+  }
 }
 
 class SongSuggestion {

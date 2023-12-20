@@ -19,9 +19,9 @@ class AppTheme {
         color: Colors.white,
         foregroundColor: Colors.black,
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.white,
+          statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
-          systemNavigationBarColor: Colors.white,
+          systemNavigationBarColor: Colors.transparent,
         ),
       ),
       backgroundColor: Colors.white,
@@ -44,12 +44,13 @@ class AppTheme {
     ThemeData(
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
-          color: getMaterialColor(Colors.black87),
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarColor: getMaterialColor(Colors.black87),
-            statusBarIconBrightness: Brightness.light,
-            systemNavigationBarColor: getGrey(20),
-          )),
+        color: getMaterialColor(Colors.black87),
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.transparent,
+        ),
+      ),
       backgroundColor: getGrey(20),
       scaffoldBackgroundColor: getGrey(20),
       dialogBackgroundColor: getGrey(20),

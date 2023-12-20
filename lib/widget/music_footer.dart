@@ -89,7 +89,8 @@ class MobileMusicFooter extends StatelessWidget {
         ],
         color: Theme.of(context).backgroundColor,
       ),
-      height: 170,
+      // TODO: better way to draw the footer considering the bottom padding of the navigation bar
+      height: 170 + MediaQuery.of(context).padding.bottom,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -152,6 +153,8 @@ class MobileMusicFooter extends StatelessWidget {
               ),
             ],
           ),
+          // TODO: better way to draw the footer considering the bottom padding of the navigation bar
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
       ),
     );
