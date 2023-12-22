@@ -10,7 +10,6 @@ import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/process_notifications/process_notification_list.dart';
-import '../widget/process_notifications/process_notifications_button.dart';
 import '../widget/search/song_search.dart';
 
 class HomeScreen extends ScaffoldScreen {
@@ -22,15 +21,6 @@ class HomeScreen extends ScaffoldScreen {
             builder: (context) {
               final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
               final volumeWidget = VolumeWidget(key: volumeWidgetKey);
-
-              final processNotificationsButtonKey =
-                  GlobalKey<ProcessNotificationsButtonState>();
-              final processNotificationsButton = ProcessNotificationsButton(
-                key: processNotificationsButtonKey,
-                notificationList: processNotificationList,
-              );
-              processNotificationList
-                  .setButtonKey(processNotificationsButtonKey);
 
               return Stack(
                 children: [
@@ -44,18 +34,9 @@ class HomeScreen extends ScaffoldScreen {
                       padding: const EdgeInsets.only(top: 15),
                     ),
                   ),
-                  Row(
-                    children: [
-                      const Spacer(),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const LyricsButton(),
-                          processNotificationsButton,
-                        ],
-                      ),
-                    ],
+                  const Align(
+                    alignment: Alignment.bottomRight,
+                    child: LyricsButton(),
                   ),
 
                   // <------ Volume Button ------>
