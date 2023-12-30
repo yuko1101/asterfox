@@ -15,6 +15,7 @@ import '../music/manager/notifiers/audio_state_notifier.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../utils/async_utils.dart';
 import '../utils/result.dart';
+import '../widget/process_notifications/process_notification_screen.dart';
 import '../widget/process_notifications/process_notification_widget.dart';
 import '../widget/search/song_search.dart';
 import '../widget/toast/toast_manager.dart';
@@ -270,6 +271,14 @@ class DebugMainScreen extends StatelessWidget {
                         context: context,
                       );
                     },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.task),
+                    onPressed: () => EasyApp.pushPage(
+                      context,
+                      ProcessNotificationScreen(
+                          HomeScreen.processNotificationList),
+                    ),
                   ),
                 ],
               ),
