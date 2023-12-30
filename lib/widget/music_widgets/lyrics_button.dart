@@ -52,15 +52,13 @@ class LyricsButton extends StatelessWidget {
         child: Column(
           children: [
             AppBar(
-              title: Flexible(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  child: Text(
-                    song.title,
-                    style: TextStyle(
-                      color: Theme.of(context).extraColors.secondary,
-                    ),
+              title: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                child: Text(
+                  song.title,
+                  style: TextStyle(
+                    color: Theme.of(context).extraColors.secondary,
                   ),
                 ),
               ),
