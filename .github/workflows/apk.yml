@@ -22,8 +22,8 @@ jobs:
         shell: bash
         run: |
           git init
-          echo "ref: refs/heads/${{ env.branch }}" > .git/HEAD
-          echo "${{ env.commitId }}" > .git/refs/heads/${{ env.branch }}
+          echo "ref: ${{ env.branch }}" > .git/HEAD
+          echo "${{ env.commitId }}" > .git/${{ env.branch }}
 
       - name: Build release APK
         run: flutter build apk
