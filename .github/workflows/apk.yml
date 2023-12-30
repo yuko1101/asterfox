@@ -8,12 +8,22 @@ jobs:
   build:
     name: Generate APK
     runs-on: ubuntu-latest
+    env:
+      branch: ${{ github.ref }}
+      commitId: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Initialize flutter
         uses: subosito/flutter-action@v2
+      
+      - name: Generate git info
+        shell: bash
+        run: |
+          git init
+          echo "ref: refs/heads/${{ env.branch }}" > .git/HEAD
+          echo "${{ env.commitId }}" > .git/refs/heads/${{ env.branch }}
 
       - name: Build release APK
         run: flutter build apk
