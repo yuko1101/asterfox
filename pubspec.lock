@@ -244,10 +244,11 @@ packages:
   easy_app:
     dependency: "direct main"
     description:
-      path: "../EasyApp"
-      relative: true
-    source: path
-    version: "0.1.17"
+      name: easy_app
+      sha256: edce2bd4c6f591b03db13c6d034e36a63cef37b344d3af1426a664eff88fcf6b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.18"
   fake_async:
     dependency: transitive
     description:
