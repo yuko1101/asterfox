@@ -6,11 +6,11 @@ Pair<String, String>? _gitInfo;
 /// Returns a pair of branch and commit id.
 Future<Pair<String, String>> getGitInfo() async {
   if (_gitInfo == null) {
-    final _head = await rootBundle.loadString('.git/HEAD');
-    final _commitId = await rootBundle.loadString('.git/ORIG_HEAD');
+    final headBranch = await rootBundle.loadString(".git/HEAD");
+    final branch = headBranch.split('/').last.replaceAll("\n", "");
 
-    final branch = _head.split('/').last.replaceAll("\n", "");
-    final commitId = _commitId.replaceAll("\n", "");
+    final headCommit = await rootBundle.loadString(".git/refs/heads/$branch");
+    final commitId = headCommit.replaceAll("\n", "");
 
     _gitInfo = Pair(branch, commitId);
   }
