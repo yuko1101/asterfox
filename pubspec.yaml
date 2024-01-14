@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.2.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,15 +33,15 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
-  flutter_svg: ^2.0.7
+  flutter_svg: ^2.0.9
 
   easy_app: ^0.1.18
 
   path_provider: ^2.0.15
-  provider: ^6.0.5
-  uuid: ^4.1.0
+  provider: ^6.1.1
+  uuid: ^4.3.3
 
-  fluttertoast: ^8.2.2
+  fluttertoast: ^8.2.4
 
   just_audio: # ^0.9.35
     git:
@@ -54,26 +54,26 @@ dependencies:
 
   # use this version since newer versions break the fast-forward/rewind buttons in the notification.
   # TODO: update to the latest version when the issue is fixed.
-  audio_service: 0.18.10
-  audio_session: ^0.1.16
+  audio_service: ^0.18.12
+  audio_session: ^0.1.18
 
-  youtube_explode_dart: ^2.0.2
+  youtube_explode_dart: ^2.0.4
 
-  audio_video_progress_bar: ^2.0.0
+  audio_video_progress_bar: ^2.0.1
 
   receive_sharing_intent: ^1.4.5
 
   share_plus: ^4.5.3
-  url_launcher: ^6.1.14
+  url_launcher: ^6.2.3
 
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^2.17.0
-  firebase_crashlytics: ^3.3.7
-  firebase_analytics: ^10.5.1
-  firebase_auth: ^4.10.1
-  cloud_firestore: ^4.9.3
+  firebase_core: ^2.24.2
+  firebase_crashlytics: ^3.4.9
+  firebase_analytics: ^10.8.0
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -81,7 +81,7 @@ dependencies:
   # # TODO: support Firestore for desktop os
 
 
-  google_sign_in: ^6.1.5
+  google_sign_in: ^6.2.1
 
   flutter_displaymode: ^0.6.0
 
@@ -105,8 +105,8 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.3
-  msix: ^3.16.4
+  flutter_lints: ^3.0.1
+  msix: ^3.16.7
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.3.3
 
