@@ -299,7 +299,10 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.durationStream.listen((duration) {
       var index = _player.currentIndex;
       final newQueue = queue.value;
+
       if (index == null || newQueue.isEmpty) return;
+      if (index >= newQueue.length) return;
+      
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
       newQueue[index] = newMediaItem;
