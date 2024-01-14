@@ -175,8 +175,10 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> onNotificationDeleted() async {
+    // exit if queue is not empty meaning that the notification was deleted by the user (not working right now)
     // TODO: safe exit
-    exitApp(true);
+    if (queue.value.isNotEmpty) exitApp(true);
+    await super.onNotificationDeleted();
   }
 
   UriAudioSource _createAudioSource(MediaItem mediaItem) {
@@ -310,7 +312,10 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.currentIndexStream.listen((index) {
       print("index:$index");
       final playlist = queue.value;
+
       if (index == null || playlist.isEmpty) return;
+      if (index >= playlist.length) return;
+
       mediaItem.add(playlist[index]);
     });
   }
@@ -339,8 +344,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     if (songCount == 0 && preQueue.isNotEmpty) {
       // remove music notification
       await _player.stop();
-      await _player.seek(Duration.zero);
+      // TODO: fix error at just_audo.dart:803 (maybe by set `_active` to true)
       await _player.load();
+      await _player.seek(Duration.zero);
     }
   }
 
