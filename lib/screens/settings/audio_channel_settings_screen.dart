@@ -10,9 +10,8 @@ import 'settings_screen.dart';
 
 class AudioChannelSettingsScreen extends ScaffoldScreen {
   const AudioChannelSettingsScreen({
-    Key? key,
+    super.key,
   }) : super(
-          key: key,
           body: const _AudioChannelChoice(),
           appBar: const _AppBar(),
           previousPage: const SettingsScreen(),
@@ -20,9 +19,7 @@ class AudioChannelSettingsScreen extends ScaffoldScreen {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({
-    Key? key,
-  }) : super(key: key);
+  const _AppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

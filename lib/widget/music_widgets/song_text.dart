@@ -4,7 +4,7 @@ import '../../main.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class CurrentSongTitle extends StatelessWidget {
-  const CurrentSongTitle({Key? key}) : super(key: key);
+  const CurrentSongTitle({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
@@ -30,7 +30,7 @@ class CurrentSongTitle extends StatelessWidget {
 }
 
 class CurrentSongAuthor extends StatelessWidget {
-  const CurrentSongAuthor({Key? key}) : super(key: key);
+  const CurrentSongAuthor({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(

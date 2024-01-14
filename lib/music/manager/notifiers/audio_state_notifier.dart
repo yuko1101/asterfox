@@ -65,9 +65,9 @@ class AudioState extends AudioDataContainer {
 
 class MainAudioStateNotifier extends AudioStateNotifier {
   MainAudioStateNotifier(
-    AudioState value,
-    Set<AudioStateChange> targetChanges,
-  ) : super(value, targetChanges);
+    super.value,
+    super.targetChanges,
+  );
 
   /// Paused changes are changes that are not notified to listeners.
   /// The integer value is the number of processes pausing the change right now.

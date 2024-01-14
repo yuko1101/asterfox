@@ -9,19 +9,15 @@ import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 
 class SongHistoryScreen extends ScaffoldScreen {
-  const SongHistoryScreen({
-    Key? key,
-  }) : super(
+  const SongHistoryScreen({super.key})
+      : super(
           appBar: const SongHistoryAppBar(),
           body: const SongHistoryMainScreen(),
-          key: key,
         );
 }
 
 class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const SongHistoryAppBar({
-    Key? key,
-  }) : super(key: key);
+  const SongHistoryAppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -40,7 +36,7 @@ class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class SongHistoryMainScreen extends StatefulWidget {
-  const SongHistoryMainScreen({Key? key}) : super(key: key);
+  const SongHistoryMainScreen({super.key});
 
   @override
   State<SongHistoryMainScreen> createState() => _SongHistoryMainScreenState();

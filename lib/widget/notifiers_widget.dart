@@ -40,8 +40,8 @@ class SingleNotifierWidget<T> extends StatelessWidget {
   const SingleNotifierWidget({
     required this.notifier,
     required this.builder,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ValueListenable<T> notifier;
   final Widget Function(BuildContext, T, Widget?) builder;
@@ -60,8 +60,8 @@ class DoubleNotifierWidget<T, U> extends StatelessWidget {
     required this.notifier1,
     required this.notifier2,
     required this.builder,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ValueListenable<T> notifier1;
   final ValueListenable<U> notifier2;
@@ -89,8 +89,8 @@ class TripleNotifierWidget<T, U, V> extends StatelessWidget {
     required this.notifier2,
     required this.notifier3,
     required this.builder,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ValueListenable<T> notifier1;
   final ValueListenable<U> notifier2;
@@ -125,8 +125,8 @@ class QuadNotifierWidget<T, U, V, W> extends StatelessWidget {
     required this.notifier3,
     required this.notifier4,
     required this.builder,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ValueListenable<T> notifier1;
   final ValueListenable<U> notifier2;
@@ -169,8 +169,8 @@ class QuintNotifierWidget<T, U, V, W, X> extends StatelessWidget {
     required this.notifier4,
     required this.notifier5,
     required this.builder,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ValueListenable<T> notifier1;
   final ValueListenable<U> notifier2;

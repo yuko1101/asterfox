@@ -9,10 +9,8 @@ import '../../system/theme/theme.dart';
 import 'settings_screen.dart';
 
 class ThemeSettingsScreen extends ScaffoldScreen {
-  const ThemeSettingsScreen({
-    Key? key,
-  }) : super(
-          key: key,
+  const ThemeSettingsScreen({super.key})
+      : super(
           body: const _ThemeChoice(),
           appBar: const _AppBar(),
           previousPage: const SettingsScreen(),
@@ -20,9 +18,7 @@ class ThemeSettingsScreen extends ScaffoldScreen {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({
-    Key? key,
-  }) : super(key: key);
+  const _AppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -41,7 +37,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _ThemeChoice extends StatefulWidget {
-  const _ThemeChoice({Key? key}) : super(key: key);
+  const _ThemeChoice({super.key});
 
   @override
   State<_ThemeChoice> createState() => _ThemeChoiceState();

@@ -190,7 +190,7 @@ class YouTubeMusicUtils {
     }
 
     return YouTubeMusicData(
-      remoteUrl: manifest.audioOnly.withHighestBitrate().url.toString(),
+      remoteAudioUrl: manifest.audioOnly.withHighestBitrate().url.toString(),
       id: video.id.value,
       title: video.title,
       description: video.description,

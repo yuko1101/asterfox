@@ -184,7 +184,7 @@ Future<void> main() async {
 }
 
 class AsterfoxApp extends StatelessWidget {
-  const AsterfoxApp({Key? key}) : super(key: key);
+  const AsterfoxApp({super.key});
 
   // This widget is the root of your application.
   @override

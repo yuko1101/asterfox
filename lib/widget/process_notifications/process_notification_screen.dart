@@ -47,9 +47,7 @@ class _MainScreen extends StatelessWidget {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({
-    Key? key,
-  }) : super(key: key);
+  const _AppBar({super.key});
 
   @override
   Widget build(BuildContext context) {

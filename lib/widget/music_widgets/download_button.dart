@@ -10,7 +10,7 @@ import '../../music/utils/music_url_utils.dart';
 import '../../system/home_screen_music_manager.dart';
 
 class DownloadButton extends StatelessWidget {
-  const DownloadButton({Key? key}) : super(key: key);
+  const DownloadButton({super.key});
 
   @override
   Widget build(BuildContext context) {

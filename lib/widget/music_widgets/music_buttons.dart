@@ -6,7 +6,7 @@ import '../../music/manager/audio_data_manager.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class ShuffleButton extends StatelessWidget {
-  const ShuffleButton({Key? key}) : super(key: key);
+  const ShuffleButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
@@ -28,7 +28,7 @@ class ShuffleButton extends StatelessWidget {
 }
 
 class PreviousSongButton extends StatelessWidget {
-  const PreviousSongButton({Key? key}) : super(key: key);
+  const PreviousSongButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
@@ -45,7 +45,7 @@ class PreviousSongButton extends StatelessWidget {
 }
 
 class PlayButton extends StatelessWidget {
-  const PlayButton({Key? key}) : super(key: key);
+  const PlayButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
@@ -94,7 +94,7 @@ class PlayButton extends StatelessWidget {
 }
 
 class NextSongButton extends StatelessWidget {
-  const NextSongButton({Key? key}) : super(key: key);
+  const NextSongButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(

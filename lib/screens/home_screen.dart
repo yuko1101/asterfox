@@ -15,7 +15,7 @@ import '../widget/search/song_search.dart';
 class HomeScreen extends ScaffoldScreen {
   static late ProcessNotificationList processNotificationList;
   HomeScreen({
-    Key? key,
+    super.key,
   }) : super(
           body: Builder(
             builder: (context) {
@@ -66,14 +66,13 @@ class HomeScreen extends ScaffoldScreen {
           ),
           appBar: const HomeScreenAppBar(),
           footer: const MusicFooter(),
-          key: key,
         );
 }
 
 class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeScreenAppBar({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -82,19 +81,19 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
             height: 35,
             width: 35,
             child: FittedBox(
-              child: Image.asset("assets/images/asterfox.png"),
               fit: BoxFit.contain,
+              child: Image.asset("assets/images/asterfox.png"),
             ),
           ),
           const SizedBox(width: 5),
           const Text("Asterfox")
         ],
-        mainAxisAlignment: MainAxisAlignment.start,
       ),
       actions: [
         IconButton(
@@ -140,7 +139,7 @@ class AppDrawerController {
 }
 
 class AnimatedMenuIcon extends StatefulWidget {
-  const AnimatedMenuIcon({Key? key}) : super(key: key);
+  const AnimatedMenuIcon({super.key});
 
   @override
   State<AnimatedMenuIcon> createState() => AnimatedMenuIconState();
@@ -157,11 +156,6 @@ class AnimatedMenuIconState extends State<AnimatedMenuIcon>
       vsync: this,
       duration: const Duration(milliseconds: 350),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override

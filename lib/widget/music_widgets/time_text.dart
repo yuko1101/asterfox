@@ -4,7 +4,7 @@ import '../../main.dart';
 import 'audio_progress_bar.dart';
 
 class TimeText extends StatelessWidget {
-  const TimeText({Key? key}) : super(key: key);
+  const TimeText({super.key});
 
   String getProgress(progress, total) {
     return total.inHours < 1

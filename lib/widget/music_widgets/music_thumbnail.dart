@@ -12,7 +12,7 @@ Image getDefaultImage([BoxFit? fit]) =>
     Image.asset("assets/images/asterfox-no-image.png", fit: fit);
 
 class MusicThumbnail extends StatelessWidget {
-  const MusicThumbnail({this.fit, Key? key}) : super(key: key);
+  const MusicThumbnail({this.fit, super.key});
   final BoxFit? fit;
 
   @override
@@ -20,8 +20,7 @@ class MusicThumbnail extends StatelessWidget {
     return ValueListenableBuilder<AudioState>(
       valueListenable: musicManager.audioStateManager.currentSongNotifier,
       builder: (context, audioState, child) {
-        print("thumbnail: " +
-            (audioState.currentSong?.title.toString() ?? "null"));
+        print("thumbnail: ${audioState.currentSong?.title.toString() ?? "null"}");
         return MusicImageWidget(
           audioState.currentSong?.imageUrl,
           fit: fit,
@@ -32,7 +31,7 @@ class MusicThumbnail extends StatelessWidget {
 }
 
 class MusicImageWidget extends StatelessWidget {
-  const MusicImageWidget(this.image, {this.fit, Key? key}) : super(key: key);
+  const MusicImageWidget(this.image, {this.fit, super.key});
   final String? image;
   final BoxFit? fit;
   @override

@@ -1,13 +1,17 @@
 {
     "files.autoGuessEncoding": true,
     "cSpell.words": [
+        "ARGB",
         "asterfox",
         "asterium",
+        "Autovalidate",
         "cupertino",
+        "displaymode",
         "firestore",
         "fluttertoast",
         "libwinmedia",
         "msix",
+        "Reclip",
         "Reorderable",
         "Schyler",
         "themedata",

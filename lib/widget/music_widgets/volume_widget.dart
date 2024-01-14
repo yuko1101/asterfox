@@ -11,7 +11,7 @@ import '../notifiers_widget.dart';
 final _tween = Tween<double>(begin: 0, end: 1);
 
 class VolumeWidget extends StatefulWidget {
-  VolumeWidget({Key? key}) : super(key: key);
+  VolumeWidget({super.key});
 
   static IconData getVolumeIcon(num volume, bool mute) {
     if (volume == 0 || mute) {
@@ -136,15 +136,15 @@ class VolumeWidgetState extends State<VolumeWidget>
                   musicManager.setMute(!mute);
                 },
                 onTap: () {},
+                customBorder: const CircleBorder(),
                 child: FloatingActionButton(
                   onPressed: _progress.value == 0
                       ? _controller.forward
                       : _controller.reverse,
-                  child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
                   backgroundColor: Theme.of(context).backgroundColor,
                   foregroundColor: Theme.of(context).extraColors.primary,
+                  child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
                 ),
-                customBorder: const CircleBorder(),
               ),
             ],
           );

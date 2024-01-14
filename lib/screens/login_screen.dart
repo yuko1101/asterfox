@@ -13,7 +13,7 @@ import '../widget/loading_dialog.dart';
 
 // TODO: alert users to connect to the Internet when offline
 class AuthScreen extends StatefulWidget {
-  AuthScreen({Key? key}) : super(key: key);
+  AuthScreen({super.key});
 
   final TextEditingController emailController = TextEditingController();
 
@@ -114,8 +114,8 @@ class _AuthScreenState extends State<AuthScreen> {
         leading: IconButton(
           tooltip: Language.getText("exit_app"),
           icon: const RotatedBox(
-            child: Icon(Icons.exit_to_app),
             quarterTurns: 2,
+            child: Icon(Icons.exit_to_app),
           ),
           onPressed: exitApp,
         ),
@@ -208,8 +208,8 @@ class EmailField extends StatefulWidget {
     required this.emailController,
     required this.passwordController,
     required this.signUp,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -282,8 +282,8 @@ class PasswordField extends StatefulWidget {
     required this.passwordController,
     required this.emailController,
     required this.signUp,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
   final TextEditingController emailController;
@@ -351,8 +351,8 @@ class ConfirmButton extends StatelessWidget {
     required this.passwordController,
     required this.emailController,
     required this.signUp,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final GlobalKey<FormState> formKey;
   final TextEditingController passwordController;
   final TextEditingController emailController;
@@ -379,6 +379,7 @@ class ConfirmButton extends StatelessWidget {
             Align(
               alignment: Alignment.topLeft,
               child: ClipPath(
+                clipper: LoginButtonClipper(),
                 child: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
@@ -389,7 +390,6 @@ class ConfirmButton extends StatelessWidget {
                     ),
                   ),
                 ),
-                clipper: LoginButtonClipper(),
               ),
             ),
             Material(
@@ -446,8 +446,8 @@ class AuthMessage extends StatelessWidget {
   const AuthMessage({
     required this.signUp,
     required this.changeMode,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final bool signUp;
   final void Function(bool) changeMode;
@@ -457,14 +457,14 @@ class AuthMessage extends StatelessWidget {
     final text = signUp
         ? Language.getText("login_message")
         : Language.getText("sign_up_message");
-    final clickables = RegExp(r"\{[^{}]+\}").allMatches(text).toList();
+    final clickableTexts = RegExp(r"\{[^{}]+\}").allMatches(text).toList();
     final List<TextSpan> textSpans = [];
 
     int currentIndex = 0;
     int clickableIndex = 0;
     while (currentIndex < text.length) {
-      final RegExpMatch? clickable = clickableIndex < clickables.length
-          ? clickables[clickableIndex]
+      final RegExpMatch? clickable = clickableIndex < clickableTexts.length
+          ? clickableTexts[clickableIndex]
           : null;
       final int nextStart = clickable?.start ?? text.length;
       if (currentIndex < nextStart) {
@@ -496,7 +496,7 @@ class AuthMessage extends StatelessWidget {
 }
 
 class ForgotPassword extends StatelessWidget {
-  const ForgotPassword({Key? key}) : super(key: key);
+  const ForgotPassword({super.key});
 
   @override
   Widget build(BuildContext context) {

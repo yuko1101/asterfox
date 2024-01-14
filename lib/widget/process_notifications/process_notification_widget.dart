@@ -38,8 +38,8 @@ class ProcessNotificationData {
 class ProcessNotificationWidget extends StatelessWidget {
   const ProcessNotificationWidget({
     required this.notificationData,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final ProcessNotificationData notificationData;
 
   @override

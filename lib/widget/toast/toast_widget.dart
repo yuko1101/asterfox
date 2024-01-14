@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../utils/math.dart';
 
 class Toast extends StatefulWidget {
-  const Toast({Key? key}) : super(key: key);
+  const Toast({super.key});
 
   static final List<Pair<ToastData, Completer>> _queue = [];
   static final ValueNotifier<ToastData?> _toastMessageNotifier =

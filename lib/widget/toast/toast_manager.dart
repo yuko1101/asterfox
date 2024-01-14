@@ -31,7 +31,6 @@ class ToastManager {
       {BuildContext? context, ThemeData? theme}) {
     assert(context != null || theme != null);
     return Container(
-      child: widget,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: (theme ?? Theme.of(context!)).backgroundColor,
@@ -42,6 +41,7 @@ class ToastManager {
           ),
         ],
       ),
+      child: widget,
     );
   }
 }

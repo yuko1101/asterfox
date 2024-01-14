@@ -14,8 +14,8 @@ class PlaylistWidget extends StatefulWidget {
     this.onMove,
     this.onRemove,
     this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final List<MusicData> songs;
   final MusicData? currentSong;
@@ -28,7 +28,7 @@ class PlaylistWidget extends StatefulWidget {
   final dynamic Function(int)? onTap;
 
   @override
-  _PlaylistWidgetState createState() => _PlaylistWidgetState();
+  State<PlaylistWidget> createState() => _PlaylistWidgetState();
 }
 
 class _PlaylistWidgetState extends State<PlaylistWidget> {

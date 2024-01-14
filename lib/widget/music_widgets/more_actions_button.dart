@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/local_musics_data.dart';
@@ -52,9 +53,9 @@ class MoreActionsButton extends StatelessWidget {
             }(),
             percentageNotifier: DownloadManager.getNotifiers(key).second,
           );
-          await Share.shareFiles([downloadPath.path]);
+          await Share.shareXFiles([XFile(downloadPath.path)]);
         } else {
-          await Share.shareFiles([song.audioSavePath]);
+          await Share.shareXFiles([XFile(song.audioSavePath)]);
         }
       },
       songFilter: (MusicData? song) => song != null,
@@ -198,13 +199,13 @@ class MoreActionsButton extends StatelessWidget {
 
 class _Action extends StatelessWidget {
   const _Action({
-    Key? key,
+    super.key,
     required this.id,
     required this.icon,
     required this.title,
     required this.onTap,
     required this.songFilter,
-  }) : super(key: key);
+  });
 
   final String id;
   final IconData icon;

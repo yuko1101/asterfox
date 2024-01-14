@@ -21,19 +21,15 @@ import 'audio_channel_settings_screen.dart';
 import 'theme_settings_screen.dart';
 
 class SettingsScreen extends ScaffoldScreen {
-  const SettingsScreen({
-    Key? key,
-  }) : super(
+  const SettingsScreen({super.key})
+      : super(
           body: const _MainSettingsScreen(),
           appBar: const _AppBar(),
-          key: key,
         );
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({
-    Key? key,
-  }) : super(key: key);
+  const _AppBar({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -52,7 +48,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _MainSettingsScreen extends StatefulWidget {
-  const _MainSettingsScreen({Key? key}) : super(key: key);
+  const _MainSettingsScreen({super.key});
 
   @override
   State<_MainSettingsScreen> createState() => _MainSettingsScreenState();
@@ -107,8 +103,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 description: RichText(
                   text: TextSpan(
                     text:
-                        Language.getText("disable_interruptions_description") +
-                            "\n",
+                        "${Language.getText("disable_interruptions_description")}\n",
                     children: [
                       restartRequiredText,
                     ],
@@ -129,10 +124,9 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 title: Text(Language.getText("audio_channel")),
                 description: RichText(
                   text: TextSpan(
-                    text: Language.getText(
-                          "audio_channel_${SettingsData.getValue(key: "audioChannel")}",
-                        ) +
-                        "\n",
+                    text: "${Language.getText(
+                      "audio_channel_${SettingsData.getValue(key: "audioChannel")}",
+                    )}\n",
                     children: [
                       restartRequiredText,
                     ],

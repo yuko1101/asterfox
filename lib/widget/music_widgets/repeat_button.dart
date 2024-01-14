@@ -7,7 +7,7 @@ import '../../main.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class RepeatButton extends StatelessWidget {
-  const RepeatButton({Key? key}) : super(key: key);
+  const RepeatButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(

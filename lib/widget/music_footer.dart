@@ -11,7 +11,7 @@ import 'music_widgets/song_text.dart';
 import 'music_widgets/time_text.dart';
 
 class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
-  const MusicFooter({Key? key}) : super(key: key);
+  const MusicFooter({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -73,7 +73,7 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class MobileMusicFooter extends StatelessWidget {
-  const MobileMusicFooter({Key? key}) : super(key: key);
+  const MobileMusicFooter({super.key});
 
   @override
   Widget build(BuildContext context) {

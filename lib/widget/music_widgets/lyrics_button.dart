@@ -10,7 +10,7 @@ import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../system/theme/theme.dart';
 
 class LyricsButton extends StatelessWidget {
-  const LyricsButton({Key? key}) : super(key: key);
+  const LyricsButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +115,8 @@ class FindLyricsDialog {
             children: [
               SelectableText.rich(
                 TextSpan(text: song.title),
-                toolbarOptions: const ToolbarOptions(
-                    copy: false, cut: false, paste: false, selectAll: false),
+                contextMenuBuilder: (context, editableTextState) =>
+                    const SizedBox(),
                 onSelectionChanged: (selection, cause) {
                   final selected = selection.isCollapsed
                       ? ""
@@ -158,8 +158,7 @@ class FindLyricsDialog {
             children: [
               SelectableText.rich(
                 TextSpan(text: displayText),
-                toolbarOptions: const ToolbarOptions(
-                    copy: false, cut: false, paste: false, selectAll: false),
+                contextMenuBuilder: (context, editableTextState) => const SizedBox(),
                 onSelectionChanged: (selection, cause) {
                   final selected = selection.isCollapsed
                       ? ""

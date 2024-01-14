@@ -16,8 +16,8 @@ class MusicCardWidget extends StatelessWidget {
     required this.index,
     this.onTap,
     this.onRemove,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MusicData song;
   final bool isCurrentSong;
@@ -106,8 +106,8 @@ class MusicCardLeading extends StatelessWidget {
   const MusicCardLeading({
     required this.song,
     required this.isCurrentSong,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MusicData song;
   final bool isCurrentSong;
@@ -123,9 +123,9 @@ class MusicCardLeading extends StatelessWidget {
               height: 60,
               width: 60,
               child: FittedBox(
-                child: MusicImageWidget(song.imageUrl),
                 fit: BoxFit.fitHeight,
                 clipBehavior: Clip.antiAlias,
+                child: MusicImageWidget(song.imageUrl),
               ),
             ),
           ),

@@ -10,8 +10,8 @@ class SongSearchTile extends StatelessWidget {
   SongSearchTile({
     required this.suggestion,
     required this.parent,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final SongSuggestion suggestion;
   final SongSearch parent;

@@ -22,7 +22,7 @@ import 'settings/settings_screen.dart';
 import 'song_history_screen.dart';
 
 class AsterfoxScreen extends StatelessWidget {
-  const AsterfoxScreen({Key? key}) : super(key: key);
+  const AsterfoxScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,8 +58,8 @@ class AsterfoxScreen extends StatelessWidget {
             : const AsterfoxMainScreen(),
         // Toast Message Overlay
         const DefaultTextStyle(
-          child: Toast(),
           style: TextStyle(),
+          child: Toast(),
         ),
       ],
     );
@@ -70,8 +70,8 @@ class AsterfoxScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false,
+      builder: (context) => PopScope(
+        canPop: false,
         child: AlertDialog(
           title: Text(Language.getText("verify_email")),
           actions: [
@@ -118,7 +118,7 @@ class AsterfoxScreen extends StatelessWidget {
 }
 
 class AsterfoxMainScreen extends StatelessWidget {
-  const AsterfoxMainScreen({Key? key}) : super(key: key);
+  const AsterfoxMainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +135,7 @@ class AsterfoxMainScreen extends StatelessWidget {
           "assets/images/asterfox.png",
           scale: 0.1,
         ),
-        title: const Text("Asterfox", textScaleFactor: 1.3),
+        title: const Text("Asterfox", textScaler: TextScaler.linear(1.3)),
         items: [
           SideMenuItem(
             title: const Text("Home"),
