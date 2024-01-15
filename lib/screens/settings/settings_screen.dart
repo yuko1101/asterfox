@@ -104,6 +104,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   text: TextSpan(
                     text:
                         "${Language.getText("disable_interruptions_description")}\n",
+                    style: TextStyle(
+                        color: Theme.of(context).extraColors.secondary),
                     children: [
                       restartRequiredText,
                     ],
@@ -127,6 +129,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                     text: "${Language.getText(
                       "audio_channel_${SettingsData.getValue(key: "audioChannel")}",
                     )}\n",
+                    style: TextStyle(
+                        color: Theme.of(context).extraColors.secondary),
                     children: [
                       restartRequiredText,
                     ],
