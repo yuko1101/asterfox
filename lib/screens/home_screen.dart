@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../music/manager/notifiers/audio_state_notifier.dart';
+import '../system/theme/theme.dart';
 import '../widget/music_footer.dart';
 import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
@@ -113,6 +114,10 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const AnimatedMenuIcon(),
         tooltip: Language.getText("menu"),
       ),
+      bottom: AppBarDivider(
+        height: 1,
+        color: Theme.of(context).extraColors.primary.withOpacity(0.04),
+      ),
     );
   }
 }
@@ -163,4 +168,23 @@ class AnimatedMenuIconState extends State<AnimatedMenuIcon>
     return AnimatedIcon(
         icon: AnimatedIcons.menu_arrow, progress: _menuIconAnimationController);
   }
+}
+
+class AppBarDivider extends Divider implements PreferredSizeWidget {
+  AppBarDivider({
+    double height = 16.0,
+    super.endIndent,
+    super.color,
+    super.key,
+  })  : assert(height >= 0.0),
+        super(
+          height: height,
+        ) {
+    _height = height;
+  }
+
+  late final double _height;
+
+  @override
+  Size get preferredSize => Size(double.infinity, _height);
 }

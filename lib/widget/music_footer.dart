@@ -1,6 +1,7 @@
 import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
+import '../system/theme/theme.dart';
 import 'music_widgets/audio_progress_bar.dart';
 import 'music_widgets/download_button.dart';
 import 'music_widgets/more_actions_button.dart';
@@ -77,86 +78,86 @@ class MobileMusicFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
-        color: Theme.of(context).backgroundColor,
-      ),
-      // TODO: better way to draw the footer considering the bottom padding of the navigation bar
-      height: 170 + MediaQuery.of(context).padding.bottom,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Row(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
-                height: 70,
-                width: 70,
-                child: const MusicThumbnail(fit: BoxFit.fitHeight),
-              ),
-              const Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CurrentSongTitle(),
-                    CurrentSongAuthor(),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-            ],
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 20, right: 20),
-            child: const Column(
-              children: [
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: TimeText(),
-                ),
-                AudioProgressBar(),
-              ],
-            ),
-          ),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ShuffleButton(),
-                    RepeatButton(),
-                    PreviousSongButton(),
-                  ],
-                ),
-              ),
-              PlayButton(),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    NextSongButton(),
-                    DownloadButton(),
-                    MoreActionsButton(),
-                  ],
-                ),
-              ),
-            ],
+    return Column(
+      children: [
+        Divider(
+          height: 1,
+          color: Theme.of(context).extraColors.primary.withOpacity(0.04),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).backgroundColor,
           ),
           // TODO: better way to draw the footer considering the bottom padding of the navigation bar
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
-        ],
-      ),
+          height: 170 + MediaQuery.of(context).padding.bottom,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
+                    height: 70,
+                    width: 70,
+                    child: const MusicThumbnail(fit: BoxFit.fitHeight),
+                  ),
+                  const Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CurrentSongTitle(),
+                        CurrentSongAuthor(),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20, right: 20),
+                child: const Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: TimeText(),
+                    ),
+                    AudioProgressBar(),
+                  ],
+                ),
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ShuffleButton(),
+                        RepeatButton(),
+                        PreviousSongButton(),
+                      ],
+                    ),
+                  ),
+                  PlayButton(),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        NextSongButton(),
+                        DownloadButton(),
+                        MoreActionsButton(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // TODO: better way to draw the footer considering the bottom padding of the navigation bar
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

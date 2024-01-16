@@ -25,6 +25,7 @@ class AppTheme {
         ),
       ),
       backgroundColor: Colors.white,
+      scaffoldBackgroundColor: Colors.white,
       drawerTheme: const DrawerThemeData(backgroundColor: Colors.white),
       extensions: <ThemeExtension<dynamic>>[
         ThemeDetails(
