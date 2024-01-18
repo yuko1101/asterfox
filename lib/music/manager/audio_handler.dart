@@ -262,16 +262,24 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       controls: [
         const MediaControl(
           androidIcon: "drawable/ic_skip_previous",
-          label: "Previous",
+          label: "Skip Previous",
           action: MediaAction.skipToPrevious,
         ),
-        MediaControl.rewind,
-        _player.playing ? MediaControl.pause : MediaControl.play,
-        MediaControl.fastForward,
         const MediaControl(
-          action: MediaAction.skipToNext,
-          label: "Next",
+          androidIcon: "drawable/ic_fast_rewind",
+          label: "Fast Rewind",
+          action: MediaAction.rewind,
+        ),
+        _player.playing ? MediaControl.pause : MediaControl.play,
+        const MediaControl(
+          androidIcon: "drawable/ic_fast_forward",
+          label: "Fast Forward",
+          action: MediaAction.fastForward,
+        ),
+        const MediaControl(
           androidIcon: "drawable/ic_skip_next",
+          label: "Skip Next",
+          action: MediaAction.skipToNext,
         ),
       ],
       systemActions: const {
@@ -279,6 +287,14 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
         MediaAction.seekForward,
         MediaAction.seekBackward,
       },
+      repeatMode: const {
+        LoopMode.off: AudioServiceRepeatMode.none,
+        LoopMode.one: AudioServiceRepeatMode.one,
+        LoopMode.all: AudioServiceRepeatMode.all,
+      }[_player.loopMode]!,
+      shuffleMode: _player.shuffleModeEnabled
+          ? AudioServiceShuffleMode.all
+          : AudioServiceShuffleMode.none,
       androidCompactActionIndices: const [0, 2, 4],
       processingState: const {
         ProcessingState.idle: AudioProcessingState.idle,
@@ -302,7 +318,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
       if (index == null || newQueue.isEmpty) return;
       if (index >= newQueue.length) return;
-      
+
       final oldMediaItem = newQueue[index];
       final newMediaItem = oldMediaItem.copyWith(duration: duration);
       newQueue[index] = newMediaItem;

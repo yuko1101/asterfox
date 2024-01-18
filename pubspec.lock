@@ -37,10 +37,10 @@ packages:
     dependency: "direct main"
     description:
       name: audio_service
-      sha256: a4d989f1225ea9621898d60f23236dcbfc04876fa316086c23c5c4af075dbac4
+      sha256: "8b719ac7982fdea1a54a528f19e345907295489c53709ba4cdee65a2955c0f4d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.12"
+    version: "0.18.10"
   audio_service_platform_interface:
     dependency: transitive
     description:

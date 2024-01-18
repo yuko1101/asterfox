@@ -57,7 +57,7 @@ dependencies:
 
   # use this version since newer versions break the fast-forward/rewind buttons in the notification.
   # TODO: update to the latest version when the issue is fixed.
-  audio_service: ^0.18.12
+  audio_service: 0.18.10
   audio_session: ^0.1.18
 
   youtube_explode_dart: ^2.0.4
