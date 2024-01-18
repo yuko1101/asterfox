@@ -363,9 +363,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     if (songCount == 0 && preQueue.isNotEmpty) {
       // remove music notification
       await _player.stop();
+      await _player.seek(Duration.zero);
       // TODO: fix error at just_audo.dart:803 (maybe by set `_active` to true)
       await _player.load();
-      await _player.seek(Duration.zero);
     }
   }
 
