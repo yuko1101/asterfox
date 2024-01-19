@@ -221,10 +221,26 @@ packages:
     dependency: transitive
     description:
       name: dbus
-      sha256: "253bfaa3d340778d8bc755e89c3af38e85ef95e65fd5d5670aa3167f8d4f6577"
+      sha256: "365c771ac3b0e58845f39ec6deebc76e3276aa9922b0cc60840712094d9047ac"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.4"
+    version: "0.7.10"
+  device_info_plus:
+    dependency: "direct main"
+    description:
+      name: device_info_plus
+      sha256: "0042cb3b2a76413ea5f8a2b40cec2a33e01d0c937e91f0f7c211fde4f7739ba6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.1.1"
+  device_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: device_info_plus_platform_interface
+      sha256: d3b01d5868b50ae571cd1dc6e502fc94d956b665756180f7b16ead09e836fd64
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   easy_app:
     dependency: "direct main"
     description:
@@ -245,10 +261,10 @@ packages:
     dependency: transitive
     description:
       name: ffi
-      sha256: "13a6ccf6a459a125b3fcdb6ec73bd5ff90822e071207c663bfd1f70062d51d18"
+      sha256: "7bf0adc28a23d395f19f3f1eb21dd7cfd1dd9f8e1c50051c069122e6853bc878"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "2.1.0"
   file:
     dependency: transitive
     description:
@@ -545,14 +561,6 @@ packages:
       url: "https://github.com/yuko1101/just_audio.git"
     source: git
     version: "0.9.36"
-  just_audio_libwinmedia:
-    dependency: "direct main"
-    description:
-      name: just_audio_libwinmedia
-      sha256: "66587bbc7a2c46fc7ad5625c97e7f7282bdb3e1daeba1be759fb464cabbf9dc3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.4+1"
   just_audio_platform_interface:
     dependency: transitive
     description:
@@ -569,14 +577,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.9"
-  libwinmedia:
-    dependency: transitive
-    description:
-      name: libwinmedia
-      sha256: c9223d9213f99bf498a516079e274eca4982024d46df633ef20a9d8006b5d826
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.7"
   lints:
     dependency: transitive
     description:
@@ -718,10 +718,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_windows
-      sha256: a34ecd7fb548f8e57321fd8e50d865d266941b54e6c3b7758cf8f37c24116905
+      sha256: "8bc9f22eee8690981c22aa7fc602f5c85b497a6fb2ceb35ee5a5e5ed85ad8170"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.7"
+    version: "2.2.1"
   petitparser:
     dependency: transitive
     description:
@@ -1075,10 +1075,18 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: c0e3a4f7be7dae51d8f152230b86627e3397c1ba8c3fa58e63d44a9f3edc9cef
+      sha256: "464f5674532865248444b4c3daca12bd9bf2d7c47f759ce2617986e7229494a8"
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.1"
+    version: "5.2.0"
+  win32_registry:
+    dependency: transitive
+    description:
+      name: win32_registry
+      sha256: "41fd8a189940d8696b1b810efb9abcf60827b6cbfab90b0c43e8439e3a39d85a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   xdg_directories:
     dependency: transitive
     description:

@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -68,8 +69,23 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
-  Future<void> seek(Duration position) async {
-    await _player.seek(position);
+  Future<void> seek(final Duration? position, {int? index}) async {
+    int? androidSdkInt;
+    if (OS.getOS() == OSType.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      androidSdkInt = androidInfo.version.sdkInt;
+    }
+
+    await _player.seek(position, index: index);
+
+    // fix volume bug for android 14
+    // TODO: better fix or wait for just_audio update
+    if (androidSdkInt != null && 34 <= androidSdkInt) {
+      final volume = musicManager.baseVolumeNotifier.value;
+      await musicManager.setBaseVolume(volume + 0.00001);
+      await Future.delayed(const Duration(milliseconds: 16));
+      await musicManager.setBaseVolume(volume);
+    }
   }
 
   @override

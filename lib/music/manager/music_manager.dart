@@ -68,7 +68,7 @@ class MusicManager {
 
   /// `index` is not shuffled index
   Future<void> seek(Duration position, {int? index}) async {
-    await _audioHandler.audioPlayer.seek(position, index: index);
+    await _audioHandler.seek(position, index: index);
   }
 
   Future<void> previous([bool force = false]) async {
