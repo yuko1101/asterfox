@@ -6,7 +6,7 @@ import '../../data/custom_colors.dart';
 import '../../main.dart';
 
 class AudioProgressBar extends StatelessWidget {
-  const AudioProgressBar({Key? key}) : super(key: key);
+  const AudioProgressBar({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ProgressBarState>(

@@ -98,7 +98,7 @@ class MainAudioStateNotifier extends AudioStateNotifier {
     return pausingProcesses != null && pausingProcesses > 0;
   }
 
-  AudioState getAppliedPaused(
+  AudioState getAppliedPausedState(
       AudioState oldAudioState, AudioState newAudioState) {
     return newAudioState.copyWith({
       if (isChangePaused("sequence")) "sequence": oldAudioState.$sequence,
@@ -185,17 +185,17 @@ class AudioStateManager {
     mainNotifier.addListener(() {
       final value = mainNotifier.value;
       songsNotifier.value =
-          mainNotifier.getAppliedPaused(songsNotifier.value, value);
+          mainNotifier.getAppliedPausedState(songsNotifier.value, value);
       currentSongNotifier.value =
-          mainNotifier.getAppliedPaused(currentSongNotifier.value, value);
+          mainNotifier.getAppliedPausedState(currentSongNotifier.value, value);
       playingStateNotifier.value =
-          mainNotifier.getAppliedPaused(playingStateNotifier.value, value);
+          mainNotifier.getAppliedPausedState(playingStateNotifier.value, value);
       repeatModeNotifier.value =
-          mainNotifier.getAppliedPaused(repeatModeNotifier.value, value);
+          mainNotifier.getAppliedPausedState(repeatModeNotifier.value, value);
       hasNextNotifier.value =
-          mainNotifier.getAppliedPaused(hasNextNotifier.value, value);
+          mainNotifier.getAppliedPausedState(hasNextNotifier.value, value);
       isShuffledNotifier.value =
-          mainNotifier.getAppliedPaused(isShuffledNotifier.value, value);
+          mainNotifier.getAppliedPausedState(isShuffledNotifier.value, value);
     });
   }
 
