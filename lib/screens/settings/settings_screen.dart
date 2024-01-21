@@ -1,11 +1,11 @@
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:easy_app/utils/pair.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -37,11 +37,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(Language.getText("settings")),
+      title: Text(AppLocalizations.of(context)!.settings),
       leading: IconButton(
         onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
-        tooltip: Language.getText("go_back"),
+        tooltip: AppLocalizations.of(context)!.go_back,
       ),
     );
   }
@@ -58,7 +58,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final restartRequiredText = TextSpan(
-      text: Language.getText("restart_required"),
+      text: AppLocalizations.of(context)!.restart_required,
       style: const TextStyle(color: Colors.red),
     );
 
@@ -66,14 +66,14 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: Text(Language.getText("general_settings")),
+            title: Text(AppLocalizations.of(context)!.general_settings),
             tiles: [
               SettingsTile.navigation(
-                title: Text(Language.getText("theme")),
+                title: Text(AppLocalizations.of(context)!.theme),
                 description: Text(AppTheme.themes
                     .map((theme) => theme.themeDetails.name)
-                    .map((name) => Language.getText("theme_$name"))
-                    .join(Language.getText("list_separator"))),
+                    .map((name) => AppLocalizations.of(context)!.theme_names(name))
+                    .join(AppLocalizations.of(context)!.list_separator)),
                 onPressed: (context) {
                   EasyApp.pushPage(context, const ThemeSettingsScreen());
                 },
@@ -82,12 +82,12 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             ],
           ),
           SettingsSection(
-            title: Text(Language.getText("useful_functions")),
+            title: Text(AppLocalizations.of(context)!.useful_functions),
             tiles: [
               SettingsTile.switchTile(
-                title: Text(Language.getText("auto_download")),
-                description:
-                    Text(Language.getText("auto_download_description")),
+                title: Text(AppLocalizations.of(context)!.auto_download),
+                description: Text(
+                    AppLocalizations.of(context)!.auto_download_description),
                 initialValue: SettingsData.getValue(key: "autoDownload"),
                 activeSwitchColor: CustomColors.getColor("accent"),
                 onToggle: (value) {
@@ -99,11 +99,12 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 },
               ),
               SettingsTile.switchTile(
-                title: Text(Language.getText("disable_interruptions")),
+                title:
+                    Text(AppLocalizations.of(context)!.disable_interruptions),
                 description: RichText(
                   text: TextSpan(
                     text:
-                        "${Language.getText("disable_interruptions_description")}\n",
+                        "${AppLocalizations.of(context)!.disable_interruptions_description}\n",
                     style: TextStyle(
                         color: Theme.of(context).extraColors.secondary),
                     children: [
@@ -123,12 +124,10 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 },
               ),
               SettingsTile.navigation(
-                title: Text(Language.getText("audio_channel")),
+                title: Text(AppLocalizations.of(context)!.audio_channel),
                 description: RichText(
                   text: TextSpan(
-                    text: "${Language.getText(
-                      "audio_channel_${SettingsData.getValue(key: "audioChannel")}",
-                    )}\n",
+                    text: "${AppLocalizations.of(context)!.audio_channels(SettingsData.getValue(key: "audioChannel"))}\n",
                     style: TextStyle(
                         color: Theme.of(context).extraColors.secondary),
                     children: [
@@ -147,7 +146,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             SettingsSection(
               tiles: [
                 SettingsTile(
-                  title: Text(Language.getText("logout")),
+                  title: Text(AppLocalizations.of(context)!.logout),
                   description: Text(FirebaseAuth.instance.currentUser!.email ??
                       FirebaseAuth.instance.currentUser!.displayName!),
                   leading: const Icon(Icons.logout),
@@ -176,7 +175,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
           SettingsSection(
             tiles: [
               SettingsTile(
-                title: Text(Language.getText("app_info")),
+                title: Text(AppLocalizations.of(context)!.app_info),
                 description: FutureBuilder<Pair<String, String>>(
                   future: getGitInfo(),
                   builder: (context, snapshot) {
@@ -191,7 +190,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                                 ClipboardData(text: snapshot.data!.second),
                               );
                               Fluttertoast.showToast(
-                                  msg: Language.getText("copied_to_clipboard"));
+                                  msg: AppLocalizations.of(context)!
+                                      .copied_to_clipboard);
                             });
                   },
                 ),

@@ -29,6 +29,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -37,6 +39,8 @@ dependencies:
 
   http: ^1.1.2
   html: ^0.15.4
+
+  intl: ^0.18.1
 
   easy_app: ^0.1.18
 
@@ -128,6 +132,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  generate: true
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -135,7 +141,6 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
-    - assets/lang/
     - .git/HEAD         # This file points out the current branch of the project.
     - .git/refs/heads/  # This directory includes files for each branch which points to the last commit id (local repo).
 

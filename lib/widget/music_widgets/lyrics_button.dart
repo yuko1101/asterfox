@@ -1,6 +1,6 @@
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../main.dart';
@@ -67,7 +67,7 @@ class LyricsButton extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                tooltip: Language.getText("close"),
+                tooltip: AppLocalizations.of(context)!.close,
               ),
               actions: [
                 IconButton(
@@ -109,7 +109,7 @@ class FindLyricsDialog {
         final textEditingController = TextEditingController();
         textEditingController.text = songTitle;
         return AlertDialog(
-          title: Text(Language.getText("song_title")),
+          title: Text(AppLocalizations.of(context)!.song_title),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -152,13 +152,14 @@ class FindLyricsDialog {
         textEditingController.text = songArtist;
         final displayText = "${song.title}\n${song.author}";
         return AlertDialog(
-          title: Text(Language.getText("song_artist")),
+          title: Text(AppLocalizations.of(context)!.song_artist),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SelectableText.rich(
                 TextSpan(text: displayText),
-                contextMenuBuilder: (context, editableTextState) => const SizedBox(),
+                contextMenuBuilder: (context, editableTextState) =>
+                    const SizedBox(),
                 onSelectionChanged: (selection, cause) {
                   final selected = selection.isCollapsed
                       ? ""
@@ -185,7 +186,7 @@ class FindLyricsDialog {
             cancelButton(context),
             previousButton(context),
             TextButton(
-              child: Text(Language.getText("finish")),
+              child: Text(AppLocalizations.of(context)!.finish),
               onPressed: () async => await finish(context),
             )
           ],
@@ -215,7 +216,8 @@ class FindLyricsDialog {
     // TODO: make better (like progress indicator)
     lyrics ??= await LyricsFinder.search(songTitle, songArtist);
     if (lyrics == null || lyrics!.isEmpty) {
-      Fluttertoast.showToast(msg: Language.getText("lyrics_not_found"));
+      Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.lyrics_not_found);
       Navigator.pop(context);
       return;
     }
@@ -225,37 +227,37 @@ class FindLyricsDialog {
   }
 
   TextButton cancelButton(BuildContext context) => TextButton(
-        child: Text(Language.getText("cancel")),
+        child: Text(AppLocalizations.of(context)!.cancel),
         onPressed: () {
           Navigator.pop(context);
         },
       );
   TextButton previousButton(BuildContext context) => TextButton(
-        child: Text(Language.getText("previous")),
+        child: Text(AppLocalizations.of(context)!.previous),
         onPressed: () {
           goTo(currentPage - 1, context);
         },
       );
   TextButton nextButton(BuildContext context) => TextButton(
-        child: Text(Language.getText("next")),
+        child: Text(AppLocalizations.of(context)!.next),
         onPressed: () {
           goTo(currentPage + 1, context);
         },
       );
 
   TextButton fromClipboardButton(BuildContext context) => TextButton(
-        child: Text(Language.getText("from_clipboard")),
+        child: Text(AppLocalizations.of(context)!.from_clipboard),
         onPressed: () async {
           final clipboardData = await Clipboard.getData("text/plain");
           if (clipboardData == null) {
             Fluttertoast.showToast(
-                msg: Language.getText("no_text_in_clipboard"));
+                msg: AppLocalizations.of(context)!.no_text_in_clipboard);
             return;
           }
           final text = clipboardData.text;
           if (text == null) {
             Fluttertoast.showToast(
-                msg: Language.getText("no_text_in_clipboard"));
+                msg: AppLocalizations.of(context)!.no_text_in_clipboard);
             return;
           }
           lyrics = text;

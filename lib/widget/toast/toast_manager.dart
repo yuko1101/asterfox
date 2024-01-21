@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../system/theme/theme.dart';
 import 'toast_widget.dart';
 
 class ToastManager {
   static Future<void> showSimpleToast({
     Icon? icon,
     required Widget msg,
-    BuildContext? context,
-    ThemeData? theme,
   }) async {
     final givenWidget = icon == null
         ? msg
@@ -19,7 +18,7 @@ class ToastManager {
       padding: const EdgeInsets.all(8.0),
       child: givenWidget,
     );
-    final toastWidget = getToastWidget(widget, context: context, theme: theme);
+    final toastWidget = getToastWidget(widget);
     final toastData = ToastData(
       message: toastWidget,
       duration: const Duration(seconds: 2),
@@ -27,13 +26,11 @@ class ToastManager {
     await Toast.showToast(toastData);
   }
 
-  static Widget getToastWidget(Widget widget,
-      {BuildContext? context, ThemeData? theme}) {
-    assert(context != null || theme != null);
+  static Widget getToastWidget(Widget widget) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: (theme ?? Theme.of(context!)).backgroundColor,
+        color: AppTheme.themeNotifier.value.backgroundColor,
         boxShadow: const [
           BoxShadow(
             blurRadius: 5,

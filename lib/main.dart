@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wear/wear.dart';
 
@@ -23,14 +24,8 @@ import 'music/manager/music_manager.dart';
 import 'screens/asterfox_screen.dart';
 import 'screens/home_screen.dart';
 import 'system/firebase/cloud_firestore.dart';
-import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
 import 'widget/process_notifications/process_notification_list.dart';
-
-final List<String> supportedLanguages = [
-  "ja_JP",
-  "en_US",
-];
 
 final MusicManager musicManager = MusicManager(true);
 late final bool isWearOS;
@@ -105,7 +100,7 @@ Future<void> main() async {
       await EasyApp.initialize(
         homeScreen:
             isWearOS ? const WidgetScreen(child: SizedBox()) : HomeScreen(),
-        languages: supportedLanguages,
+        languages: [],
         activateConnectionChecker: true,
       );
 
@@ -114,9 +109,7 @@ Future<void> main() async {
       if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
       debugPrint("localPath: ${EasyApp.localPath}");
-      if (OS.isMobile()) {
-        SharingIntent.init();
-      }
+      if (OS.isMobile()) {}
 
       runApp(const AsterfoxApp());
 
@@ -197,6 +190,8 @@ class AsterfoxApp extends StatelessWidget {
           theme: theme,
           home: const AsterfoxScreen(),
           debugShowCheckedModeBanner: false,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
         );
       },
     );

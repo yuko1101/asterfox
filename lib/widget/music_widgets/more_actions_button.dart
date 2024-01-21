@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -26,7 +26,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "share",
       icon: Icons.share,
-      title: Language.getText("share"),
+      title: (context) => AppLocalizations.of(context)!.share,
       onTap: (song, context) async {
         Share.share(song!.mediaURL, subject: song.title);
         Navigator.pop(context);
@@ -36,7 +36,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "share",
       icon: Icons.share,
-      title: Language.getText("share_mp3"),
+      title: (context) => AppLocalizations.of(context)!.share_mp3,
       onTap: (song, context) async {
         Navigator.pop(context);
         if (!song!.isInstalled) {
@@ -63,12 +63,13 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "youtube",
       icon: Icons.open_in_new,
-      title: Language.getText("open_in_youtube"),
+      title: (context) => AppLocalizations.of(context)!.open_in_youtube,
       onTap: (song, context) async {
         final launched = await launchUrl(Uri.parse(song!.mediaURL),
             mode: LaunchMode.externalNonBrowserApplication);
         if (!launched) {
-          Fluttertoast.showToast(msg: Language.getText("launch_url_error"));
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.launch_url_error);
         }
         Navigator.pop(context);
       },
@@ -77,7 +78,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "export",
       icon: Icons.file_download,
-      title: Language.getText("export_as_mp3"),
+      title: (context) => AppLocalizations.of(context)!.export_as_mp3,
       onTap: (song, context) {
         Navigator.pop(context);
       },
@@ -86,22 +87,22 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "delete_from_local",
       icon: Icons.delete_forever,
-      title: Language.getText("delete_from_local"),
+      title: (context) => AppLocalizations.of(context)!.delete_from_local,
       onTap: (song, context) {
         Navigator.pop(context);
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text(Language.getText("delete_from_local")),
-            content:
-                Text(Language.getText("delete_from_local_confirm_message")),
+            title: Text(AppLocalizations.of(context)!.delete_from_local),
+            content: Text(AppLocalizations.of(context)!
+                .delete_from_local_confirm_message),
             actions: [
               TextButton(
-                child: Text(Language.getText("cancel")),
+                child: Text(AppLocalizations.of(context)!.cancel),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               TextButton(
-                child: Text(Language.getText("delete")),
+                child: Text(AppLocalizations.of(context)!.delete),
                 onPressed: () {
                   Navigator.of(context).pop();
                   song!.delete();
@@ -116,7 +117,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "refresh_all",
       icon: Icons.refresh,
-      title: Language.getText("refresh_all"),
+      title: (context) => AppLocalizations.of(context)!.refresh_all,
       onTap: (song, context) {
         musicManager.refreshSongs();
         Navigator.pop(context);
@@ -133,7 +134,7 @@ class MoreActionsButton extends StatelessWidget {
         final song = state.currentSong;
         return IconButton(
           icon: const Icon(Icons.more_vert),
-          tooltip: Language.getText("more_actions"),
+          tooltip: AppLocalizations.of(context)!.more_actions,
           onPressed: _actions.any((action) => action.songFilter(song))
               ? () {
                   showModalBottomSheet(
@@ -209,7 +210,7 @@ class _Action extends StatelessWidget {
 
   final String id;
   final IconData icon;
-  final String title;
+  final String Function(BuildContext) title;
   final void Function(MusicData?, BuildContext) onTap;
   final bool Function(MusicData?) songFilter;
 
@@ -220,7 +221,7 @@ class _Action extends StatelessWidget {
       autofocus: true,
       child: ListTile(
         leading: Icon(icon),
-        title: Text(title),
+        title: Text(title(context)),
         onTap: () => onTap(musicManager.audioDataManager.currentSong, context),
         tileColor: Theme.of(context).backgroundColor,
       ),

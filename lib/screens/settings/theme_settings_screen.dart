@@ -1,7 +1,7 @@
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
@@ -26,11 +26,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(Language.getText("theme")),
+      title: Text(AppLocalizations.of(context)!.theme),
       leading: IconButton(
         onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
-        tooltip: Language.getText("go_back"),
+        tooltip: AppLocalizations.of(context)!.go_back,
       ),
     );
   }
@@ -49,11 +49,11 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
     return SettingsList(
       sections: [
         SettingsSection(
-          title: Text(Language.getText("theme")),
+          title: Text(AppLocalizations.of(context)!.theme),
           tiles: AppTheme.themes
               .map((theme) => theme.themeDetails.name)
               .map((name) => RadioListTile(
-                  title: Text(Language.getText("theme_$name")),
+                  title: Text(AppLocalizations.of(context)!.theme_names(name)),
                   value: name,
                   groupValue: AppTheme.themeNotifier.value.themeDetails.name,
                   activeColor:

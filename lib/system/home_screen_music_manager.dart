@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -26,6 +26,7 @@ import 'exceptions/unable_to_load_from_playlist_exception.dart';
 class HomeScreenMusicManager {
   static Future<void> addSong({
     required String key,
+    required AppLocalizations localizations,
     String? audioId,
     MusicData? musicData,
     String? mediaUrl,
@@ -48,8 +49,8 @@ class HomeScreenMusicManager {
     HomeScreen.processNotificationList.push(
       ProcessNotificationData(
         title: Text(autoDownload
-            ? Language.getText("downloading_automatically")
-            : Language.getText("loading_songs").replaceAll("{count}", "1")),
+            ? localizations.downloading_automatically
+            : localizations.loading_songs(1)),
         description: ValueListenableBuilder<String?>(
           valueListenable: songTitleNotifier,
           builder: (context, value, child) => SingleChildScrollView(
@@ -75,11 +76,10 @@ class HomeScreenMusicManager {
               isTemporary: false,
             );
           } on VideoUnplayableException {
-            Fluttertoast.showToast(msg: Language.getText("song_unplayable"));
+            Fluttertoast.showToast(msg: localizations.song_unplayable);
             return;
           } on NetworkException {
-            Fluttertoast.showToast(
-                msg: Language.getText("network_not_accessible"));
+            Fluttertoast.showToast(msg: localizations.network_not_accessible);
             return;
           }
           songTitleNotifier.value = song.title;
@@ -92,7 +92,7 @@ class HomeScreenMusicManager {
 
               // TODO: pass context
               ToastManager.showSimpleToast(
-                msg: Text(Language.getText("song_unplayable")),
+                msg: Text(localizations.song_unplayable),
                 icon: const Icon(
                   Icons.error_outline,
                   color: Colors.red,
@@ -142,9 +142,8 @@ class HomeScreenMusicManager {
           notifier2: maxProgressNotifier,
           builder: (context, isDownloadMode, max, child) => Text(
             isDownloadMode
-                ? Language.getText("downloading_automatically")
-                : Language.getText("loading_songs")
-                    .replaceAll("{count}", "$max"),
+                ? AppLocalizations.of(context)!.downloading_automatically
+                : AppLocalizations.of(context)!.loading_songs(max),
           ),
         ),
         maxProgressListenable: maxProgressNotifier,
@@ -208,19 +207,27 @@ class HomeScreenMusicManager {
     );
   }
 
-  static Future<void> addSongBySearch(String query,
-      {BuildContext? context, ThemeData? theme}) async {
+  static Future<void> addSongBySearch({
+    required String query,
+    required AppLocalizations localizations,
+  }) async {
     if (query.isUrl) {
-      await loadFromUrl(query, context: context, theme: theme);
+      await loadFromUrl(url: query, localizations: localizations);
       return;
     }
     final list = await YouTubeMusicUtils.searchYouTubeVideo(query);
-    await addSong(key: const Uuid().v4(), audioId: list.first.id.value);
+    await addSong(
+        key: const Uuid().v4(),
+        audioId: list.first.id.value,
+        localizations: localizations);
   }
 
-  static Future<void> loadFromUrl(String url,
-      {BuildContext? context, ThemeData? theme}) async {
-    final isPlaylist = await loadPlaylist(url, context: context, theme: theme);
+  static Future<void> loadFromUrl({
+    required String url,
+    required AppLocalizations localizations,
+  }) async {
+    final isPlaylist =
+        await loadPlaylist(url: url, localizations: localizations);
     if (isPlaylist) return;
 
     VideoId id;
@@ -228,35 +235,37 @@ class HomeScreenMusicManager {
       id = VideoId(url);
     } on ArgumentError {
       ToastManager.showSimpleToast(
-        msg: Text(Language.getText("invalid_url")),
+        msg: Text(localizations.invalid_url),
         icon: const Icon(
           Icons.wifi_off,
           color: Colors.red,
         ),
-        context: context,
       );
       return;
     }
-    await addSong(key: const Uuid().v4(), audioId: id.value);
+    await addSong(
+        key: const Uuid().v4(),
+        audioId: id.value,
+        localizations: localizations);
   }
 
   static final RegExp playlistRegex =
       RegExp(r"^https?://(www.)?youtube.com/playlist\?((.+=.+&)*)list=([^&]+)");
-  static Future<bool> loadPlaylist(String text,
-      {BuildContext? context, ThemeData? theme}) async {
-    if (!playlistRegex.hasMatch(text)) {
+  static Future<bool> loadPlaylist({
+    required String url,
+    required AppLocalizations localizations,
+  }) async {
+    if (!playlistRegex.hasMatch(url)) {
       return false;
     }
-    final match = playlistRegex.firstMatch(text)!;
+    final match = playlistRegex.firstMatch(url)!;
     final listId = match.group(4)!;
     final yt = YoutubeExplode();
     final playlist = await yt.playlists.get(listId);
     if (playlist.videoCount == null || playlist.videoCount == 0) {
       ToastManager.showSimpleToast(
         icon: const Icon(Icons.music_off_outlined, color: Colors.red),
-        msg: Text(Language.getText("external_playlist_empty")),
-        context: context,
-        theme: theme,
+        msg: Text(localizations.external_playlist_empty),
       );
       return true;
     }
@@ -270,6 +279,7 @@ class HomeScreenMusicManager {
   /// Download a song with progress indicator notification
   static Future<void> download(
     MusicData song,
+    AppLocalizations localizations,
   ) async {
     final completer = Completer();
 
@@ -279,7 +289,7 @@ class HomeScreenMusicManager {
     HomeScreen.processNotificationList.push(
       ProcessNotificationData(
         title: Text(
-          "${Language.getText("downloading")}${song.size != null ? " - ${_formatBytes(song.size!, 1)}" : ""}",
+          "${localizations.downloading}${song.size != null ? " - ${_formatBytes(song.size!, 1)}" : ""}",
         ),
         description: Text(song.title),
         maxProgress: 100,

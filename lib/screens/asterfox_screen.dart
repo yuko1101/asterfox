@@ -3,14 +3,16 @@ import 'dart:async';
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/drawer.dart';
 import 'package:easy_app/screen/main_screen.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wear/wear.dart';
 
 import '../main.dart';
 import '../system/home_screen_music_manager.dart';
+import '../system/sharing_intent.dart';
 import '../widget/music_widgets/music_buttons.dart';
 import '../widget/music_widgets/music_thumbnail.dart';
 import '../widget/toast/toast_manager.dart';
@@ -38,7 +40,7 @@ class AsterfoxScreen extends StatelessWidget {
                   } else if (snapshot.hasError) {
                     // TODO: show toast
                     // Fluttertoast.showToast(
-                    //     msg: Language.getText("something_went_wrong"));
+                    //     msg: AppLocalizations.of(context)!.something_went_wrong);
                     return AuthScreen();
                   } else if (!snapshot.hasData) {
                     return AuthScreen();
@@ -73,10 +75,10 @@ class AsterfoxScreen extends StatelessWidget {
       builder: (context) => PopScope(
         canPop: false,
         child: AlertDialog(
-          title: Text(Language.getText("verify_email")),
+          title: Text(AppLocalizations.of(context)!.verify_email),
           actions: [
             TextButton(
-              child: Text(Language.getText("send")),
+              child: Text(AppLocalizations.of(context)!.send),
               onPressed: () {
                 FirebaseAuth.instance.currentUser!
                     .sendEmailVerification()
@@ -93,7 +95,7 @@ class AsterfoxScreen extends StatelessWidget {
               },
             ),
             TextButton(
-              child: Text(Language.getText("logout")),
+              child: Text(AppLocalizations.of(context)!.logout),
               onPressed: () {
                 FirebaseAuth.instance.signOut();
               },
@@ -117,11 +119,44 @@ class AsterfoxScreen extends StatelessWidget {
   }
 }
 
-class AsterfoxMainScreen extends StatelessWidget {
+class AsterfoxMainScreen extends StatefulWidget {
   const AsterfoxMainScreen({super.key});
 
   @override
+  State<AsterfoxMainScreen> createState() => _AsterfoxMainScreenState();
+}
+
+class _AsterfoxMainScreenState extends State<AsterfoxMainScreen> {
+  String? _sharedText;
+  bool? _sharedTextIsInitial;
+
+  @override
+  void initState() {
+    super.initState();
+
+    ReceiveSharingIntent.getTextStream().listen((text) {
+      setState(() {
+        _sharedText = text;
+        _sharedTextIsInitial = false;
+      });
+    });
+
+    ReceiveSharingIntent.getInitialText().then((text) {
+      setState(() {
+        _sharedText = text;
+        _sharedTextIsInitial = true;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_sharedText != null && _sharedTextIsInitial != null) {
+      SharingIntent.addSong(_sharedText!, _sharedTextIsInitial!, context);
+      _sharedText = null;
+      _sharedTextIsInitial = null;
+    }
+
     if (isWearOS) {
       return DefaultTextStyle(
         style: const TextStyle(),
@@ -180,6 +215,7 @@ class AsterfoxMainScreen extends StatelessWidget {
   }
 }
 
+// TODO: support sharing intent
 class AsterfoxMainWatchScreen extends StatelessWidget {
   const AsterfoxMainWatchScreen(this.shape, {super.key});
 
@@ -208,6 +244,7 @@ class AsterfoxMainWatchScreen extends StatelessWidget {
                           HomeScreenMusicManager.addSong(
                             key: const Uuid().v4(),
                             audioId: "ZRtdQ81jPUQ",
+                            localizations: AppLocalizations.of(context)!,
                           );
                         },
                       ),

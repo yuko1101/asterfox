@@ -1,7 +1,7 @@
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/song_history_data.dart';
@@ -25,11 +25,11 @@ class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(Language.getText("song_history")),
+      title: Text(AppLocalizations.of(context)!.song_history),
       leading: IconButton(
         onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
-        tooltip: Language.getText("go_back"),
+        tooltip: AppLocalizations.of(context)!.go_back,
       ),
     );
   }
@@ -49,7 +49,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
     if (songs.isEmpty) {
       return Center(
         child: Text(
-          Language.getText("no_song_history"),
+          AppLocalizations.of(context)!.no_song_history,
           style: TextStyle(
             color: Theme.of(context).extraColors.secondary,
           ),
@@ -67,20 +67,21 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
           subtitle: Text(song["author"]),
           trailing: IconButton(
             icon: const Icon(Icons.close),
-            tooltip: Language.getText("delete_from_history"),
+            tooltip: AppLocalizations.of(context)!.delete_from_history,
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text(Language.getText("delete_from_history")),
-                  content: Text(
-                      Language.getText("delete_from_history_confirm_message")),
+                  title:
+                      Text(AppLocalizations.of(context)!.delete_from_history),
+                  content: Text(AppLocalizations.of(context)!
+                      .delete_from_history_confirm_message),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text(Language.getText("cancel")),
+                      child: Text(AppLocalizations.of(context)!.cancel),
                     ),
                     TextButton(
                       onPressed: () {
@@ -89,7 +90,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                           Navigator.pop(context);
                         });
                       },
-                      child: Text(Language.getText("delete")),
+                      child: Text(AppLocalizations.of(context)!.delete),
                     ),
                   ],
                 ),
@@ -101,6 +102,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
             HomeScreenMusicManager.addSong(
               key: key,
               audioId: song["audioId"],
+              localizations: AppLocalizations.of(context)!,
             );
             EasyApp.popPage(context);
           },

@@ -1,5 +1,5 @@
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../main.dart';
 import '../../music/manager/audio_data_manager.dart';
@@ -20,7 +20,7 @@ class ShuffleButton extends StatelessWidget {
           onPressed: () {
             musicManager.toggleShuffle();
           },
-          tooltip: Language.getText("shuffle"),
+          tooltip: AppLocalizations.of(context)!.shuffle,
         );
       },
     );
@@ -38,7 +38,7 @@ class PreviousSongButton extends StatelessWidget {
         onPressed: audioState.currentSong == null
             ? null
             : () async => await musicManager.playback(true),
-        tooltip: Language.getText("play_previous_song"),
+        tooltip: AppLocalizations.of(context)!.play_previous_song,
       ),
     );
   }
@@ -57,7 +57,7 @@ class PlayButton extends StatelessWidget {
               icon: const Icon(Icons.play_arrow),
               iconSize: 32.0,
               onPressed: null,
-              tooltip: Language.getText("play"),
+              tooltip: AppLocalizations.of(context)!.play,
             );
           case PlayingState.loading:
             return Container(
@@ -71,21 +71,21 @@ class PlayButton extends StatelessWidget {
               icon: const Icon(Icons.play_arrow),
               iconSize: 32.0,
               onPressed: musicManager.play,
-              tooltip: Language.getText("play"),
+              tooltip: AppLocalizations.of(context)!.play,
             );
           case PlayingState.playing:
             return IconButton(
               icon: const Icon(Icons.pause),
               iconSize: 32.0,
               onPressed: musicManager.pause,
-              tooltip: Language.getText("pause"),
+              tooltip: AppLocalizations.of(context)!.pause,
             );
           case PlayingState.unknown:
             return IconButton(
               icon: const Icon(Icons.play_arrow),
               iconSize: 32.0,
               onPressed: null,
-              tooltip: Language.getText("play"),
+              tooltip: AppLocalizations.of(context)!.play,
             );
         }
       },
@@ -103,7 +103,7 @@ class NextSongButton extends StatelessWidget {
         return IconButton(
           icon: const Icon(Icons.skip_next),
           onPressed: audioState.hasNext ? () => musicManager.next(true) : null,
-          tooltip: Language.getText("play_next_song"),
+          tooltip: AppLocalizations.of(context)!.play_next_song,
         );
       },
     );

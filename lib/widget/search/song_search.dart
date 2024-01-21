@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:easy_app/utils/languages.dart';
 import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -54,7 +54,7 @@ class SongSearch extends SearchDelegate<String> {
       IconButton(
         icon: const Icon(Icons.clear),
         color: Theme.of(context).textTheme.bodyText1?.color,
-        tooltip: Language.getText("clear"),
+        tooltip: AppLocalizations.of(context)!.clear,
         onPressed: () {
           query = "";
         },
@@ -79,7 +79,8 @@ class SongSearch extends SearchDelegate<String> {
                     children: [
                       Flexible(
                         child: OptionSwitch(
-                          title: Text(Language.getText("offline_search")),
+                          title: Text(
+                              AppLocalizations.of(context)!.offline_search),
                           value: forceOfflineSearch,
                           onChanged: (from, to) {
                             forceOfflineSearch = to;
@@ -97,7 +98,7 @@ class SongSearch extends SearchDelegate<String> {
       IconButton(
         icon: const Icon(Icons.search),
         color: Theme.of(context).textTheme.bodyText1?.color,
-        tooltip: Language.getText("search"),
+        tooltip: AppLocalizations.of(context)!.search,
         onPressed: () {
           if (multiSelectMode.value) {
             addSuggestionsToQueue(
@@ -120,7 +121,7 @@ class SongSearch extends SearchDelegate<String> {
         progress: animationController ?? transitionAnimation,
       ),
       color: Theme.of(context).textTheme.bodyText1?.color,
-      tooltip: Language.getText("go_back"),
+      tooltip: AppLocalizations.of(context)!.go_back,
       onPressed: () {
         close(context, "");
       },
@@ -187,7 +188,7 @@ class SongSearch extends SearchDelegate<String> {
             visible: value.isNotEmpty,
             child: ExpansionTile(
               title: Text(
-                "${Language.getText("selected_songs")} (${value.length})",
+                "${AppLocalizations.of(context)!.selected_songs} (${value.length})",
               ),
               children: value,
             ),
@@ -210,10 +211,12 @@ class SongSearch extends SearchDelegate<String> {
   }
 
   void search(BuildContext context, String text) async {
+    final localizations = AppLocalizations.of(context)!;
     try {
-      await HomeScreenMusicManager.addSongBySearch(text, context: context);
+      await HomeScreenMusicManager.addSongBySearch(
+          query: text, localizations: localizations);
     } on NetworkException {
-      Fluttertoast.showToast(msg: Language.getText("network_not_accessible"));
+      Fluttertoast.showToast(msg: localizations.network_not_accessible);
     }
   }
 

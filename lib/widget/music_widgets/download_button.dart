@@ -1,5 +1,5 @@
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../data/local_musics_data.dart';
@@ -42,7 +42,7 @@ class DownloadButton extends StatelessWidget {
                 width: 24,
                 margin: const EdgeInsets.only(right: 12, left: 12),
                 child: Tooltip(
-                  message: Language.getText("saving"),
+                  message: AppLocalizations.of(context)!.saving,
                   child: const CircularProgressIndicator(),
                 ),
               );
@@ -59,7 +59,10 @@ class DownloadButton extends StatelessWidget {
             if (downloadable) {
               return IconButton(
                   onPressed: () {
-                    HomeScreenMusicManager.download(song);
+                    HomeScreenMusicManager.download(
+                      song,
+                      AppLocalizations.of(context)!,
+                    );
                   },
                   icon: const Icon(Icons.file_download));
             }

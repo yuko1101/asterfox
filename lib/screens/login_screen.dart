@@ -1,8 +1,8 @@
-import 'package:easy_app/utils/languages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -41,18 +41,19 @@ class AuthScreen extends StatefulWidget {
       } on FirebaseAuthException catch (e) {
         if (e.code == "network-request-failed") {
           Fluttertoast.showToast(
-              msg: Language.getText("network_not_connected"));
+              msg: AppLocalizations.of(context)!.network_not_connected);
         } else if (e.code == "invalid-email" ||
             e.code == "user-not-found" ||
             e.code == "wrong-password") {
           emailController.clear();
           passwordController.clear();
           Fluttertoast.showToast(
-              msg: Language.getText("invalid_email_or_password"));
+              msg: AppLocalizations.of(context)!.invalid_email_or_password);
         } else if (e.code == "user-disabled") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: Language.getText("disabled_user"));
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.disabled_user);
         } else {
           rethrow;
         }
@@ -79,14 +80,17 @@ class AuthScreen extends StatefulWidget {
         if (e.code == "email-already-in-use") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: Language.getText("email_already_in_use"));
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.email_already_in_use);
         } else if (e.code == "invalid-email") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: Language.getText("invalid_email"));
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.invalid_email);
         } else if (e.code == "weak-password") {
           passwordController.clear();
-          Fluttertoast.showToast(msg: Language.getText("weak_password"));
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.weak_password);
         } else {
           rethrow;
         }
@@ -112,7 +116,7 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(
         title: const Text("Asterfox"),
         leading: IconButton(
-          tooltip: Language.getText("exit_app"),
+          tooltip: AppLocalizations.of(context)!.exit_app,
           icon: const RotatedBox(
             quarterTurns: 2,
             child: Icon(Icons.exit_to_app),
@@ -144,8 +148,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     Text(
                       signUp
-                          ? Language.getText("welcome")
-                          : Language.getText("welcome_back"),
+                          ? AppLocalizations.of(context)!.welcome
+                          : AppLocalizations.of(context)!.welcome_back,
                       style: const TextStyle(
                           fontSize: 40, fontWeight: FontWeight.bold),
                     ),
@@ -230,7 +234,7 @@ class _EmailFieldState extends State<EmailField> {
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
-        labelText: Language.getText("email"),
+        labelText: AppLocalizations.of(context)!.email,
         border: const OutlineInputBorder(),
         // fillColor: Colors.black45,
         hintText: "username@example.com",
@@ -252,7 +256,7 @@ class _EmailFieldState extends State<EmailField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (String? input) {
         if (input == null || !EmailField.emailRegExp.hasMatch(input.trim())) {
-          return Language.getText("invalid_email");
+          return AppLocalizations.of(context)!.invalid_email;
         }
         return null;
       },
@@ -308,7 +312,7 @@ class _PasswordFieldState extends State<PasswordField> {
       obscureText: !showPassword,
       controller: widget.passwordController,
       decoration: InputDecoration(
-        labelText: Language.getText("password"),
+        labelText: AppLocalizations.of(context)!.password,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: Icon(
@@ -325,9 +329,9 @@ class _PasswordFieldState extends State<PasswordField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (String? input) {
         if (input == null || input.isEmpty) {
-          return Language.getText("input_password");
+          return AppLocalizations.of(context)!.input_password;
         } else if (!PasswordField.passwordRegExp.hasMatch(input)) {
-          return Language.getText("invalid_password_format");
+          return AppLocalizations.of(context)!.invalid_password_format;
         }
         return null;
       },
@@ -409,8 +413,8 @@ class ConfirmButton extends StatelessWidget {
                 child: Center(
                   child: Text(
                     signUp
-                        ? Language.getText("sign_up")
-                        : Language.getText("login"),
+                        ? AppLocalizations.of(context)!.sign_up
+                        : AppLocalizations.of(context)!.login,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -455,8 +459,8 @@ class AuthMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = signUp
-        ? Language.getText("login_message")
-        : Language.getText("sign_up_message");
+        ? AppLocalizations.of(context)!.login_message
+        : AppLocalizations.of(context)!.sign_up_message;
     final clickableTexts = RegExp(r"\{[^{}]+\}").allMatches(text).toList();
     final List<TextSpan> textSpans = [];
 
@@ -502,7 +506,7 @@ class ForgotPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        text: Language.getText("forgot_password"),
+        text: AppLocalizations.of(context)!.forgot_password,
         style: TextStyle(
           color: Colors.amber[600],
           decoration: TextDecoration.underline,
@@ -521,7 +525,7 @@ class ForgotPassword extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(Language.getText("reset_password")),
+        title: Text(AppLocalizations.of(context)!.reset_password),
         content: Form(
           key: formKey,
           child: TextFormField(
@@ -529,12 +533,12 @@ class ForgotPassword extends StatelessWidget {
             autofillHints: const [AutofillHints.email],
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
-              labelText: Language.getText("email"),
+              labelText: AppLocalizations.of(context)!.email,
             ),
             validator: (String? input) {
               if (input == null ||
                   !EmailField.emailRegExp.hasMatch(input.trim())) {
-                return Language.getText("invalid_email");
+                return AppLocalizations.of(context)!.invalid_email;
               }
               return null;
             },
@@ -542,7 +546,7 @@ class ForgotPassword extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            child: Text(Language.getText("send")),
+            child: Text(AppLocalizations.of(context)!.send),
             onPressed: () async {
               if (!formKey.currentState!.validate()) return;
               Navigator.pop(context);
@@ -553,7 +557,7 @@ class ForgotPassword extends StatelessWidget {
               await LoadingDialog.showLoading(context: context, future: future);
 
               Fluttertoast.showToast(
-                  msg: Language.getText("reset_password_email_sent"));
+                  msg: AppLocalizations.of(context)!.reset_password_email_sent);
             },
           )
         ],
@@ -596,7 +600,7 @@ class GoogleSignInWidget extends StatelessWidget {
                           width: 24,
                         ),
                         Text(
-                          Language.getText("sign_in_with_google"),
+                          AppLocalizations.of(context)!.sign_in_with_google,
                           style: const TextStyle(color: Colors.black),
                         ),
                         const SizedBox(

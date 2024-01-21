@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../main.dart';
@@ -13,27 +13,25 @@ class RepeatButton extends StatelessWidget {
     return ValueListenableBuilder<AudioState>(
       valueListenable: musicManager.audioStateManager.repeatModeNotifier,
       builder: (context, audioState, child) {
+        final l10n = AppLocalizations.of(context)!;
         switch (audioState.repeatState) {
           case RepeatState.none:
             return IconButton(
               icon: Icon(Icons.repeat, color: Theme.of(context).disabledColor),
               onPressed: musicManager.nextRepeatMode,
-              tooltip:
-                  "${Language.getText("repeat")}: ${Language.getText("off")}",
+              tooltip: "${l10n.repeat}: ${l10n.off}",
             );
           case RepeatState.all:
             return IconButton(
               icon: const Icon(Icons.repeat),
               onPressed: musicManager.nextRepeatMode,
-              tooltip:
-                  "${Language.getText("repeat")}: ${Language.getText("queue")}",
+              tooltip: "${l10n.repeat}: ${l10n.queue}",
             );
           case RepeatState.one:
             return IconButton(
               icon: const Icon(Icons.repeat_one),
               onPressed: musicManager.nextRepeatMode,
-              tooltip:
-                  "${Language.getText("repeat")}: 1${Language.getText("song")}",
+              tooltip: "${l10n.repeat}: 1${l10n.song}",
             );
         }
       },

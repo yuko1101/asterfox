@@ -2,6 +2,7 @@ import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
@@ -27,18 +28,18 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(Language.getText("audio_channel")),
+      title: Text(AppLocalizations.of(context)!.audio_channel),
       leading: IconButton(
         onPressed: () => EasyApp.popPage(context),
         icon: const Icon(Icons.arrow_back),
-        tooltip: Language.getText("go_back"),
+        tooltip: AppLocalizations.of(context)!.go_back,
       ),
     );
   }
 }
 
 class _AudioChannelChoice extends StatefulWidget {
-  const _AudioChannelChoice({Key? key}) : super(key: key);
+  const _AudioChannelChoice({super.key});
 
   @override
   State<_AudioChannelChoice> createState() => _AudioChannelChoiceState();
@@ -73,7 +74,7 @@ class _AudioChannelChoiceState extends State<_AudioChannelChoice> {
     return SettingsList(
       sections: [
         SettingsSection(
-          title: Text(Language.getText("audio_channel")),
+          title: Text(AppLocalizations.of(context)!.audio_channel),
           tiles: audioChannels
               .map((audioChannel) => RadioListTile<String>(
                     title: Row(

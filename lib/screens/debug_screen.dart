@@ -23,18 +23,15 @@ import 'home_screen.dart';
 
 class DebugScreen extends ScaffoldScreen {
   const DebugScreen({
-    Key? key,
+    super.key,
   }) : super(
           body: const DebugMainScreen(),
           appBar: const DebugAppBar(),
-          key: key,
         );
 }
 
 class DebugMainScreen extends StatelessWidget {
-  const DebugMainScreen({
-    Key? key,
-  }) : super(key: key);
+  const DebugMainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +56,6 @@ class DebugMainScreen extends StatelessWidget {
                           "ログインしました",
                           style: TextStyle(fontSize: 20),
                         ),
-                        context: context,
                       );
                     },
                   ),
@@ -233,7 +229,6 @@ class DebugMainScreen extends StatelessWidget {
                       if (data == null || data.isEmpty) {
                         ToastManager.showSimpleToast(
                           msg: const Text("クリップボードが空です"),
-                          context: context,
                         );
                         return;
                       }
@@ -248,27 +243,23 @@ class DebugMainScreen extends StatelessWidget {
                       } catch (e) {
                         ToastManager.showSimpleToast(
                           msg: const Text("JSONのパース中にエラーが発生しました"),
-                          context: context,
                         );
                         return;
                       }
 
                       ToastManager.showSimpleToast(
                         msg: const Text("インポート中"),
-                        context: context,
                       );
                       try {
                         await CloudFirestoreManager.importData(json);
                       } catch (e) {
                         ToastManager.showSimpleToast(
                           msg: const Text("インポート中にエラーが発生しました"),
-                          context: context,
                         );
                         return;
                       }
                       ToastManager.showSimpleToast(
                         msg: const Text("インポートが完了しました"),
-                        context: context,
                       );
                     },
                   ),
@@ -314,16 +305,14 @@ class DebugMainScreen extends StatelessWidget {
     if (bytes <= 0) return "0 B";
     const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     var i = (log(bytes) / log(1024)).floor();
-    return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) +
-        ' ' +
-        suffixes[i];
+    return "${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}";
   }
 }
 
 class DebugAppBar extends StatelessWidget implements PreferredSizeWidget {
   const DebugAppBar({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
