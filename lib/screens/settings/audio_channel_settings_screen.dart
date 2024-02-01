@@ -1,6 +1,5 @@
 import 'package:easy_app/easy_app.dart';
 import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -83,8 +82,8 @@ class _AudioChannelChoiceState extends State<_AudioChannelChoice> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(Language.getText(
-                            "audio_channel_${audioChannel["name"]}")),
+                        Text(AppLocalizations.of(context)!
+                            .audio_channels(audioChannel["name"] as String)),
                       ],
                     ),
                     value: audioChannel["name"] as String,
