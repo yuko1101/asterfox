@@ -179,6 +179,7 @@ class SongSearch extends SearchDelegate<String> {
 
       lastQuery = query;
     }
+    print(MediaQuery.of(context).viewPadding.bottom);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -190,19 +191,33 @@ class SongSearch extends SearchDelegate<String> {
               title: Text(
                 "${AppLocalizations.of(context)!.selected_songs} (${value.length})",
               ),
-              children: value,
+              children: [
+                Material(
+                  clipBehavior: Clip.antiAlias,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.6),
+                    child: ListView(
+                      children: value,
+                    ),
+                  ),
+                )
+              ],
             ),
           ),
         ),
         Expanded(
-          child: ValueListenableBuilder<List<SongSearchTile>>(
-            valueListenable: suggestionTiles,
-            builder: (_, value, __) => ListView.builder(
-              shrinkWrap: false,
-              itemBuilder: (context, index) {
-                return value[index];
-              },
-              itemCount: value.length,
+          child: Material(
+            clipBehavior: Clip.antiAlias,
+            child: ValueListenableBuilder<List<SongSearchTile>>(
+              valueListenable: suggestionTiles,
+              builder: (_, value, __) => ListView.builder(
+                shrinkWrap: false,
+                itemBuilder: (context, index) {
+                  return value[index];
+                },
+                itemCount: value.length,
+              ),
             ),
           ),
         ),
