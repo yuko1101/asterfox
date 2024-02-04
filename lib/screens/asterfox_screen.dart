@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -234,7 +235,7 @@ class AsterfoxSideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 210,
+      width: min(320, MediaQuery.of(context).size.width * 0.8),
       child: Drawer(
         child: Container(
           color: Theme.of(context).backgroundColor,
@@ -249,8 +250,10 @@ class AsterfoxSideMenu extends StatelessWidget {
                       "assets/images/asterfox.png",
                       scale: 0.1,
                     ),
-                    title: const Text("Asterfox",
-                        textScaler: TextScaler.linear(1.3)),
+                    title: const Text(
+                      "Asterfox",
+                      textScaler: TextScaler.linear(1.3),
+                    ),
                   ),
                 )),
                 SideMenuItem(
