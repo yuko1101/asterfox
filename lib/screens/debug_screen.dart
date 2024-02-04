@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:colored_json/colored_json.dart';
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -17,8 +15,10 @@ import '../utils/async_utils.dart';
 import '../utils/result.dart';
 import '../widget/process_notifications/process_notification_screen.dart';
 import '../widget/process_notifications/process_notification_widget.dart';
+import '../widget/screen/scaffold_screen.dart';
 import '../widget/search/song_search.dart';
 import '../widget/toast/toast_manager.dart';
+import 'asterfox_screen.dart';
 import 'home_screen.dart';
 
 class DebugScreen extends ScaffoldScreen {
@@ -27,6 +27,7 @@ class DebugScreen extends ScaffoldScreen {
   }) : super(
           body: const DebugMainScreen(),
           appBar: const DebugAppBar(),
+          drawer: const AsterfoxSideMenu(),
         );
 }
 
@@ -123,7 +124,7 @@ class DebugMainScreen extends StatelessWidget {
                           actions: [
                             TextButton(
                               child: const Text("キャンセル"),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => Navigator.of(context).pop(),
                             ),
                             TextButton(
                               child: const Text("ダウンロード"),
@@ -163,8 +164,11 @@ class DebugMainScreen extends StatelessWidget {
                                     future: Future.wait(futures),
                                   ),
                                 );
-                                Navigator.pop(context);
-                                EasyApp.pushPage(context, HomeScreen());
+                                Navigator.of(context).pop();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => HomeScreen()),
+                                );
                               },
                             ),
                           ],
@@ -186,7 +190,7 @@ class DebugMainScreen extends StatelessWidget {
                           actions: [
                             TextButton(
                               child: const Text("キャンセル"),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () => Navigator.of(context).pop(),
                             ),
                             TextButton(
                               child: const Text("削除"),
@@ -211,8 +215,11 @@ class DebugMainScreen extends StatelessWidget {
                                     future: Future.wait(futures),
                                   ),
                                 );
-                                Navigator.pop(context);
-                                EasyApp.pushPage(context, HomeScreen());
+                                Navigator.of(context).pop();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) => HomeScreen()),
+                                );
                               },
                             ),
                           ],
@@ -265,10 +272,11 @@ class DebugMainScreen extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.task),
-                    onPressed: () => EasyApp.pushPage(
-                      context,
-                      ProcessNotificationScreen(
-                          HomeScreen.processNotificationList),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ProcessNotificationScreen(
+                            HomeScreen.processNotificationList),
+                      ),
                     ),
                   ),
                 ],
@@ -321,7 +329,7 @@ class DebugAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
-          EasyApp.popPage(context);
+          Navigator.of(context).pop();
         },
       ),
     );

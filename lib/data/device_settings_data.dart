@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/utils/config_file.dart';
-
 import '../main.dart';
+import '../utils/config_file.dart';
 import '../widget/music_widgets/repeat_button.dart';
 
 class DeviceSettingsData {
@@ -16,7 +14,7 @@ class DeviceSettingsData {
 
   static Future<void> init() async {
     data = await ConfigFile(
-      File("${EasyApp.localPath}/device_settings.json"),
+      File("$localPath/device_settings.json"),
       defaultData,
     ).load();
   }

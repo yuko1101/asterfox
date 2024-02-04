@@ -1,5 +1,6 @@
-import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/services.dart';
+
+import '../utils/pair.dart';
 
 Pair<String, String>? _gitInfo;
 

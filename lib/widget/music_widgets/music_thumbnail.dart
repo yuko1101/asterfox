@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../music/utils/music_url_utils.dart';
+import '../../utils/network_utils.dart';
 
 Image getDefaultImage([BoxFit? fit]) =>
     Image.asset("assets/images/asterfox-no-image.png", fit: fit);

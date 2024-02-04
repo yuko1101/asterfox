@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/utils/config_file.dart';
-
+import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/manager/music_manager.dart';
+import '../utils/config_file.dart';
 
 class SongHistoryData {
   static late ConfigFile historyData;
@@ -13,7 +12,7 @@ class SongHistoryData {
 
   static Future<void> init(MusicManager manager) async {
     historyData = await ConfigFile(
-        File("${EasyApp.localPath}/history.json"), {"history": []}).load();
+        File("$localPath/history.json"), {"history": []}).load();
 
     // when song is played, add it to history.
     manager.audioStateManager.currentSongNotifier.addListener(() {

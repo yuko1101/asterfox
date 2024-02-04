@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screens/widget_screen.dart';
-import 'package:easy_app/utils/os.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -22,15 +20,23 @@ import 'data/song_history_data.dart';
 import 'firebase_options.dart';
 import 'music/manager/music_manager.dart';
 import 'screens/asterfox_screen.dart';
+import 'screens/debug_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/settings/audio_channel_settings_screen.dart';
+import 'screens/settings/settings_screen.dart';
+import 'screens/settings/theme_settings_screen.dart';
+import 'screens/song_history_screen.dart';
 import 'system/firebase/cloud_firestore.dart';
 import 'system/theme/theme.dart';
+import 'utils/network_utils.dart';
 import 'widget/process_notifications/process_notification_list.dart';
 
 final MusicManager musicManager = MusicManager(true);
 late final bool isWearOS;
 final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+
+late final String localPath;
 
 Future<void> main() async {
   await runZonedGuarded<Future<void>>(
@@ -49,14 +55,15 @@ Future<void> main() async {
         isWearOS = false;
       }
 
-      if (OS.getOS() == OSType.android) {
+      if (Platform.isAndroid) {
         final modes = await FlutterDisplayMode.supported;
         modes.forEach(print);
         await FlutterDisplayMode.setHighRefreshRate();
       }
 
-      await EasyApp.initializePath();
-      final wearOSCheckFile = File("${EasyApp.localPath}/wear_os");
+      if (!kIsWeb) localPath = (await getApplicationDocumentsDirectory()).path;
+
+      final wearOSCheckFile = File("$localPath/wear_os");
       final wearOSCheckFileExists = wearOSCheckFile.existsSync();
       if (isWearOS && !wearOSCheckFileExists) {
         wearOSCheckFile.createSync();
@@ -67,6 +74,8 @@ Future<void> main() async {
       await SettingsData.init();
 
       await DeviceSettingsData.init();
+
+      NetworkUtils.init(ConnectivityResult.mobile);
 
       // Firebase set-up
       if (shouldInitializeFirebase) {
@@ -97,19 +106,11 @@ Future<void> main() async {
 
       HomeScreen.processNotificationList = ProcessNotificationList();
 
-      await EasyApp.initialize(
-        homeScreen:
-            isWearOS ? const WidgetScreen(child: SizedBox()) : HomeScreen(),
-        languages: [],
-        activateConnectionChecker: true,
-      );
-
       final shareFilesDir =
           Directory("${(await getTemporaryDirectory()).path}/share_files");
       if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
-      debugPrint("localPath: ${EasyApp.localPath}");
-      if (OS.isMobile()) {}
+      debugPrint("localPath: $localPath");
 
       runApp(const AsterfoxApp());
 
@@ -192,6 +193,14 @@ class AsterfoxApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          routes: {
+            "/home": (context) => HomeScreen(),
+            "/history": (context) => const SongHistoryScreen(),
+            "/settings": (context) => const SettingsScreen(),
+            "/settings/theme": (context) => const ThemeSettingsScreen(),
+            "/settings/audioChannel": (context) => const AudioChannelSettingsScreen(),
+            "/debug": (context) => const DebugScreen(),
+          },
         );
       },
     );
@@ -199,7 +208,7 @@ class AsterfoxApp extends StatelessWidget {
 }
 
 void exitApp([bool force = false]) {
-  if (OS.getOS() == OSType.android && !force) {
+  if (Platform.isAndroid && !force) {
     SystemNavigator.pop();
   } else {
     exit(0);

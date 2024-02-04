@@ -9,7 +9,7 @@ import '../../data/local_musics_data.dart';
 import '../../system/exceptions/unable_to_load_from_playlist_exception.dart';
 import '../audio_source/youtube_music_data.dart';
 import '../../system/exceptions/network_exception.dart';
-import '../../utils/network_check.dart';
+import '../../utils/network_utils.dart';
 
 class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
@@ -27,7 +27,7 @@ class YouTubeMusicUtils {
       // オンライン上から取得
 
       // インターネット接続確認
-      NetworkCheck.check();
+      NetworkUtils.check();
 
       final YoutubeExplode yt = YoutubeExplode();
       StreamManifest manifest;
@@ -69,7 +69,7 @@ class YouTubeMusicUtils {
       // オンライン上から取得
 
       // インターネット接続確認
-      NetworkCheck.check();
+      NetworkUtils.check();
 
       final YoutubeExplode yt = YoutubeExplode();
       StreamManifest manifest;
@@ -104,7 +104,7 @@ class YouTubeMusicUtils {
     required bool isTemporary,
   }) {
     // インターネット接続確認
-    NetworkCheck.check();
+    NetworkUtils.check();
 
     final controller = StreamController<YouTubeMusicData>();
     final YoutubeExplode yt = YoutubeExplode();
@@ -211,7 +211,7 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   static Future<List<Video>> searchYouTubeVideo(String query) async {
     // インターネット接続確認
-    NetworkCheck.check();
+    NetworkUtils.check();
 
     final YoutubeExplode yt = YoutubeExplode();
     final results = await yt.search.search(query);
@@ -222,7 +222,7 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   static Future<List<String>> searchWords(String query) async {
     // インターネット接続確認
-    NetworkCheck.check();
+    NetworkUtils.check();
 
     final YoutubeExplode yt = YoutubeExplode();
     final results = await yt.search.getQuerySuggestions(query);

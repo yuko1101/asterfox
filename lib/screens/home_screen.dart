@@ -1,17 +1,18 @@
-import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../main.dart';
 import '../music/manager/notifiers/audio_state_notifier.dart';
 import '../system/theme/theme.dart';
+import '../utils/responsive.dart';
 import '../widget/music_footer.dart';
 import '../widget/music_widgets/lyrics_button.dart';
 import '../widget/music_widgets/volume_widget.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/process_notifications/process_notification_list.dart';
+import '../widget/screen/scaffold_screen.dart';
 import '../widget/search/song_search.dart';
+import 'asterfox_screen.dart';
 
 class HomeScreen extends ScaffoldScreen {
   static late ProcessNotificationList processNotificationList;
@@ -67,6 +68,7 @@ class HomeScreen extends ScaffoldScreen {
           ),
           appBar: const HomeScreenAppBar(),
           footer: const MusicFooter(),
+          drawer: const AsterfoxSideMenu(),
         );
 }
 

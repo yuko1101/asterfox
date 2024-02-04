@@ -1,8 +1,7 @@
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../notifiers_widget.dart';
+import '../screen/scaffold_screen.dart';
 import 'process_notification_list.dart';
 import 'process_notification_widget.dart';
 
@@ -56,7 +55,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () {
-          EasyApp.popPage(context);
+          Navigator.of(context).pop();
         },
       ),
     );

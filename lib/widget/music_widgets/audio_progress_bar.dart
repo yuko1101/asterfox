@@ -1,9 +1,9 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:easy_app/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/custom_colors.dart';
 import '../../main.dart';
+import '../../utils/responsive.dart';
 
 class AudioProgressBar extends StatelessWidget {
   const AudioProgressBar({super.key});

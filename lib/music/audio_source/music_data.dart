@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:easy_app/easy_app.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/song_history_data.dart';
+import '../../main.dart';
 import '../utils/music_url_utils.dart';
 import '../utils/youtube_music_utils.dart';
 import 'url_music_data.dart';
@@ -166,7 +166,7 @@ class MusicData {
   }
 
   static String getDirectoryPath(String audioId) =>
-      "${EasyApp.localPath}/music/$audioId"
+      "$localPath/music/$audioId"
           .replaceAll("/", Platform.pathSeparator);
   static String getAudioSavePath(String audioId) =>
       "${getDirectoryPath(audioId)}/audio.mp3"

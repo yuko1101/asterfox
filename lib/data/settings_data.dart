@@ -1,12 +1,11 @@
 import 'dart:io';
 
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/utils/config_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../main.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../system/theme/theme.dart';
+import '../utils/config_file.dart';
 
 class SettingsData {
   static late ConfigFile settings;
@@ -18,7 +17,7 @@ class SettingsData {
   };
   static Future<void> init() async {
     settings = await ConfigFile(
-      File("${EasyApp.localPath}/settings.json"),
+      File("$localPath/settings.json"),
       defaultData,
     ).load();
   }

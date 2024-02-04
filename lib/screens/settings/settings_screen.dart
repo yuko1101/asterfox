@@ -1,7 +1,3 @@
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
-import 'package:easy_app/utils/network_utils.dart';
-import 'package:easy_app/utils/pair.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,10 +11,11 @@ import '../../data/settings_data.dart';
 import '../../system/firebase/cloud_firestore.dart';
 import '../../system/git.dart';
 import '../../system/theme/theme.dart';
+import '../../utils/network_utils.dart';
+import '../../utils/pair.dart';
 import '../../widget/loading_dialog.dart';
+import '../../widget/screen/scaffold_screen.dart';
 import '../login_screen.dart';
-import 'audio_channel_settings_screen.dart';
-import 'theme_settings_screen.dart';
 
 class SettingsScreen extends ScaffoldScreen {
   const SettingsScreen({super.key})
@@ -39,7 +36,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(AppLocalizations.of(context)!.settings),
       leading: IconButton(
-        onPressed: () => EasyApp.popPage(context),
+        onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
         tooltip: AppLocalizations.of(context)!.go_back,
       ),
@@ -72,10 +69,11 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 title: Text(AppLocalizations.of(context)!.theme),
                 description: Text(AppTheme.themes
                     .map((theme) => theme.themeDetails.name)
-                    .map((name) => AppLocalizations.of(context)!.theme_names(name))
+                    .map((name) =>
+                        AppLocalizations.of(context)!.theme_names(name))
                     .join(AppLocalizations.of(context)!.list_separator)),
                 onPressed: (context) {
-                  EasyApp.pushPage(context, const ThemeSettingsScreen());
+                  Navigator.of(context).pushNamed("/settings/theme");
                 },
                 trailing: const Icon(Icons.keyboard_arrow_right),
               )
@@ -127,7 +125,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 title: Text(AppLocalizations.of(context)!.audio_channel),
                 description: RichText(
                   text: TextSpan(
-                    text: "${AppLocalizations.of(context)!.audio_channels(SettingsData.getValue(key: "audioChannel"))}\n",
+                    text:
+                        "${AppLocalizations.of(context)!.audio_channels(SettingsData.getValue(key: "audioChannel"))}\n",
                     style: TextStyle(
                         color: Theme.of(context).extraColors.secondary),
                     children: [
@@ -136,7 +135,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   ),
                 ),
                 onPressed: (context) {
-                  EasyApp.pushPage(context, const AudioChannelSettingsScreen());
+                  Navigator.of(context).pushNamed("/settings/audioChannel");
                 },
                 trailing: const Icon(Icons.keyboard_arrow_right),
               )

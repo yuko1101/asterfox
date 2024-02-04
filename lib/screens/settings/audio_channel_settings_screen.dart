@@ -1,12 +1,10 @@
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
 import '../../data/settings_data.dart';
-import 'settings_screen.dart';
+import '../../widget/screen/scaffold_screen.dart';
 
 class AudioChannelSettingsScreen extends ScaffoldScreen {
   const AudioChannelSettingsScreen({
@@ -14,7 +12,6 @@ class AudioChannelSettingsScreen extends ScaffoldScreen {
   }) : super(
           body: const _AudioChannelChoice(),
           appBar: const _AppBar(),
-          previousPage: const SettingsScreen(),
         );
 }
 
@@ -29,7 +26,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(AppLocalizations.of(context)!.audio_channel),
       leading: IconButton(
-        onPressed: () => EasyApp.popPage(context),
+        onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
         tooltip: AppLocalizations.of(context)!.go_back,
       ),

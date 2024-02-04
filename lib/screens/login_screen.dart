@@ -549,7 +549,7 @@ class ForgotPassword extends StatelessWidget {
             child: Text(AppLocalizations.of(context)!.send),
             onPressed: () async {
               if (!formKey.currentState!.validate()) return;
-              Navigator.pop(context);
+              Navigator.of(context).pop();
 
               // TODO: handle [There is no user record corresponding to this identifier. The user may have been deleted.]
               final future = FirebaseAuth.instance

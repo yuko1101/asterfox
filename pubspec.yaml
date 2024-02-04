@@ -42,11 +42,11 @@ dependencies:
 
   intl: ^0.18.1
 
-  easy_app: ^0.1.18
-
   path_provider: ^2.0.15
   provider: ^6.1.1
   uuid: ^4.3.3
+
+  connectivity_plus: ^5.0.2
 
   fluttertoast: ^8.2.4
 

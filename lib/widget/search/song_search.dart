@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_app/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,6 +15,7 @@ import '../../system/exceptions/network_exception.dart';
 import '../../system/home_screen_music_manager.dart';
 import '../../music/utils/youtube_music_utils.dart';
 import '../../system/theme/theme.dart';
+import '../../utils/network_utils.dart';
 import '../option_widgets/option_switch.dart';
 import 'song_search_tile.dart';
 import 'sort_and_filter.dart';

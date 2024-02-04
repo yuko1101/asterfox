@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:easy_app/utils/os.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../data/settings_data.dart';
@@ -16,7 +17,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   var _playlist = ConcatenatingAudioSource(children: []);
 
   // fix that the audio player is not working when the empty playlist is added
-  final fix = OS.getOS() == OSType.windows;
+  final fix = Platform.isWindows;
   final bool useSession;
   final bool handleInterruptions;
 
@@ -71,7 +72,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> seek(final Duration? position, {int? index}) async {
     int? androidSdkInt;
-    if (OS.getOS() == OSType.android) {
+    if (Platform.isAndroid) {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
       androidSdkInt = androidInfo.version.sdkInt;
     }

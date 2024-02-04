@@ -65,7 +65,7 @@ class LyricsButton extends StatelessWidget {
               leading: IconButton(
                 icon: const Icon(Icons.expand_more),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
                 },
                 tooltip: AppLocalizations.of(context)!.close,
               ),
@@ -73,7 +73,7 @@ class LyricsButton extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.edit_note),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.of(context).pop();
                     final FindLyricsDialog findLyricsDialog =
                         FindLyricsDialog(song);
                     showDialog(
@@ -208,7 +208,7 @@ class FindLyricsDialog {
       throw Exception("Page index out of range");
     }
     currentPage = page;
-    Navigator.pop(context);
+    Navigator.of(context).pop();
     showDialog(context: context, builder: pages[page]);
   }
 
@@ -218,18 +218,18 @@ class FindLyricsDialog {
     if (lyrics == null || lyrics!.isEmpty) {
       Fluttertoast.showToast(
           msg: AppLocalizations.of(context)!.lyrics_not_found);
-      Navigator.pop(context);
+      Navigator.of(context).pop();
       return;
     }
     await LyricsFinder.applyLyrics(song, lyrics!, true);
-    Navigator.pop(context);
+    Navigator.of(context).pop();
     LyricsButton.showLyrics(song, context);
   }
 
   TextButton cancelButton(BuildContext context) => TextButton(
         child: Text(AppLocalizations.of(context)!.cancel),
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.of(context).pop();
         },
       );
   TextButton previousButton(BuildContext context) => TextButton(

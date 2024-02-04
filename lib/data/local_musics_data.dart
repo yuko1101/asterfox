@@ -1,16 +1,16 @@
 import 'dart:io';
 
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/utils/config_file.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
 import '../system/exceptions/network_exception.dart';
 import '../system/exceptions/song_not_stored_exception.dart';
 import '../system/firebase/cloud_firestore.dart';
+import '../utils/config_file.dart';
 import '../utils/result.dart';
 
 // TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
@@ -22,7 +22,7 @@ class LocalMusicsData {
 
   static Future<void> init() async {
     musicData =
-        await ConfigFile(File("${EasyApp.localPath}/music.json"), {}).load();
+        await ConfigFile(File("$localPath/music.json"), {}).load();
   }
 
   static bool isStored({MusicData? song, String? audioId}) {

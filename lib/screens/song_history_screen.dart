@@ -1,5 +1,3 @@
-import 'package:easy_app/easy_app.dart';
-import 'package:easy_app/screen/base_screens/scaffold_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
@@ -7,12 +5,15 @@ import 'package:uuid/uuid.dart';
 import '../data/song_history_data.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
+import '../widget/screen/scaffold_screen.dart';
+import 'asterfox_screen.dart';
 
 class SongHistoryScreen extends ScaffoldScreen {
   const SongHistoryScreen({super.key})
       : super(
           appBar: const SongHistoryAppBar(),
           body: const SongHistoryMainScreen(),
+          drawer: const AsterfoxSideMenu(),
         );
 }
 
@@ -27,7 +28,7 @@ class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(AppLocalizations.of(context)!.song_history),
       leading: IconButton(
-        onPressed: () => EasyApp.popPage(context),
+        onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
         tooltip: AppLocalizations.of(context)!.go_back,
       ),
@@ -79,7 +80,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.of(context).pop();
                       },
                       child: Text(AppLocalizations.of(context)!.cancel),
                     ),
@@ -87,7 +88,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
                       onPressed: () {
                         setState(() {
                           SongHistoryData.removeFromHistory(song["audioId"]);
-                          Navigator.pop(context);
+                          Navigator.of(context).pop();
                         });
                       },
                       child: Text(AppLocalizations.of(context)!.delete),
@@ -104,7 +105,7 @@ class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
               audioId: song["audioId"],
               localizations: AppLocalizations.of(context)!,
             );
-            EasyApp.popPage(context);
+            Navigator.of(context).pop();
           },
         );
       },

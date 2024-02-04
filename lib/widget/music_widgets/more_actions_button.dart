@@ -29,7 +29,7 @@ class MoreActionsButton extends StatelessWidget {
       title: (context) => AppLocalizations.of(context)!.share,
       onTap: (song, context) async {
         Share.share(song!.mediaURL, subject: song.title);
-        Navigator.pop(context);
+        Navigator.of(context).pop();
       },
       songFilter: (MusicData? song) => song != null,
     ),
@@ -38,7 +38,7 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.share,
       title: (context) => AppLocalizations.of(context)!.share_mp3,
       onTap: (song, context) async {
-        Navigator.pop(context);
+        Navigator.of(context).pop();
         if (!song!.isInstalled) {
           final key = "share-${song.key}";
           final downloadPath = File(
@@ -71,7 +71,7 @@ class MoreActionsButton extends StatelessWidget {
           Fluttertoast.showToast(
               msg: AppLocalizations.of(context)!.launch_url_error);
         }
-        Navigator.pop(context);
+        Navigator.of(context).pop();
       },
       songFilter: (MusicData? song) => song != null && song is YouTubeMusicData,
     ),
@@ -80,7 +80,7 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.file_download,
       title: (context) => AppLocalizations.of(context)!.export_as_mp3,
       onTap: (song, context) {
-        Navigator.pop(context);
+        Navigator.of(context).pop();
       },
       songFilter: (MusicData? song) => song != null,
     ),
@@ -89,7 +89,7 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.delete_forever,
       title: (context) => AppLocalizations.of(context)!.delete_from_local,
       onTap: (song, context) {
-        Navigator.pop(context);
+        Navigator.of(context).pop();
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -120,7 +120,7 @@ class MoreActionsButton extends StatelessWidget {
       title: (context) => AppLocalizations.of(context)!.refresh_all,
       onTap: (song, context) {
         musicManager.refreshSongs();
-        Navigator.pop(context);
+        Navigator.of(context).pop();
       },
       songFilter: (MusicData? song) => song != null,
     )

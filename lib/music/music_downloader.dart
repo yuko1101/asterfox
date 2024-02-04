@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,8 @@ import '../system/exceptions/song_already_installed_exception.dart';
 import '../system/exceptions/song_already_installing_exception.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../utils/async_utils.dart';
-import '../utils/network_check.dart';
+import '../utils/network_utils.dart';
+import '../utils/pair.dart';
 import 'audio_source/music_data.dart';
 import 'audio_source/youtube_music_data.dart';
 
@@ -41,7 +41,7 @@ class DownloadManager {
       throw SongAlreadyInstallingException();
     }
 
-    NetworkCheck.check();
+    NetworkUtils.check();
 
     _downloadStarted(downloadKey);
     final notifiers = _getNotifiers(downloadKey);

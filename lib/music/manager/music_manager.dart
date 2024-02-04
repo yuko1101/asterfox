@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
-import 'package:easy_app/utils/os.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../data/device_settings_data.dart';
@@ -27,7 +27,7 @@ class MusicManager {
   late final AudioSession _audioSession;
   late final AudioDataManager audioDataManager;
 
-  static bool windowsMode = OS.getOS() == OSType.windows;
+  static bool windowsMode = Platform.isWindows;
 
   // notifiers
   final audioStateManager = AudioStateManager();
@@ -240,7 +240,7 @@ class MusicManager {
     final volume = (muteNotifier.value ? 0 : 1) *
         baseVolumeNotifier.value *
         audioDataManager.currentSongVolume;
-    if (OS.getOS() == OSType.android) {
+    if (Platform.isAndroid) {
       _audioHandler.androidEnhancer
           .setTargetGain(max(MathUtils.log(volume, VolumeWidget.base), 0));
     }

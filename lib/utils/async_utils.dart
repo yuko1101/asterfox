@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import 'package:easy_app/utils/pair.dart';
 import 'package:flutter/foundation.dart';
+
+import 'pair.dart';
 
 /// `limit` - Maximum number of futures to be executed at the same time
 class AsyncCore<T> {
