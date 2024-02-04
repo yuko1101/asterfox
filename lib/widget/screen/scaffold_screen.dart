@@ -30,7 +30,6 @@ class ScaffoldScreen extends BaseScreen {
 
   @override
   Widget build(BuildContext context) {
-    print("Route: ${ModalRoute.of(context)?.settings.name ?? "null"}");
     if (Responsive.isDesktop(context)) {
       return Scaffold(
         resizeToAvoidBottomInset: false,
