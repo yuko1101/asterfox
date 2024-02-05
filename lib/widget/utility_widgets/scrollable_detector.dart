@@ -18,6 +18,8 @@ class _ScrollableDetectorState extends State<ScrollableDetector> {
   late final ScrollController _controller;
   late bool _isScrollable;
 
+  bool _cancelNextCheck = false;
+
   @override
   void initState() {
     _controller = widget.controller;
@@ -29,11 +31,19 @@ class _ScrollableDetectorState extends State<ScrollableDetector> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isScrollable = _controller.position.maxScrollExtent > 0;
+    // スクロール可能であるかチェックするためにまずレンダリングして、
+    // 次のフレームで最大スクロールをチェックしてそれに合わせて再レンダリングする。
+    // (2回目ではチェックをキャンセルしてループを防ぐ)
+    if (!_cancelNextCheck) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _isScrollable = _controller.position.maxScrollExtent > 0;
+          _cancelNextCheck = true;
+        });
       });
-    });
+    } else {
+      _cancelNextCheck = false;
+    }
     return widget.builder(context, _isScrollable);
   }
 }
