@@ -30,6 +30,7 @@ class AppTheme {
       extensions: <ThemeExtension<dynamic>>[
         ThemeDetails(
           name: "light",
+          icon: Icons.light_mode_outlined,
         ),
         ExtraColors(
           primary: getGrey(0),
@@ -62,6 +63,7 @@ class AppTheme {
       extensions: <ThemeExtension<dynamic>>[
         ThemeDetails(
           name: "dark",
+          icon: Icons.dark_mode_outlined,
         ),
         ExtraColors(
           primary: getGrey(255),

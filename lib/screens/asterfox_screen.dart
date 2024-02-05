@@ -13,8 +13,10 @@ import '../system/home_screen_music_manager.dart';
 import '../system/sharing_intent.dart';
 import '../widget/music_widgets/music_buttons.dart';
 import '../widget/music_widgets/music_thumbnail.dart';
+import '../widget/theme_icon_button.dart';
 import '../widget/toast/toast_manager.dart';
 import '../widget/toast/toast_widget.dart';
+import '../widget/utility_widgets/scrollable_detector.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 
@@ -239,70 +241,126 @@ class AsterfoxSideMenu extends StatelessWidget {
       child: Drawer(
         child: Container(
           color: Theme.of(context).backgroundColor,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DrawerHeader(
-                    child: Center(
-                  child: ListTile(
-                    leading: Image.asset(
-                      "assets/images/asterfox.png",
-                      scale: 0.1,
-                    ),
-                    title: const Text(
-                      "Asterfox",
-                      textScaler: TextScaler.linear(1.3),
-                    ),
-                  ),
-                )),
-                SideMenuItem(
-                  title: const Text("Home"),
-                  icon: const Icon(Icons.home),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      "/home",
-                    );
-                  },
-                ),
-                SideMenuItem(
-                  title: const Text("Playlist"),
-                  icon: const Icon(Icons.playlist_play),
-                  onPressed: () async {},
-                ),
-                SideMenuItem(
-                  title: const Text("History"),
-                  icon: const Icon(Icons.replay),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      "/history",
-                    );
-                  },
-                ),
-                SideMenuItem(
-                  title: const Text("Settings"),
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      "/settings",
-                    );
-                  },
-                ),
-                SideMenuItem(
-                  title: const Text("Debug"),
-                  icon: const Icon(Icons.bug_report),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      "/debug",
-                    );
-                  },
-                )
-              ],
+          child: const _SideMenuContent(),
+        ),
+      ),
+    );
+  }
+}
+
+class _SideMenuContent extends StatefulWidget {
+  const _SideMenuContent({super.key});
+
+  @override
+  State<_SideMenuContent> createState() => _SideMenuContentState();
+}
+
+class _SideMenuContentState extends State<_SideMenuContent> {
+  final _scrollController = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      DrawerHeader(
+        child: Center(
+          child: ListTile(
+            leading: Image.asset(
+              "assets/images/asterfox.png",
+              scale: 0.1,
+            ),
+            title: const Text(
+              "Asterfox",
+              textScaler: TextScaler.linear(1.3),
             ),
           ),
         ),
       ),
-    );
+      SideMenuItem(
+        title: const Text("Home"),
+        icon: const Icon(Icons.home),
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            "/home",
+          );
+        },
+      ),
+      SideMenuItem(
+        title: const Text("Playlist"),
+        icon: const Icon(Icons.playlist_play),
+        onPressed: () async {},
+      ),
+      SideMenuItem(
+        title: const Text("History"),
+        icon: const Icon(Icons.replay),
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            "/history",
+          );
+        },
+      ),
+      SideMenuItem(
+        title: const Text("Settings"),
+        icon: const Icon(Icons.settings),
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            "/settings",
+          );
+        },
+      ),
+      SideMenuItem(
+        title: const Text("Debug"),
+        icon: const Icon(Icons.bug_report),
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            "/debug",
+          );
+        },
+      ),
+    ];
+
+    return ScrollableDetector(
+        controller: _scrollController,
+        builder: (context, isScrollable) {
+          return isScrollable
+              ? SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...items,
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.bottom + 1,
+                          left: 15,
+                        ),
+                        child: const Align(
+                          alignment: Alignment.centerLeft,
+                          child: ThemeIconButton(),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Stack(
+                  children: [
+                    Positioned(
+                      bottom: MediaQuery.of(context).padding.bottom + 15,
+                      left: 25,
+                      child: const ThemeIconButton(),
+                    ),
+                    SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: items,
+                      ),
+                    ),
+                  ],
+                );
+        });
   }
 }
 
