@@ -318,6 +318,7 @@ class _SideMenuContentState extends State<_SideMenuContent> {
       ),
     ];
 
+    // TODO: 今のままだとスクロールが可能になるのは、ColumnとThemeIconButtonが重なったあとになってしまうため、Columnに余白を追加したいが可読性が悪くなってしまうため、それ専用のウィジェットを作成する。
     return ScrollableDetector(
         controller: _scrollController,
         builder: (context, isScrollable) {
