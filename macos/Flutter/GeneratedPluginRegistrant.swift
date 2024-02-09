@@ -9,7 +9,7 @@ import audio_service
 import audio_session
 import cloud_firestore
 import connectivity_plus
-import device_info_plus
+import device_info_plus_macos
 import firebase_analytics
 import firebase_auth
 import firebase_core

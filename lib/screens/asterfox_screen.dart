@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -131,19 +132,21 @@ class _AsterfoxMainScreenState extends State<AsterfoxMainScreen> {
   void initState() {
     super.initState();
 
-    ReceiveSharingIntent.getTextStream().listen((text) {
-      setState(() {
-        _sharedText = text;
-        _sharedTextIsInitial = false;
+    if (Platform.isAndroid || Platform.isIOS) {
+      ReceiveSharingIntent.getTextStream().listen((text) {
+        setState(() {
+          _sharedText = text;
+          _sharedTextIsInitial = false;
+        });
       });
-    });
 
-    ReceiveSharingIntent.getInitialText().then((text) {
-      setState(() {
-        _sharedText = text;
-        _sharedTextIsInitial = true;
+      ReceiveSharingIntent.getInitialText().then((text) {
+        setState(() {
+          _sharedText = text;
+          _sharedTextIsInitial = true;
+        });
       });
-    });
+    }
   }
 
   @override
