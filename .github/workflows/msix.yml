@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Generate msix
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       branch: ${{ github.ref }}
       commitId: ${{ github.sha }}
