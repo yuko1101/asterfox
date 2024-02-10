@@ -141,6 +141,7 @@ class MoreActionsButton extends StatelessWidget {
                     context: context,
                     backgroundColor: Colors.transparent,
                     enableDrag: true,
+                    elevation: 0,
                     builder: (context) => Container(
                       margin: const EdgeInsets.only(
                         left: 10,
