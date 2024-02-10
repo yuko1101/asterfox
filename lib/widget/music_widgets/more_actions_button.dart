@@ -34,7 +34,7 @@ class MoreActionsButton extends StatelessWidget {
       songFilter: (MusicData? song) => song != null,
     ),
     _Action(
-      id: "share",
+      id: "share_mp3",
       icon: Icons.share,
       title: (context) => AppLocalizations.of(context)!.share_mp3,
       onTap: (song, context) async {
