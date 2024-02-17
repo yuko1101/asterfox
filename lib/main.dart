@@ -72,6 +72,7 @@ Future<void> main() async {
       }
 
       await SettingsData.init();
+      await SettingsData.applySettings();
 
       await DeviceSettingsData.init();
 
@@ -198,7 +199,8 @@ class AsterfoxApp extends StatelessWidget {
             "/history": (context) => const SongHistoryScreen(),
             "/settings": (context) => const SettingsScreen(),
             "/settings/theme": (context) => const ThemeSettingsScreen(),
-            "/settings/audioChannel": (context) => const AudioChannelSettingsScreen(),
+            "/settings/audioChannel": (context) =>
+                const AudioChannelSettingsScreen(),
             "/debug": (context) => const DebugScreen(),
           },
         );
