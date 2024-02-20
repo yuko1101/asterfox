@@ -55,7 +55,6 @@ jobs:
             $flutter gen-l10n
             $flutter build linux --release
 
-            cp ./build /build -r
             echo "Build successful for Linux (arm64)"
 
       - name: TEMP - List files
