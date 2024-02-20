@@ -1,0 +1,52 @@
+name: Build for Linux
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Generate build for Linux
+    strategy:
+      matrix:
+        arch: [arm64, x64]
+        include:
+          - arch: arm64
+            arm64: true
+    runs-on: ubuntu-latest
+    env:
+      branch: ${{ github.ref }}
+      commitId: ${{ github.sha }}
+    steps:
+      - if: ${{ matrix.arm64 }}
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+            platforms: linux/arm64
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize flutter
+        uses: subosito/flutter-action@v2
+
+      - name: Generate l10n files
+        run: flutter gen-l10n
+      
+      - name: Generate git info
+        shell: bash
+        run: |
+          git init
+          echo "ref: ${{ env.branch }}" > .git/HEAD
+          echo "${{ env.commitId }}" > .git/${{ env.branch }}
+
+      - name: Build release for Linux
+        run: flutter build linux --release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asterfox
+          path: ./build/linux/${{ matrix.arch }}/release/bundle
+    
+    
