@@ -47,7 +47,7 @@ jobs:
           echo "${{ env.commitId }}" > .git/${{ env.branch }}
 
       - name: Build release for Linux
-        run: sudo -E flutter build linux --release
+        run: sudo $(which flutter) build linux --release
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
