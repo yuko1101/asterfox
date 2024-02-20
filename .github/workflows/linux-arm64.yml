@@ -27,7 +27,6 @@ jobs:
         with:
           arch: aarch64
           distro: ubuntu20.04
-          shell: /bin/bash
           setup: |
             mkdir -p "${PWD}/build"
           dockerRunArgs: |
