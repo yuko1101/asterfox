@@ -49,6 +49,9 @@ jobs:
       - name: Build release for Linux
         run: sudo $(which flutter) build linux --release
 
+      - name: TEMP - List files
+        run: ls ./build/linux
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
