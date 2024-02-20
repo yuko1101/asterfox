@@ -44,14 +44,14 @@ jobs:
             git checkout stable
             cd ..
 
-            flutter="flutter/bin/flutter"
-            echo "Flutter installed successfully at $(pwd)/$flutter"
+            flutter="/flutter/bin/flutter"
+            echo "Flutter installed successfully at $flutter"
 
             $flutter doctor -v
             $flutter config --enable-linux-desktop
 
           run: |
-            flutter="flutter/bin/flutter"
+            flutter="/flutter/bin/flutter"
             $flutter gen-l10n
             $flutter build linux --release
 
