@@ -42,15 +42,18 @@ jobs:
             git clone https://github.com/flutter/flutter.git
             cd flutter
             git checkout stable
-            export PATH="$PATH:$(pwd)/bin"
             cd ..
 
-            flutter doctor -v
-            flutter config --enable-linux-desktop
+            flutter="flutter/bin/flutter"
+            echo "Flutter installed successfully at $(pwd)/$flutter"
+
+            $flutter doctor -v
+            $flutter config --enable-linux-desktop
 
           run: |
-            flutter gen-l10n
-            flutter build linux --release
+            flutter="flutter/bin/flutter"
+            $flutter gen-l10n
+            $flutter build linux --release
 
             cp ./build /build -r
             echo "Build successful for Linux (arm64)"
