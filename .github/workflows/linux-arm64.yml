@@ -9,7 +9,7 @@ jobs:
     name: Generate build for Linux (arm64)
     runs-on: ubuntu-latest
     env:
-      branch: ${{ github.ref }}
+      branch: refs/heads/${{ github.head_ref && github.head_ref || github.ref_name }}
       commitId: ${{ github.sha }}
     steps:
       - name: Checkout repository
