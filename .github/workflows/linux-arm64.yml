@@ -57,13 +57,10 @@ jobs:
 
             echo "Build successful for Linux (arm64)"
 
-      - name: TEMP - List files
-        run: ls ./build/linux
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: asterfox
+          name: asterfox-linux-arm64
           path: ./build/linux/arm64/release/bundle
     
     
