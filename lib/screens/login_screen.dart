@@ -461,7 +461,7 @@ class AuthMessage extends StatelessWidget {
     final text = signUp
         ? AppLocalizations.of(context)!.login_message
         : AppLocalizations.of(context)!.sign_up_message;
-    final clickableTexts = RegExp(r"\{[^{}]+\}").allMatches(text).toList();
+    final clickableTexts = RegExp(r"%.+?%").allMatches(text).toList();
     final List<TextSpan> textSpans = [];
 
     int currentIndex = 0;
