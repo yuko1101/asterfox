@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../data/settings_data.dart';
@@ -31,27 +32,32 @@ class CloudFirestoreManager {
     _isInitialized = true;
   }
 
-  static void _onUserUpdate() {
+  static Future<void> _onUserUpdate() async {
     LocalMusicsData.musicData.resetData();
     SettingsData.settings.resetData();
-    _listenUserDataUpdate();
-    _listenSongsUpdate();
+    final tasks = <Future>[
+      _listenUserDataUpdate(),
+      _listenSongsUpdate(),
+    ];
+    await Future.wait(tasks);
   }
 
   static Future<void> importData(Map<String, dynamic> data) async {
-    if (data.containsKey("songs")) {
-      LocalMusicsData.musicData.data = data["songs"];
-      await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
-      await CloudFirestoreManager.removeAllSongs();
-      await CloudFirestoreManager.addOrUpdateSongs(
-          LocalMusicsData.getAll(isTemporary: true));
-    }
-    if (data.containsKey("settings")) {
-      SettingsData.settings.data = MapUtils.bindOptions(
-          SettingsData.settings.defaultValue, data["settings"]);
-      await SettingsData.save(upload: false);
-      await SettingsData.applySettings();
-    }
+    await runTask(() async {
+      if (data.containsKey("songs")) {
+        LocalMusicsData.musicData.data = data["songs"];
+        await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
+        await CloudFirestoreManager.removeAllSongs();
+        await CloudFirestoreManager.addOrUpdateSongs(
+            LocalMusicsData.getAll(isTemporary: true));
+      }
+      if (data.containsKey("settings")) {
+        SettingsData.settings.data = MapUtils.bindOptions(
+            SettingsData.settings.defaultValue, data["settings"]);
+        await SettingsData.save(upload: false);
+        await SettingsData.applySettings();
+      }
+    });
   }
 
   static Map<String, dynamic> exportData(
@@ -65,57 +71,67 @@ class CloudFirestoreManager {
   // add or update songs
   static Future<void> addOrUpdateSongs(List<MusicData> songs) async {
     if (!_isInitialized) return;
-    final user = FirebaseAuth.instance.currentUser!;
-    final collection = FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
-        .collection("songs");
-    final List<Future<void>> futures = [];
-    for (final song in songs) {
-      futures.add(collection.doc(song.audioId).set(song.toJson()));
-    }
-    await Future.wait(futures);
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("songs");
+      final List<Future<void>> futures = [];
+      for (final song in songs) {
+        futures.add(collection.doc(song.audioId).set(song.toJson()));
+      }
+      await Future.wait(futures);
+    });
   }
 
   static Future<void> removeSongs(List<String> audioIds) async {
     if (!_isInitialized) return;
-    final user = FirebaseAuth.instance.currentUser!;
-    final collection = FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
-        .collection("songs");
-    final List<Future<void>> futures = [];
-    for (final audioId in audioIds) {
-      futures.add(collection.doc(audioId).delete());
-    }
-    await Future.wait(futures);
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("songs");
+      final List<Future<void>> futures = [];
+      for (final audioId in audioIds) {
+        futures.add(collection.doc(audioId).delete());
+      }
+      await Future.wait(futures);
+    });
   }
 
   static Future<void> removeAllSongs() async {
     if (!_isInitialized) return;
-    final user = FirebaseAuth.instance.currentUser!;
-    final collection = FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
-        .collection("songs");
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("songs");
 
-    final songs = await collection.get();
+      final songs = await collection.get();
 
-    final List<Future<void>> futures = [];
-    for (final docId in songs.docs.map((doc) => doc.id)) {
-      futures.add(collection.doc(docId).delete());
-    }
-    await Future.wait(futures);
+      final List<Future<void>> futures = [];
+      for (final docId in songs.docs.map((doc) => doc.id)) {
+        futures.add(collection.doc(docId).delete());
+      }
+      await Future.wait(futures);
+    });
   }
 
   static Future<void> updateUserData() async {
     if (!_isInitialized) return;
-    final user = FirebaseAuth.instance.currentUser!;
-    final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
 
-    final Map<String, dynamic> data = {"settings": SettingsData.settings.data};
+      final Map<String, dynamic> data = {
+        "settings": SettingsData.settings.data
+      };
 
-    await doc.set(data);
+      await doc.set(data);
+    });
   }
 
   static StreamSubscription? _userDataStreamSubscription;
@@ -123,25 +139,29 @@ class CloudFirestoreManager {
     if (_userDataStreamSubscription != null) {
       await _userDataStreamSubscription!.cancel();
     }
-    final user = FirebaseAuth.instance.currentUser!;
-    final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
 
-    final data = await doc.get();
-    if (data.data() == null) {
-      SettingsData.settings.resetData();
-      await SettingsData.save(upload: false);
-      await updateUserData();
-    }
+      final data = await doc.get();
+      if (data.data() == null) {
+        SettingsData.settings.resetData();
+        await SettingsData.save(upload: false);
+        await updateUserData();
+      }
 
-    _userDataStreamSubscription =
-        doc.snapshots(includeMetadataChanges: true).listen((snapshot) async {
-      final data = snapshot.data();
-      print("database update (cache: ${snapshot.metadata.isFromCache})");
-      if (data == null) return;
-      SettingsData.settings.data = MapUtils.bindOptions(
-          SettingsData.settings.defaultValue, data["settings"]);
-      await SettingsData.save(upload: false);
-      await SettingsData.applySettings();
+      _userDataStreamSubscription =
+          doc.snapshots(includeMetadataChanges: true).listen((snapshot) {
+        runTask(() async {
+          final data = snapshot.data();
+          print("database update (cache: ${snapshot.metadata.isFromCache})");
+          if (data == null) return;
+          SettingsData.settings.data = MapUtils.bindOptions(
+              SettingsData.settings.defaultValue, data["settings"]);
+          await SettingsData.save(upload: false);
+          await SettingsData.applySettings();
+        });
+      });
     });
   }
 
@@ -150,26 +170,32 @@ class CloudFirestoreManager {
     if (_songsStreamSubscription != null) {
       await _songsStreamSubscription!.cancel();
     }
-    final user = FirebaseAuth.instance.currentUser!;
-    final collection = FirebaseFirestore.instance
-        .collection("users")
-        .doc(user.uid)
-        .collection("songs");
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("songs");
 
-    _songsStreamSubscription = collection.snapshots().listen((snapshot) async {
-      final changes = snapshot.docChanges;
-      if (changes.isEmpty) return;
-      print(
-          "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} songs.");
-      for (final change in changes) {
-        final audioId = change.doc.id;
-        if (change.type == DocumentChangeType.removed) {
-          LocalMusicsData.musicData.delete(key: audioId);
-        } else {
-          LocalMusicsData.musicData.set(key: audioId, value: change.doc.data());
-        }
-      }
-      await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
+      _songsStreamSubscription = collection.snapshots().listen((snapshot) {
+        runTask(() async {
+          final changes = snapshot.docChanges;
+          if (changes.isEmpty) return;
+          print(
+              "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} songs.");
+          for (final change in changes) {
+            final audioId = change.doc.id;
+            if (change.type == DocumentChangeType.removed) {
+              LocalMusicsData.musicData.delete(key: audioId);
+            } else {
+              LocalMusicsData.musicData
+                  .set(key: audioId, value: change.doc.data());
+            }
+          }
+          await LocalMusicsData.musicData
+              .save(compact: LocalMusicsData.compact);
+        });
+      });
     });
   }
 
@@ -183,5 +209,27 @@ class CloudFirestoreManager {
     }
 
     await Future.wait(futures);
+  }
+
+  static ValueNotifier<int> runningTasks = ValueNotifier(0);
+  static Future<T> runTask<T>(Future<T> Function() task) async {
+    runningTasks.value = runningTasks.value + 1;
+    final result = await task();
+    runningTasks.value = runningTasks.value - 1;
+    return result;
+  }
+
+  static Future<void> waitForTasks() async {
+    if (runningTasks.value == 0) return;
+    final completer = Completer();
+    void listener() {
+      if (runningTasks.value == 0) {
+        completer.complete();
+      }
+    }
+
+    runningTasks.addListener(listener);
+    await completer.future;
+    runningTasks.removeListener(listener);
   }
 }

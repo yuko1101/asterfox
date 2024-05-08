@@ -158,8 +158,12 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                     }
 
                     final future = () async {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
                       await CloudFirestoreManager.cancelListeners();
-                      GoogleSignInWidget.googleSignIn.disconnect();
+                      await CloudFirestoreManager.waitForTasks();
+                      if (await GoogleSignInWidget.googleSignIn.isSignedIn()) {
+                        GoogleSignInWidget.googleSignIn.disconnect();
+                      }
                       FirebaseAuth.instance.signOut();
                     }();
 
@@ -191,7 +195,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                               Fluttertoast.showToast(
                                   msg: AppLocalizations.of(context)!
                                       .copied_to_clipboard);
-                            });
+                            },
+                          );
                   },
                 ),
               ),

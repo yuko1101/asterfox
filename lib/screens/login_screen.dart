@@ -44,7 +44,8 @@ class AuthScreen extends StatefulWidget {
               msg: AppLocalizations.of(context)!.network_not_connected);
         } else if (e.code == "invalid-email" ||
             e.code == "user-not-found" ||
-            e.code == "wrong-password") {
+            e.code == "wrong-password" ||
+            e.code == "invalid-credential") {
           emailController.clear();
           passwordController.clear();
           Fluttertoast.showToast(
@@ -551,13 +552,15 @@ class ForgotPassword extends StatelessWidget {
               if (!formKey.currentState!.validate()) return;
               Navigator.of(context).pop();
 
+              final resetPasswordMsg =
+                  AppLocalizations.of(context)!.reset_password_email_sent;
+
               // TODO: handle [There is no user record corresponding to this identifier. The user may have been deleted.]
               final future = FirebaseAuth.instance
                   .sendPasswordResetEmail(email: controller.text);
               await LoadingDialog.showLoading(context: context, future: future);
 
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!.reset_password_email_sent);
+              Fluttertoast.showToast(msg: resetPasswordMsg);
             },
           )
         ],
@@ -633,7 +636,17 @@ class GoogleSignInWidget extends StatelessWidget {
   static final GoogleSignIn googleSignIn = GoogleSignIn();
   static Future<void> googleLogin(BuildContext context) async {
     final future = () async {
-      final googleUser = await googleSignIn.signIn();
+      GoogleSignInAccount? googleUser;
+      try {
+        googleUser = await googleSignIn.signIn();
+      } on PlatformException catch (e) {
+        if (e.code == "sign_in_failed") {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.something_went_wrong);
+        } else {
+          rethrow;
+        }
+      }
 
       if (googleUser != null) {
         final googleAuth = await googleUser.authentication;
