@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:colored_json/colored_json.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 
 import '../data/local_musics_data.dart';
 import '../main.dart';

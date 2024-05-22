@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../data/playlist_data.dart';
+import '../widget/playlist_card.dart';
 import '../widget/screen/scaffold_screen.dart';
 import 'asterfox_screen.dart';
 
@@ -49,14 +50,7 @@ class _PlaylistMainScreenState extends State<PlaylistMainScreen> {
       crossAxisCount: MediaQuery.of(context).size.width ~/ 150,
       children: List.generate(playlistIds.length, (index) {
         final playlist = PlaylistsData.getById(playlistIds[index]);
-        return Card(
-          child: Column(
-            children: [
-              Text(playlist.name),
-              Text(playlist.songs.length.toString()),
-            ],
-          ),
-        );
+        return PlaylistCard(playlist);
       }),
     );
   }
