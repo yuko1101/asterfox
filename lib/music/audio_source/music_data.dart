@@ -35,7 +35,7 @@ class MusicData {
     print("MusicData created : temp = $isTemporary");
     if (isTemporary) return;
     print("MusicData: {key: $key, title: $title}");
-    _created.add(this);
+    _created[key] = this;
   }
   final MusicType type;
   final String title;
@@ -80,12 +80,12 @@ class MusicData {
   String get installCompleteFilePath => getInstallCompleteFilePath(audioId);
 
   void destroy() {
-    _created.remove(this);
+    _created.remove(key);
     print("MusicData destroyed : remaining = ${_created.length}");
   }
 
-  factory MusicData.fromKey(String key) {
-    return _created.firstWhere((element) => element.key == key);
+  static MusicData? fromKey(String key) {
+    return _created[key];
   }
 
   Map<String, dynamic> toJson() {
@@ -166,8 +166,7 @@ class MusicData {
   }
 
   static String getDirectoryPath(String audioId) =>
-      "$localPath/music/$audioId"
-          .replaceAll("/", Platform.pathSeparator);
+      "$localPath/music/$audioId".replaceAll("/", Platform.pathSeparator);
   static String getAudioSavePath(String audioId) =>
       "${getDirectoryPath(audioId)}/audio.mp3"
           .replaceAll("/", Platform.pathSeparator);
@@ -178,8 +177,8 @@ class MusicData {
       "${getDirectoryPath(audioId)}/installed.txt"
           .replaceAll("/", Platform.pathSeparator);
 
-  static final List<MusicData> _created = [];
-  static List<MusicData> getCreated() {
+  static final Map<String, MusicData> _created = {};
+  static Map<String, MusicData> getCreated() {
     return _created;
   }
 
@@ -188,7 +187,7 @@ class MusicData {
   }
 
   static void deleteCreated(String key) {
-    _created.removeWhere((song) => song.key == key);
+    _created.remove(key);
   }
 
   /// Throws [VideoUnplayableException], [NetworkException]
@@ -297,14 +296,12 @@ enum MusicType { youtube, url }
 
 extension MediaItemParseMusicData on MediaItem {
   MusicData toMusicData() {
-    return MusicData.getCreated()
-        .firstWhere((musicData) => musicData.key == id);
+    return MusicData.fromKey(id)!;
   }
 }
 
 extension AudioSourceParseMusicData on IndexedAudioSource {
   MusicData toMusicData() {
-    return MusicData.getCreated()
-        .firstWhere((musicData) => musicData.key == tag["key"]);
+    return MusicData.fromKey(tag["key"])!;
   }
 }

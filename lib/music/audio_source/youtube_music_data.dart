@@ -50,7 +50,7 @@ class YouTubeMusicData extends MusicData {
       final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(),
           forceRemote: true);
       remoteAudioUrl = url;
-      await LocalMusicsData.musicData
+      await LocalMusicsData.localMusicData
           .get([audioId])
           .set(key: "remoteAudioUrl", value: url)
           .save(compact: LocalMusicsData.compact);

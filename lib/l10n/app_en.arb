@@ -201,5 +201,7 @@
     "from_clipboard": "From Clipboard",
     "@from_clipboard": {},
     "no_text_in_clipboard": "No text in clipboard",
-    "@no_text_in_clipboard": {}
+    "@no_text_in_clipboard": {},
+    "playlist": "Playlist",
+    "@playlist": {}
 }

@@ -290,7 +290,11 @@ class _SideMenuContentState extends State<_SideMenuContent> {
       SideMenuItem(
         title: const Text("Playlist"),
         icon: const Icon(Icons.playlist_play),
-        onPressed: () async {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            "/playlist",
+          );
+        },
       ),
       SideMenuItem(
         title: const Text("History"),

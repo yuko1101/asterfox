@@ -22,6 +22,7 @@ import 'music/manager/music_manager.dart';
 import 'screens/asterfox_screen.dart';
 import 'screens/debug_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/playlist_screen.dart';
 import 'screens/settings/audio_channel_settings_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/settings/theme_settings_screen.dart';
@@ -196,6 +197,7 @@ class AsterfoxApp extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           routes: {
             "/home": (context) => HomeScreen(),
+            "/playlist": (context) => const PlaylistScreen(),
             "/history": (context) => const SongHistoryScreen(),
             "/settings": (context) => const SettingsScreen(),
             "/settings/theme": (context) => const ThemeSettingsScreen(),

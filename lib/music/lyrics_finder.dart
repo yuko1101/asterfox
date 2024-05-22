@@ -19,7 +19,7 @@ class LyricsFinder {
       [bool applyToAll = true]) async {
     // 既に読み込まれた音楽データを更新
     if (applyToAll) {
-      for (final s in MusicData.getCreated()) {
+      for (final s in MusicData.getCreated().values) {
         if (s.audioId == song.audioId) s.lyrics = lyrics;
       }
     } else {
@@ -28,7 +28,7 @@ class LyricsFinder {
 
     // 保存されているデータを更新
     if (song.isStored) {
-      await LocalMusicsData.musicData
+      await LocalMusicsData.localMusicData
           .get([song.audioId])
           .set(key: "lyrics", value: lyrics)
           .save(compact: LocalMusicsData.compact);

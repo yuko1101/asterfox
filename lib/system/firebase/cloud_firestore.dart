@@ -33,7 +33,7 @@ class CloudFirestoreManager {
   }
 
   static Future<void> _onUserUpdate() async {
-    LocalMusicsData.musicData.resetData();
+    LocalMusicsData.localMusicData.resetData();
     SettingsData.settings.resetData();
     final tasks = <Future>[
       _listenUserDataUpdate(),
@@ -45,8 +45,9 @@ class CloudFirestoreManager {
   static Future<void> importData(Map<String, dynamic> data) async {
     await runTask(() async {
       if (data.containsKey("songs")) {
-        LocalMusicsData.musicData.data = data["songs"];
-        await LocalMusicsData.musicData.save(compact: LocalMusicsData.compact);
+        LocalMusicsData.localMusicData.data = data["songs"];
+        await LocalMusicsData.localMusicData
+            .save(compact: LocalMusicsData.compact);
         await CloudFirestoreManager.removeAllSongs();
         await CloudFirestoreManager.addOrUpdateSongs(
             LocalMusicsData.getAll(isTemporary: true));
@@ -63,7 +64,7 @@ class CloudFirestoreManager {
   static Map<String, dynamic> exportData(
       {required bool songs, required bool settings}) {
     return {
-      if (songs) "songs": LocalMusicsData.musicData.data,
+      if (songs) "songs": LocalMusicsData.localMusicData.data,
       if (settings) "settings": SettingsData.settings.data,
     };
   }
@@ -186,13 +187,13 @@ class CloudFirestoreManager {
           for (final change in changes) {
             final audioId = change.doc.id;
             if (change.type == DocumentChangeType.removed) {
-              LocalMusicsData.musicData.delete(key: audioId);
+              LocalMusicsData.localMusicData.delete(key: audioId);
             } else {
-              LocalMusicsData.musicData
+              LocalMusicsData.localMusicData
                   .set(key: audioId, value: change.doc.data());
             }
           }
-          await LocalMusicsData.musicData
+          await LocalMusicsData.localMusicData
               .save(compact: LocalMusicsData.compact);
         });
       });

@@ -16,18 +16,17 @@ import '../utils/result.dart';
 // TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
 // TODO: move `remoteAudioUrl` into TemporaryData
 class LocalMusicsData {
-  static late ConfigFile musicData;
+  static late ConfigFile localMusicData;
 
   static const bool compact = false;
 
   static Future<void> init() async {
-    musicData =
-        await ConfigFile(File("$localPath/music.json"), {}).load();
+    localMusicData = await ConfigFile(File("$localPath/music.json"), {}).load();
   }
 
   static bool isStored({MusicData? song, String? audioId}) {
     assert(song != null || audioId != null);
-    return musicData.has(song?.audioId ?? audioId!);
+    return localMusicData.has(song?.audioId ?? audioId!);
   }
 
   static bool isInstalled({MusicData? song, String? audioId}) {
@@ -40,7 +39,7 @@ class LocalMusicsData {
   static Future<void> store(MusicData song) async {
     if (song.isStored) return;
     song.songStoredAt = DateTime.now().millisecondsSinceEpoch;
-    await musicData
+    await localMusicData
         .set(key: song.audioId, value: song.toJson())
         .save(compact: compact);
     await CloudFirestoreManager.addOrUpdateSongs([song]);
@@ -75,9 +74,9 @@ class LocalMusicsData {
   /// Throws [SongNotStoredException] if the song is not stored.
   static Future<void> delete(String audioId, {bool saveDataFile = true}) async {
     Future<void> deleteFromDataFile() async {
-      musicData.delete(key: audioId);
+      localMusicData.delete(key: audioId);
       if (saveDataFile) {
-        await musicData.save(compact: compact);
+        await localMusicData.save(compact: compact);
         await CloudFirestoreManager.removeSongs([audioId]);
       }
     }
@@ -89,12 +88,12 @@ class LocalMusicsData {
   static Future<void> deleteSongs(List<String> audioIds) async {
     final futures = audioIds.map((id) => delete(id, saveDataFile: false));
     await Future.wait(futures);
-    await musicData.save(compact: compact);
+    await localMusicData.save(compact: compact);
     await CloudFirestoreManager.removeSongs(audioIds);
   }
 
   static List<MusicData> getAll({required bool isTemporary}) {
-    final data = Map<String, dynamic>.from(musicData.getValue());
+    final data = Map<String, dynamic>.from(localMusicData.getValue());
     return data.values
         .map((e) => MusicData.fromJson(
               json: e,
@@ -113,7 +112,7 @@ class LocalMusicsData {
   // }
 
   static List<String> getStoredAudioIds() {
-    final songs = musicData.getValue() as Map<String, dynamic>;
+    final songs = localMusicData.getValue() as Map<String, dynamic>;
     return songs.keys.toList();
   }
 
@@ -122,8 +121,8 @@ class LocalMusicsData {
     required String key,
     required bool isTemporary,
   }) {
-    if (!musicData.has(audioId)) throw LocalSongNotFoundException(audioId);
-    final data = musicData.getValue(audioId) as Map<String, dynamic>;
+    if (!localMusicData.has(audioId)) throw LocalSongNotFoundException(audioId);
+    final data = localMusicData.getValue(audioId) as Map<String, dynamic>;
     return MusicData.fromJson(json: data, key: key, isTemporary: isTemporary);
   }
 }
