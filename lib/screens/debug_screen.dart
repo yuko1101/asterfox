@@ -240,13 +240,9 @@ class DebugMainScreen extends StatelessWidget {
                         return;
                       }
 
-                      final res = await http.get(Uri.parse(data));
-                      final content =
-                          const Utf8Decoder().convert(res.bodyBytes);
-
                       late final Map<String, dynamic> json;
                       try {
-                        json = jsonDecode(content);
+                        json = jsonDecode(data);
                       } catch (e) {
                         ToastManager.showSimpleToast(
                           msg: const Text("JSONのパース中にエラーが発生しました"),

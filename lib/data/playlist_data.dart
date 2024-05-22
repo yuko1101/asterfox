@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import '../main.dart';
-import '../music/manager/music_manager.dart';
-import '../music/playlist/Playlist.dart';
+import '../music/playlist/playlist.dart';
 import '../utils/config_file.dart';
 
 class PlaylistsData {
@@ -10,7 +9,7 @@ class PlaylistsData {
 
   static const bool _compact = false;
 
-  static Future<void> init(MusicManager manager) async {
+  static Future<void> init() async {
     playlistsData =
         await ConfigFile(File("$localPath/playlists.json"), {}).load();
   }
@@ -24,7 +23,7 @@ class PlaylistsData {
     await saveData();
   }
 
-  static List<AppPlaylist> getAll({required bool isTemporary}) {
+  static List<AppPlaylist> getAll() {
     final data = playlistsData.getValue() as Map<String, dynamic>;
     return data.values
         .map((p) => AppPlaylist.fromJson(p as Map<String, dynamic>))
@@ -49,7 +48,7 @@ class PlaylistsData {
   }
 
   static Future<void> clear() async {
-    playlistsData.set(value: {});
+    playlistsData.resetData();
     await saveData();
   }
 }

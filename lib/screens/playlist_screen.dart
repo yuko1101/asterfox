@@ -46,7 +46,7 @@ class _PlaylistMainScreenState extends State<PlaylistMainScreen> {
     final List<String> playlistIds =
         PlaylistsData.playlistsData.getValue().keys.toList();
     return GridView.count(
-      crossAxisCount: MediaQuery.of(context).size.width ~/ 200,
+      crossAxisCount: MediaQuery.of(context).size.width ~/ 150,
       children: List.generate(playlistIds.length, (index) {
         final playlist = PlaylistsData.getById(playlistIds[index]);
         return Card(

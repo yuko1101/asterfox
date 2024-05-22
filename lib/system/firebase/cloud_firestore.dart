@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../data/local_musics_data.dart';
+import '../../data/playlist_data.dart';
 import '../../data/settings_data.dart';
 import '../../music/audio_source/music_data.dart';
+import '../../music/playlist/playlist.dart';
 import '../../utils/map_utils.dart';
 
 class CloudFirestoreManager {
@@ -15,7 +17,7 @@ class CloudFirestoreManager {
   static bool _isInitialized = false;
 
   /// Must run after initializing FirebaseAuth, LocalMusicsData, SettingsData,
-  /// and TemporaryData.
+  /// and PlaylistsData.
   static Future<void> init() async {
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
@@ -35,9 +37,11 @@ class CloudFirestoreManager {
   static Future<void> _onUserUpdate() async {
     LocalMusicsData.localMusicData.resetData();
     SettingsData.settings.resetData();
+    PlaylistsData.playlistsData.resetData();
     final tasks = <Future>[
       _listenUserDataUpdate(),
       _listenSongsUpdate(),
+      _listenPlaylistsUpdate(),
     ];
     await Future.wait(tasks);
   }
@@ -52,6 +56,12 @@ class CloudFirestoreManager {
         await CloudFirestoreManager.addOrUpdateSongs(
             LocalMusicsData.getAll(isTemporary: true));
       }
+      if (data.containsKey("playlists")) {
+        PlaylistsData.playlistsData.data = data["playlists"];
+        await CloudFirestoreManager.removeAllPlaylists();
+        await CloudFirestoreManager.addOrUpdatePlaylists(
+            PlaylistsData.getAll());
+      }
       if (data.containsKey("settings")) {
         SettingsData.settings.data = MapUtils.bindOptions(
             SettingsData.settings.defaultValue, data["settings"]);
@@ -62,9 +72,10 @@ class CloudFirestoreManager {
   }
 
   static Map<String, dynamic> exportData(
-      {required bool songs, required bool settings}) {
+      {required bool songs, required bool settings, required bool playlists}) {
     return {
       if (songs) "songs": LocalMusicsData.localMusicData.data,
+      if (playlists) "playlists": PlaylistsData.playlistsData.data,
       if (settings) "settings": SettingsData.settings.data,
     };
   }
@@ -115,6 +126,58 @@ class CloudFirestoreManager {
 
       final List<Future<void>> futures = [];
       for (final docId in songs.docs.map((doc) => doc.id)) {
+        futures.add(collection.doc(docId).delete());
+      }
+      await Future.wait(futures);
+    });
+  }
+
+  // add or update playlists
+  static Future<void> addOrUpdatePlaylists(List<AppPlaylist> playlists) async {
+    if (!_isInitialized) return;
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("playlists");
+      final List<Future<void>> futures = [];
+      for (final playlist in playlists) {
+        futures.add(collection.doc(playlist.id).set(playlist.toJson()));
+      }
+      await Future.wait(futures);
+    });
+  }
+
+  static Future<void> removePlaylists(List<String> playlistIds) async {
+    if (!_isInitialized) return;
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("playlists");
+      final List<Future<void>> futures = [];
+      for (final playlistId in playlistIds) {
+        futures.add(collection.doc(playlistId).delete());
+      }
+      await Future.wait(futures);
+    });
+  }
+
+  static Future<void> removeAllPlaylists() async {
+    if (!_isInitialized) return;
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("playlists");
+
+      final playlists = await collection.get();
+
+      final List<Future<void>> futures = [];
+      for (final docId in playlists.docs.map((doc) => doc.id)) {
         futures.add(collection.doc(docId).delete());
       }
       await Future.wait(futures);
@@ -200,6 +263,39 @@ class CloudFirestoreManager {
     });
   }
 
+  static StreamSubscription? _playlistsStreamSubscription;
+  static Future<void> _listenPlaylistsUpdate() async {
+    if (_playlistsStreamSubscription != null) {
+      await _playlistsStreamSubscription!.cancel();
+    }
+    await runTask(() async {
+      final user = FirebaseAuth.instance.currentUser!;
+      final collection = FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .collection("playlists");
+
+      _playlistsStreamSubscription = collection.snapshots().listen((snapshot) {
+        runTask(() async {
+          final changes = snapshot.docChanges;
+          if (changes.isEmpty) return;
+          print(
+              "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} playlists. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} playlists. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} playlists.");
+          for (final change in changes) {
+            final playlistId = change.doc.id;
+            if (change.type == DocumentChangeType.removed) {
+              PlaylistsData.playlistsData.delete(key: playlistId);
+            } else {
+              PlaylistsData.playlistsData
+                  .set(key: playlistId, value: change.doc.data());
+            }
+          }
+          await PlaylistsData.playlistsData.save();
+        });
+      });
+    });
+  }
+
   static Future<void> cancelListeners() async {
     final List<Future> futures = [];
     if (_userDataStreamSubscription != null) {
@@ -207,6 +303,9 @@ class CloudFirestoreManager {
     }
     if (_songsStreamSubscription != null) {
       futures.add(_songsStreamSubscription!.cancel());
+    }
+    if (_playlistsStreamSubscription != null) {
+      futures.add(_playlistsStreamSubscription!.cancel());
     }
 
     await Future.wait(futures);

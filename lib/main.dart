@@ -15,6 +15,7 @@ import 'package:wear/wear.dart';
 import 'data/custom_colors.dart';
 import 'data/device_settings_data.dart';
 import 'data/local_musics_data.dart';
+import 'data/playlist_data.dart';
 import 'data/settings_data.dart';
 import 'data/song_history_data.dart';
 import 'firebase_options.dart';
@@ -97,6 +98,7 @@ Future<void> main() async {
       await DeviceSettingsData.applyMusicManagerSettings();
 
       await LocalMusicsData.init();
+      await PlaylistsData.init();
 
       // run this after initializing Firebase, LocalMusicsData, and SettingsData.
       if (shouldInitializeFirebase) {
