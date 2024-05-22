@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,12 +13,13 @@ import '../../music/audio_source/music_data.dart';
 import '../../music/audio_source/youtube_music_data.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../music/music_downloader.dart';
+import '../../system/theme/theme.dart';
 import '../loading_dialog.dart';
 
 class MoreActionsButton extends StatelessWidget {
   const MoreActionsButton({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   // TODO: Add more actions
   static final List<_Action> _actions = [
@@ -41,8 +41,7 @@ class MoreActionsButton extends StatelessWidget {
         Navigator.of(context).pop();
         if (!song!.isInstalled) {
           final key = "share-${song.key}";
-          final downloadPath = File(
-              "${(await getTemporaryDirectory()).path}/share_files/${song.key}.mp3");
+          final downloadPath = File("$tempPath/share_files/${song.key}.mp3");
           final downloadFuture = DownloadManager.download(song,
               customPath: downloadPath, customDownloadKey: key);
 
@@ -153,7 +152,7 @@ class MoreActionsButton extends StatelessWidget {
                             const BorderRadius.all(Radius.circular(10)),
                         // 一番下のListTileの角が丸まらないのを直す
                         clipBehavior: Clip.antiAlias,
-                        color: Theme.of(context).backgroundColor,
+                        color: Theme.of(context).scaffoldBackgroundColor,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
@@ -164,10 +163,9 @@ class MoreActionsButton extends StatelessWidget {
                                   Radius.circular(20),
                                 ),
                                 color: Theme.of(context)
-                                    .textTheme
-                                    .headline1
-                                    ?.color
-                                    ?.withOpacity(0.1),
+                                    .extraColors
+                                    .primary
+                                    .withOpacity(0.1),
                               ),
                               margin: const EdgeInsets.only(
                                 top: 7,
@@ -224,7 +222,7 @@ class _Action extends StatelessWidget {
         leading: Icon(icon),
         title: Text(title(context)),
         onTap: () => onTap(musicManager.audioDataManager.currentSong, context),
-        tileColor: Theme.of(context).backgroundColor,
+        tileColor: Theme.of(context).scaffoldBackgroundColor,
       ),
     );
   }

@@ -96,7 +96,7 @@ class VolumeWidgetState extends State<VolumeWidget>
                 height: _progress.value * 120,
                 width: 55,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   borderRadius: BorderRadius.circular(40),
                   boxShadow: [
                     BoxShadow(
@@ -141,7 +141,7 @@ class VolumeWidgetState extends State<VolumeWidget>
                   onPressed: _progress.value == 0
                       ? _controller.forward
                       : _controller.reverse,
-                  backgroundColor: Theme.of(context).backgroundColor,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                   foregroundColor: Theme.of(context).extraColors.primary,
                   child: Icon(VolumeWidget.getVolumeIcon(volume, mute)),
                 ),

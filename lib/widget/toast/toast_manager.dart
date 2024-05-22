@@ -30,7 +30,7 @@ class ToastManager {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: AppTheme.themeNotifier.value.backgroundColor,
+        color: AppTheme.themeNotifier.value.scaffoldBackgroundColor,
         boxShadow: const [
           BoxShadow(
             blurRadius: 5,

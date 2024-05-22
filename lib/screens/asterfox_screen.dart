@@ -178,7 +178,7 @@ class AsterfoxMainWatchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: Container(
-        color: Theme.of(context).backgroundColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: ConstrainedBox(
             constraints: const BoxConstraints.expand(),
             child: Stack(
@@ -243,7 +243,7 @@ class AsterfoxSideMenu extends StatelessWidget {
       width: min(320, MediaQuery.of(context).size.width * 0.8),
       child: Drawer(
         child: Container(
-          color: Theme.of(context).backgroundColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: const _SideMenuContent(),
         ),
       ),

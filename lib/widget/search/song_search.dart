@@ -53,7 +53,7 @@ class SongSearch extends SearchDelegate<String> {
       ),
       IconButton(
         icon: const Icon(Icons.clear),
-        color: Theme.of(context).textTheme.bodyText1?.color,
+        color: Theme.of(context).extraColors.primary,
         tooltip: AppLocalizations.of(context)!.clear,
         onPressed: () {
           query = "";
@@ -61,7 +61,7 @@ class SongSearch extends SearchDelegate<String> {
       ),
       IconButton(
         icon: const Icon(Icons.tune),
-        color: Theme.of(context).textTheme.bodyText1?.color,
+        color: Theme.of(context).extraColors.primary,
         onPressed: () {
           showDialog(
             context: context,
@@ -97,7 +97,7 @@ class SongSearch extends SearchDelegate<String> {
       ),
       IconButton(
         icon: const Icon(Icons.search),
-        color: Theme.of(context).textTheme.bodyText1?.color,
+        color: Theme.of(context).extraColors.primary,
         tooltip: AppLocalizations.of(context)!.search,
         onPressed: () {
           if (multiSelectMode.value) {
@@ -120,7 +120,7 @@ class SongSearch extends SearchDelegate<String> {
         icon: AnimatedIcons.menu_arrow,
         progress: animationController ?? transitionAnimation,
       ),
-      color: Theme.of(context).textTheme.bodyText1?.color,
+      color: Theme.of(context).extraColors.primary,
       tooltip: AppLocalizations.of(context)!.go_back,
       onPressed: () {
         close(context, "");

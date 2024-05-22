@@ -23,7 +23,7 @@ class LyricsButton extends StatelessWidget {
               Icons.lyrics_outlined,
               shadows: [
                 BoxShadow(
-                  color: Theme.of(context).backgroundColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   offset: const Offset(0, 0),
                   blurRadius: 10,
                 ),
@@ -86,7 +86,7 @@ class LyricsButton extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  color: Theme.of(context).backgroundColor,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   child: Text(
                     song.lyrics,
                     textAlign: TextAlign.center,

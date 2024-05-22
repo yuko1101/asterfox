@@ -24,7 +24,6 @@ class AppTheme {
           systemNavigationBarColor: Colors.transparent,
         ),
       ),
-      backgroundColor: Colors.white,
       scaffoldBackgroundColor: Colors.white,
       drawerTheme: const DrawerThemeData(backgroundColor: Colors.white),
       extensions: <ThemeExtension<dynamic>>[
@@ -53,7 +52,6 @@ class AppTheme {
           systemNavigationBarColor: Colors.transparent,
         ),
       ),
-      backgroundColor: getGrey(20),
       scaffoldBackgroundColor: getGrey(20),
       dialogBackgroundColor: getGrey(20),
       focusColor: Colors.orange,

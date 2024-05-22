@@ -86,7 +86,7 @@ class MobileMusicFooter extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
+            color: Theme.of(context).scaffoldBackgroundColor,
           ),
           // TODO: better way to draw the footer considering the bottom padding of the navigation bar
           height: 170 + MediaQuery.of(context).padding.bottom,

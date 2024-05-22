@@ -39,6 +39,7 @@ final bool shouldInitializeFirebase =
     Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
 
 late final String localPath;
+late final String tempPath;
 
 Future<void> main() async {
   await runZonedGuarded<Future<void>>(
@@ -63,7 +64,10 @@ Future<void> main() async {
         await FlutterDisplayMode.setHighRefreshRate();
       }
 
-      if (!kIsWeb) localPath = (await getApplicationDocumentsDirectory()).path;
+      if (!kIsWeb) {
+        localPath = (await getApplicationDocumentsDirectory()).path;
+        tempPath = (await getTemporaryDirectory()).path;
+      }
 
       final wearOSCheckFile = File("$localPath/wear_os");
       final wearOSCheckFileExists = wearOSCheckFile.existsSync();
@@ -111,7 +115,7 @@ Future<void> main() async {
       HomeScreen.processNotificationList = ProcessNotificationList();
 
       final shareFilesDir =
-          Directory("${(await getTemporaryDirectory()).path}/share_files");
+          Directory("$tempPath/share_files");
       if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
       debugPrint("localPath: $localPath");

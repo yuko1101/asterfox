@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
+import '../../system/theme/theme.dart';
 import 'audio_progress_bar.dart';
 
 class TimeText extends StatelessWidget {
@@ -30,7 +31,7 @@ class TimeText extends StatelessWidget {
         return Text(
           "${getProgress(value.current, value.total)} / ${getTotal(value.total)}",
           style: TextStyle(
-            color: Theme.of(context).textTheme.headline3?.color,
+            color: Theme.of(context).extraColors.secondary,
           ),
         );
       },
