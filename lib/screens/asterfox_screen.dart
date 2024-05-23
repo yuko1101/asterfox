@@ -292,7 +292,7 @@ class _SideMenuContentState extends State<_SideMenuContent> {
         icon: const Icon(Icons.playlist_play),
         onPressed: () {
           Navigator.of(context).pushNamed(
-            "/playlist",
+            "/playlists",
           );
         },
       ),

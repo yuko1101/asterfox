@@ -53,7 +53,13 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 isLinked: widget.isLinked,
                 index: index,
                 onTap: widget.onTap,
-                onRemove: widget.onRemove,
+                onRemove: widget.isLinked || widget.onRemove == null
+                    ? null
+                    : (i, _) {
+                        setState(() {
+                          widget.onRemove!(i, _);
+                        });
+                      },
               ),
       itemCount: widget.songs.length,
       onReorder: (oldIndex, newIndex) async {

@@ -20,10 +20,12 @@ import 'data/settings_data.dart';
 import 'data/song_history_data.dart';
 import 'firebase_options.dart';
 import 'music/manager/music_manager.dart';
+import 'music/playlist/playlist.dart';
 import 'screens/asterfox_screen.dart';
 import 'screens/debug_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/playlist_screen.dart';
+import 'screens/playlists_screen.dart';
 import 'screens/settings/audio_channel_settings_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/settings/theme_settings_screen.dart';
@@ -114,8 +116,7 @@ Future<void> main() async {
 
       HomeScreen.processNotificationList = ProcessNotificationList();
 
-      final shareFilesDir =
-          Directory("$tempPath/share_files");
+      final shareFilesDir = Directory("$tempPath/share_files");
       if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
       debugPrint("localPath: $localPath");
@@ -203,13 +204,24 @@ class AsterfoxApp extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           routes: {
             "/home": (context) => HomeScreen(),
-            "/playlist": (context) => const PlaylistScreen(),
+            "/playlists": (context) => const PlaylistsScreen(),
             "/history": (context) => const SongHistoryScreen(),
             "/settings": (context) => const SettingsScreen(),
             "/settings/theme": (context) => const ThemeSettingsScreen(),
             "/settings/audioChannel": (context) =>
                 const AudioChannelSettingsScreen(),
             "/debug": (context) => const DebugScreen(),
+          },
+          onGenerateRoute: (settings) {
+            switch (settings.name) {
+              case "/playlist":
+                final playlist = settings.arguments as AppPlaylist;
+                return MaterialPageRoute(
+                  builder: (context) => PlaylistScreen(playlist),
+                );
+              default:
+                return null;
+            }
           },
         );
       },

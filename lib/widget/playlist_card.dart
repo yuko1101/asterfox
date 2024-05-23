@@ -57,7 +57,18 @@ class PlaylistCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 20),
               ),
             ),
-          )
+          ),
+          Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  '/playlist',
+                  arguments: playlist,
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../data/playlist_data.dart';
-import '../widget/playlist_card.dart';
+import '../music/playlist/playlist.dart';
+import '../widget/playlist_widget.dart';
 import '../widget/screen/scaffold_screen.dart';
 import 'asterfox_screen.dart';
 
 class PlaylistScreen extends ScaffoldScreen {
-  const PlaylistScreen({super.key})
+  PlaylistScreen(AppPlaylist playlist, {super.key})
       : super(
-          appBar: const PlaylistAppBar(),
-          body: const PlaylistMainScreen(),
-          drawer: const AsterfoxSideMenu(),
-        );
+            appBar: const PlaylistAppBar(),
+            body: PlaylistMainScreen(playlist),
+            drawer: const AsterfoxSideMenu());
 }
 
 class PlaylistAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -35,7 +34,9 @@ class PlaylistAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class PlaylistMainScreen extends StatefulWidget {
-  const PlaylistMainScreen({super.key});
+  const PlaylistMainScreen(this.playlist, {super.key});
+
+  final AppPlaylist playlist;
 
   @override
   State<PlaylistMainScreen> createState() => _PlaylistMainScreenState();
@@ -44,14 +45,12 @@ class PlaylistMainScreen extends StatefulWidget {
 class _PlaylistMainScreenState extends State<PlaylistMainScreen> {
   @override
   Widget build(BuildContext context) {
-    final List<String> playlistIds =
-        PlaylistsData.playlistsData.getValue().keys.toList();
-    return GridView.count(
-      crossAxisCount: MediaQuery.of(context).size.width ~/ 150,
-      children: List.generate(playlistIds.length, (index) {
-        final playlist = PlaylistsData.getById(playlistIds[index]);
-        return PlaylistCard(playlist);
-      }),
+    final songs = widget.playlist.musicDataList;
+    return PlaylistWidget(
+      songs: songs,
+      onRemove: (i, _) {
+        songs.removeAt(i);
+      },
     );
   }
 }
