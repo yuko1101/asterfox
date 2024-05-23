@@ -37,12 +37,14 @@ class PlaylistCard extends StatelessWidget {
                   image,
                   fit: BoxFit.cover,
                   height: double.infinity,
+                  width: double.infinity,
                 );
               }
               return Image.file(
                 File(image),
                 fit: BoxFit.cover,
                 height: double.infinity,
+                width: double.infinity,
               );
             }).toList(),
           ),
@@ -92,7 +94,7 @@ class FourImagesGrid extends StatelessWidget {
       case 1:
         return images[0];
       case 2:
-        return Row(
+        return Column(
           children: images.map((img) => Expanded(child: img)).toList(),
         );
       case 3:
