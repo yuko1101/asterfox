@@ -24,7 +24,7 @@ import 'music/playlist/playlist.dart';
 import 'screens/asterfox_screen.dart';
 import 'screens/debug_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/playlist_screen.dart';
+import 'screens/playlist_info_screen.dart';
 import 'screens/playlists_screen.dart';
 import 'screens/settings/audio_channel_settings_screen.dart';
 import 'screens/settings/settings_screen.dart';
