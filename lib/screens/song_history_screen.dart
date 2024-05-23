@@ -9,16 +9,20 @@ import '../widget/screen/scaffold_screen.dart';
 import 'asterfox_screen.dart';
 
 class SongHistoryScreen extends ScaffoldScreen {
-  const SongHistoryScreen({super.key})
-      : super(
-          appBar: const SongHistoryAppBar(),
-          body: const SongHistoryMainScreen(),
-          drawer: const AsterfoxSideMenu(),
-        );
+  const SongHistoryScreen({super.key});
+
+  @override
+  PreferredSizeWidget appBar(BuildContext context) => const _AppBar();
+
+  @override
+  Widget body(BuildContext context) => const _SongHistory();
+
+  @override
+  Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 }
 
-class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const SongHistoryAppBar({super.key});
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -36,14 +40,14 @@ class SongHistoryAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class SongHistoryMainScreen extends StatefulWidget {
-  const SongHistoryMainScreen({super.key});
+class _SongHistory extends StatefulWidget {
+  const _SongHistory();
 
   @override
-  State<SongHistoryMainScreen> createState() => _SongHistoryMainScreenState();
+  State<_SongHistory> createState() => _SongHistoryState();
 }
 
-class _SongHistoryMainScreenState extends State<SongHistoryMainScreen> {
+class _SongHistoryState extends State<_SongHistory> {
   @override
   Widget build(BuildContext context) {
     final songs = SongHistoryData.getAll(isTemporary: true).reversed.toList();

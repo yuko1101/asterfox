@@ -7,16 +7,22 @@ import '../widget/screen/scaffold_screen.dart';
 import 'asterfox_screen.dart';
 
 class PlaylistInfoScreen extends ScaffoldScreen {
-  PlaylistInfoScreen(AppPlaylist playlist, {super.key})
-      : super(
-            appBar: const PlaylistInfoAppBar(),
-            body: PlaylistInfoMainScreen(playlist),
-            drawer: const AsterfoxSideMenu());
+  const PlaylistInfoScreen(this.playlist, {super.key});
+
+  final AppPlaylist playlist;
+
+  @override
+  PreferredSizeWidget appBar(BuildContext context) => const _AppBar();
+
+  @override
+  Widget body(BuildContext context) => _PlaylistInfo(playlist);
+
+  @override
+  Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 }
 
-class PlaylistInfoAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
-  const PlaylistInfoAppBar({super.key});
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -34,16 +40,16 @@ class PlaylistInfoAppBar extends StatelessWidget
   }
 }
 
-class PlaylistInfoMainScreen extends StatefulWidget {
-  const PlaylistInfoMainScreen(this.playlist, {super.key});
+class _PlaylistInfo extends StatefulWidget {
+  const _PlaylistInfo(this.playlist);
 
   final AppPlaylist playlist;
 
   @override
-  State<PlaylistInfoMainScreen> createState() => _PlaylistInfoMainScreenState();
+  State<_PlaylistInfo> createState() => _PlaylistInfoState();
 }
 
-class _PlaylistInfoMainScreenState extends State<PlaylistInfoMainScreen> {
+class _PlaylistInfoState extends State<_PlaylistInfo> {
   @override
   Widget build(BuildContext context) {
     final songs = widget.playlist.musicDataList;

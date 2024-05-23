@@ -16,60 +16,66 @@ import 'asterfox_screen.dart';
 
 class HomeScreen extends ScaffoldScreen {
   static late ProcessNotificationList processNotificationList;
-  HomeScreen({
+  const HomeScreen({
     super.key,
-  }) : super(
-          body: Builder(
-            builder: (context) {
-              final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
-              final volumeWidget = VolumeWidget(key: volumeWidgetKey);
+  });
 
-              return Stack(
-                children: [
-                  ValueListenableBuilder<AudioState>(
-                    valueListenable:
-                        musicManager.audioStateManager.songsNotifier,
-                    builder: (context, audioState, child) => PlaylistWidget(
-                      songs: audioState.shuffledPlaylist,
-                      currentSong: audioState.currentSong,
-                      isLinked: true,
-                      padding: const EdgeInsets.only(top: 15),
-                    ),
-                  ),
-                  const Align(
-                    alignment: Alignment.bottomRight,
-                    child: LyricsButton(),
-                  ),
+  @override
+  PreferredSizeWidget appBar(BuildContext context) => const HomeScreenAppBar();
 
-                  // <------ Volume Button ------>
-                  if (Responsive.isMobile(context))
-                    ValueListenableBuilder<bool>(
-                      valueListenable: volumeWidget.openedNotifier,
-                      builder: (context, opened, _) {
-                        if (opened) {
-                          return GestureDetector(
-                            onTap: volumeWidgetKey.currentState?.close,
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-                  if (Responsive.isMobile(context))
-                    Positioned(
-                      bottom: 5,
-                      left: 5,
-                      child: volumeWidget,
-                    ),
-                  // <----------------------------->
-                ],
-              );
-            },
-          ),
-          appBar: const HomeScreenAppBar(),
-          footer: const MusicFooter(),
-          drawer: const AsterfoxSideMenu(),
-        );
+  @override
+  Widget body(BuildContext context) => Builder(
+        builder: (context) {
+          final volumeWidgetKey = GlobalKey<VolumeWidgetState>();
+          final volumeWidget = VolumeWidget(key: volumeWidgetKey);
+
+          return Stack(
+            children: [
+              ValueListenableBuilder<AudioState>(
+                valueListenable: musicManager.audioStateManager.songsNotifier,
+                builder: (context, audioState, child) => PlaylistWidget(
+                  songs: audioState.shuffledPlaylist,
+                  currentSong: audioState.currentSong,
+                  isLinked: true,
+                  padding: const EdgeInsets.only(top: 15),
+                ),
+              ),
+              const Align(
+                alignment: Alignment.bottomRight,
+                child: LyricsButton(),
+              ),
+
+              // <------ Volume Button ------>
+              if (Responsive.isMobile(context))
+                ValueListenableBuilder<bool>(
+                  valueListenable: volumeWidget.openedNotifier,
+                  builder: (context, opened, _) {
+                    if (opened) {
+                      return GestureDetector(
+                        onTap: volumeWidgetKey.currentState?.close,
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+              if (Responsive.isMobile(context))
+                Positioned(
+                  bottom: 5,
+                  left: 5,
+                  child: volumeWidget,
+                ),
+              // <----------------------------->
+            ],
+          );
+        },
+      );
+
+  @override
+  Widget footer(BuildContext context) => const MusicFooter();
+
+  @override
+  Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 }
 
 class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {

@@ -34,27 +34,25 @@ class AuthScreen extends StatefulWidget {
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
 
+    final localizations = AppLocalizations.of(context)!;
     final future = () async {
       try {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
       } on FirebaseAuthException catch (e) {
         if (e.code == "network-request-failed") {
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.network_not_connected);
+          Fluttertoast.showToast(msg: localizations.network_not_connected);
         } else if (e.code == "invalid-email" ||
             e.code == "user-not-found" ||
             e.code == "wrong-password" ||
             e.code == "invalid-credential") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.invalid_email_or_password);
+          Fluttertoast.showToast(msg: localizations.invalid_email_or_password);
         } else if (e.code == "user-disabled") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.disabled_user);
+          Fluttertoast.showToast(msg: localizations.disabled_user);
         } else {
           rethrow;
         }
@@ -73,6 +71,7 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
+    final localizations = AppLocalizations.of(context)!;
     final future = () async {
       try {
         await FirebaseAuth.instance
@@ -81,17 +80,14 @@ class AuthScreen extends StatefulWidget {
         if (e.code == "email-already-in-use") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.email_already_in_use);
+          Fluttertoast.showToast(msg: localizations.email_already_in_use);
         } else if (e.code == "invalid-email") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.invalid_email);
+          Fluttertoast.showToast(msg: localizations.invalid_email);
         } else if (e.code == "weak-password") {
           passwordController.clear();
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.weak_password);
+          Fluttertoast.showToast(msg: localizations.weak_password);
         } else {
           rethrow;
         }
@@ -571,7 +567,7 @@ class ForgotPassword extends StatelessWidget {
 
 // https://developers.google.com/identity/branding-guidelines?hl=ja
 class GoogleSignInWidget extends StatelessWidget {
-  const GoogleSignInWidget({Key? key}) : super(key: key);
+  const GoogleSignInWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -635,14 +631,15 @@ class GoogleSignInWidget extends StatelessWidget {
 
   static final GoogleSignIn googleSignIn = GoogleSignIn();
   static Future<void> googleLogin(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
+
     final future = () async {
       GoogleSignInAccount? googleUser;
       try {
         googleUser = await googleSignIn.signIn();
       } on PlatformException catch (e) {
         if (e.code == "sign_in_failed") {
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.something_went_wrong);
+          Fluttertoast.showToast(msg: localizations.something_went_wrong);
         } else {
           rethrow;
         }

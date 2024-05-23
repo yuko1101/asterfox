@@ -6,16 +6,39 @@ import 'process_notification_list.dart';
 import 'process_notification_widget.dart';
 
 class ProcessNotificationScreen extends ScaffoldScreen {
-  ProcessNotificationScreen(ProcessNotificationList processNotificationList,
-      {super.key})
-      : super(
-          body: _MainScreen(processNotificationList),
-          appBar: const _AppBar(),
-        );
+  const ProcessNotificationScreen(this.processNotificationList, {super.key});
+
+  final ProcessNotificationList processNotificationList;
+
+  @override
+  PreferredSizeWidget appBar(BuildContext context) => const _AppBar();
+
+  @override
+  Widget body(BuildContext context) => _MainScreen(processNotificationList);
+}
+
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: const Text("Running Processes"), // TODO: l10n
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
 }
 
 class _MainScreen extends StatelessWidget {
-  const _MainScreen(this.processNotificationList, {super.key});
+  const _MainScreen(this.processNotificationList);
   final ProcessNotificationList processNotificationList;
 
   @override
@@ -43,24 +66,4 @@ class _MainScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: const Text("Running Processes"), // TODO: l10n
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      ),
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

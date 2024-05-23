@@ -15,18 +15,20 @@ import '../../utils/network_utils.dart';
 import '../../utils/pair.dart';
 import '../../widget/loading_dialog.dart';
 import '../../widget/screen/scaffold_screen.dart';
-import '../login_screen.dart';
+import '../auth_screen.dart';
 
 class SettingsScreen extends ScaffoldScreen {
-  const SettingsScreen({super.key})
-      : super(
-          body: const _MainSettingsScreen(),
-          appBar: const _AppBar(),
-        );
+  const SettingsScreen({super.key});
+
+  @override
+  PreferredSizeWidget appBar(BuildContext context) => const _AppBar();
+
+  @override
+  Widget body(BuildContext context) => const _MainSettingsScreen();
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({super.key});
+  const _AppBar();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -45,7 +47,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _MainSettingsScreen extends StatefulWidget {
-  const _MainSettingsScreen({super.key});
+  const _MainSettingsScreen();
 
   @override
   State<_MainSettingsScreen> createState() => _MainSettingsScreenState();

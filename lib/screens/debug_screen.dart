@@ -23,11 +23,16 @@ import 'home_screen.dart';
 class DebugScreen extends ScaffoldScreen {
   const DebugScreen({
     super.key,
-  }) : super(
-          body: const DebugMainScreen(),
-          appBar: const DebugAppBar(),
-          drawer: const AsterfoxSideMenu(),
-        );
+  });
+
+  @override
+  PreferredSizeWidget appBar(BuildContext context) => const DebugAppBar();
+
+  @override
+  Widget body(BuildContext context) => const DebugMainScreen();
+
+  @override
+  Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 }
 
 class DebugMainScreen extends StatelessWidget {
@@ -166,7 +171,7 @@ class DebugMainScreen extends StatelessWidget {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (context) => HomeScreen()),
+                                      builder: (context) => const HomeScreen()),
                                 );
                               },
                             ),
@@ -217,7 +222,7 @@ class DebugMainScreen extends StatelessWidget {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (context) => HomeScreen()),
+                                      builder: (context) => const HomeScreen()),
                                 );
                               },
                             ),

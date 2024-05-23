@@ -1,35 +1,44 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/responsive.dart';
-import 'base_screen.dart';
+import 'screen_interface.dart';
 
-class ScaffoldScreen extends BaseScreen {
+abstract class ScaffoldScreen extends StatelessWidget implements IScreen {
   const ScaffoldScreen({
-    required this.body,
-    this.appBar,
-    this.footer,
-    this.endDrawer,
-    this.drawer,
     super.key,
   });
 
   /// The app bar of the screen which is displayed on top of the screen.
-  final PreferredSizeWidget? appBar;
+  PreferredSizeWidget? appBar(BuildContext context) {
+    return null;
+  }
 
   /// The main content of the screen.
-  final Widget body;
+  Widget body(BuildContext context);
 
   /// The footer of the screen which is displayed at the bottom of the screen.
-  final Widget? footer;
+  Widget? footer(BuildContext context) {
+    return null;
+  }
 
   /// The endDrawer of the screen which is at the right side of the screen.
   /// You can drag the endDrawer to open it.
-  final Widget? endDrawer;
+  Widget? endDrawer(BuildContext context) {
+    return null;
+  }
 
-  final Widget? drawer;
+  Widget? drawer(BuildContext context) {
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final appBar = this.appBar(context);
+    final body = this.body(context);
+    final footer = this.footer(context);
+    final endDrawer = this.endDrawer(context);
+    final drawer = this.drawer(context);
+
     if (Responsive.isDesktop(context)) {
       return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -40,13 +49,13 @@ class ScaffoldScreen extends BaseScreen {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  if (drawer != null) drawer!,
+                  if (drawer != null) drawer,
                   Expanded(child: body),
-                  if (endDrawer != null) endDrawer!,
+                  if (endDrawer != null) endDrawer,
                 ],
               ),
             ),
-            if (footer != null) footer!,
+            if (footer != null) footer,
           ],
         ),
       );
@@ -57,7 +66,7 @@ class ScaffoldScreen extends BaseScreen {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: footer != null
-            ? [Expanded(child: body), footer!]
+            ? [Expanded(child: body), footer]
             : [Expanded(child: body)],
       ),
       drawer: drawer,

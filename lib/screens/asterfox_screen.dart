@@ -19,7 +19,7 @@ import '../widget/toast/toast_manager.dart';
 import '../widget/toast/toast_widget.dart';
 import '../widget/utility_widgets/scrollable_detector.dart';
 import 'home_screen.dart';
-import 'login_screen.dart';
+import 'auth_screen.dart';
 
 class AsterfoxScreen extends StatelessWidget {
   const AsterfoxScreen({super.key});
@@ -164,7 +164,7 @@ class _AsterfoxMainScreenState extends State<AsterfoxMainScreen> {
             builder: (_, shape, __) => AsterfoxMainWatchScreen(shape)),
       );
     }
-    return HomeScreen();
+    return const HomeScreen();
   }
 }
 
@@ -252,7 +252,7 @@ class AsterfoxSideMenu extends StatelessWidget {
 }
 
 class _SideMenuContent extends StatefulWidget {
-  const _SideMenuContent({super.key});
+  const _SideMenuContent();
 
   @override
   State<_SideMenuContent> createState() => _SideMenuContentState();
