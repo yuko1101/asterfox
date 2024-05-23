@@ -214,10 +214,10 @@ class AsterfoxApp extends StatelessWidget {
           },
           onGenerateRoute: (settings) {
             switch (settings.name) {
-              case "/playlist":
+              case "/playlistInfo":
                 final playlist = settings.arguments as AppPlaylist;
                 return MaterialPageRoute(
-                  builder: (context) => PlaylistScreen(playlist),
+                  builder: (context) => PlaylistInfoScreen(playlist),
                 );
               default:
                 return null;

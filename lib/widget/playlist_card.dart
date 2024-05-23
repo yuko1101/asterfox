@@ -65,7 +65,7 @@ class PlaylistCard extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 Navigator.of(context).pushNamed(
-                  '/playlist',
+                  "/playlistInfo",
                   arguments: playlist,
                 );
               },
