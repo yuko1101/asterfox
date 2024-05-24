@@ -122,60 +122,6 @@ Future<void> main() async {
       debugPrint("localPath: $localPath");
 
       runApp(const AsterfoxApp());
-
-      // void notify() async {
-      //   final notifier = ValueNotifier(0);
-      //   await HomeScreen.processNotificationList.push(
-      //     ProcessNotificationData(
-      //       title: Text(const Uuid().v4()),
-      //       description: const Text("Test Process"),
-      //       future: () async {
-      //         await Future.delayed(const Duration(seconds: 1));
-      //         notifier.value = notifier.value + 1;
-      //         await Future.delayed(const Duration(seconds: 1));
-      //         notifier.value = notifier.value + 1;
-      //         await Future.delayed(const Duration(seconds: 1));
-      //         notifier.value = notifier.value + 1;
-      //         await Future.delayed(const Duration(seconds: 1));
-      //         notifier.value = notifier.value + 1;
-      //       }(),
-      //       progressListenable: notifier,
-      //       maxProgress: 4,
-      //     ),
-      //   );
-      //   notify();
-      // }
-
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
-      // notify();
-      // await Future.delayed(const Duration(milliseconds: 200));
     },
     (error, stack) {
       if (kDebugMode) throw error;
