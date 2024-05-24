@@ -8,9 +8,10 @@ import '../widget/screen/scaffold_screen.dart';
 import 'asterfox_screen.dart';
 
 class PlaylistInfoScreen extends ScaffoldScreen {
-  const PlaylistInfoScreen(this.playlist, {super.key});
+  PlaylistInfoScreen(this.playlist, {super.key});
 
   final AppPlaylist playlist;
+  final ValueNotifier<bool> editModeNotifier = ValueNotifier(false);
 
   @override
   PreferredSizeWidget appBar(BuildContext context) {
@@ -22,6 +23,12 @@ class PlaylistInfoScreen extends ScaffoldScreen {
         tooltip: l10n.value.go_back,
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () {
+            editModeNotifier.value = !editModeNotifier.value;
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.play_arrow),
           tooltip: l10n.value.play,
@@ -37,16 +44,18 @@ class PlaylistInfoScreen extends ScaffoldScreen {
   }
 
   @override
-  Widget body(BuildContext context) => _PlaylistInfo(playlist);
+  Widget body(BuildContext context) =>
+      _PlaylistInfo(playlist, editModeNotifier);
 
   @override
   Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 }
 
 class _PlaylistInfo extends StatefulWidget {
-  const _PlaylistInfo(this.playlist);
+  const _PlaylistInfo(this.playlist, this.editModeNotifier);
 
   final AppPlaylist playlist;
+  final ValueNotifier<bool> editModeNotifier;
 
   @override
   State<_PlaylistInfo> createState() => _PlaylistInfoState();
@@ -56,11 +65,12 @@ class _PlaylistInfoState extends State<_PlaylistInfo> {
   @override
   Widget build(BuildContext context) {
     final songs = widget.playlist.getMusicDataList(true);
-    return PlaylistWidget(
+    return PlaylistWidgetWithEditMode(
       songs: songs,
       onRemove: (i, _) {
         songs.removeAt(i);
       },
+      editModeNotifier: widget.editModeNotifier,
     );
   }
 }

@@ -43,24 +43,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     return ReorderableListView.builder(
       padding: widget.padding,
       physics: const BouncingScrollPhysics(),
-      itemBuilder: widget.songWidgetBuilder ??
-          (context, index) => MusicCardWidget(
-                song: widget.songs[index],
-                isCurrentSong:
-                    widget.songs[index].key == widget.currentSong?.key &&
-                        widget.isLinked,
-                key: Key(widget.songs[index].key),
-                isLinked: widget.isLinked,
-                index: index,
-                onTap: widget.onTap,
-                onRemove: widget.isLinked || widget.onRemove == null
-                    ? null
-                    : (i, _) {
-                        setState(() {
-                          widget.onRemove!(i, _);
-                        });
-                      },
-              ),
+      itemBuilder: widget.songWidgetBuilder ?? buildItem,
       itemCount: widget.songs.length,
       onReorder: (oldIndex, newIndex) async {
         if (oldIndex < newIndex) newIndex -= 1;
@@ -79,6 +62,62 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
         });
       },
+    );
+  }
+
+  MusicCardWidget buildItem(BuildContext context, int index) => MusicCardWidget(
+        song: widget.songs[index],
+        isCurrentSong: widget.songs[index].key == widget.currentSong?.key &&
+            widget.isLinked,
+        key: Key(widget.songs[index].key),
+        isLinked: widget.isLinked,
+        index: index,
+        onTap: widget.onTap,
+        onRemove: widget.isLinked || widget.onRemove == null
+            ? null
+            : (i, _) {
+                setState(() {
+                  widget.onRemove!(i, _);
+                });
+              },
+      );
+}
+
+class PlaylistWidgetWithEditMode extends PlaylistWidget {
+  const PlaylistWidgetWithEditMode({
+    required super.songs,
+    super.currentSong,
+    super.isLinked = false,
+    super.padding,
+    super.songWidgetBuilder,
+    super.onMove,
+    super.onRemove,
+    super.onTap,
+    super.key,
+    required this.editModeNotifier,
+  });
+
+  final ValueNotifier<bool> editModeNotifier;
+
+  @override
+  State<PlaylistWidget> createState() => _PlaylistWidgetWithEditModeState();
+}
+
+class _PlaylistWidgetWithEditModeState extends _PlaylistWidgetState {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: (widget as PlaylistWidgetWithEditMode).editModeNotifier,
+      builder: (context, editMode, child) => editMode
+          ? super.build(context)
+          : ListView.builder(
+              padding: widget.padding,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: widget.songWidgetBuilder ??
+                  (context, index) =>
+                      buildItem(context, index).withEditMode(editMode),
+              itemCount: widget.songs.length,
+            ),
     );
   }
 }

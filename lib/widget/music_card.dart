@@ -34,62 +34,7 @@ class MusicCardWidget extends StatelessWidget {
       background: Container(
         color: Theme.of(context).extraColors.primary.withOpacity(0.07),
       ),
-      child: InkWell(
-        child: SizedBox(
-          height: 80,
-          child: Row(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(left: 10, right: 10),
-                width: 60,
-                height: 60,
-                child: MusicCardLeading(
-                  song: song,
-                  isCurrentSong: isCurrentSong,
-                ),
-              ),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      song.title,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).extraColors.primary,
-                      ),
-                    ),
-                    Text(
-                      song.author,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Theme.of(context).extraColors.secondary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-        onTap: () {
-          if (onTap != null) {
-            onTap!(index);
-            return;
-          }
-          if (isLinked) {
-            musicManager.seek(
-              Duration.zero,
-              index: musicManager.audioDataManager.playlist
-                  .indexWhere((element) => element.key == song.key),
-            );
-          }
-        },
-      ),
+      child: buildCard(context),
       onDismissed: (DismissDirection dismissDirection) async {
         if (onRemove != null) {
           onRemove!(index, dismissDirection);
@@ -98,6 +43,78 @@ class MusicCardWidget extends StatelessWidget {
         if (isLinked) await musicManager.remove(song.key);
         song.destroy();
       },
+    );
+  }
+
+  Widget buildCard(BuildContext context) {
+    return InkWell(
+      child: SizedBox(
+        height: 80,
+        child: Row(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 10, right: 10),
+              width: 60,
+              height: 60,
+              child: MusicCardLeading(
+                song: song,
+                isCurrentSong: isCurrentSong,
+              ),
+            ),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    song.title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).extraColors.primary,
+                    ),
+                  ),
+                  Text(
+                    song.author,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Theme.of(context).extraColors.secondary,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+      onTap: () {
+        if (onTap != null) {
+          onTap!(index);
+          return;
+        }
+        if (isLinked) {
+          musicManager.seek(
+            Duration.zero,
+            index: musicManager.audioDataManager.playlist
+                .indexWhere((element) => element.key == song.key),
+          );
+        }
+      },
+    );
+  }
+
+  MusicCardWidgetWithEditMode withEditMode(bool editMode) {
+    return MusicCardWidgetWithEditMode(
+      song: song,
+      isCurrentSong: isCurrentSong,
+      isLinked: isLinked,
+      index: index,
+      onTap: onTap,
+      onRemove: onRemove,
+      key: key,
+      editMode: editMode,
     );
   }
 }
@@ -157,5 +174,25 @@ class MusicCardLeading extends StatelessWidget {
           ),
       ],
     );
+  }
+}
+
+class MusicCardWidgetWithEditMode extends MusicCardWidget {
+  const MusicCardWidgetWithEditMode({
+    required super.song,
+    super.isCurrentSong,
+    super.isLinked,
+    required super.index,
+    super.onTap,
+    super.onRemove,
+    super.key,
+    required this.editMode,
+  });
+
+  final bool editMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return editMode ? super.build(context) : buildCard(context);
   }
 }
