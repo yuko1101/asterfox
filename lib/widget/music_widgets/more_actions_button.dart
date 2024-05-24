@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cross_file/cross_file.dart';
@@ -26,7 +25,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "share",
       icon: Icons.share,
-      title: (context) => AppLocalizations.of(context)!.share,
+      title: (context) => l10n.value.share,
       onTap: (song, context) async {
         Share.share(song!.mediaURL, subject: song.title);
         Navigator.of(context).pop();
@@ -36,7 +35,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "share_mp3",
       icon: Icons.share,
-      title: (context) => AppLocalizations.of(context)!.share_mp3,
+      title: (context) => l10n.value.share_mp3,
       onTap: (song, context) async {
         Navigator.of(context).pop();
         if (!song!.isInstalled) {
@@ -62,13 +61,12 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "youtube",
       icon: Icons.open_in_new,
-      title: (context) => AppLocalizations.of(context)!.open_in_youtube,
+      title: (context) => l10n.value.open_in_youtube,
       onTap: (song, context) async {
         final launched = await launchUrl(Uri.parse(song!.mediaURL),
             mode: LaunchMode.externalNonBrowserApplication);
         if (!launched) {
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.launch_url_error);
+          Fluttertoast.showToast(msg: l10n.value.launch_url_error);
         }
         Navigator.of(context).pop();
       },
@@ -77,7 +75,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "export",
       icon: Icons.file_download,
-      title: (context) => AppLocalizations.of(context)!.export_as_mp3,
+      title: (context) => l10n.value.export_as_mp3,
       onTap: (song, context) {
         Navigator.of(context).pop();
       },
@@ -86,22 +84,21 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "delete_from_local",
       icon: Icons.delete_forever,
-      title: (context) => AppLocalizations.of(context)!.delete_from_local,
+      title: (context) => l10n.value.delete_from_local,
       onTap: (song, context) {
         Navigator.of(context).pop();
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text(AppLocalizations.of(context)!.delete_from_local),
-            content: Text(AppLocalizations.of(context)!
-                .delete_from_local_confirm_message),
+            title: Text(l10n.value.delete_from_local),
+            content: Text(l10n.value.delete_from_local_confirm_message),
             actions: [
               TextButton(
-                child: Text(AppLocalizations.of(context)!.cancel),
+                child: Text(l10n.value.cancel),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               TextButton(
-                child: Text(AppLocalizations.of(context)!.delete),
+                child: Text(l10n.value.delete),
                 onPressed: () {
                   Navigator.of(context).pop();
                   song!.delete();
@@ -116,7 +113,7 @@ class MoreActionsButton extends StatelessWidget {
     _Action(
       id: "refresh_all",
       icon: Icons.refresh,
-      title: (context) => AppLocalizations.of(context)!.refresh_all,
+      title: (context) => l10n.value.refresh_all,
       onTap: (song, context) {
         musicManager.refreshSongs();
         Navigator.of(context).pop();
@@ -133,7 +130,7 @@ class MoreActionsButton extends StatelessWidget {
         final song = state.currentSong;
         return IconButton(
           icon: const Icon(Icons.more_vert),
-          tooltip: AppLocalizations.of(context)!.more_actions,
+          tooltip: l10n.value.more_actions,
           onPressed: _actions.any((action) => action.songFilter(song))
               ? () {
                   showModalBottomSheet(

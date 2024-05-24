@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -36,11 +35,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(AppLocalizations.of(context)!.settings),
+      title: Text(l10n.value.settings),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
-        tooltip: AppLocalizations.of(context)!.go_back,
+        tooltip: l10n.value.go_back,
       ),
     );
   }
@@ -57,7 +56,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final restartRequiredText = TextSpan(
-      text: AppLocalizations.of(context)!.restart_required,
+      text: l10n.value.restart_required,
       style: const TextStyle(color: Colors.red),
     );
 
@@ -65,15 +64,14 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
       body: SettingsList(
         sections: [
           SettingsSection(
-            title: Text(AppLocalizations.of(context)!.general_settings),
+            title: Text(l10n.value.general_settings),
             tiles: [
               SettingsTile.navigation(
-                title: Text(AppLocalizations.of(context)!.theme),
+                title: Text(l10n.value.theme),
                 description: Text(AppTheme.themes
                     .map((theme) => theme.themeDetails.name)
-                    .map((name) =>
-                        AppLocalizations.of(context)!.theme_names(name))
-                    .join(AppLocalizations.of(context)!.list_separator)),
+                    .map((name) => l10n.value.theme_names(name))
+                    .join(l10n.value.list_separator)),
                 onPressed: (context) {
                   Navigator.of(context).pushNamed("/settings/theme");
                 },
@@ -82,12 +80,11 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             ],
           ),
           SettingsSection(
-            title: Text(AppLocalizations.of(context)!.useful_functions),
+            title: Text(l10n.value.useful_functions),
             tiles: [
               SettingsTile.switchTile(
-                title: Text(AppLocalizations.of(context)!.auto_download),
-                description: Text(
-                    AppLocalizations.of(context)!.auto_download_description),
+                title: Text(l10n.value.auto_download),
+                description: Text(l10n.value.auto_download_description),
                 initialValue: SettingsData.getValue(key: "autoDownload"),
                 activeSwitchColor: CustomColors.getColor("accent"),
                 onToggle: (value) {
@@ -99,12 +96,10 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 },
               ),
               SettingsTile.switchTile(
-                title:
-                    Text(AppLocalizations.of(context)!.disable_interruptions),
+                title: Text(l10n.value.disable_interruptions),
                 description: RichText(
                   text: TextSpan(
-                    text:
-                        "${AppLocalizations.of(context)!.disable_interruptions_description}\n",
+                    text: "${l10n.value.disable_interruptions_description}\n",
                     style: TextStyle(
                         color: Theme.of(context).extraColors.secondary),
                     children: [
@@ -124,11 +119,11 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 },
               ),
               SettingsTile.navigation(
-                title: Text(AppLocalizations.of(context)!.audio_channel),
+                title: Text(l10n.value.audio_channel),
                 description: RichText(
                   text: TextSpan(
                     text:
-                        "${AppLocalizations.of(context)!.audio_channels(SettingsData.getValue(key: "audioChannel"))}\n",
+                        "${l10n.value.audio_channels(SettingsData.getValue(key: "audioChannel"))}\n",
                     style: TextStyle(
                         color: Theme.of(context).extraColors.secondary),
                     children: [
@@ -147,7 +142,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
             SettingsSection(
               tiles: [
                 SettingsTile(
-                  title: Text(AppLocalizations.of(context)!.logout),
+                  title: Text(l10n.value.logout),
                   description: Text(FirebaseAuth.instance.currentUser!.email ??
                       FirebaseAuth.instance.currentUser!.displayName!),
                   leading: const Icon(Icons.logout),
@@ -180,7 +175,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
           SettingsSection(
             tiles: [
               SettingsTile(
-                title: Text(AppLocalizations.of(context)!.app_info),
+                title: Text(l10n.value.app_info),
                 description: FutureBuilder<Pair<String, String>>(
                   future: getGitInfo(),
                   builder: (context, snapshot) {
@@ -195,8 +190,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                                 ClipboardData(text: snapshot.data!.second),
                               );
                               Fluttertoast.showToast(
-                                  msg: AppLocalizations.of(context)!
-                                      .copied_to_clipboard);
+                                  msg: l10n.value.copied_to_clipboard);
                             },
                           );
                   },

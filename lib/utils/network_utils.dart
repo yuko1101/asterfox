@@ -9,7 +9,7 @@ class NetworkUtils {
   static late StreamSubscription connectivitySubscription;
 
   /// Current network status
-  static late ConnectivityResult connectivityResult;
+  static late List<ConnectivityResult> connectivityResults;
 
   /// Minimum network level
   static late ConnectivityResult minimum;
@@ -18,11 +18,9 @@ class NetworkUtils {
   static Future<void> init(ConnectivityResult minimumNetworkLevel) async {
     minimum = minimumNetworkLevel;
     connectivitySubscription =
-        Connectivity().onConnectivityChanged.listen((event) {});
-    connectivitySubscription.onData((data) {
-      connectivityResult = data;
+        Connectivity().onConnectivityChanged.listen((data) {
+      connectivityResults = data;
     });
-    connectivityResult = await Connectivity().checkConnectivity();
   }
 
   /// Set minimum network level
@@ -37,12 +35,12 @@ class NetworkUtils {
 
   /// Check if there is internet connection
   static bool networkConnected() {
-    return connectivityResult != ConnectivityResult.none;
+    return connectivityResults.any((c) => c != ConnectivityResult.none);
   }
 
   /// Check if the internet connection is accessible
   static bool networkAccessible() {
-    return networkConnected() && connectivityResult.index <= minimum.index;
+    return connectivityResults.any((c) => c.index <= minimum.index);
   }
 
   /// Show a message when there is no internet connection

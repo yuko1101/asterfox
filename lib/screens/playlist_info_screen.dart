@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../main.dart';
 import '../music/playlist/playlist.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/screen/scaffold_screen.dart';
@@ -30,11 +30,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(AppLocalizations.of(context)!.playlist),
+      title: Text(l10n.value.playlist),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
-        tooltip: AppLocalizations.of(context)!.go_back,
+        tooltip: l10n.value.go_back,
       ),
     );
   }

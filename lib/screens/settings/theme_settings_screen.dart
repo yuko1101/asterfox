@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
+import '../../main.dart';
 import '../../system/theme/theme.dart';
 import '../../widget/screen/scaffold_screen.dart';
 
@@ -25,11 +25,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(AppLocalizations.of(context)!.theme),
+      title: Text(l10n.value.theme),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
-        tooltip: AppLocalizations.of(context)!.go_back,
+        tooltip: l10n.value.go_back,
       ),
     );
   }
@@ -48,11 +48,11 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
     return SettingsList(
       sections: [
         SettingsSection(
-          title: Text(AppLocalizations.of(context)!.theme),
+          title: Text(l10n.value.theme),
           tiles: AppTheme.themes
               .map((theme) => theme.themeDetails.name)
               .map((name) => RadioListTile(
-                  title: Text(AppLocalizations.of(context)!.theme_names(name)),
+                  title: Text(l10n.value.theme_names(name)),
                   value: name,
                   groupValue: AppTheme.themeNotifier.value.themeDetails.name,
                   activeColor:

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../system/home_screen_music_manager.dart';
@@ -65,7 +64,6 @@ class SongSearchTile extends StatelessWidget {
             key: const Uuid().v4(),
             musicData: suggestion.musicData,
             mediaUrl: suggestion.mediaUrl,
-            localizations: AppLocalizations.of(context)!,
           );
         }
       }

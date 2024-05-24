@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -34,25 +33,24 @@ class AuthScreen extends StatefulWidget {
     final String password = passwordController.text.trim();
     // print("email: $email, password: $value");
 
-    final localizations = AppLocalizations.of(context)!;
     final future = () async {
       try {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
       } on FirebaseAuthException catch (e) {
         if (e.code == "network-request-failed") {
-          Fluttertoast.showToast(msg: localizations.network_not_connected);
+          Fluttertoast.showToast(msg: l10n.value.network_not_connected);
         } else if (e.code == "invalid-email" ||
             e.code == "user-not-found" ||
             e.code == "wrong-password" ||
             e.code == "invalid-credential") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: localizations.invalid_email_or_password);
+          Fluttertoast.showToast(msg: l10n.value.invalid_email_or_password);
         } else if (e.code == "user-disabled") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: localizations.disabled_user);
+          Fluttertoast.showToast(msg: l10n.value.disabled_user);
         } else {
           rethrow;
         }
@@ -71,7 +69,6 @@ class AuthScreen extends StatefulWidget {
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
 
-    final localizations = AppLocalizations.of(context)!;
     final future = () async {
       try {
         await FirebaseAuth.instance
@@ -80,14 +77,14 @@ class AuthScreen extends StatefulWidget {
         if (e.code == "email-already-in-use") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: localizations.email_already_in_use);
+          Fluttertoast.showToast(msg: l10n.value.email_already_in_use);
         } else if (e.code == "invalid-email") {
           emailController.clear();
           passwordController.clear();
-          Fluttertoast.showToast(msg: localizations.invalid_email);
+          Fluttertoast.showToast(msg: l10n.value.invalid_email);
         } else if (e.code == "weak-password") {
           passwordController.clear();
-          Fluttertoast.showToast(msg: localizations.weak_password);
+          Fluttertoast.showToast(msg: l10n.value.weak_password);
         } else {
           rethrow;
         }
@@ -113,7 +110,7 @@ class _AuthScreenState extends State<AuthScreen> {
       appBar: AppBar(
         title: const Text("Asterfox"),
         leading: IconButton(
-          tooltip: AppLocalizations.of(context)!.exit_app,
+          tooltip: l10n.value.exit_app,
           icon: const RotatedBox(
             quarterTurns: 2,
             child: Icon(Icons.exit_to_app),
@@ -144,9 +141,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                     Text(
-                      signUp
-                          ? AppLocalizations.of(context)!.welcome
-                          : AppLocalizations.of(context)!.welcome_back,
+                      signUp ? l10n.value.welcome : l10n.value.welcome_back,
                       style: const TextStyle(
                           fontSize: 40, fontWeight: FontWeight.bold),
                     ),
@@ -231,7 +226,7 @@ class _EmailFieldState extends State<EmailField> {
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
-        labelText: AppLocalizations.of(context)!.email,
+        labelText: l10n.value.email,
         border: const OutlineInputBorder(),
         // fillColor: Colors.black45,
         hintText: "username@example.com",
@@ -253,7 +248,7 @@ class _EmailFieldState extends State<EmailField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (String? input) {
         if (input == null || !EmailField.emailRegExp.hasMatch(input.trim())) {
-          return AppLocalizations.of(context)!.invalid_email;
+          return l10n.value.invalid_email;
         }
         return null;
       },
@@ -309,7 +304,7 @@ class _PasswordFieldState extends State<PasswordField> {
       obscureText: !showPassword,
       controller: widget.passwordController,
       decoration: InputDecoration(
-        labelText: AppLocalizations.of(context)!.password,
+        labelText: l10n.value.password,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: Icon(
@@ -326,9 +321,9 @@ class _PasswordFieldState extends State<PasswordField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (String? input) {
         if (input == null || input.isEmpty) {
-          return AppLocalizations.of(context)!.input_password;
+          return l10n.value.input_password;
         } else if (!PasswordField.passwordRegExp.hasMatch(input)) {
-          return AppLocalizations.of(context)!.invalid_password_format;
+          return l10n.value.invalid_password_format;
         }
         return null;
       },
@@ -409,9 +404,7 @@ class ConfirmButton extends StatelessWidget {
                 },
                 child: Center(
                   child: Text(
-                    signUp
-                        ? AppLocalizations.of(context)!.sign_up
-                        : AppLocalizations.of(context)!.login,
+                    signUp ? l10n.value.sign_up : l10n.value.login,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -455,9 +448,7 @@ class AuthMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = signUp
-        ? AppLocalizations.of(context)!.login_message
-        : AppLocalizations.of(context)!.sign_up_message;
+    final text = signUp ? l10n.value.login_message : l10n.value.sign_up_message;
     final clickableTexts = RegExp(r"%.+?%").allMatches(text).toList();
     final List<TextSpan> textSpans = [];
 
@@ -503,7 +494,7 @@ class ForgotPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        text: AppLocalizations.of(context)!.forgot_password,
+        text: l10n.value.forgot_password,
         style: TextStyle(
           color: Colors.amber[600],
           decoration: TextDecoration.underline,
@@ -522,7 +513,7 @@ class ForgotPassword extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.reset_password),
+        title: Text(l10n.value.reset_password),
         content: Form(
           key: formKey,
           child: TextFormField(
@@ -530,12 +521,12 @@ class ForgotPassword extends StatelessWidget {
             autofillHints: const [AutofillHints.email],
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.email,
+              labelText: l10n.value.email,
             ),
             validator: (String? input) {
               if (input == null ||
                   !EmailField.emailRegExp.hasMatch(input.trim())) {
-                return AppLocalizations.of(context)!.invalid_email;
+                return l10n.value.invalid_email;
               }
               return null;
             },
@@ -543,13 +534,12 @@ class ForgotPassword extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            child: Text(AppLocalizations.of(context)!.send),
+            child: Text(l10n.value.send),
             onPressed: () async {
               if (!formKey.currentState!.validate()) return;
               Navigator.of(context).pop();
 
-              final resetPasswordMsg =
-                  AppLocalizations.of(context)!.reset_password_email_sent;
+              final resetPasswordMsg = l10n.value.reset_password_email_sent;
 
               // TODO: handle [There is no user record corresponding to this identifier. The user may have been deleted.]
               final future = FirebaseAuth.instance
@@ -599,7 +589,7 @@ class GoogleSignInWidget extends StatelessWidget {
                           width: 24,
                         ),
                         Text(
-                          AppLocalizations.of(context)!.sign_in_with_google,
+                          l10n.value.sign_in_with_google,
                           style: const TextStyle(color: Colors.black),
                         ),
                         const SizedBox(
@@ -631,15 +621,13 @@ class GoogleSignInWidget extends StatelessWidget {
 
   static final GoogleSignIn googleSignIn = GoogleSignIn();
   static Future<void> googleLogin(BuildContext context) async {
-    final localizations = AppLocalizations.of(context)!;
-
     final future = () async {
       GoogleSignInAccount? googleUser;
       try {
         googleUser = await googleSignIn.signIn();
       } on PlatformException catch (e) {
         if (e.code == "sign_in_failed") {
-          Fluttertoast.showToast(msg: localizations.something_went_wrong);
+          Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
         } else {
           rethrow;
         }

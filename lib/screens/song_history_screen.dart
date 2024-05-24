@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/song_history_data.dart';
+import '../main.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 import '../widget/screen/scaffold_screen.dart';
@@ -30,11 +30,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(AppLocalizations.of(context)!.song_history),
+      title: Text(l10n.value.song_history),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
-        tooltip: AppLocalizations.of(context)!.go_back,
+        tooltip: l10n.value.go_back,
       ),
     );
   }
@@ -54,7 +54,7 @@ class _SongHistoryState extends State<_SongHistory> {
     if (songs.isEmpty) {
       return Center(
         child: Text(
-          AppLocalizations.of(context)!.no_song_history,
+          l10n.value.no_song_history,
           style: TextStyle(
             color: Theme.of(context).extraColors.secondary,
           ),
@@ -72,21 +72,19 @@ class _SongHistoryState extends State<_SongHistory> {
           subtitle: Text(song["author"]),
           trailing: IconButton(
             icon: const Icon(Icons.close),
-            tooltip: AppLocalizations.of(context)!.delete_from_history,
+            tooltip: l10n.value.delete_from_history,
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title:
-                      Text(AppLocalizations.of(context)!.delete_from_history),
-                  content: Text(AppLocalizations.of(context)!
-                      .delete_from_history_confirm_message),
+                  title: Text(l10n.value.delete_from_history),
+                  content: Text(l10n.value.delete_from_history_confirm_message),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text(AppLocalizations.of(context)!.cancel),
+                      child: Text(l10n.value.cancel),
                     ),
                     TextButton(
                       onPressed: () {
@@ -95,7 +93,7 @@ class _SongHistoryState extends State<_SongHistory> {
                           Navigator.of(context).pop();
                         });
                       },
-                      child: Text(AppLocalizations.of(context)!.delete),
+                      child: Text(l10n.value.delete),
                     ),
                   ],
                 ),
@@ -107,7 +105,6 @@ class _SongHistoryState extends State<_SongHistory> {
             HomeScreenMusicManager.addSong(
               key: key,
               audioId: song["audioId"],
-              localizations: AppLocalizations.of(context)!,
             );
             Navigator.of(context).pop();
           },

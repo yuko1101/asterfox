@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../data/custom_colors.dart';
 import '../../data/settings_data.dart';
+import '../../main.dart';
 import '../../widget/screen/scaffold_screen.dart';
 
 class AudioChannelSettingsScreen extends ScaffoldScreen {
@@ -27,11 +27,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(AppLocalizations.of(context)!.audio_channel),
+      title: Text(l10n.value.audio_channel),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
-        tooltip: AppLocalizations.of(context)!.go_back,
+        tooltip: l10n.value.go_back,
       ),
     );
   }
@@ -73,7 +73,7 @@ class _AudioChannelChoiceState extends State<_AudioChannelChoice> {
     return SettingsList(
       sections: [
         SettingsSection(
-          title: Text(AppLocalizations.of(context)!.audio_channel),
+          title: Text(l10n.value.audio_channel),
           tiles: audioChannels
               .map((audioChannel) => RadioListTile<String>(
                     title: Row(
@@ -82,7 +82,7 @@ class _AudioChannelChoiceState extends State<_AudioChannelChoice> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Text(AppLocalizations.of(context)!
+                        Text(l10n.value
                             .audio_channels(audioChannel["name"] as String)),
                       ],
                     ),

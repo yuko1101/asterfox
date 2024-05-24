@@ -31,7 +31,9 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/settings/theme_settings_screen.dart';
 import 'screens/song_history_screen.dart';
 import 'system/firebase/cloud_firestore.dart';
+import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
+import 'utils/late_value_notifier.dart';
 import 'utils/network_utils.dart';
 import 'widget/process_notifications/process_notification_list.dart';
 
@@ -42,6 +44,8 @@ final bool shouldInitializeFirebase =
 
 late final String localPath;
 late final String tempPath;
+
+final LateValueNotifier<AppLocalizations> l10n = LateValueNotifier();
 
 Future<void> main() async {
   await runZonedGuarded<Future<void>>(
@@ -119,6 +123,8 @@ Future<void> main() async {
       final shareFilesDir = Directory("$tempPath/share_files");
       if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
 
+      SharingIntent.init();
+
       debugPrint("localPath: $localPath");
 
       runApp(const AsterfoxApp());
@@ -149,7 +155,7 @@ class AsterfoxApp extends StatelessWidget {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routes: {
-            "/home": (context) => HomeScreen(),
+            "/home": (context) => const HomeScreen(),
             "/playlists": (context) => const PlaylistsScreen(),
             "/history": (context) => const SongHistoryScreen(),
             "/settings": (context) => const SettingsScreen(),

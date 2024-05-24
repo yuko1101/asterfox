@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../main.dart';
 import '../music/manager/notifiers/audio_state_notifier.dart';
@@ -120,7 +119,7 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         onPressed: () => AppDrawerController(context).openDrawer(),
         icon: const AnimatedMenuIcon(),
-        tooltip: AppLocalizations.of(context)!.menu,
+        tooltip: l10n.value.menu,
       ),
       bottom: AppBarDivider(
         height: 1,
