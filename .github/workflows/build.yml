@@ -35,6 +35,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - if: matrix.target == 'android'
+        name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+      
       - if: matrix.target == 'linux'
         name: Install native dependencies
         shell: bash
