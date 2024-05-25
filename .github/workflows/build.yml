@@ -19,7 +19,7 @@ jobs:
           - target: windows
             runner: windows-latest
             build: dart run msix:create --install-certificate false
-            artifact: ./build/windows/x64/runner/Release/asterfox.msix
+            artifact: ./build/windows/x64/runner/Release
             artifactSuffix: "-x64"
           - target: linux
             runner: ubuntu-latest
