@@ -14,6 +14,7 @@ import '../../utils/network_utils.dart';
 import '../../utils/pair.dart';
 import '../../widget/loading_dialog.dart';
 import '../../widget/screen/scaffold_screen.dart';
+import '../asterfox_screen.dart';
 import '../auth_screen.dart';
 
 class SettingsScreen extends ScaffoldScreen {
@@ -24,6 +25,9 @@ class SettingsScreen extends ScaffoldScreen {
 
   @override
   Widget body(BuildContext context) => const _MainSettingsScreen();
+
+  @override
+  Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
