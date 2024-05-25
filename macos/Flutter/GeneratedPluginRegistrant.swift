@@ -9,14 +9,14 @@ import audio_service
 import audio_session
 import cloud_firestore
 import connectivity_plus
-import device_info_plus_macos
+import device_info_plus
 import firebase_auth
 import firebase_core
 import firebase_crashlytics
 import google_sign_in_ios
 import just_audio
 import path_provider_foundation
-import share_plus_macos
+import share_plus
 import sqflite
 import url_launcher_macos
 

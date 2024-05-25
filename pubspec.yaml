@@ -42,8 +42,7 @@ dependencies:
 
   intl: ^0.19.0
 
-  # use this version for just_audio_libwinmedia v0.0.4+1
-  path_provider: 2.0.15
+  path_provider: 2.1.3
   provider: ^6.1.2
   uuid: ^4.4.0
 
@@ -56,9 +55,7 @@ dependencies:
       url: https://github.com/yuko1101/just_audio.git
       ref: 9b060a4f1a88c86e0235b267970d51dd2be5fc0f
       path: just_audio
-  # just_audio_windows: ^0.2.0
-  just_audio_libwinmedia: ^0.0.4+1 # Temporarily
-  # just_audio_background: ^0.0.1-beta.5
+  just_audio_windows: ^0.2.1
 
   # use this version since newer versions break the fast-forward/rewind buttons in the notification.
   # TODO: update to the latest version when the issue is fixed.
@@ -71,8 +68,7 @@ dependencies:
 
   receive_sharing_intent: ^1.8.0
 
-  # use this version for just_audio_libwinmedia v0.0.4+1
-  share_plus: 4.5.3
+  share_plus: ^9.0.0
   cross_file: ^0.3.4+1
 
   url_launcher: ^6.2.6
@@ -102,8 +98,7 @@ dependencies:
       url: https://github.com/yuko1101/dart-lyrics.git
       ref: main
 
-  # use this version for just_audio_libwinmedia v0.0.4+1
-  device_info_plus: ^4.0.0
+  device_info_plus: ^10.1.0
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
   colored_json: ^1.1.2
@@ -118,10 +113,10 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.1
+  flutter_lints: ^4.0.0
   msix: ^3.16.7
   flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.3.3
+  flutter_native_splash: ^2.4.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
