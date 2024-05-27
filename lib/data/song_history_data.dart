@@ -11,8 +11,9 @@ class SongHistoryData {
   static const bool _compact = false;
 
   static Future<void> init(MusicManager manager) async {
-    historyData = await ConfigFile(
-        File("$localPath/history.json"), {"history": []}).load();
+    historyData =
+        await ConfigFile(File("$localPath/history.json"), {"history": []})
+            .load();
 
     // when song is played, add it to history.
     manager.audioStateManager.currentSongNotifier.addListener(() {
@@ -45,21 +46,21 @@ class SongHistoryData {
     return data.map((e) => e as Map<String, dynamic>).toList();
   }
 
-  static Future<void> removeFromHistory(String audioId) async {
+  static Future<void> remove(String audioId) async {
     final data = historyData.getValue("history") as List<dynamic>;
     data.removeWhere((element) => element["audioId"] == audioId);
     historyData.set(key: "history", value: data);
     await saveData();
   }
 
-  static Future<void> removeAllFromHistory(List<String> audioIds) async {
+  static Future<void> removeMultiple(List<String> audioIds) async {
     final data = historyData.getValue("history") as List<dynamic>;
     data.removeWhere((element) => audioIds.contains(element["audioId"]));
     historyData.set(key: "history", value: data);
     await saveData();
   }
 
-  static Future<void> clearHistory() async {
+  static Future<void> clear() async {
     historyData.set(key: "history", value: []);
     await saveData();
   }

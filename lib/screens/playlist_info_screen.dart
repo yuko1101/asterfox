@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/playlist_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/playlist/playlist.dart';
@@ -33,27 +34,48 @@ class _PlaylistInfoScreenState
         icon: const Icon(Icons.arrow_back),
         tooltip: l10n.value.go_back,
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            setState(() {
-              editMode = !editMode;
-            });
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.play_arrow),
-          tooltip: l10n.value.play,
-          onPressed: () {
-            HomeScreenMusicManager.addSongs(
-              count: widget.playlist.songs.length,
-              musicDataList: widget.playlist.getMusicDataList(false),
-            );
-            Navigator.of(context).pushNamed("/home");
-          },
-        ),
-      ],
+      actions: editMode
+          ? [
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  setState(() {
+                    editMode = false;
+                    resetChanges();
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.check),
+                onPressed: () {
+                  setState(() {
+                    editMode = false;
+                    applyChanges();
+                  });
+                },
+              ),
+            ]
+          : [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  setState(() {
+                    editMode = true;
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.play_arrow),
+                tooltip: l10n.value.play,
+                onPressed: () {
+                  HomeScreenMusicManager.addSongs(
+                    count: widget.playlist.songs.length,
+                    musicDataList: widget.playlist.getMusicDataList(false),
+                  );
+                  Navigator.of(context).pushNamed("/home");
+                },
+              ),
+            ],
     );
   }
 
@@ -79,5 +101,6 @@ class _PlaylistInfoScreenState
   void applyChanges() {
     widget.playlist.songs.clear();
     widget.playlist.songs.addAll(editingSongs.map((s) => s.audioId));
+    PlaylistsData.addAndSave(widget.playlist);
   }
 }

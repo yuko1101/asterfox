@@ -89,7 +89,7 @@ class _SongHistoryState extends State<_SongHistory> {
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          SongHistoryData.removeFromHistory(song["audioId"]);
+                          SongHistoryData.remove(song["audioId"]);
                           Navigator.of(context).pop();
                         });
                       },

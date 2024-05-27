@@ -2,6 +2,7 @@ import 'dart:io';
 
 import '../main.dart';
 import '../music/playlist/playlist.dart';
+import '../system/firebase/cloud_firestore.dart';
 import '../utils/config_file.dart';
 
 class PlaylistsData {
@@ -14,13 +15,14 @@ class PlaylistsData {
         await ConfigFile(File("$localPath/playlists.json"), {}).load();
   }
 
-  static Future<void> saveData() async {
+  static Future<void> saveData({bool upload = true}) async {
     await playlistsData.save(compact: _compact);
   }
 
   static Future<void> addAndSave(AppPlaylist playlist) async {
     playlistsData.set(key: playlist.id, value: playlist.toJson());
     await saveData();
+    await CloudFirestoreManager.addOrUpdatePlaylists([playlist]);
   }
 
   static List<AppPlaylist> getAll() {
@@ -38,17 +40,20 @@ class PlaylistsData {
   static Future<void> remove(String id) async {
     playlistsData.delete(key: id);
     await saveData();
+    await CloudFirestoreManager.removePlaylists([id]);
   }
 
-  static Future<void> removeAll(List<String> ids) async {
+  static Future<void> removeMultiple(List<String> ids) async {
     for (final id in ids) {
       playlistsData.delete(key: id);
     }
     await saveData();
+    await CloudFirestoreManager.removePlaylists(ids);
   }
 
   static Future<void> clear() async {
     playlistsData.resetData();
     await saveData();
+    await CloudFirestoreManager.removeAllPlaylists();
   }
 }
