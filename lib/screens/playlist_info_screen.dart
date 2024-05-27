@@ -5,22 +5,29 @@ import '../music/audio_source/music_data.dart';
 import '../music/playlist/playlist.dart';
 import '../system/home_screen_music_manager.dart';
 import '../widget/playlist_widget.dart';
-import '../widget/screen/scaffold_screen.dart';
+import '../widget/screen/stateful_scaffold_screen.dart';
 import 'asterfox_screen.dart';
 
-class PlaylistInfoScreen extends ScaffoldScreen {
-  PlaylistInfoScreen(this.playlist, {super.key}) {
-    editingSongs = [...playlist.getMusicDataList(true)];
-  }
+class PlaylistInfoScreen extends StatefulScaffoldScreen {
+  const PlaylistInfoScreen(this.playlist, {super.key});
 
   final AppPlaylist playlist;
-  final ValueNotifier<bool> editModeNotifier = ValueNotifier(false);
-  late final List<MusicData> editingSongs;
 
   @override
-  PreferredSizeWidget appBar(BuildContext context) {
+  State<PlaylistInfoScreen> createState() => _PlaylistInfoScreenState();
+}
+
+class _PlaylistInfoScreenState
+    extends StatefulScaffoldScreenState<PlaylistInfoScreen> {
+  bool editMode = false;
+  late final List<MusicData> editingSongs = [
+    ...widget.playlist.getMusicDataList(true)
+  ];
+
+  @override
+  PreferredSizeWidget? appBar(BuildContext context) {
     return AppBar(
-      title: Text("${playlist.name} (${playlist.songs.length})"),
+      title: Text("${widget.playlist.name} (${widget.playlist.songs.length})"),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
@@ -30,7 +37,9 @@ class PlaylistInfoScreen extends ScaffoldScreen {
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
-            editModeNotifier.value = !editModeNotifier.value;
+            setState(() {
+              editMode = !editMode;
+            });
           },
         ),
         IconButton(
@@ -38,8 +47,8 @@ class PlaylistInfoScreen extends ScaffoldScreen {
           tooltip: l10n.value.play,
           onPressed: () {
             HomeScreenMusicManager.addSongs(
-              count: playlist.songs.length,
-              musicDataList: playlist.getMusicDataList(false),
+              count: widget.playlist.songs.length,
+              musicDataList: widget.playlist.getMusicDataList(false),
             );
             Navigator.of(context).pushNamed("/home");
           },
@@ -49,43 +58,26 @@ class PlaylistInfoScreen extends ScaffoldScreen {
   }
 
   @override
-  Widget body(BuildContext context) =>
-      _PlaylistInfo(editingSongs, editModeNotifier);
+  Widget body(BuildContext context) {
+    return PlaylistWidgetWithEditMode(
+      songs: editingSongs,
+      onRemove: (i, _) {
+        editingSongs.removeAt(i);
+      },
+      editMode: editMode,
+    );
+  }
 
   @override
   Widget drawer(BuildContext context) => const AsterfoxSideMenu();
 
   void resetChanges() {
     editingSongs.clear();
-    editingSongs.addAll(playlist.getMusicDataList(true));
+    editingSongs.addAll(widget.playlist.getMusicDataList(true));
   }
 
   void applyChanges() {
-    playlist.songs.clear();
-    playlist.songs.addAll(editingSongs.map((s) => s.audioId));
-  }
-}
-
-class _PlaylistInfo extends StatefulWidget {
-  const _PlaylistInfo(this.editingSongs, this.editModeNotifier);
-
-  final List<MusicData> editingSongs;
-  final ValueNotifier<bool> editModeNotifier;
-
-  @override
-  State<_PlaylistInfo> createState() => _PlaylistInfoState();
-}
-
-class _PlaylistInfoState extends State<_PlaylistInfo> {
-  @override
-  Widget build(BuildContext context) {
-    final songs = widget.editingSongs;
-    return PlaylistWidgetWithEditMode(
-      songs: songs,
-      onRemove: (i, _) {
-        songs.removeAt(i);
-      },
-      editModeNotifier: widget.editModeNotifier,
-    );
+    widget.playlist.songs.clear();
+    widget.playlist.songs.addAll(editingSongs.map((s) => s.audioId));
   }
 }

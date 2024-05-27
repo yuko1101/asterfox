@@ -94,10 +94,10 @@ class PlaylistWidgetWithEditMode extends PlaylistWidget {
     super.onRemove,
     super.onTap,
     super.key,
-    required this.editModeNotifier,
+    required this.editMode,
   });
 
-  final ValueNotifier<bool> editModeNotifier;
+  final bool editMode;
 
   @override
   State<PlaylistWidget> createState() => _PlaylistWidgetWithEditModeState();
@@ -106,18 +106,16 @@ class PlaylistWidgetWithEditMode extends PlaylistWidget {
 class _PlaylistWidgetWithEditModeState extends _PlaylistWidgetState {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: (widget as PlaylistWidgetWithEditMode).editModeNotifier,
-      builder: (context, editMode, child) => editMode
-          ? super.build(context)
-          : ListView.builder(
-              padding: widget.padding,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: widget.songWidgetBuilder ??
-                  (context, index) =>
-                      buildItem(context, index).withEditMode(editMode),
-              itemCount: widget.songs.length,
-            ),
-    );
+    final editMode = (widget as PlaylistWidgetWithEditMode).editMode;
+    return editMode
+        ? super.build(context)
+        : ListView.builder(
+            padding: widget.padding,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: widget.songWidgetBuilder ??
+                (context, index) =>
+                    buildItem(context, index).withEditMode(editMode),
+            itemCount: widget.songs.length,
+          );
   }
 }
