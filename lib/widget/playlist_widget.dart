@@ -75,9 +75,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         onTap: widget.onTap,
         onRemove: widget.isLinked || widget.onRemove == null
             ? null
-            : (i, _) {
+            : (i, direction) {
                 setState(() {
-                  widget.onRemove!(i, _);
+                  widget.onRemove!(i, direction);
                 });
               },
       );
