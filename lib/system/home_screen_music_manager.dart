@@ -26,11 +26,10 @@ class HomeScreenMusicManager {
   static Future<void> addSong({
     required String key,
     String? audioId,
-    MusicData? musicData,
+    MusicData<CachingDisabled>? musicData,
     String? mediaUrl,
   }) async {
     assert(audioId != null || musicData != null || mediaUrl != null);
-    if (musicData != null) assert(musicData.isTemporary == true);
 
     audioId = MusicUrlUtils.getAudioId(
         audioId: audioId, mediaUrl: mediaUrl, musicData: musicData);
@@ -71,7 +70,7 @@ class HomeScreenMusicManager {
               musicData: musicData,
               audioId: audioId,
               key: key,
-              isTemporary: false,
+              caching: CachingEnabled(),
             );
           } on VideoUnplayableException {
             Fluttertoast.showToast(msg: l10n.value.song_unplayable);
@@ -108,7 +107,7 @@ class HomeScreenMusicManager {
 
   static Future<void> addSongs({
     required int count,
-    List<MusicData>? musicDataList,
+    List<MusicData<CachingDisabled>>? musicDataList,
     List<String>? mediaUrlList,
     String? youtubePlaylist,
   }) async {
@@ -155,8 +154,7 @@ class HomeScreenMusicManager {
             musicDataList: musicDataList,
             mediaUrlList: mediaUrlList,
             youtubePlaylist: youtubePlaylist,
-            isTemporary: false,
-            renew: false,
+            caching: CachingEnabled(),
           );
 
           final completer = Completer();

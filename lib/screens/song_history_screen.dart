@@ -50,7 +50,7 @@ class _SongHistory extends StatefulWidget {
 class _SongHistoryState extends State<_SongHistory> {
   @override
   Widget build(BuildContext context) {
-    final songs = SongHistoryData.getAll(isTemporary: true).reversed.toList();
+    final songs = SongHistoryData.getAll().reversed.toList();
     if (songs.isEmpty) {
       return Center(
         child: Text(

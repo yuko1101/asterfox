@@ -14,7 +14,7 @@ import 'url_music_data.dart';
 import 'youtube_music_data.dart';
 import '../../data/local_musics_data.dart';
 
-class MusicData {
+class MusicData<T extends Caching> {
   MusicData({
     required this.type,
     required this.remoteAudioUrl,
@@ -30,12 +30,12 @@ class MusicData {
     required this.songStoredAt,
     required this.size,
     required this.key,
-    required this.isTemporary,
+    required this.caching,
   }) {
-    print("MusicData created : temp = $isTemporary");
-    if (isTemporary) return;
+    print("MusicData created : caching = $caching");
+    if (!caching.enabled) return;
     print("MusicData: {key: $key, title: $title}");
-    _created[key] = this;
+    _created[key] = this as MusicData<CachingEnabled>;
   }
   final MusicType type;
   final String title;
@@ -52,7 +52,7 @@ class MusicData {
   String remoteAudioUrl;
   String remoteImageUrl;
 
-  final bool isTemporary;
+  final T caching;
 
   Future<MediaItem> toMediaItem() async {
     return toMediaItemWithUrl(await audioUrl);
@@ -112,10 +112,10 @@ class MusicData {
 
   Map<String, dynamic> get jsonExtras => {};
 
-  factory MusicData.fromJson({
+  static MusicData<T> fromJson<T extends Caching>({
     required Map<String, dynamic> json,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) {
     final type = MusicType.values
         .firstWhere((musicType) => musicType.name == json["type"] as String);
@@ -124,13 +124,13 @@ class MusicData {
         return YouTubeMusicData.fromJson(
           json: json,
           key: key,
-          isTemporary: isTemporary,
+          caching: caching,
         );
       case MusicType.url:
         return UrlMusicData.fromJson(
           json: json,
           key: key,
-          isTemporary: isTemporary,
+          caching: caching,
         );
       // default:
       //   return MusicData(
@@ -147,7 +147,7 @@ class MusicData {
       //     keywords: (json["keywords"] as List).map((e) => e as String).toList(),
       //     volume: json["volume"] as double,
       //     lyrics: json["lyrics"] as String,
-      //     isTemporary: isTemporary,
+      //     caching: caching,
       //   );
     }
   }
@@ -177,7 +177,7 @@ class MusicData {
       "${getDirectoryPath(audioId)}/installed.txt"
           .replaceAll("/", Platform.pathSeparator);
 
-  static final Map<String, MusicData> _created = {};
+  static final Map<String, MusicData<CachingEnabled>> _created = {};
   static Map<String, MusicData> getCreated() {
     return _created;
   }
@@ -191,45 +191,44 @@ class MusicData {
   }
 
   /// Throws [VideoUnplayableException], [NetworkException]
-  static Future<MusicData> getByAudioId({
+  static Future<MusicData<T>> getByAudioId<T extends Caching>({
     required String audioId,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) async {
     return await YouTubeMusicUtils.getYouTubeAudio(
       videoId: audioId,
       key: key,
-      isTemporary: isTemporary,
+      caching: caching,
     );
   }
 
-  static Future<MusicData> get({
+  static Future<MusicData<T>> get<T extends Caching>({
     String? audioId,
     String? mediaUrl,
     MusicData? musicData,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) async {
     assert(audioId != null || mediaUrl != null || musicData != null);
 
     if (musicData != null) {
-      return musicData.renew(key: key, isTemporary: isTemporary);
+      return musicData.renew(key: key, caching: caching);
     }
 
     final id = audioId ?? MusicUrlUtils.getAudioIdFromUrl(mediaUrl!);
 
-    return await getByAudioId(audioId: id, key: key, isTemporary: isTemporary);
+    return await getByAudioId(audioId: id, key: key, caching: caching);
   }
 
   /// if renew is false, musicData in musicDataList won't be renewed by MusicData#renew().
-  static Stream<MusicData> getList({
+  static Stream<MusicData<T>> getList<T extends Caching>({
     List<MusicData>? musicDataList,
     List<String>? mediaUrlList,
     String? youtubePlaylist,
-    required bool isTemporary,
-    required bool renew,
+    required T caching,
   }) {
-    final controller = StreamController<MusicData>();
+    final controller = StreamController<MusicData<T>>();
 
     int remaining = (musicDataList?.length ?? 0) + (mediaUrlList?.length ?? 0);
     bool isYouTubePlaylistDone = youtubePlaylist == null;
@@ -238,7 +237,7 @@ class MusicData {
       controller.sink.close();
     }
 
-    void add(MusicData event) {
+    void add(MusicData<T> event) {
       controller.sink.add(event);
       remaining--;
       if (remaining == 0 && isYouTubePlaylistDone) {
@@ -249,12 +248,10 @@ class MusicData {
     if (musicDataList != null) {
       for (final musicData in musicDataList) {
         add(
-          renew
-              ? musicData.renew(
-                  key: const Uuid().v4(),
-                  isTemporary: isTemporary,
-                )
-              : musicData,
+          musicData.renew(
+            key: const Uuid().v4(),
+            caching: caching,
+          ),
         );
       }
     }
@@ -263,14 +260,14 @@ class MusicData {
         MusicData.get(
           mediaUrl: mediaUrl,
           key: const Uuid().v4(),
-          isTemporary: isTemporary,
+          caching: caching,
         ).then(add);
       }
     }
     if (youtubePlaylist != null) {
       final playlistStream = YouTubeMusicUtils.getMusicDataFromPlaylist(
         playlistId: youtubePlaylist,
-        isTemporary: isTemporary,
+        caching: caching,
       );
 
       playlistStream.listen(
@@ -305,3 +302,12 @@ extension AudioSourceParseMusicData on IndexedAudioSource {
     return MusicData.fromKey(tag["key"])!;
   }
 }
+
+class Caching {
+  // whether to cache the instance into the `created`.
+  bool get enabled => this is CachingEnabled;
+}
+
+class CachingEnabled extends Caching {}
+
+class CachingDisabled extends Caching {}

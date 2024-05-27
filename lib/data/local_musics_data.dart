@@ -92,13 +92,13 @@ class LocalMusicsData {
     await CloudFirestoreManager.removeSongs(audioIds);
   }
 
-  static List<MusicData> getAll({required bool isTemporary}) {
+  static List<MusicData<T>> getAll<T extends Caching>({required T caching}) {
     final data = Map<String, dynamic>.from(localMusicData.getValue());
     return data.values
         .map((e) => MusicData.fromJson(
               json: e,
               key: const Uuid().v4(),
-              isTemporary: isTemporary,
+              caching: caching,
             ))
         .toList();
   }
@@ -116,14 +116,14 @@ class LocalMusicsData {
     return songs.keys.toList();
   }
 
-  static MusicData getByAudioId({
+  static MusicData<T> getByAudioId<T extends Caching>({
     required String audioId,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) {
     if (!localMusicData.has(audioId)) throw LocalSongNotFoundException(audioId);
     final data = localMusicData.getValue(audioId) as Map<String, dynamic>;
-    return MusicData.fromJson(json: data, key: key, isTemporary: isTemporary);
+    return MusicData.fromJson(json: data, key: key, caching: caching);
   }
 }
 

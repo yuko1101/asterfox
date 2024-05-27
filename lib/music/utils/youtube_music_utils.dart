@@ -7,6 +7,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../system/exceptions/unable_to_load_from_playlist_exception.dart';
+import '../audio_source/music_data.dart';
 import '../audio_source/youtube_music_data.dart';
 import '../../system/exceptions/network_exception.dart';
 import '../../utils/network_utils.dart';
@@ -21,7 +22,7 @@ class YouTubeMusicUtils {
     bool local = LocalMusicsData.isStored(audioId: videoId);
     if (local && !forceRemote) {
       final song = LocalMusicsData.getByAudioId(
-          audioId: videoId, key: key, isTemporary: true);
+          audioId: videoId, key: key, caching: CachingDisabled());
       return song.audioUrl;
     } else {
       // オンライン上から取得
@@ -52,19 +53,20 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  static Future<YouTubeMusicData> getYouTubeAudio({
+  static Future<YouTubeMusicData<T>> getYouTubeAudio<T extends Caching>({
     required String videoId,
     required String key,
-    required isTemporary,
+    required T caching,
   }) async {
     // 曲が保存されているかどうか
     bool local = LocalMusicsData.isStored(audioId: videoId);
     if (local) {
       // throws LocalSongNotFoundException
       return LocalMusicsData.getByAudioId(
-          audioId: videoId,
-          key: key,
-          isTemporary: isTemporary) as YouTubeMusicData;
+        audioId: videoId,
+        key: key,
+        caching: caching,
+      ) as YouTubeMusicData<T>;
     } else {
       // オンライン上から取得
 
@@ -90,7 +92,7 @@ class YouTubeMusicUtils {
       yt.close();
 
       return getFromVideo(
-          video: video, manifest: manifest, key: key, isTemporary: isTemporary);
+          video: video, manifest: manifest, key: key, caching: caching);
     }
   }
 
@@ -99,14 +101,15 @@ class YouTubeMusicUtils {
   /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
   ///
   /// Throws [NetworkException] if the network is not accessible.
-  static Stream<YouTubeMusicData> getMusicDataFromPlaylist({
+  static Stream<YouTubeMusicData<T>>
+      getMusicDataFromPlaylist<T extends Caching>({
     required String playlistId,
-    required bool isTemporary,
+    required T caching,
   }) {
     // インターネット接続確認
     NetworkUtils.check();
 
-    final controller = StreamController<YouTubeMusicData>();
+    final controller = StreamController<YouTubeMusicData<T>>();
     final YoutubeExplode yt = YoutubeExplode();
     final videoStream = yt.playlists.getVideos(playlistId);
 
@@ -125,7 +128,7 @@ class YouTubeMusicUtils {
           video: video,
           yt: yt,
           key: const Uuid().v4(),
-          isTemporary: isTemporary,
+          caching: caching,
         );
         controller.sink.add(musicData);
       } catch (e, stacktrace) {
@@ -149,18 +152,19 @@ class YouTubeMusicUtils {
     return controller.stream;
   }
 
-  static Future<YouTubeMusicData> _getFromVideoWithoutStreamManifest({
+  static Future<YouTubeMusicData<T>>
+      _getFromVideoWithoutStreamManifest<T extends Caching>({
     required Video video,
     required YoutubeExplode yt,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) async {
     if (LocalMusicsData.isStored(audioId: video.id.value)) {
       final song = LocalMusicsData.getByAudioId(
         audioId: video.id.value,
         key: key,
-        isTemporary: isTemporary,
-      ) as YouTubeMusicData;
+        caching: caching,
+      ) as YouTubeMusicData<T>;
       if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
       return song;
     }
@@ -172,16 +176,16 @@ class YouTubeMusicUtils {
       video: video,
       manifest: manifest,
       key: key,
-      isTemporary: isTemporary,
+      caching: caching,
     );
   }
 
   // even if the song is stored, this fetches it from remote.
-  static Future<YouTubeMusicData> getFromVideo({
+  static Future<YouTubeMusicData<T>> getFromVideo<T extends Caching>({
     required Video video,
     required StreamManifest manifest,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) async {
     String imageUrl = video.thumbnails.maxResUrl;
     final imageRes = await http.get(Uri.parse(video.thumbnails.maxResUrl));
@@ -204,7 +208,7 @@ class YouTubeMusicUtils {
       lyrics: "", // TODO: by default, get from closed captions
       songStoredAt: null,
       size: null,
-      isTemporary: isTemporary,
+      caching: caching,
     );
   }
 

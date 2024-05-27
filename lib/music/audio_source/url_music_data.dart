@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'music_data.dart';
 
-class UrlMusicData extends MusicData {
+class UrlMusicData<T extends Caching> extends MusicData<T> {
   UrlMusicData({
     required super.remoteAudioUrl,
     required super.remoteImageUrl,
@@ -16,16 +16,16 @@ class UrlMusicData extends MusicData {
     required super.songStoredAt,
     required super.size,
     required super.key,
-    required super.isTemporary,
+    required super.caching,
   }) : super(
           type: MusicType.url,
           audioId: const Base64Decoder().convert(remoteAudioUrl).toString(),
         );
 
-  factory UrlMusicData.fromJson({
+  static UrlMusicData<T> fromJson<T extends Caching>({
     required Map<String, dynamic> json,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) {
     return UrlMusicData(
       key: key,
@@ -40,7 +40,7 @@ class UrlMusicData extends MusicData {
       lyrics: json["lyrics"] as String,
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,
-      isTemporary: isTemporary,
+      caching: caching,
     );
   }
 }

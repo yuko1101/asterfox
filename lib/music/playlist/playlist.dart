@@ -14,12 +14,12 @@ class AppPlaylist {
   final String name;
   final List<String> songs;
 
-  List<MusicData> getMusicDataList(bool isTemporary) => songs
+  List<MusicData<T>> getMusicDataList<T extends Caching>(T caching) => songs
       .map(
         (audioId) => LocalMusicsData.getByAudioId(
           audioId: audioId,
           key: const Uuid().v4(),
-          isTemporary: isTemporary,
+          caching: caching,
         ),
       )
       .toList();

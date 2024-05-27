@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/custom_colors.dart';
 import '../../data/local_musics_data.dart';
-import '../../data/song_history_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/audio_source/youtube_music_data.dart';
@@ -291,8 +289,8 @@ class SongSearch extends SearchDelegate<String> {
     print("loading offline songs");
     final List<SongSuggestion> list = [];
 
-    final List<MusicData> storedSongs =
-        LocalMusicsData.getAll(isTemporary: true);
+    final List<MusicData<CachingDisabled>> storedSongs =
+        LocalMusicsData.getAll(caching: CachingDisabled());
     list.addAll(storedSongs.map((e) {
       final List<SongTag> tags = [SongTag.stored];
       if (e.isInstalled) tags.add(SongTag.installed);
@@ -351,10 +349,7 @@ class SongSearch extends SearchDelegate<String> {
       count: suggestions.length,
       musicDataList: suggestions
           .where((s) => s.musicData != null)
-          .map(
-            (s) =>
-                s.musicData!.renew(isTemporary: false, key: const Uuid().v4()),
-          )
+          .map((s) => s.musicData!)
           .toList(),
       mediaUrlList: suggestions
           .where((s) => s.mediaUrl != null && s.musicData == null)
@@ -393,7 +388,7 @@ class SongSuggestion {
     assert((tags.contains(SongTag.word) && word != null) ||
         (!tags.contains(SongTag.word) && word == null));
   }
-  final MusicData? musicData;
+  final MusicData<CachingDisabled>? musicData;
   final String? mediaUrl;
   final String? word;
 

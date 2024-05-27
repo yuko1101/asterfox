@@ -8,7 +8,7 @@ import '../../system/firebase/cloud_firestore.dart';
 import '../utils/youtube_music_utils.dart';
 import 'music_data.dart';
 
-class YouTubeMusicData extends MusicData {
+class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   YouTubeMusicData({
     required this.id,
     required super.remoteAudioUrl,
@@ -23,7 +23,7 @@ class YouTubeMusicData extends MusicData {
     required super.songStoredAt,
     required super.size,
     required super.key,
-    required super.isTemporary,
+    required super.caching,
     required this.authorId,
   }) : super(
           type: MusicType.youtube,
@@ -82,10 +82,10 @@ class YouTubeMusicData extends MusicData {
   }
 
   // from json
-  factory YouTubeMusicData.fromJson({
+  static YouTubeMusicData<T> fromJson<T extends Caching>({
     required Map<String, dynamic> json,
     required String key,
-    required bool isTemporary,
+    required T caching,
   }) {
     return YouTubeMusicData(
       key: key,
@@ -102,7 +102,7 @@ class YouTubeMusicData extends MusicData {
       lyrics: json["lyrics"] as String,
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,
-      isTemporary: isTemporary,
+      caching: caching,
     );
   }
 }

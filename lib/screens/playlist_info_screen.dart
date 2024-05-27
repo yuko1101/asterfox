@@ -7,6 +7,7 @@ import '../music/playlist/playlist.dart';
 import '../system/home_screen_music_manager.dart';
 import '../widget/playlist_widget.dart';
 import '../widget/screen/stateful_scaffold_screen.dart';
+import '../widget/search/song_search.dart';
 import 'asterfox_screen.dart';
 
 class PlaylistInfoScreen extends StatefulScaffoldScreen {
@@ -22,7 +23,7 @@ class _PlaylistInfoScreenState
     extends StatefulScaffoldScreenState<PlaylistInfoScreen> {
   bool editMode = false;
   late final List<MusicData> editingSongs = [
-    ...widget.playlist.getMusicDataList(true)
+    ...widget.playlist.getMusicDataList(CachingDisabled())
   ];
 
   @override
@@ -36,6 +37,12 @@ class _PlaylistInfoScreenState
       ),
       actions: editMode
           ? [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  showSearch(context: context, delegate: SongSearch());
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () {
@@ -70,7 +77,7 @@ class _PlaylistInfoScreenState
                 onPressed: () {
                   HomeScreenMusicManager.addSongs(
                     count: widget.playlist.songs.length,
-                    musicDataList: widget.playlist.getMusicDataList(false),
+                    musicDataList: widget.playlist.getMusicDataList(CachingDisabled()),
                   );
                   Navigator.of(context).pushNamed("/home");
                 },
@@ -95,7 +102,7 @@ class _PlaylistInfoScreenState
 
   void resetChanges() {
     editingSongs.clear();
-    editingSongs.addAll(widget.playlist.getMusicDataList(true));
+    editingSongs.addAll(widget.playlist.getMusicDataList(CachingDisabled()));
   }
 
   void applyChanges() {

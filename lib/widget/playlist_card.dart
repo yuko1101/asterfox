@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/local_musics_data.dart';
+import '../music/audio_source/music_data.dart';
 import '../music/playlist/playlist.dart';
 import '../music/utils/music_url_utils.dart';
 import '../utils/network_utils.dart';
@@ -26,7 +27,7 @@ class PlaylistCard extends StatelessWidget {
                 .map((audioId) => LocalMusicsData.getByAudioId(
                     audioId: audioId,
                     key: const Uuid().v4(),
-                    isTemporary: true))
+                    caching: CachingDisabled()))
                 .map((song) {
               final image = song.imageUrl;
               if (image.isUrl) {

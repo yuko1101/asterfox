@@ -41,7 +41,7 @@ class SongHistoryData {
     await saveData();
   }
 
-  static List<Map<String, dynamic>> getAll({required bool isTemporary}) {
+  static List<Map<String, dynamic>> getAll() {
     final data = historyData.getValue("history") as List;
     return data.map((e) => e as Map<String, dynamic>).toList();
   }
@@ -76,11 +76,12 @@ extension SongHistoryDataExtension on MusicData {
     return song["lastPlayed"] as int;
   }
 
-  MusicData renew({required String key, required bool? isTemporary}) {
+  MusicData<T> renew<T extends Caching>(
+      {required String key, required T caching}) {
     return MusicData.fromJson(
       json: toJson(),
       key: key,
-      isTemporary: isTemporary ?? this.isTemporary,
+      caching: caching,
     );
   }
 }
