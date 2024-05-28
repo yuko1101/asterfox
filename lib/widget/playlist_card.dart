@@ -11,9 +11,11 @@ import '../utils/network_utils.dart';
 import 'music_widgets/music_thumbnail.dart';
 
 class PlaylistCard extends StatelessWidget {
-  const PlaylistCard(this.playlist, {super.key});
+  const PlaylistCard({required this.playlist, this.onTap, this.onLongPress, super.key});
 
   final AppPlaylist playlist;
+  final void Function()? onTap;
+  final void Function()? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +69,8 @@ class PlaylistCard extends StatelessWidget {
           Material(
             type: MaterialType.transparency,
             child: InkWell(
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  "/playlistInfo",
-                  arguments: playlist,
-                );
-              },
+              onTap: onTap,
+              onLongPress: onLongPress,
             ),
           ),
         ],

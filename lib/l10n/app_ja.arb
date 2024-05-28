@@ -192,5 +192,9 @@
     "playlist_name": "プレイリスト名",
     "@playlist_name": {},
     "create": "作成",
-    "@create": {}
+    "@create": {},
+    "delete_playlists": "プレイリストを削除",
+    "@delete_playlists": {},
+    "delete_playlists_message": "選択したプレイリストを削除しますか？",
+    "@delete_playlists_message": {}
 }

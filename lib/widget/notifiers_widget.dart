@@ -3,6 +3,29 @@ import 'package:flutter/material.dart';
 
 import 'non_null_stream_builder.dart';
 
+class PreferredSizeValueListenableBuilder<T> extends StatelessWidget
+    implements PreferredSizeWidget {
+  const PreferredSizeValueListenableBuilder({
+    required this.valueListenable,
+    required this.builder,
+    super.key,
+  });
+
+  final ValueListenable<T> valueListenable;
+  final Widget Function(BuildContext, T, Widget?) builder;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<T>(
+      valueListenable: valueListenable,
+      builder: builder,
+    );
+  }
+}
+
 class NullableNotifierWidget<T> extends StatelessWidget {
   const NullableNotifierWidget({
     required this.initialData,

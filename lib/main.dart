@@ -156,7 +156,7 @@ class AsterfoxApp extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           routes: {
             "/home": (context) => const HomeScreen(),
-            "/playlists": (context) => const PlaylistsScreen(),
+            "/playlists": (context) => PlaylistsScreen(),
             "/history": (context) => const SongHistoryScreen(),
             "/settings": (context) => const SettingsScreen(),
             "/settings/theme": (context) => const ThemeSettingsScreen(),

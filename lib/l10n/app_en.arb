@@ -209,5 +209,9 @@
     "playlist_name": "Playlist Name",
     "@playlist_name": {},
     "create": "Create",
-    "@create": {}
+    "@create": {},
+    "delete_playlists": "Delete Playlists",
+    "@delete_playlists": {},
+    "delete_playlists_message": "Are you sure you want to delete the selected playlists?",
+    "@delete_playlists_message": {}
 }
