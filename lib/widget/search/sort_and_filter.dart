@@ -1,10 +1,10 @@
-import 'song_search.dart';
+import 'suggestion.dart';
 
-List<SongSuggestion> filterAndSort(
-    {required List<SongSuggestion> list,
+List<Suggestion> filterAndSort(
+    {required List<Suggestion> list,
     required List<FilterSorting> filterSortingList}) {
   if (filterSortingList.isEmpty) return list;
-  List<SongSuggestion> result = list;
+  List<Suggestion> result = list;
   for (final filterSorting in filterSortingList) {
     result = filterSorting.apply(result);
   }
@@ -12,25 +12,29 @@ List<SongSuggestion> filterAndSort(
 }
 
 class FilterSorting {
-  List<SongSuggestion> apply(List<SongSuggestion> list) {
+  List<Suggestion> apply(List<Suggestion> list) {
     return list;
   }
 }
 
 class YouTubeFilter extends FilterSorting {
   @override
-  List<SongSuggestion> apply(List<SongSuggestion> list) {
+  List<Suggestion> apply(List<Suggestion> list) {
     return list
-        .where((suggestion) => suggestion.tags.contains(SongTag.youtube))
+        .where((suggestion) =>
+            suggestion is SongSuggestion &&
+            suggestion.tags.contains(SongTag.youtube))
         .toList();
   }
 }
 
 class StoredFilter extends FilterSorting {
   @override
-  List<SongSuggestion> apply(List<SongSuggestion> list) {
+  List<Suggestion> apply(List<Suggestion> list) {
     return list
-        .where((suggestion) => suggestion.tags.contains(SongTag.stored))
+        .where((suggestion) =>
+            suggestion is SongSuggestion &&
+            suggestion.tags.contains(SongTag.stored))
         .toList();
   }
 }
@@ -39,7 +43,7 @@ class RelatedFilter extends FilterSorting {
   RelatedFilter(this.query);
   final String query;
   @override
-  List<SongSuggestion> apply(List<SongSuggestion> list) {
+  List<Suggestion> apply(List<Suggestion> list) {
     if (query.isEmpty) return list;
     return list
         .where((suggestion) => _getScore(suggestion, query) > 0)
@@ -51,7 +55,7 @@ class RelevanceSorting extends FilterSorting {
   RelevanceSorting(this.query);
   final String query;
   @override
-  List<SongSuggestion> apply(List<SongSuggestion> list) {
+  List<Suggestion> apply(List<Suggestion> list) {
     if (query.isEmpty) return list;
     list.sort((a, b) {
       final aScore = _getScore(a, query);
@@ -62,12 +66,14 @@ class RelevanceSorting extends FilterSorting {
   }
 }
 
-int _getScore(SongSuggestion suggestion, String query) {
+int _getScore(Suggestion suggestion, String query) {
   int score = 0;
   if (suggestion.title.toLowerCase().contains(query.toLowerCase())) score += 1;
   if (suggestion.keywords
       .any((e) => e.toLowerCase().contains(query.toLowerCase()))) score += 1;
-  if (suggestion.lyrics != null && suggestion.lyrics!.contains(query)) {
+  if (suggestion is SongSuggestion &&
+      suggestion.lyrics != null &&
+      suggestion.lyrics!.contains(query)) {
     score += 1;
   }
   return score;

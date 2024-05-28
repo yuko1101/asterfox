@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../data/local_musics_data.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/playlist/playlist.dart';
-import '../music/utils/music_url_utils.dart';
+import '../music/utils/music_data_utils.dart';
 import '../utils/network_utils.dart';
 import 'music_widgets/music_thumbnail.dart';
 

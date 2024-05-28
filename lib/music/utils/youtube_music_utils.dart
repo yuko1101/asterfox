@@ -55,6 +55,7 @@ class YouTubeMusicUtils {
   /// Throws [VideoUnplayableException] if the video is not playable.
   static Future<YouTubeMusicData<T>> getYouTubeAudio<T extends Caching>({
     required String videoId,
+    Video? video,
     required String key,
     required T caching,
   }) async {
@@ -87,12 +88,16 @@ class YouTubeMusicUtils {
       //   return null;
       // }
 
-      final Video video = await yt.videos.get(videoId);
+      final Video v = video ?? await yt.videos.get(videoId);
 
       yt.close();
 
       return getFromVideo(
-          video: video, manifest: manifest, key: key, caching: caching);
+        video: v,
+        manifest: manifest,
+        key: key,
+        caching: caching,
+      );
     }
   }
 
@@ -232,5 +237,19 @@ class YouTubeMusicUtils {
     final results = await yt.search.getQuerySuggestions(query);
     yt.close();
     return results.toList();
+  }
+}
+
+extension MusicDataUtil on Video {
+  Future<YouTubeMusicData<T>> fetchMusicData<T extends Caching>({
+    required String key,
+    required T caching,
+  }) {
+    return YouTubeMusicUtils.getYouTubeAudio(
+      videoId: id.value,
+      video: this,
+      key: key,
+      caching: caching,
+    );
   }
 }

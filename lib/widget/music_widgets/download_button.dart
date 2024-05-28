@@ -5,7 +5,7 @@ import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../music/music_downloader.dart';
-import '../../music/utils/music_url_utils.dart';
+import '../../music/utils/music_data_utils.dart';
 import '../../system/home_screen_music_manager.dart';
 
 class DownloadButton extends StatelessWidget {

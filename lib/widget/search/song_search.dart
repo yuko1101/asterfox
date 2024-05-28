@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/custom_colors.dart';
@@ -9,22 +9,23 @@ import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/audio_source/music_data.dart';
 import '../../music/audio_source/youtube_music_data.dart';
-import '../../system/exceptions/network_exception.dart';
-import '../../system/home_screen_music_manager.dart';
+import '../../music/utils/music_data_utils.dart';
 import '../../music/utils/youtube_music_utils.dart';
 import '../../system/theme/theme.dart';
 import '../../utils/network_utils.dart';
 import '../option_widgets/option_switch.dart';
 import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
+import 'suggestion.dart';
 
-class SongSearch extends SearchDelegate<String> {
+class SongSearch
+    extends SearchDelegate<Future<List<MusicData<CachingDisabled>>>> {
   SongSearch({this.animationController});
   final AnimationController? animationController;
 
   final ValueNotifier<bool> multiSelectMode = ValueNotifier(false);
 
-  final List<SongSearchTile> selectedTiles = [];
+  final List<SongSearchTile<SongSuggestion>> selectedTiles = [];
 
   // search options
   bool forceOfflineSearch = false;
@@ -97,14 +98,15 @@ class SongSearch extends SearchDelegate<String> {
         color: Theme.of(context).extraColors.primary,
         tooltip: l10n.value.search,
         onPressed: () {
+          late final Future<List<MusicData<CachingDisabled>>> songs;
           if (multiSelectMode.value) {
-            addSuggestionsToQueue(
-                selectedTiles.map((tile) => tile.suggestion).toList());
+            songs = Future.wait(
+                selectedTiles.map((tile) => tile.suggestion.fetchMusicData()));
           } else {
             if (query.isEmpty || query == "") return;
-            search(context, query);
+            songs = Future.wait([MusicDataUtils.search(query)]);
           }
-          close(context, "");
+          close(context, songs);
         },
       ),
     ];
@@ -120,7 +122,7 @@ class SongSearch extends SearchDelegate<String> {
       color: Theme.of(context).extraColors.primary,
       tooltip: l10n.value.go_back,
       onPressed: () {
-        close(context, "");
+        close(context, Future.value([]));
       },
     );
   }
@@ -132,13 +134,15 @@ class SongSearch extends SearchDelegate<String> {
 
   @override
   void showResults(BuildContext context) {
+    late final Future<List<MusicData<CachingDisabled>>> songs;
     if (multiSelectMode.value) {
-      addSuggestionsToQueue(
-          selectedTiles.map((tile) => tile.suggestion).toList());
+      songs = Future.wait(
+          selectedTiles.map((tile) => tile.suggestion.fetchMusicData()));
     } else {
-      search(context, query);
+      if (query.isEmpty || query == "") return close(context, Future.value([]));
+      songs = Future.wait([MusicDataUtils.search(query)]);
     }
-    close(context, "");
+    close(context, songs);
   }
 
   final ValueNotifier<List<SongSearchTile>> suggestionTiles = ValueNotifier([]);
@@ -222,14 +226,6 @@ class SongSearch extends SearchDelegate<String> {
     );
   }
 
-  void search(BuildContext context, String text) async {
-    try {
-      await HomeScreenMusicManager.addSongBySearch(text);
-    } on NetworkException {
-      Fluttertoast.showToast(msg: l10n.value.network_not_accessible);
-    }
-  }
-
   void loadSuggestions(String text, {int? time}) async {
     loading.value = true;
     final fetched = await Future.wait([
@@ -258,8 +254,7 @@ class SongSearch extends SearchDelegate<String> {
     }).toList();
 
     final wordsSuggestions = words
-        .map((e) => SongSuggestion(
-            tags: [SongTag.word], title: e, word: e, keywords: []))
+        .map((e) => WordSuggestion(title: e, word: e, keywords: []))
         .toList();
 
     final videoResult = filterAndSort(
@@ -278,7 +273,7 @@ class SongSearch extends SearchDelegate<String> {
       // suggestionTiles.valueに含まれていない、選択されたSongSearchTile
       otherSelectedTilesNotifier.value = selectedTiles
           .where((s1) => !suggestionTiles.value
-              .any((s2) => _isSameSuggestion(s1.suggestion, s2.suggestion)))
+              .any((s2) => s1.suggestion.isSameSuggestion(s2.suggestion)))
           .toList();
       loading.value = false;
     }
@@ -305,7 +300,7 @@ class SongSearch extends SearchDelegate<String> {
       );
     }));
 
-    final List<SongSuggestion> result = filterAndSort(
+    final List<Suggestion> result = filterAndSort(
       list: list,
       filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
     );
@@ -313,50 +308,22 @@ class SongSearch extends SearchDelegate<String> {
     // suggestionTiles.valueに含まれていない、選択されたSongSearchTile
     otherSelectedTilesNotifier.value = selectedTiles
         .where((s1) => !suggestionTiles.value
-            .any((s2) => _isSameSuggestion(s1.suggestion, s2.suggestion)))
+            .any((s2) => s1.suggestion.isSameSuggestion(s2.suggestion)))
         .toList();
     loading.value = false;
   }
 
-  SongSearchTile _getSongSearchTile(SongSuggestion songSuggestion) {
-    if (selectedTiles
-        .any((s) => _isSameSuggestion(s.suggestion, songSuggestion))) {
-      final found = selectedTiles
-          .firstWhere((s) => _isSameSuggestion(s.suggestion, songSuggestion));
-      return found;
+  SongSearchTile _getSongSearchTile(Suggestion suggestion) {
+    final matched = selectedTiles
+        .firstWhereOrNull((s) => suggestion.isSameSuggestion(s.suggestion));
+    if (matched != null) {
+      return matched;
     } else {
-      return SongSearchTile(suggestion: songSuggestion, parent: this);
+      return SongSearchTile(suggestion: suggestion, parent: this);
     }
   }
 
-  bool _isSameAudioId(SongSuggestion s1, SongSuggestion s2) =>
-      (s1.musicData != null &&
-          s2.musicData != null &&
-          s1.musicData!.audioId == s2.musicData!.audioId);
-  bool _isSameUrl(SongSuggestion s1, SongSuggestion s2) =>
-      (s1.mediaUrl != null && s1.mediaUrl == s2.mediaUrl);
-
-  bool _isSameWord(SongSuggestion s1, SongSuggestion s2) =>
-      (s1.word != null && s1.word == s2.word);
-
-  bool _isSameSuggestion(SongSuggestion s1, SongSuggestion s2) =>
-      (_isSameAudioId(s1, s2) || _isSameUrl(s1, s2) || _isSameWord(s1, s2));
-
   void setQuery(newQuery) => query = newQuery;
-
-  Future<void> addSuggestionsToQueue(List<SongSuggestion> suggestions) async {
-    await HomeScreenMusicManager.addSongs(
-      count: suggestions.length,
-      musicDataList: suggestions
-          .where((s) => s.musicData != null)
-          .map((s) => s.musicData!)
-          .toList(),
-      mediaUrlList: suggestions
-          .where((s) => s.mediaUrl != null && s.musicData == null)
-          .map((s) => s.mediaUrl!)
-          .toList(),
-    );
-  }
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -370,33 +337,3 @@ class SongSearch extends SearchDelegate<String> {
     );
   }
 }
-
-class SongSuggestion {
-  SongSuggestion({
-    this.musicData,
-    this.mediaUrl,
-    this.word,
-    required this.tags,
-    required this.title,
-    this.subtitle,
-    required this.keywords,
-    this.lyrics,
-  }) {
-    assert(musicData != null || word != null || mediaUrl != null);
-    // タグにSongTag.wordを含む場合にはwordはnullにはならず、
-    // 含まない場合にはnullになる必要がある
-    assert((tags.contains(SongTag.word) && word != null) ||
-        (!tags.contains(SongTag.word) && word == null));
-  }
-  final MusicData<CachingDisabled>? musicData;
-  final String? mediaUrl;
-  final String? word;
-
-  final List<SongTag> tags;
-  final String title;
-  final String? subtitle;
-  final List<String> keywords;
-  final String? lyrics;
-}
-
-enum SongTag { installed, stored, youtube, word }

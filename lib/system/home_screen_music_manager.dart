@@ -11,7 +11,7 @@ import '../data/settings_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/music_downloader.dart';
-import '../music/utils/music_url_utils.dart';
+import '../music/utils/music_data_utils.dart';
 import '../screens/home_screen.dart';
 import '../music/utils/youtube_music_utils.dart';
 import '../utils/async_utils.dart';
@@ -31,7 +31,7 @@ class HomeScreenMusicManager {
   }) async {
     assert(audioId != null || musicData != null || mediaUrl != null);
 
-    audioId = MusicUrlUtils.getAudioId(
+    audioId = MusicDataUtils.getAudioId(
         audioId: audioId, mediaUrl: mediaUrl, musicData: musicData);
 
     // the auto downloader works only for remote music
@@ -64,7 +64,7 @@ class HomeScreenMusicManager {
         progressListenable: DownloadManager.getNotifiers(audioId).second,
         errorListNotifier: errorListNotifier,
         future: () async {
-          MusicData song;
+          MusicData<CachingEnabled> song;
           try {
             song = await MusicData.get(
               musicData: musicData,
@@ -201,65 +201,6 @@ class HomeScreenMusicManager {
         }(),
       ),
     );
-  }
-
-  static Future<void> addSongBySearch(String query) async {
-    if (query.isUrl) {
-      await loadFromUrl(query);
-      return;
-    }
-    final list = await YouTubeMusicUtils.searchYouTubeVideo(query);
-    await addSong(
-      key: const Uuid().v4(),
-      audioId: list.first.id.value,
-    );
-  }
-
-  static Future<void> loadFromUrl(String url) async {
-    final isPlaylist = await loadPlaylist(url);
-    if (isPlaylist) return;
-
-    VideoId id;
-    try {
-      id = VideoId(url);
-    } on ArgumentError {
-      ToastManager.showSimpleToast(
-        msg: Text(l10n.value.invalid_url),
-        icon: const Icon(
-          Icons.wifi_off,
-          color: Colors.red,
-        ),
-      );
-      return;
-    }
-    await addSong(
-      key: const Uuid().v4(),
-      audioId: id.value,
-    );
-  }
-
-  static final RegExp playlistRegex =
-      RegExp(r"^https?://(www.)?youtube.com/playlist\?((.+=.+&)*)list=([^&]+)");
-  static Future<bool> loadPlaylist(String url) async {
-    if (!playlistRegex.hasMatch(url)) {
-      return false;
-    }
-    final match = playlistRegex.firstMatch(url)!;
-    final listId = match.group(4)!;
-    final yt = YoutubeExplode();
-    final playlist = await yt.playlists.get(listId);
-    if (playlist.videoCount == null || playlist.videoCount == 0) {
-      ToastManager.showSimpleToast(
-        icon: const Icon(Icons.music_off_outlined, color: Colors.red),
-        msg: Text(l10n.value.external_playlist_empty),
-      );
-      return true;
-    }
-    await HomeScreenMusicManager.addSongs(
-      count: playlist.videoCount!,
-      youtubePlaylist: listId,
-    );
-    return true;
   }
 
   /// Download a song with progress indicator notification

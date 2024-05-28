@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../system/home_screen_music_manager.dart';
 import '../../system/theme/theme.dart';
 import '../notifiers_widget.dart';
 import 'song_search.dart';
+import 'suggestion.dart';
 
-class SongSearchTile extends StatelessWidget {
+class SongSearchTile<T extends Suggestion> extends StatelessWidget {
   SongSearchTile({
     required this.suggestion,
     required this.parent,
     super.key,
   });
 
-  final SongSuggestion suggestion;
+  final T suggestion;
   final SongSearch parent;
 
   final ValueNotifier<bool> selectedNotifier = ValueNotifier(false);
@@ -22,22 +21,28 @@ class SongSearchTile extends StatelessWidget {
   Widget build(BuildContext context) {
     late Icon icon;
 
+    final suggestion = this.suggestion;
+
     // TODO: custom colored icons
-    if (suggestion.tags.contains(SongTag.word)) {
-      icon = const Icon(Icons.tag, color: Colors.grey);
-    } else if (suggestion.tags.contains(SongTag.installed)) {
-      icon = const Icon(Icons.offline_pin_outlined, color: Colors.green);
-    } else if (suggestion.tags.contains(SongTag.stored)) {
-      icon = const Icon(Icons.star_outline, color: Colors.orange);
+    if (suggestion is SongSuggestion) {
+      if (suggestion.tags.contains(SongTag.installed)) {
+        icon = const Icon(Icons.offline_pin_outlined, color: Colors.green);
+      } else if (suggestion.tags.contains(SongTag.stored)) {
+        icon = const Icon(Icons.star_outline, color: Colors.orange);
+      } else {
+        icon = const Icon(Icons.library_music_outlined, color: Colors.blue);
+      }
     } else {
-      icon = const Icon(Icons.library_music_outlined, color: Colors.blue);
+      icon = const Icon(Icons.tag, color: Colors.grey);
     }
 
     void updateSelectedList() {
+      if (this is! SongSearchTile<SongSuggestion>) return;
+
       // update selected list in parent
       if (selectedNotifier.value) {
         if (!parent.selectedTiles.contains(this)) {
-          parent.selectedTiles.add(this);
+          parent.selectedTiles.add(this as SongSearchTile<SongSuggestion>);
         }
       } else {
         if (parent.selectedTiles.contains(this)) {
@@ -56,15 +61,13 @@ class SongSearchTile extends StatelessWidget {
           parent.multiSelectMode.value = false;
         }
       } else {
-        if (suggestion.tags.contains(SongTag.word)) {
-          parent.setQuery(suggestion.word!);
-        } else if (suggestion.tags.contains(SongTag.youtube)) {
-          parent.close(context, "");
-          await HomeScreenMusicManager.addSong(
-            key: const Uuid().v4(),
-            musicData: suggestion.musicData,
-            mediaUrl: suggestion.mediaUrl,
-          );
+        final suggestion = this.suggestion;
+
+        if (suggestion is WordSuggestion) {
+          parent.setQuery(suggestion.word);
+        } else if (suggestion is SongSuggestion &&
+            suggestion.tags.contains(SongTag.youtube)) {
+          parent.close(context, Future.wait([suggestion.fetchMusicData()]));
         }
       }
     }
@@ -74,7 +77,7 @@ class SongSearchTile extends StatelessWidget {
       notifier2: selectedNotifier,
       builder: (context, multiSelect, isSelected, child) {
         return Visibility(
-          visible: !(suggestion.tags.contains(SongTag.word) && multiSelect),
+          visible: !(suggestion is WordSuggestion && multiSelect),
           child: InkWell(
             onTap: onTap,
             onLongPress: multiSelect
@@ -103,9 +106,9 @@ class SongSearchTile extends StatelessWidget {
                               color: icon.color!,
                               width: 2,
                             ),
-                            fillColor: MaterialStateProperty.resolveWith(
+                            fillColor: WidgetStateProperty.resolveWith(
                               (states) {
-                                if (!states.contains(MaterialState.selected)) {
+                                if (!states.contains(WidgetState.selected)) {
                                   return Colors.transparent;
                                 }
                                 return icon.color!;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../music/manager/notifiers/audio_state_notifier.dart';
+import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 import '../utils/responsive.dart';
 import '../widget/music_footer.dart';
@@ -109,10 +110,17 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
               final searchDelegate =
                   SongSearch(animationController: _menuIconAnimationController);
               _menuIconAnimationController.forward();
-              await showSearch(context: context, delegate: searchDelegate)
-                  .then((value) {
-                _menuIconAnimationController.reverse();
-              });
+              final result =
+                  await showSearch(context: context, delegate: searchDelegate);
+              _menuIconAnimationController.reverse();
+
+              final songs = await result;
+              if (songs != null && songs.isNotEmpty) {
+                HomeScreenMusicManager.addSongs(
+                  count: songs.length,
+                  musicDataList: songs,
+                );
+              }
             },
             icon: const Icon(Icons.search)),
       ],

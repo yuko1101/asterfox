@@ -8,7 +8,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/song_history_data.dart';
 import '../../main.dart';
-import '../utils/music_url_utils.dart';
+import '../utils/music_data_utils.dart';
 import '../utils/youtube_music_utils.dart';
 import 'url_music_data.dart';
 import 'youtube_music_data.dart';
@@ -216,7 +216,7 @@ class MusicData<T extends Caching> {
       return musicData.renew(key: key, caching: caching);
     }
 
-    final id = audioId ?? MusicUrlUtils.getAudioIdFromUrl(mediaUrl!);
+    final id = audioId ?? MusicDataUtils.getAudioIdFromUrl(mediaUrl!);
 
     return await getByAudioId(audioId: id, key: key, caching: caching);
   }
@@ -303,7 +303,7 @@ extension AudioSourceParseMusicData on IndexedAudioSource {
   }
 }
 
-class Caching {
+abstract class Caching {
   // whether to cache the instance into the `created`.
   bool get enabled => this is CachingEnabled;
 }
