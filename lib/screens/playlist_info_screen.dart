@@ -39,8 +39,17 @@ class _PlaylistInfoScreenState
           ? [
               IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () {
-                  showSearch(context: context, delegate: SongSearch());
+                onPressed: () async {
+                  final result = await showSearch(
+                    context: context,
+                    delegate: SongSearch(),
+                  );
+                  final songs = await result;
+                  if (songs != null && songs.isNotEmpty) {
+                    setState(() {
+                      editingSongs.addAll(songs);
+                    });
+                  }
                 },
               ),
               IconButton(
@@ -77,7 +86,8 @@ class _PlaylistInfoScreenState
                 onPressed: () {
                   HomeScreenMusicManager.addSongs(
                     count: widget.playlist.songs.length,
-                    musicDataList: widget.playlist.getMusicDataList(CachingDisabled()),
+                    musicDataList:
+                        widget.playlist.getMusicDataList(CachingDisabled()),
                   );
                   Navigator.of(context).pushNamed("/home");
                 },
