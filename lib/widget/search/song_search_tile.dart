@@ -5,14 +5,14 @@ import '../notifiers_widget.dart';
 import 'song_search.dart';
 import 'suggestion.dart';
 
-class SongSearchTile<T extends Suggestion> extends StatelessWidget {
+class SongSearchTile extends StatelessWidget {
   SongSearchTile({
     required this.suggestion,
     required this.parent,
     super.key,
   });
 
-  final T suggestion;
+  final Suggestion suggestion;
   final SongSearch parent;
 
   final ValueNotifier<bool> selectedNotifier = ValueNotifier(false);
