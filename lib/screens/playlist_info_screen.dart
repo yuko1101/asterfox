@@ -66,6 +66,7 @@ class _PlaylistInfoScreenState
                 onPressed: () {
                   setState(() {
                     editMode = false;
+                    // TODO: handle unstored songs
                     applyChanges();
                   });
                 },
