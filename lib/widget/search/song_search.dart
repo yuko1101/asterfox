@@ -25,7 +25,7 @@ class SongSearch
 
   final ValueNotifier<bool> multiSelectMode = ValueNotifier(false);
 
-  final List<SongSearchTile<SongSuggestion>> selectedTiles = [];
+  final Set<SongSearchTile<SongSuggestion>> selectedTiles = {};
 
   // search options
   bool forceOfflineSearch = false;

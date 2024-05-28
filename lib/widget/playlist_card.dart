@@ -21,34 +21,37 @@ class PlaylistCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          FourImagesGrid(
-            playlist.songs
-                .take(4)
-                .map((audioId) => LocalMusicsData.getByAudioId(
-                    audioId: audioId,
-                    key: const Uuid().v4(),
-                    caching: CachingDisabled()))
-                .map((song) {
-              final image = song.imageUrl;
-              if (image.isUrl) {
-                if (!NetworkUtils.networkAccessible()) {
-                  return getDefaultImage(BoxFit.cover);
-                }
-                return Image.network(
-                  image,
-                  fit: BoxFit.cover,
-                  height: double.infinity,
-                  width: double.infinity,
-                );
-              }
-              return Image.file(
-                File(image),
-                fit: BoxFit.cover,
-                height: double.infinity,
-                width: double.infinity,
-              );
-            }).toList(),
-          ),
+          playlist.songs.isEmpty
+              // TODO: better empty widget
+              ? const Text("Empty")
+              : FourImagesGrid(
+                  playlist.songs
+                      .take(4)
+                      .map((audioId) => LocalMusicsData.getByAudioId(
+                          audioId: audioId,
+                          key: const Uuid().v4(),
+                          caching: CachingDisabled()))
+                      .map((song) {
+                    final image = song.imageUrl;
+                    if (image.isUrl) {
+                      if (!NetworkUtils.networkAccessible()) {
+                        return getDefaultImage(BoxFit.cover);
+                      }
+                      return Image.network(
+                        image,
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                        width: double.infinity,
+                      );
+                    }
+                    return Image.file(
+                      File(image),
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                      width: double.infinity,
+                    );
+                  }).toList(),
+                ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(

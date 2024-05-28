@@ -203,5 +203,11 @@
     "no_text_in_clipboard": "No text in clipboard",
     "@no_text_in_clipboard": {},
     "playlist": "Playlist",
-    "@playlist": {}
+    "@playlist": {},
+    "create_playlist": "Create a playlist",
+    "@create_playlist": {},
+    "playlist_name": "Playlist Name",
+    "@playlist_name": {},
+    "create": "Create",
+    "@create": {}
 }

@@ -186,5 +186,11 @@
     "no_text_in_clipboard": "クリップボードにテキストがありません",
     "@no_text_in_clipboard": {},
     "playlist": "プレイリスト",
-    "@playlist": {}
+    "@playlist": {},
+    "create_playlist": "プレイリストを作成",
+    "@create_playlist": {},
+    "playlist_name": "プレイリスト名",
+    "@playlist_name": {},
+    "create": "作成",
+    "@create": {}
 }
