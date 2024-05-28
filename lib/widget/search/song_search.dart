@@ -25,7 +25,7 @@ class SongSearch
 
   final ValueNotifier<bool> multiSelectMode = ValueNotifier(false);
 
-  final Set<SongSearchTile<SongSuggestion>> selectedTiles = {};
+  final Set<SongSearchTile> selectedTiles = {};
 
   // search options
   bool forceOfflineSearch = false;
@@ -100,8 +100,10 @@ class SongSearch
         onPressed: () {
           late final Future<List<MusicData<CachingDisabled>>> songs;
           if (multiSelectMode.value) {
-            songs = Future.wait(
-                selectedTiles.map((tile) => tile.suggestion.fetchMusicData()));
+            songs = Future.wait(selectedTiles
+                .where((tile) => tile.suggestion is SongSuggestion)
+                .map((tile) =>
+                    (tile.suggestion as SongSuggestion).fetchMusicData()));
           } else {
             if (query.isEmpty || query == "") return;
             songs = Future.wait([MusicDataUtils.search(query)]);
@@ -136,8 +138,9 @@ class SongSearch
   void showResults(BuildContext context) {
     late final Future<List<MusicData<CachingDisabled>>> songs;
     if (multiSelectMode.value) {
-      songs = Future.wait(
-          selectedTiles.map((tile) => tile.suggestion.fetchMusicData()));
+      songs = Future.wait(selectedTiles
+          .where((tile) => tile.suggestion is SongSuggestion)
+          .map((tile) => (tile.suggestion as SongSuggestion).fetchMusicData()));
     } else {
       if (query.isEmpty || query == "") return close(context, Future.value([]));
       songs = Future.wait([MusicDataUtils.search(query)]);

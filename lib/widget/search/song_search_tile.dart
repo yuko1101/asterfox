@@ -37,17 +37,11 @@ class SongSearchTile<T extends Suggestion> extends StatelessWidget {
     }
 
     void updateSelectedList() {
-      if (this is! SongSearchTile<SongSuggestion>) return;
-
       // update selected list in parent
       if (selectedNotifier.value) {
-        if (!parent.selectedTiles.contains(this)) {
-          parent.selectedTiles.add(this as SongSearchTile<SongSuggestion>);
-        }
+        parent.selectedTiles.add(this);
       } else {
-        if (parent.selectedTiles.contains(this)) {
-          parent.selectedTiles.remove(this);
-        }
+        parent.selectedTiles.remove(this);
       }
     }
 
