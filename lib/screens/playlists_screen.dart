@@ -24,7 +24,14 @@ class PlaylistsScreen extends ScaffoldScreen {
         valueListenable: selectedPlaylistsNotifier,
         builder: (context, value, child) {
           return AppBar(
-            title: Text(l10n.value.playlist),
+            title: Text(
+              value.isEmpty
+                  ? l10n.value.playlist
+                  : l10n.value.selected(value.length),
+            ),
+            backgroundColor: value.isEmpty
+                ? null
+                : CustomColors.getColor("accent").withOpacity(0.8),
             leading: IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back),
@@ -41,8 +48,10 @@ class PlaylistsScreen extends ScaffoldScreen {
                         );
                         if (playlist != null) {
                           await PlaylistsData.addAndSave(playlist);
-                          playlistsNotifier.value = [...playlistsNotifier.value]
-                            ..add(playlist);
+                          playlistsNotifier.value = [
+                            ...playlistsNotifier.value,
+                            playlist
+                          ];
                         }
                       },
                     ),

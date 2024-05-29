@@ -54,7 +54,13 @@
     "list_separator": "、",
     "@list_separator": {},
     "theme_names": "{theme, select, dark {ダーク} light {ライト} other {{theme}}}",
-    "@theme_names": {},
+    "@theme_names": {
+        "placeholders": {
+            "theme": {
+                "type": "String"
+            }
+        }
+    },
     "shuffle": "シャッフル",
     "@shuffle": {},
     "play_previous_song": "一つ前の曲を再生",
@@ -78,7 +84,13 @@
     "more_actions": "その他",
     "@more_actions": {},
     "loading_songs": "{count}曲を読み込み中",
-    "@loading_songs": {},
+    "@loading_songs": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
     "invalid_url": "無効なURLです",
     "@invalid_url": {},
     "saving": "ローカルに保存中",
@@ -180,7 +192,13 @@
     "audio_channel": "オーディオチャンネル",
     "@audio_channel": {},
     "audio_channels": "{channel, select, media {メディア} call {通話} call_speaker {通話 (スピーカー)} notification {着信音と通知} alarm {アラーム} other {{channel}}}",
-    "@audio_channels": {},
+    "@audio_channels": {
+        "placeholders": {
+            "channel": {
+                "type": "String"
+            }
+        }
+    },
     "from_clipboard": "クリップボードから",
     "@from_clipboard": {},
     "no_text_in_clipboard": "クリップボードにテキストがありません",
@@ -202,5 +220,13 @@
     "store_songs_explanation": "プレイリストには保存された曲のみを追加できます。プレイリスト内の保存されていない曲を保存しますか？",
     "@store_songs_explanation": {},
     "empty_playlist": "空のプレイリスト",
-    "@empty_playlist": {}
+    "@empty_playlist": {},
+    "selected": "選択中 ({count}個)",
+    "@selected": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    }
 }
