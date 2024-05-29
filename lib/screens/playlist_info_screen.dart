@@ -65,7 +65,8 @@ class _PlaylistInfoScreenState
               IconButton(
                 icon: const Icon(Icons.check),
                 onPressed: () async {
-                  final notStoredSongs = editingSongs.where((s) => !s.isStored).toList();
+                  final notStoredSongs =
+                      editingSongs.where((s) => !s.isStored).toList();
                   bool cancel = false;
                   if (notStoredSongs.isNotEmpty &&
                       !await showDialog(
@@ -94,14 +95,16 @@ class _PlaylistInfoScreenState
               IconButton(
                 icon: const Icon(Icons.play_arrow),
                 tooltip: l10n.value.play,
-                onPressed: () {
-                  HomeScreenMusicManager.addSongs(
-                    count: widget.playlist.songs.length,
-                    musicDataList:
-                        widget.playlist.getMusicDataList(CachingDisabled()),
-                  );
-                  Navigator.of(context).pushNamed("/home");
-                },
+                onPressed: widget.playlist.songs.isNotEmpty
+                    ? () {
+                        HomeScreenMusicManager.addSongs(
+                          count: widget.playlist.songs.length,
+                          musicDataList: widget.playlist
+                              .getMusicDataList(CachingDisabled()),
+                        );
+                        Navigator.of(context).pushNamed("/home");
+                      }
+                    : null,
               ),
             ],
     );
