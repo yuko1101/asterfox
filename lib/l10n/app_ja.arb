@@ -200,5 +200,7 @@
     "store_songs": "曲を保存",
     "@store_songs": {},
     "store_songs_explanation": "プレイリストには保存された曲のみを追加できます。プレイリスト内の保存されていない曲を保存しますか？",
-    "@store_songs_explanation": {}
+    "@store_songs_explanation": {},
+    "empty_playlist": "空のプレイリスト",
+    "@empty_playlist": {}
 }

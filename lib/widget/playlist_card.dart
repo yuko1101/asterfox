@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/local_musics_data.dart';
+import '../main.dart';
 import '../music/audio_source/music_data.dart';
 import '../music/playlist/playlist.dart';
 import '../music/utils/music_data_utils.dart';
@@ -11,7 +12,8 @@ import '../utils/network_utils.dart';
 import 'music_widgets/music_thumbnail.dart';
 
 class PlaylistCard extends StatelessWidget {
-  const PlaylistCard({required this.playlist, this.onTap, this.onLongPress, super.key});
+  const PlaylistCard(
+      {required this.playlist, this.onTap, this.onLongPress, super.key});
 
   final AppPlaylist playlist;
   final void Function()? onTap;
@@ -24,8 +26,7 @@ class PlaylistCard extends StatelessWidget {
       child: Stack(
         children: [
           playlist.songs.isEmpty
-              // TODO: better empty widget
-              ? const Text("Empty")
+              ? Center(child: Text(l10n.value.empty_playlist))
               : FourImagesGrid(
                   playlist.songs
                       .take(4)

@@ -217,5 +217,7 @@
     "store_songs": "Store Songs",
     "@store_songs": {},
     "store_songs_explanation": "Playlists cannot have non-stored songs. Would you like to store the non-stored songs in the playlist?",
-    "@store_songs_explanation": {}
+    "@store_songs_explanation": {},
+    "empty_playlist": "Empty Playlist",
+    "@empty_playlist": {}
 }
