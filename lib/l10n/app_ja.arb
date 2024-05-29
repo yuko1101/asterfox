@@ -196,5 +196,9 @@
     "delete_playlists": "プレイリストを削除",
     "@delete_playlists": {},
     "delete_playlists_message": "選択したプレイリストを削除しますか？",
-    "@delete_playlists_message": {}
+    "@delete_playlists_message": {},
+    "store_songs": "曲を保存",
+    "@store_songs": {},
+    "store_songs_explanation": "プレイリストには保存された曲のみを追加できます。プレイリスト内の保存されていない曲を保存しますか？",
+    "@store_songs_explanation": {}
 }

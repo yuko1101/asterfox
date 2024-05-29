@@ -213,5 +213,9 @@
     "delete_playlists": "Delete Playlists",
     "@delete_playlists": {},
     "delete_playlists_message": "Are you sure you want to delete the selected playlists?",
-    "@delete_playlists_message": {}
+    "@delete_playlists_message": {},
+    "store_songs": "Store Songs",
+    "@store_songs": {},
+    "store_songs_explanation": "Playlists cannot have non-stored songs. Would you like to store the non-stored songs in the playlist?",
+    "@store_songs_explanation": {}
 }

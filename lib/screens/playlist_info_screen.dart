@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/local_musics_data.dart';
 import '../data/playlist_data.dart';
 import '../main.dart';
 import '../music/audio_source/music_data.dart';
@@ -63,10 +64,19 @@ class _PlaylistInfoScreenState
               ),
               IconButton(
                 icon: const Icon(Icons.check),
-                onPressed: () {
+                onPressed: () async {
+                  final notStoredSongs = editingSongs.where((s) => !s.isStored).toList();
+                  bool cancel = false;
+                  if (notStoredSongs.isNotEmpty &&
+                      !await showDialog(
+                        context: context,
+                        builder: (context) => StoreSongsDialog(notStoredSongs),
+                      )) {
+                    cancel = true;
+                  }
+                  if (cancel) return;
                   setState(() {
                     editMode = false;
-                    // TODO: handle unstored songs
                     applyChanges();
                   });
                 },
@@ -120,5 +130,32 @@ class _PlaylistInfoScreenState
     widget.playlist.songs.clear();
     widget.playlist.songs.addAll(editingSongs.map((s) => s.audioId));
     PlaylistsData.addAndSave(widget.playlist);
+  }
+}
+
+class StoreSongsDialog extends StatelessWidget {
+  const StoreSongsDialog(this.songs, {super.key});
+
+  final List<MusicData> songs;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(l10n.value.store_songs),
+      content: Text(l10n.value.store_songs_explanation),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.value.cancel),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.of(context).pop(true);
+            await LocalMusicsData.storeMultiple(songs);
+          },
+          child: Text(l10n.value.ok),
+        ),
+      ],
+    );
   }
 }

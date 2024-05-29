@@ -45,6 +45,16 @@ class LocalMusicsData {
     await CloudFirestoreManager.addOrUpdateSongs([song]);
   }
 
+  static Future<void> storeMultiple(List<MusicData> songs) async {
+    for (final song in songs) {
+      if (song.isStored) continue;
+      song.songStoredAt = DateTime.now().millisecondsSinceEpoch;
+      localMusicData.set(key: song.audioId, value: song.toJson());
+    }
+    await localMusicData.save(compact: compact);
+    await CloudFirestoreManager.addOrUpdateSongs(songs);
+  }
+
   /// Throws [VideoUnplayableException], [NetworkException] and [SongNotStoredException].
   static Future<void> install(MusicData song) async {
     if (!song.isStored) throw SongNotStoredException();
