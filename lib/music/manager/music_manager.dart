@@ -88,7 +88,7 @@ class MusicManager {
   }
 
   Future<void> add(MusicData song) async {
-    if (!song.isInstalled && !(await song.isAudioUrlAvailable())) {
+    if (!song.isInstalled && !await song.isAudioUrlAvailable()) {
       await song.refreshAudioUrl();
     }
     await _audioHandler.addQueueItem(await song.toMediaItem());
@@ -98,7 +98,7 @@ class MusicManager {
     await _audioHandler.addQueueItems(
       await Future.wait(
         songs.map((e) => (MusicData e) async {
-              if (!e.isInstalled && !(await e.isAudioUrlAvailable())) {
+              if (!e.isInstalled && !await e.isAudioUrlAvailable()) {
                 await e.refreshAudioUrl();
               }
               return e.toMediaItem();

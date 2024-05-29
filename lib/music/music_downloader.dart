@@ -46,7 +46,7 @@ class DownloadManager {
     _downloadStarted(downloadKey);
     final notifiers = _getNotifiers(downloadKey);
 
-    if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
+    if (!await song.isAudioUrlAvailable()) await song.refreshAudioUrl();
 
     // download
     await for (final progress

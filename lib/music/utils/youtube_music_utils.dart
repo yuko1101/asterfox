@@ -170,7 +170,7 @@ class YouTubeMusicUtils {
         key: key,
         caching: caching,
       ) as YouTubeMusicData<T>;
-      if (!(await song.isAudioUrlAvailable())) await song.refreshAudioUrl();
+      if (!await song.isAudioUrlAvailable()) await song.refreshAudioUrl();
       return song;
     }
 
