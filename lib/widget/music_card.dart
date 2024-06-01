@@ -34,6 +34,7 @@ class MusicCardWidget extends StatelessWidget {
       background: Container(
         color: Theme.of(context).extraColors.primary.withOpacity(0.07),
       ),
+      dismissThresholds: const {DismissDirection.endToStart: 0.6, DismissDirection.startToEnd: 0.6},
       child: buildCard(context),
       onDismissed: (DismissDirection dismissDirection) async {
         if (onRemove != null) {
