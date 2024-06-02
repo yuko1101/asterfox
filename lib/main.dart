@@ -52,6 +52,17 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
+      // Firebase set-up
+      if (shouldInitializeFirebase) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        if (!kDebugMode) {
+          FlutterError.onError =
+              FirebaseCrashlytics.instance.recordFlutterFatalError;
+        }
+      }
+
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.edgeToEdge,
         overlays: [SystemUiOverlay.top],
@@ -89,17 +100,6 @@ Future<void> main() async {
       await DeviceSettingsData.init();
 
       NetworkUtils.init(ConnectivityResult.mobile);
-
-      // Firebase set-up
-      if (shouldInitializeFirebase) {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        if (!kDebugMode) {
-          FlutterError.onError =
-              FirebaseCrashlytics.instance.recordFlutterFatalError;
-        }
-      }
 
       // run this before initializing HomeScreen
       await musicManager.init();
