@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import '../music/audio_source/music_data.dart';
@@ -11,29 +10,28 @@ import 'home_screen_music_manager.dart';
 class SharingIntent {
   static void init() {
     if (Platform.isAndroid || Platform.isIOS) {
-      ReceiveSharingIntent.instance.getMediaStream().listen((mediaList) {});
+      ReceiveSharingIntent.instance.getMediaStream().listen((mediaList) {
+        addSongs(mediaList, false);
+      });
 
-      ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {});
+      ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
+        addSongs(mediaList, true);
+      });
     }
   }
 
-  static Future<void> addSong(
-      String? text, bool initial, BuildContext context) async {
+  static Future<void> addSongs(
+      List<SharedMediaFile> mediaList, bool initial) async {
     // Fluttertoast.showToast(msg: "${initial ? "Initial " : ""}Loading from $text");
-    if (text == null) return;
+    if (mediaList.isEmpty) return;
 
     final List<MusicData<CachingDisabled>> musicDataList = [];
-    try {
-      musicDataList.add(await MusicDataUtils.fetchFromUrl(text));
-    } on InvalidTypeOfMediaUrlException {
-      try {
-        await for (final musicData
-            in MusicDataUtils.fetchPlaylistFromUrl(text)) {
-          musicDataList.add(musicData);
-        }
-      } catch (e) {
-        // TODO: handle exception
-        return;
+
+    for (final media in mediaList) {
+      if (media.type == SharedMediaType.url || (media.type == SharedMediaType.text && media.path.isUrl)) {
+        musicDataList.addAll(await fetchSongsFromUrl(media.path));
+      } else if (media.type == SharedMediaType.text) {
+        musicDataList.add(await fetchSongsByQuery(media.path));
       }
     }
 
@@ -41,5 +39,29 @@ class SharingIntent {
       count: musicDataList.length,
       musicDataList: musicDataList,
     );
+  }
+
+  static Future<MusicData<CachingDisabled>> fetchSongsByQuery(String query) {
+    return MusicDataUtils.search(query);
+  }
+
+  static Future<List<MusicData<CachingDisabled>>> fetchSongsFromUrl(
+      String url) async {
+    final List<MusicData<CachingDisabled>> musicDataList = [];
+
+    try {
+      musicDataList.add(await MusicDataUtils.fetchFromUrl(url));
+    } on InvalidTypeOfMediaUrlException {
+      try {
+        await for (final musicData
+            in MusicDataUtils.fetchPlaylistFromUrl(url)) {
+          musicDataList.add(musicData);
+        }
+      } catch (e) {
+        // TODO: handle exception
+      }
+    }
+
+    return musicDataList;
   }
 }
