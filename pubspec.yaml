@@ -171,11 +171,12 @@ flutter:
 
 msix_config:
   display_name: Asterfox
-  publisher_display_name: asterium.net
-#  publisher: C = JP, ST = Hokkaido, L = Sapporo, O = Asterium Ltd, OU = System Management Division, DC = asterium, DC = net, CN = asterium.net
-  identity_name: net.asterfox.app
+  publisher_display_name: Asterity
+  identity_name: asterity.github.io
   msix_version: 1.0.2.0
   logo_path: ./assets/images/asterfox.png
+  certificate_path: ./certificate.pfx
+  certificate_password: ""
   capabilities: "internetClient"
 
 flutter_launcher_icons:

@@ -62,6 +62,12 @@ jobs:
           echo "ref: ${{ env.branch }}" > .git/HEAD
           echo "${{ env.commitId }}" > .git/${{ env.branch }}
 
+      - name: Decode certificate
+        if: matrix.target == 'windows'
+        shell: bash
+        run: |
+          echo ${{ secrets.PFX_BASE64 }} | base64 -d > ./certificate.pfx
+
       - name: Build release
         run: ${{ matrix.build}}
 

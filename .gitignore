@@ -1,3 +1,6 @@
+# Certificate files
+*.pfx
+
 # Miscellaneous
 *.class
 *.log
