@@ -82,8 +82,18 @@ Future<void> main() async {
       }
 
       if (!kIsWeb) {
-        localPath = (await getApplicationDocumentsDirectory()).path;
-        tempPath = (await getTemporaryDirectory()).path;
+        var documentsDir = (await getApplicationDocumentsDirectory()).path;
+        var tempDir = (await getTemporaryDirectory()).path;
+
+        final appDir = "${Platform.pathSeparator}Asterfox";
+        if (Platform.isWindows) {
+          documentsDir += appDir;
+          tempDir += appDir;
+        }
+        // TODO: add more os which has shared document and/or shared temp directory
+
+        localPath = documentsDir;
+        tempPath = tempDir;
       }
 
       final wearOSCheckFile = File("$localPath/wear_os");
