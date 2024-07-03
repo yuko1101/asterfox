@@ -545,11 +545,11 @@ packages:
     dependency: "direct main"
     description:
       path: just_audio
-      ref: "9b060a4f1a88c86e0235b267970d51dd2be5fc0f"
-      resolved-ref: "9b060a4f1a88c86e0235b267970d51dd2be5fc0f"
+      ref: caae5658fadc2ad375a5d56209d4d01b5d7fe7a0
+      resolved-ref: caae5658fadc2ad375a5d56209d4d01b5d7fe7a0
       url: "https://github.com/yuko1101/just_audio.git"
     source: git
-    version: "0.9.38"
+    version: "0.9.39"
   just_audio_platform_interface:
     dependency: transitive
     description:

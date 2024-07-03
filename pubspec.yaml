@@ -55,7 +55,7 @@ dependencies:
   just_audio: # ^0.9.35
     git:
       url: https://github.com/yuko1101/just_audio.git
-      ref: 9b060a4f1a88c86e0235b267970d51dd2be5fc0f
+      ref: caae5658fadc2ad375a5d56209d4d01b5d7fe7a0
       path: just_audio
   just_audio_windows: ^0.2.1
 
