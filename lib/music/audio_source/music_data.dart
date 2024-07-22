@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -297,9 +297,9 @@ extension MediaItemParseMusicData on MediaItem {
   }
 }
 
-extension AudioSourceParseMusicData on IndexedAudioSource {
+extension AudioSourceParseMusicData on Media {
   MusicData toMusicData() {
-    return MusicData.fromKey(tag["key"])!;
+    return MusicData.fromKey(extras!["key"])!;
   }
 }
 

@@ -1,4 +1,4 @@
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
 import 'audio_data_manager.dart';
 import 'audio_handler.dart';
 import 'music_manager.dart';
@@ -13,65 +13,63 @@ class MusicListener {
   late AudioDataManager _audioDataManager;
 
   void init() {
-    _audioHandler.audioPlayer.sequenceStateStream.listen((sequenceState) {
+    _audioHandler.audioPlayer.stream.playlist.listen((sequenceState) {
       _updatePlaylistAndIndex(sequenceState);
     });
-    _audioHandler.audioPlayer.playerStateStream.listen((playbackState) {
-      _updatePlaybackState(playbackState);
+    _audioHandler.audioPlayer.stream.playing.listen((playing) {
+      _updatePlaybackState(playing);
     });
 
-    _audioHandler.audioPlayer.positionStream.listen((position) {
+    _audioHandler.audioPlayer.stream.position.listen((position) {
       _updateProgress();
     });
-    _audioHandler.audioPlayer.bufferedPositionStream.listen((buffered) {
+    _audioHandler.audioPlayer.stream.buffer.listen((buffered) {
       _updateProgress();
     });
-    _audioHandler.audioPlayer.loopModeStream.listen((loopMode) {
+    _audioHandler.audioPlayer.stream.playlistMode.listen((loopMode) {
       _updateLoopMode(loopMode);
     });
-    _audioHandler.audioPlayer.volumeStream.listen((volume) {
-      _updateVolume(volume);
+    _audioHandler.audioPlayer.stream.volume.listen((volume) {
+      _updateVolume(volume / 100);
     });
   }
 
   int _lastPlaylistLength = 0;
-  void _updatePlaylistAndIndex(SequenceState? sequenceState) {
-    final sequence = sequenceState?.sequence;
-    final currentIndex = sequenceState?.currentIndex;
+  void _updatePlaylistAndIndex(Playlist sequenceState) {
+    final sequence = sequenceState.medias;
+    final currentIndex = sequenceState.index;
 
     _musicManager.audioStateManager.mainNotifier.update({
       "sequence": sequence,
       "currentIndex": currentIndex,
-      "shuffleMode": sequenceState?.shuffleModeEnabled ?? false,
-      "shuffleIndices": sequenceState?.shuffleIndices,
-      "loopMode": sequenceState?.loopMode ?? LoopMode.off,
     });
 
     // TODO: add to settings
-    if (_lastPlaylistLength == 0 && (sequence ?? []).isNotEmpty) {
-      _autoPlay = true;
+    if (_lastPlaylistLength == 0 && sequence.isNotEmpty) {
+      // _autoPlay = true;
     }
-    _lastPlaylistLength = (sequence ?? []).length;
+    _lastPlaylistLength = sequence.length;
   }
 
-  bool _autoPlay = false;
-  void _updatePlaybackState(PlayerState playerState) {
+  // bool _autoPlay = false;
+  void _updatePlaybackState(bool playing) {
     final newAudioState = _musicManager.audioStateManager.mainNotifier.value
-        .copyWith({"playerState": playerState});
+        .copyWith({"playing": playing});
 
     final playingState = newAudioState.playingState;
     if (playingState == PlayingState.unknown) {
       _audioHandler.seek(Duration.zero);
       _audioHandler.pause();
     }
-    if (_autoPlay) {
-      if (playingState == PlayingState.paused) {
-        _musicManager.play();
-        _autoPlay = false;
-      } else if (playingState == PlayingState.playing) {
-        _autoPlay = false;
-      }
-    }
+    // TODO: implement this
+    // if (_autoPlay) {
+    //   if (playingState == PlayingState.paused) {
+    //     _musicManager.play();
+    //     _autoPlay = false;
+    //   } else if (playingState == PlayingState.playing) {
+    //     _autoPlay = false;
+    //   }
+    // }
 
     _musicManager.audioStateManager.mainNotifier.value = newAudioState;
   }
@@ -80,7 +78,7 @@ class MusicListener {
     _musicManager.progressNotifier.value = _audioDataManager.progress;
   }
 
-  void _updateLoopMode(LoopMode loopMode) {
+  void _updateLoopMode(PlaylistMode loopMode) {
     _musicManager.audioStateManager.mainNotifier.update({"loopMode": loopMode});
   }
 

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wear/wear.dart';
 
@@ -104,6 +105,13 @@ Future<void> main() async {
         wearOSCheckFile.deleteSync();
       }
 
+      MediaKit.ensureInitialized();
+
+      // final player = Player();
+      // await player.open(
+      //   Playlist([Media("https://drive.google.com/uc?export=download&id=1IX4JIZSEN6ZiIHDo8U5JNkojfwzKBXp0")]),
+      // );
+
       await SettingsData.init();
       await SettingsData.applySettings();
 
@@ -111,14 +119,14 @@ Future<void> main() async {
 
       NetworkUtils.init(ConnectivityResult.mobile);
 
+      await LocalMusicsData.init();
+      await PlaylistsData.init();
+
       // run this before initializing HomeScreen
       await musicManager.init();
 
       // run this after initializing the music manager.
       await DeviceSettingsData.applyMusicManagerSettings();
-
-      await LocalMusicsData.init();
-      await PlaylistsData.init();
 
       // run this after initializing Firebase, LocalMusicsData, and SettingsData.
       if (shouldInitializeFirebase) {

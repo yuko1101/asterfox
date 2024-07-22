@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
@@ -24,16 +24,16 @@ class DownloadButton extends StatelessWidget {
             final downloadable = song != null && !song.isInstalled;
             final isDownloading = downloadingSongs.contains(song?.audioId);
 
-            final List<IndexedAudioSource?> songs =
-                musicManager.audioHandler.audioPlayer.sequence ?? [];
-            final audioSourceIndex = songs.indexWhere((element) =>
-                element != null && element.tag["key"] == song?.key);
-            final IndexedAudioSource? audioSource =
+            final List<Media> songs =
+                musicManager.audioHandler.audioPlayer.state.playlist.medias;
+            final audioSourceIndex = songs
+                .indexWhere((element) => element.extras!["key"] == song?.key);
+            final Media? audioSource =
                 audioSourceIndex != -1 ? songs[audioSourceIndex] : null;
             final isDownloaded = song != null &&
                 audioSource != null &&
                 LocalMusicsData.isInstalled(audioId: song.audioId) &&
-                (audioSource.tag["url"] as String).isUrl;
+                (audioSource.extras!["url"] as String).isUrl;
 
             if (isDownloading) {
               return Container(

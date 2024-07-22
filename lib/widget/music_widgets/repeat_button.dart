@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
 
 import '../../main.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
@@ -61,24 +61,24 @@ String repeatStateToString(RepeatState value) {
   }
 }
 
-LoopMode repeatStateToLoopMode(RepeatState value) {
+PlaylistMode repeatStateToPlaylistMode(RepeatState value) {
   switch (value) {
     case RepeatState.none:
-      return LoopMode.off;
+      return PlaylistMode.none;
     case RepeatState.all:
-      return LoopMode.all;
+      return PlaylistMode.loop;
     case RepeatState.one:
-      return LoopMode.one;
+      return PlaylistMode.single;
   }
 }
 
-RepeatState loopModeToRepeatState(LoopMode value) {
+RepeatState playlistModeToRepeatState(PlaylistMode value) {
   switch (value) {
-    case LoopMode.off:
+    case PlaylistMode.none:
       return RepeatState.none;
-    case LoopMode.all:
+    case PlaylistMode.loop:
       return RepeatState.all;
-    case LoopMode.one:
+    case PlaylistMode.single:
       return RepeatState.one;
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
 
 import '../audio_data_manager.dart';
 
@@ -9,13 +9,13 @@ class AudioState extends AudioDataContainer {
     required this.$currentIndex,
     required this.$shuffleMode,
     required this.$shuffleIndices,
-    required this.$playerState,
+    required this.$playing,
     required this.$loopMode,
     required this.$volume,
   });
 
   @override
-  final List<IndexedAudioSource>? $sequence;
+  final List<Media> $sequence;
   @override
   final int? $currentIndex;
   @override
@@ -23,16 +23,16 @@ class AudioState extends AudioDataContainer {
   @override
   final List<int>? $shuffleIndices;
   @override
-  final PlayerState $playerState;
+  final bool $playing;
   @override
-  final LoopMode $loopMode;
+  final PlaylistMode $loopMode;
   @override
   final double $volume;
 
   AudioState copyWith(Map<String, dynamic> map) {
     return AudioState(
       $sequence: map.containsKey("sequence")
-          ? map["sequence"] as List<IndexedAudioSource>?
+          ? map["sequence"] as List<Media>
           : $sequence,
       $currentIndex: map.containsKey("currentIndex")
           ? map["currentIndex"] as int?
@@ -43,22 +43,22 @@ class AudioState extends AudioDataContainer {
       $shuffleIndices: map.containsKey("shuffleIndices")
           ? map["shuffleIndices"] as List<int>?
           : $shuffleIndices,
-      $playerState: map.containsKey("playerState")
-          ? map["playerState"] as PlayerState
-          : $playerState,
+      $playing: map.containsKey("playing")
+          ? map["playing"] as bool
+          : $playing,
       $loopMode:
-          map.containsKey("loopMode") ? map["loopMode"] as LoopMode : $loopMode,
+          map.containsKey("loopMode") ? map["loopMode"] as PlaylistMode : $loopMode,
       $volume: map.containsKey("volume") ? map["volume"] as double : $volume,
     );
   }
 
   static final AudioState defaultState = AudioState(
-    $sequence: null,
+    $sequence: [],
     $currentIndex: null,
     $shuffleMode: false,
     $shuffleIndices: null,
-    $playerState: PlayerState(false, ProcessingState.idle),
-    $loopMode: LoopMode.off,
+    $playing: false,
+    $loopMode: PlaylistMode.none,
     $volume: 1.0,
   );
 }
@@ -108,8 +108,8 @@ class MainAudioStateNotifier extends AudioStateNotifier {
         "shuffleMode": oldAudioState.$shuffleMode,
       if (isChangePaused("shuffleIndices"))
         "shuffleIndices": oldAudioState.$shuffleIndices,
-      if (isChangePaused("playerState"))
-        "playerState": oldAudioState.$playerState,
+      if (isChangePaused("playing"))
+        "playing": oldAudioState.$playing,
       if (isChangePaused("loopMode")) "loopMode": oldAudioState.$loopMode,
       if (isChangePaused("volume")) "volume": oldAudioState.$volume,
     });
