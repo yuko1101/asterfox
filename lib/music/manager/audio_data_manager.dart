@@ -5,19 +5,20 @@ import 'package:media_kit/media_kit.dart';
 import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
 import '../audio_source/music_data.dart';
+import 'audio_player.dart';
 
 class AudioDataManager extends AudioDataContainer {
   AudioDataManager(this.audioPlayer);
-  final Player audioPlayer;
+  final AudioPlayer audioPlayer;
 
   @override
   List<Media> get $sequence => audioPlayer.state.playlist.medias;
   @override
   int? get $currentIndex => audioPlayer.state.playlist.index;
   @override
-  bool get $shuffleMode => false; // TODO: implement this
+  bool get $shuffleMode => audioPlayer.shuffled;
   @override
-  List<int>? get $shuffleIndices => null; // TODO: implement this
+  List<int>? get $shuffleIndices => audioPlayer.shuffledIndices;
   @override
   bool get $playing => audioPlayer.state.playing;
   @override
@@ -193,4 +194,4 @@ abstract class AudioDataContainer {
           shuffledIndex, isShuffled, shuffledIndices);
 }
 
-enum PlayingState { paused, playing, loading, disabled, unknown }
+enum PlayingState { paused, playing, loading, disabled }

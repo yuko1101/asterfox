@@ -79,13 +79,6 @@ class PlayButton extends StatelessWidget {
               onPressed: musicManager.pause,
               tooltip: l10n.value.pause,
             );
-          case PlayingState.unknown:
-            return IconButton(
-              icon: const Icon(Icons.play_arrow),
-              iconSize: 32.0,
-              onPressed: null,
-              tooltip: l10n.value.play,
-            );
         }
       },
     );

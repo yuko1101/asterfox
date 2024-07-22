@@ -38,7 +38,7 @@ class MusicManager {
         !SettingsData.getValue(key: "disableInterruptions");
     if (!windowsMode && showNotification) {
       _audioHandler = await AudioService.init(
-          builder: () => SessionAudioHandler(true, handleInterruptions),
+          builder: () => SessionAudioHandler(this, true, handleInterruptions),
           config: const AudioServiceConfig(
             androidNotificationChannelId: 'net.asterfox.app.channel.audio',
             androidNotificationChannelName: 'Asterfox Music',
@@ -47,7 +47,7 @@ class MusicManager {
           ));
     } else {
       print("windowsMode");
-      _audioHandler = SessionAudioHandler(false, handleInterruptions);
+      _audioHandler = SessionAudioHandler(this, false, handleInterruptions);
     }
     MusicListener(this, _audioHandler).init();
     audioDataManager = AudioDataManager(_audioHandler.audioPlayer);
@@ -242,7 +242,7 @@ class MusicManager {
     //   _audioHandler.androidEnhancer
     //       .setTargetGain(max(MathUtils.log(volume, VolumeWidget.base), 0));
     // }
-    await _audioHandler.audioPlayer.setVolume(volume * 100);
+    await _audioHandler.audioPlayer.setVolume(volume);
   }
 
   Future<void> setMute(bool mute) async {
