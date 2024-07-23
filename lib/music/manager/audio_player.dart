@@ -5,34 +5,71 @@ import 'package:media_kit/media_kit.dart';
 import 'music_manager.dart';
 
 class AudioPlayer extends Player {
-  bool _shuffled = false;
-  List<int>? _shuffledIndices;
   final MusicManager musicManager;
+  bool _shuffled = false;
+  bool _isEmpty = true;
 
   AudioPlayer(this.musicManager, {super.configuration});
 
   bool get shuffled => _shuffled;
-  List<int>? get shuffledIndices => _shuffledIndices;
 
   @override
   Future<void> setShuffle(bool shuffle) async {
     _shuffled = shuffle;
-    if (shuffle) {
-      final medias = state.playlist.medias;
-      final Map<String, int> before = {
-        for (int i = 0; i < medias.length; i++) medias[i].extras!["key"]: i
-      };
-      await super.setShuffle(true);
-      _shuffledIndices = state.playlist.medias
-          .map((media) => before[media.extras!["key"]]!)
-          .toList();
-    } else {
-      _shuffledIndices = null;
-      await super.setShuffle(false);
-    }
+    await setShuffle(shuffle);
     musicManager.audioStateManager.mainNotifier.update({
       "shuffled": _shuffled,
-      "shuffledIndices": _shuffledIndices,
     });
+  }
+
+  @override
+  Future<void> add(Media media) async {
+    if (_isEmpty) {
+      _isEmpty = false;
+      await open(Playlist([media]));
+    } else {
+      await super.add(media);
+    }
+  }
+
+  Future<void> addAll(List<Media> medias) async {
+    if (_isEmpty) {
+      _isEmpty = false;
+      await open(Playlist(medias));
+    } else {
+      for (final media in medias) {
+        await super.add(media);
+      }
+    }
+  }
+
+  Future<void> insert(int index, Media media) async {
+    await add(media);
+    await move(state.playlist.medias.length, index);
+  }
+
+  Future<void> clear() async {
+    _isEmpty = true;
+    await open(const Playlist([]));
+  }
+
+  Future<void> setMedias(List<Media> medias) async {
+    if (medias.isEmpty) {
+      await clear();
+    } else {
+      await open(Playlist(medias));
+    }
+  }
+
+  Future<void> cease() async {
+    await pause();
+  }
+
+  Future<void> playback() async {
+    if (state.position.inMilliseconds < 5000) {
+      await previous();
+    } else {
+      await seek(Duration.zero);
+    }
   }
 }

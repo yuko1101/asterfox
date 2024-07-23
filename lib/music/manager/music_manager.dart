@@ -68,20 +68,12 @@ class MusicManager {
     await _audioHandler.seek(position, index: index);
   }
 
-  Future<void> previous([bool force = false]) async {
-    if (force) {
-      await _audioHandler.skipToPrevious();
-    } else {
-      await _audioHandler.skipToPreviousUnforced();
-    }
+  Future<void> previous() async {
+    await _audioHandler.skipToPrevious();
   }
 
-  Future<void> next([bool force = false]) async {
-    if (force) {
-      await _audioHandler.skipToNext();
-    } else {
-      await _audioHandler.skipToNextUnforced();
-    }
+  Future<void> next() async {
+    await _audioHandler.skipToNext();
   }
 
   Future<void> add(MusicData song) async {
@@ -160,7 +152,7 @@ class MusicManager {
     await _audioHandler.stop();
   }
 
-  Future<void> playback([bool force = false]) async {
+  Future<void> playback() async {
     // if current progress is less than 5 sec, skip previous. if not, replay the current song.
     if (audioDataManager.progress.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.
@@ -168,7 +160,7 @@ class MusicManager {
           audioDataManager.currentIndex == 0) {
         await seek(Duration.zero);
       } else {
-        await previous(force);
+        await previous();
       }
     } else {
       await seek(Duration.zero);
@@ -237,11 +229,6 @@ class MusicManager {
     final volume = (muteNotifier.value ? 0 : 1) *
         baseVolumeNotifier.value *
         audioDataManager.currentSongVolume;
-    // TODO: implement this
-    // if (Platform.isAndroid) {
-    //   _audioHandler.androidEnhancer
-    //       .setTargetGain(max(MathUtils.log(volume, VolumeWidget.base), 0));
-    // }
     await _audioHandler.audioPlayer.setVolume(volume);
   }
 

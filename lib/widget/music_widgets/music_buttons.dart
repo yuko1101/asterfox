@@ -36,7 +36,7 @@ class PreviousSongButton extends StatelessWidget {
         icon: const Icon(Icons.skip_previous),
         onPressed: audioState.currentSong == null
             ? null
-            : () async => await musicManager.playback(true),
+            : () async => await musicManager.playback(),
         tooltip: l10n.value.play_previous_song,
       ),
     );
@@ -94,7 +94,7 @@ class NextSongButton extends StatelessWidget {
       builder: (_, audioState, __) {
         return IconButton(
           icon: const Icon(Icons.skip_next),
-          onPressed: audioState.hasNext ? () => musicManager.next(true) : null,
+          onPressed: audioState.hasNext ? () => musicManager.next() : null,
           tooltip: l10n.value.play_next_song,
         );
       },

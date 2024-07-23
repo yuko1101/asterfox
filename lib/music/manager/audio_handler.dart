@@ -3,7 +3,6 @@ import 'package:audio_session/audio_session.dart';
 import 'package:media_kit/media_kit.dart';
 
 import '../../data/settings_data.dart';
-import '../../main.dart';
 import '../music_data/music_data.dart';
 import 'audio_player.dart';
 import 'music_manager.dart';
@@ -11,7 +10,6 @@ import 'notifiers/audio_state_notifier.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   late final AudioPlayer _audioPlayer;
-  bool playerOpened = false;
 
   final bool useSession;
   final bool handleInterruptions;
@@ -76,69 +74,29 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   // forced skip
   @override
   Future<void> skipToNext() async {
-    if (_audioPlayer.state.playlistMode == PlaylistMode.single) {
-      final int currentIndex = _audioPlayer.state.playlist.index;
-      final int nextIndex =
-          (currentIndex + 1) % _audioPlayer.state.playlist.medias.length;
-      await seek(Duration.zero, index: nextIndex);
-    } else {
-      await _audioPlayer.next();
-    }
-  }
-
-  // non-forced skip
-  Future<void> skipToNextUnforced() async {
     await _audioPlayer.next();
   }
 
   @override
   Future<void> skipToPrevious() async {
-    if (_audioPlayer.state.playlistMode == PlaylistMode.single) {
-      final int currentIndex = _audioPlayer.state.playlist.index;
-      final int previousIndex =
-          (currentIndex - 1) % _audioPlayer.state.playlist.medias.length;
-      await seek(Duration.zero, index: previousIndex);
-    } else {
-      await _audioPlayer.previous();
-    }
-  }
-
-  Future<void> skipToPreviousUnforced() async {
     await _audioPlayer.previous();
   }
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
     final Media media = _createMedia(mediaItem);
-    await _add(media);
-  }
-
-  Future<void> _add(Media media) async {
-    if (!playerOpened) {
-      playerOpened = true;
-      await _audioPlayer.open(Playlist([media]));
-    } else {
-      await _audioPlayer.add(media);
-    }
+    await _audioPlayer.add(media);
   }
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
-    final medias = mediaItems.map(_createMedia);
-    if (!playerOpened) {
-      playerOpened = true;
-      await _audioPlayer.open(Playlist(medias.toList()));
-    } else {
-      for (final media in medias) {
-        await _audioPlayer.add(media);
-      }
-    }
+    final medias = mediaItems.map(_createMedia).toList();
+    await _audioPlayer.addAll(medias);
   }
 
   @override
   Future<void> insertQueueItem(int index, MediaItem mediaItem) async {
-    await addQueueItem(mediaItem);
-    await _audioPlayer.move(_audioPlayer.state.playlist.medias.length, index);
+    await _audioPlayer.insert(index, _createMedia(mediaItem));
   }
 
   @override
@@ -173,9 +131,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> onNotificationDeleted() async {
-    // exit if queue is not empty meaning that the notification was deleted by the user (not working right now)
-    // TODO: safe exit
-    if (queue.value.isNotEmpty) exitApp(true);
     await super.onNotificationDeleted();
   }
 
@@ -227,13 +182,12 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   Future<void> clear() async {
-    await _audioPlayer.open(const Playlist([]));
+    await _audioPlayer.clear();
   }
 
   Future<void> setSongs(List<MusicData> songs) async {
     final mediaItems = await Future.wait(songs.map((e) => e.toMediaItem()));
-    await _audioPlayer
-        .open(Playlist(mediaItems.map(_createMedia).toList()));
+    await _audioPlayer.setMedias(mediaItems.map(_createMedia).toList());
   }
 
   AudioPlayer get audioPlayer => _audioPlayer;
@@ -278,10 +232,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
         PlaylistMode.single: AudioServiceRepeatMode.one,
         PlaylistMode.loop: AudioServiceRepeatMode.all,
       }[_audioPlayer.state.playlistMode]!,
-      // TODO: implement this
-      // shuffleMode: _player.shuffleModeEnabled
-      //     ? AudioServiceShuffleMode.all
-      //     : AudioServiceShuffleMode.none,
+      shuffleMode: _audioPlayer.shuffled
+          ? AudioServiceShuffleMode.all
+          : AudioServiceShuffleMode.none,
       androidCompactActionIndices: const [0, 2, 4],
       // TODO: implement this
       // processingState: const {
