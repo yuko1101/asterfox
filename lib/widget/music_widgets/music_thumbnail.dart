@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
-import '../../music/manager/notifiers/audio_state_notifier.dart';
+import '../../music/manager/audio_data_manager.dart';
 import '../../music/utils/music_data_utils.dart';
 import '../../utils/network_utils.dart';
 

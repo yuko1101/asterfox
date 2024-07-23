@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../../music/manager/notifiers/audio_state_notifier.dart';
+import '../../music/manager/audio_data_manager.dart';
 
 class CurrentSongTitle extends StatelessWidget {
   const CurrentSongTitle({super.key});

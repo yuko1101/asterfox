@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 
 import '../../main.dart';
-import '../../music/manager/notifiers/audio_state_notifier.dart';
+import '../../music/manager/audio_data_manager.dart';
 
 class RepeatButton extends StatelessWidget {
   const RepeatButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
-      valueListenable: musicManager.audioStateManager.repeatModeNotifier,
+      valueListenable: musicManager.audioStateManager.repeatStateNotifier,
       builder: (context, audioState, child) {
         switch (audioState.repeatState) {
           case RepeatState.none:

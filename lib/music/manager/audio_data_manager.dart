@@ -16,63 +16,32 @@ class AudioDataManager extends AudioDataContainer {
   @override
   int? get $currentIndex => audioPlayer.state.playlist.index;
   @override
-  bool get shuffled => audioPlayer.shuffled;
+  bool get $shuffled => audioPlayer.shuffled;
   @override
   bool get $playing => audioPlayer.state.playing;
   @override
   PlaylistMode get $playlistMode => audioPlayer.state.playlistMode;
   @override
   double get $volume => audioPlayer.state.volume;
-
-  ProgressBarState get progress => AudioDataManager.getProgress(
-        audioPlayer.state.position,
-        audioPlayer.state.buffer,
-        audioPlayer.state.duration,
-      );
+  @override
+  Duration get $buffer => audioPlayer.state.buffer;
+  @override
+  Duration get $position => audioPlayer.state.position;
+  @override
+  Duration get $duration => audioPlayer.state.duration;
+  @override
+  double get $rate => audioPlayer.state.rate;
 
   static List<MusicData> getPlaylist(List<Media> medias) {
     final playlist = medias;
     return playlist.map((media) => media.toMusicData()).toList();
   }
 
-  static List<MusicData> getShuffledPlaylist(
-      List<Media> media, bool shuffled, List<int>? indices) {
-    final playlist = getPlaylist(media);
-    if (!shuffled) {
-      return playlist;
-    } else {
-      if (indices == null) {
-        return playlist;
-      }
-      // print('shuffledPlaylist: $indices, ${indices.map((index) => index >= playlist.length ? null : playlist[index].title)}');
-      // print("shuffled: ${indices.map((index) => index >= playlist.length ? null : playlist[index].title).where((element) => element != null).map((e) => e as String).toList()}");
-
-      // avoid out of range error on delete song (maybe the delay in the shuffled indices causes the error)
-      return indices
-          .map((index) => index >= playlist.length ? null : playlist[index])
-          .where((element) => element != null)
-          .map((e) => e as MusicData)
-          .toList();
-    }
-  }
-
   static int? getCurrentIndex(int? index, List<Media> medias) {
-    final queue = medias;
-    if (queue.isEmpty) return null;
-    if (queue.isNotEmpty && index == null) return 0;
+    if (medias.isEmpty) return null;
+    if (medias.isNotEmpty && index == null) return 0;
     if (index == null) return null;
-    return min(index, queue.length - 1);
-  }
-
-  static int? getCurrentShuffledIndex(
-      int? index, List<Media> medias, bool shuffled, List<int>? indices) {
-    final currentIndex = getCurrentIndex(index, medias);
-    if (!shuffled) return currentIndex;
-    if (indices == null) return currentIndex;
-    if (currentIndex == null) return null;
-    return !indices.contains(currentIndex)
-        ? null
-        : indices.indexOf(currentIndex);
+    return min(index, medias.length - 1);
   }
 
   static MusicData? getCurrentSong(int? index, List<Media> medias) {
@@ -116,34 +85,86 @@ class AudioDataManager extends AudioDataContainer {
     }
     return current < max - 1;
   }
+}
 
-  static int shuffledIndexToNormalIndex(
-      int index, bool shuffled, List<int>? indices) {
-    // if not shuffled, return index
-    if (indices == null || !shuffled) return index;
+class AudioState extends AudioDataContainer {
+  AudioState({
+    required this.$medias,
+    required this.$currentIndex,
+    required this.$shuffled,
+    required this.$playing,
+    required this.$playlistMode,
+    required this.$volume,
+    required this.$buffer,
+    required this.$position,
+    required this.$duration,
+    required this.$rate,
+  });
 
-    print("shuffled: $index to normal: ${indices[index]} by indices: $indices");
-    return indices[index];
+  @override
+  final List<Media> $medias;
+  @override
+  final int? $currentIndex;
+  @override
+  final bool $shuffled;
+  @override
+  final bool $playing;
+  @override
+  final PlaylistMode $playlistMode;
+  @override
+  final double $volume;
+  @override
+  final Duration $buffer;
+  @override
+  final Duration $position;
+  @override
+  final Duration $duration;
+  @override
+  final double $rate;
+
+  AudioState copyWith(Map<AudioRawData, dynamic> map) {
+    dynamic getData(AudioRawData dataType) =>
+        map.containsKey(dataType) ? map[dataType] : getRawData(dataType);
+
+    return AudioState(
+      $medias: getData(AudioRawData.medias),
+      $currentIndex: getData(AudioRawData.currentIndex),
+      $shuffled: getData(AudioRawData.shuffled),
+      $playing: getData(AudioRawData.playing),
+      $playlistMode: getData(AudioRawData.playlistMode),
+      $volume: getData(AudioRawData.volume),
+      $buffer: getData(AudioRawData.buffer),
+      $position: getData(AudioRawData.position),
+      $duration: getData(AudioRawData.duration),
+      $rate: getData(AudioRawData.rate),
+    );
   }
 
-  static int normalIndexToShuffledIndex(
-      int index, bool shuffled, List<int>? indices) {
-    // if not shuffled, return index
-    if (indices == null || !shuffled) return index;
-
-    print(
-        "normal: $index to shuffled: ${indices.indexOf(index)} by indices: $indices");
-    return indices.indexOf(index);
-  }
+  static final AudioState defaultState = AudioState(
+    $medias: [],
+    $currentIndex: null,
+    $shuffled: false,
+    $playing: false,
+    $playlistMode: PlaylistMode.none,
+    $volume: 100,
+    $buffer: Duration.zero,
+    $position: Duration.zero,
+    $duration: Duration.zero,
+    $rate: 1.0,
+  );
 }
 
 abstract class AudioDataContainer {
   List<Media> get $medias;
   int? get $currentIndex;
-  bool get shuffled;
+  bool get $shuffled;
   bool get $playing;
   PlaylistMode get $playlistMode;
   double get $volume;
+  Duration get $buffer;
+  Duration get $position;
+  Duration get $duration;
+  double get $rate;
 
   List<MusicData> get playlist => AudioDataManager.getPlaylist($medias);
   int? get currentIndex =>
@@ -153,11 +174,107 @@ abstract class AudioDataContainer {
   PlayingState get playingState =>
       AudioDataManager.getPlayingState($playing, $medias);
   RepeatState get repeatState => AudioDataManager.getRepeatState($playlistMode);
-  bool get isShuffled => shuffled;
+  bool get shuffled => $shuffled;
   bool get hasNext =>
       AudioDataManager.getHasNext($currentIndex, $medias, $playlistMode);
   double get currentSongVolume => currentSong?.volume ?? 1.0;
   double get volume => $volume;
+
+  Duration get buffer => $buffer;
+  Duration get position => $position;
+  Duration get duration => $duration;
+  ProgressBarState get progress =>
+      AudioDataManager.getProgress($position, $buffer, $duration);
+
+  double get speed => $rate;
+
+  dynamic getRawData(AudioRawData data) {
+    switch (data) {
+      case AudioRawData.medias:
+        return $medias;
+      case AudioRawData.currentIndex:
+        return $currentIndex;
+      case AudioRawData.shuffled:
+        return $shuffled;
+      case AudioRawData.playing:
+        return $playing;
+      case AudioRawData.playlistMode:
+        return $playlistMode;
+      case AudioRawData.volume:
+        return $volume;
+      case AudioRawData.buffer:
+        return $buffer;
+      case AudioRawData.position:
+        return $position;
+      case AudioRawData.duration:
+        return $duration;
+      case AudioRawData.rate:
+        return $rate;
+    }
+  }
+
+  dynamic getRichData(AudioRichData data) {
+    switch (data) {
+      case AudioRichData.playlist:
+        return playlist;
+      case AudioRichData.currentIndex:
+        return currentIndex;
+      case AudioRichData.currentSong:
+        return currentSong;
+      case AudioRichData.playingState:
+        return playingState;
+      case AudioRichData.repeatState:
+        return repeatState;
+      case AudioRichData.shuffled:
+        return shuffled;
+      case AudioRichData.hasNext:
+        return hasNext;
+      case AudioRichData.currentSongVolume:
+        return currentSongVolume;
+      case AudioRichData.volume:
+        return volume;
+      case AudioRichData.buffer:
+        return buffer;
+      case AudioRichData.position:
+        return position;
+      case AudioRichData.duration:
+        return duration;
+      case AudioRichData.progress:
+        return progress;
+      case AudioRichData.speed:
+        return speed;
+    }
+  }
 }
 
 enum PlayingState { paused, playing, loading, disabled }
+
+enum AudioRawData {
+  medias,
+  currentIndex,
+  shuffled,
+  playing,
+  playlistMode,
+  volume,
+  buffer,
+  position,
+  duration,
+  rate,
+}
+
+enum AudioRichData {
+  playlist,
+  currentIndex,
+  currentSong,
+  playingState,
+  repeatState,
+  shuffled,
+  hasNext,
+  currentSongVolume,
+  volume,
+  buffer,
+  position,
+  duration,
+  progress,
+  speed,
+}

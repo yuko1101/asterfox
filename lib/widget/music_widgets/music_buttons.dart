@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../main.dart';
 import '../../music/manager/audio_data_manager.dart';
-import '../../music/manager/notifiers/audio_state_notifier.dart';
 
 class ShuffleButton extends StatelessWidget {
   const ShuffleButton({super.key});
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
-      valueListenable: musicManager.audioStateManager.isShuffledNotifier,
+      valueListenable: musicManager.audioStateManager.shuffleNotifier,
       builder: (context, audioState, child) {
-        final isEnabled = audioState.isShuffled;
+        final isEnabled = audioState.shuffled;
         return IconButton(
           icon: isEnabled
               ? const Icon(Icons.shuffle)

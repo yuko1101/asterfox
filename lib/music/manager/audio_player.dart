@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:media_kit/media_kit.dart';
 
+import 'audio_data_manager.dart';
 import 'music_manager.dart';
 
 class AudioPlayer extends Player {
@@ -18,7 +19,7 @@ class AudioPlayer extends Player {
     _shuffled = shuffle;
     await setShuffle(shuffle);
     musicManager.audioStateManager.mainNotifier.update({
-      "shuffled": _shuffled,
+      AudioRawData.shuffled: _shuffled,
     });
   }
 

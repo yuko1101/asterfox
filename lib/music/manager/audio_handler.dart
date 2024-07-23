@@ -3,7 +3,9 @@ import 'package:audio_session/audio_session.dart';
 import 'package:media_kit/media_kit.dart';
 
 import '../../data/settings_data.dart';
+import '../../widget/music_widgets/repeat_button.dart';
 import '../music_data/music_data.dart';
+import 'audio_data_manager.dart';
 import 'audio_player.dart';
 import 'music_manager.dart';
 import 'notifiers/audio_state_notifier.dart';
@@ -23,7 +25,11 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
     if (useSession) {
-      _audioPlayer.stream.playlist.map(_transformEvent).pipe(playbackState);
+      _audioPlayer.musicManager.audioStateManager.mainNotifier.addListener(() {
+        final state = _transformEvent(
+            _audioPlayer.musicManager.audioStateManager.mainNotifier.value);
+        playbackState.add(state);
+      });
       _activateAudioSession();
     }
 
@@ -172,12 +178,12 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       }
     }();
     if (mainNotifier != null) {
-      mainNotifier.update({"currentIndex": newCurrentIndex});
-      mainNotifier.pauseChange("currentIndex");
+      mainNotifier.update({AudioRawData.currentIndex: newCurrentIndex});
+      mainNotifier.pauseChange(AudioRawData.currentIndex);
     }
     await _audioPlayer.move(oldIndex, newIndex);
     if (mainNotifier != null) {
-      mainNotifier.resumeChange("currentIndex");
+      mainNotifier.resumeChange(AudioRawData.currentIndex);
     }
   }
 
@@ -192,12 +198,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   AudioPlayer get audioPlayer => _audioPlayer;
 
-  /// Transform a just_audio event into an audio_service state.
-  ///
-  /// This method is used from the constructor. Every event received from the
-  /// just_audio player will be transformed into an audio_service state so that
-  /// it can be broadcast to audio_service clients.
-  PlaybackState _transformEvent(Playlist playlist) {
+  PlaybackState _transformEvent(AudioState state) {
     return PlaybackState(
       controls: [
         const MediaControl(
@@ -210,7 +211,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
           label: "Fast Rewind",
           action: MediaAction.rewind,
         ),
-        _audioPlayer.state.playing ? MediaControl.pause : MediaControl.play,
+        state.$playing ? MediaControl.pause : MediaControl.play,
         const MediaControl(
           androidIcon: "drawable/ic_fast_forward",
           label: "Fast Forward",
@@ -228,11 +229,11 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
         MediaAction.seekBackward,
       },
       repeatMode: const {
-        PlaylistMode.none: AudioServiceRepeatMode.none,
-        PlaylistMode.single: AudioServiceRepeatMode.one,
-        PlaylistMode.loop: AudioServiceRepeatMode.all,
-      }[_audioPlayer.state.playlistMode]!,
-      shuffleMode: _audioPlayer.shuffled
+        RepeatState.none: AudioServiceRepeatMode.none,
+        RepeatState.one: AudioServiceRepeatMode.one,
+        RepeatState.all: AudioServiceRepeatMode.all,
+      }[state.repeatState]!,
+      shuffleMode: state.shuffled
           ? AudioServiceShuffleMode.all
           : AudioServiceShuffleMode.none,
       androidCompactActionIndices: const [0, 2, 4],
@@ -244,11 +245,11 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       //   ProcessingState.ready: AudioProcessingState.ready,
       //   ProcessingState.completed: AudioProcessingState.completed,
       // }[_player.processingState]!,
-      playing: _audioPlayer.state.playing,
-      updatePosition: _audioPlayer.state.position,
-      bufferedPosition: _audioPlayer.state.buffer,
-      speed: _audioPlayer.state.rate,
-      queueIndex: playlist.index,
+      playing: state.playingState == PlayingState.playing,
+      updatePosition: state.position,
+      bufferedPosition: state.buffer,
+      speed: state.speed,
+      queueIndex: state.currentIndex,
     );
   }
 

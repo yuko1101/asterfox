@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../main.dart';
-import '../music/manager/notifiers/audio_state_notifier.dart';
+import '../music/manager/audio_data_manager.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 import '../utils/responsive.dart';

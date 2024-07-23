@@ -124,12 +124,12 @@ class MusicManager {
         index < currentPlayingIndex &&
         currentPlayingIndex + 1 < songsCount) {
       audioStateManager.mainNotifier
-          .update({"currentIndex": currentPlayingIndex - 1});
-      audioStateManager.mainNotifier.pauseChange("currentIndex");
+          .update({AudioRawData.currentIndex: currentPlayingIndex - 1});
+      audioStateManager.mainNotifier.pauseChange(AudioRawData.currentIndex);
 
       await _audioHandler.removeQueueItemAt(index);
 
-      audioStateManager.mainNotifier.resumeChange("currentIndex");
+      audioStateManager.mainNotifier.resumeChange(AudioRawData.currentIndex);
     } else {
       await _audioHandler.removeQueueItemAt(index);
     }
@@ -185,7 +185,7 @@ class MusicManager {
   }
 
   Future<void> toggleShuffle() async {
-    final enable = !audioDataManager.isShuffled;
+    final enable = !audioDataManager.shuffled;
     _audioHandler.setShuffleMode(
         enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }

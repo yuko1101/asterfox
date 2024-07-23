@@ -36,14 +36,14 @@ class MusicListener {
 
   void _updatePlaylistAndIndex(Playlist playlist) {
     _musicManager.audioStateManager.mainNotifier.update({
-      "medias": playlist.medias,
-      "currentIndex": playlist.index,
+      AudioRawData.medias: playlist.medias,
+      AudioRawData.currentIndex: playlist.index,
     });
   }
 
   void _updatePlaybackState(bool playing) {
     _musicManager.audioStateManager.mainNotifier.update({
-      "playing": playing,
+      AudioRawData.playing: playing,
     });
   }
 
@@ -52,10 +52,12 @@ class MusicListener {
   }
 
   void _updatePlaylistMode(PlaylistMode playlistMode) {
-    _musicManager.audioStateManager.mainNotifier.update({"playlistMode": playlistMode});
+    _musicManager.audioStateManager.mainNotifier
+        .update({AudioRawData.playlistMode: playlistMode});
   }
 
   void _updateVolume(double volume) {
-    _musicManager.audioStateManager.mainNotifier.update({"volume": volume});
+    _musicManager.audioStateManager.mainNotifier
+        .update({AudioRawData.volume: volume});
   }
 }

@@ -1,57 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:media_kit/media_kit.dart';
 
 import '../audio_data_manager.dart';
-
-class AudioState extends AudioDataContainer {
-  AudioState({
-    required this.$medias,
-    required this.$currentIndex,
-    required this.shuffled,
-    required this.$playing,
-    required this.$playlistMode,
-    required this.$volume,
-  });
-
-  @override
-  final List<Media> $medias;
-  @override
-  final int? $currentIndex;
-  @override
-  final bool shuffled;
-  @override
-  final bool $playing;
-  @override
-  final PlaylistMode $playlistMode;
-  @override
-  final double $volume;
-
-  AudioState copyWith(Map<String, dynamic> map) {
-    return AudioState(
-      $medias:
-          map.containsKey("medias") ? map["medias"] as List<Media> : $medias,
-      $currentIndex: map.containsKey("currentIndex")
-          ? map["currentIndex"] as int?
-          : $currentIndex,
-      shuffled:
-          map.containsKey("shuffled") ? map["shuffled"] as bool : shuffled,
-      $playing: map.containsKey("playing") ? map["playing"] as bool : $playing,
-      $playlistMode: map.containsKey("playlistMode")
-          ? map["playlistMode"] as PlaylistMode
-          : $playlistMode,
-      $volume: map.containsKey("volume") ? map["volume"] as double : $volume,
-    );
-  }
-
-  static final AudioState defaultState = AudioState(
-    $medias: [],
-    $currentIndex: null,
-    shuffled: false,
-    $playing: false,
-    $playlistMode: PlaylistMode.none,
-    $volume: 1.0,
-  );
-}
 
 class MainAudioStateNotifier extends AudioStateNotifier {
   MainAudioStateNotifier(
@@ -61,44 +10,39 @@ class MainAudioStateNotifier extends AudioStateNotifier {
 
   /// Paused changes are changes that are not notified to listeners.
   /// The integer value is the number of processes pausing the change right now.
-  final Map<String, int> _pausedChanges = {};
+  final Map<AudioRawData, int> _pausedChanges = {};
 
-  void pauseChange(String change) {
-    _pausedChanges[change] = (_pausedChanges[change] ?? 0) + 1;
-    print("pausing $change");
+  void pauseChange(AudioRawData dataType) {
+    _pausedChanges[dataType] = (_pausedChanges[dataType] ?? 0) + 1;
+    print("pausing $dataType");
   }
 
-  void resumeChange(String change) {
-    final pausingProcesses = _pausedChanges[change];
+  void resumeChange(AudioRawData dataType) {
+    final pausingProcesses = _pausedChanges[dataType];
     if (pausingProcesses == null) return;
     if (pausingProcesses == 1) {
       // all processes have resumed
 
-      _pausedChanges.remove(change);
+      _pausedChanges.remove(dataType);
 
       notifyListeners();
     } else {
-      _pausedChanges[change] = pausingProcesses - 1;
+      _pausedChanges[dataType] = pausingProcesses - 1;
     }
-    print("resuming $change");
+    print("resuming $dataType");
   }
 
-  bool isChangePaused(String change) {
-    final pausingProcesses = _pausedChanges[change];
+  bool isChangePaused(AudioRawData dataType) {
+    final pausingProcesses = _pausedChanges[dataType];
     return pausingProcesses != null && pausingProcesses > 0;
   }
 
   AudioState getAppliedPausedState(
       AudioState oldAudioState, AudioState newAudioState) {
     return newAudioState.copyWith({
-      if (isChangePaused("medias")) "medias": oldAudioState.$medias,
-      if (isChangePaused("currentIndex"))
-        "currentIndex": oldAudioState.$currentIndex,
-      if (isChangePaused("shuffled")) "shuffled": oldAudioState.shuffled,
-      if (isChangePaused("playing")) "playing": oldAudioState.$playing,
-      if (isChangePaused("playlistMode"))
-        "playlistMode": oldAudioState.$playlistMode,
-      if (isChangePaused("volume")) "volume": oldAudioState.$volume,
+      for (final dataType in AudioRawData.values)
+        if (isChangePaused(dataType))
+          dataType: oldAudioState.getRawData(dataType),
     });
   }
 }
@@ -111,39 +55,36 @@ class AudioStateNotifier extends ChangeNotifier
   );
 
   AudioState _value;
-  Set<AudioStateChange> targetChanges;
+  Set<AudioRichData> targetChanges;
 
   @override
   AudioState get value => _value;
   set value(newAudioState) {
-    final changes = <AudioStateChange>[];
+    final changes = <AudioRichData>[];
 
     if (newAudioState.playlist != _value.playlist) {
-      changes.add(AudioStateChange.playlist);
+      changes.add(AudioRichData.playlist);
     }
     if (newAudioState.currentIndex != _value.currentIndex) {
-      changes.add(AudioStateChange.currentIndex);
+      changes.add(AudioRichData.currentIndex);
     }
     if (newAudioState.currentSong != _value.currentSong) {
-      changes.add(AudioStateChange.currentSong);
+      changes.add(AudioRichData.currentSong);
     }
     if (newAudioState.playingState != _value.playingState) {
-      changes.add(AudioStateChange.playingState);
+      changes.add(AudioRichData.playingState);
     }
     if (newAudioState.repeatState != _value.repeatState) {
-      changes.add(AudioStateChange.repeatState);
+      changes.add(AudioRichData.repeatState);
     }
-    if (newAudioState.isShuffled != _value.isShuffled) {
-      changes.add(AudioStateChange.isShuffled);
+    if (newAudioState.shuffled != _value.shuffled) {
+      changes.add(AudioRichData.shuffled);
     }
     if (newAudioState.hasNext != _value.hasNext) {
-      changes.add(AudioStateChange.hasNext);
+      changes.add(AudioRichData.hasNext);
     }
     if (newAudioState.currentSongVolume != _value.currentSongVolume) {
-      changes.add(AudioStateChange.currentSongValue);
-    }
-    if (newAudioState.currentSongVolume != _value.currentSongVolume) {
-      changes.add(AudioStateChange.currentSongVolume);
+      changes.add(AudioRichData.currentSongVolume);
     }
 
     _value = newAudioState;
@@ -153,7 +94,7 @@ class AudioStateNotifier extends ChangeNotifier
     }
   }
 
-  void update(Map<String, dynamic> changes) {
+  void update(Map<AudioRawData, dynamic> changes) {
     value = value.copyWith(changes);
   }
 }
@@ -168,76 +109,61 @@ class AudioStateManager {
           mainNotifier.getAppliedPausedState(currentSongNotifier.value, value);
       playingStateNotifier.value =
           mainNotifier.getAppliedPausedState(playingStateNotifier.value, value);
-      repeatModeNotifier.value =
-          mainNotifier.getAppliedPausedState(repeatModeNotifier.value, value);
+      repeatStateNotifier.value =
+          mainNotifier.getAppliedPausedState(repeatStateNotifier.value, value);
       hasNextNotifier.value =
           mainNotifier.getAppliedPausedState(hasNextNotifier.value, value);
-      isShuffledNotifier.value =
-          mainNotifier.getAppliedPausedState(isShuffledNotifier.value, value);
+      shuffleNotifier.value =
+          mainNotifier.getAppliedPausedState(shuffleNotifier.value, value);
     });
   }
 
   final MainAudioStateNotifier mainNotifier = MainAudioStateNotifier(
     AudioState.defaultState,
-    AudioStateChange.values.toSet(),
+    AudioRichData.values.toSet(),
   );
 
   final AudioStateNotifier songsNotifier = AudioStateNotifier(
     AudioState.defaultState,
     {
-      AudioStateChange.shuffledPlaylist,
-      AudioStateChange.currentSong,
-      AudioStateChange.playingState,
+      AudioRichData.playlist,
+      AudioRichData.currentSong,
+      AudioRichData.playingState,
     },
   );
 
   final AudioStateNotifier currentSongNotifier = AudioStateNotifier(
     AudioState.defaultState,
     {
-      AudioStateChange.currentSong,
+      AudioRichData.currentSong,
     },
   );
 
   final AudioStateNotifier playingStateNotifier = AudioStateNotifier(
     AudioState.defaultState,
     {
-      AudioStateChange.playingState,
+      AudioRichData.playingState,
     },
   );
 
-  final AudioStateNotifier repeatModeNotifier = AudioStateNotifier(
+  final AudioStateNotifier repeatStateNotifier = AudioStateNotifier(
     AudioState.defaultState,
     {
-      AudioStateChange.repeatState,
+      AudioRichData.repeatState,
     },
   );
 
   final AudioStateNotifier hasNextNotifier = AudioStateNotifier(
     AudioState.defaultState,
     {
-      AudioStateChange.hasNext,
+      AudioRichData.hasNext,
     },
   );
 
-  final AudioStateNotifier isShuffledNotifier = AudioStateNotifier(
+  final AudioStateNotifier shuffleNotifier = AudioStateNotifier(
     AudioState.defaultState,
     {
-      AudioStateChange.isShuffled,
+      AudioRichData.shuffled,
     },
   );
-}
-
-enum AudioStateChange {
-  playlist,
-  shuffledPlaylist,
-  currentIndex,
-  currentShuffledIndex,
-  currentSong,
-  playingState,
-  repeatState,
-  isShuffled,
-  hasNext,
-  currentSongValue,
-  currentSongVolume,
-  shuffledIndices,
 }

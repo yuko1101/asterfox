@@ -40,7 +40,7 @@ class DeviceSettingsData {
   static bool _initializedRepeatListener = false;
   static Future<void> applyMusicManagerSettings() async {
     if (!_initializedRepeatListener) {
-      musicManager.audioStateManager.repeatModeNotifier.addListener(() {
+      musicManager.audioStateManager.repeatStateNotifier.addListener(() {
         print("repeatModeNotifier.addListener");
         data.set(
           key: "repeatMode",
@@ -51,7 +51,7 @@ class DeviceSettingsData {
       _initializedRepeatListener = true;
     }
     if (repeatStateToString(musicManager
-            .audioStateManager.repeatModeNotifier.value.repeatState) !=
+            .audioStateManager.repeatStateNotifier.value.repeatState) !=
         getValue(key: "repeatMode") as String) {
       musicManager.setRepeatMode(
           repeatStateFromString(getValue(key: "repeatMode") as String));
