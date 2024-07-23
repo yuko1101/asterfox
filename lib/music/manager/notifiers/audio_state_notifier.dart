@@ -5,60 +5,50 @@ import '../audio_data_manager.dart';
 
 class AudioState extends AudioDataContainer {
   AudioState({
-    required this.$sequence,
+    required this.$medias,
     required this.$currentIndex,
-    required this.$shuffleMode,
-    required this.$shuffleIndices,
+    required this.shuffled,
     required this.$playing,
-    required this.$loopMode,
+    required this.$playlistMode,
     required this.$volume,
   });
 
   @override
-  final List<Media> $sequence;
+  final List<Media> $medias;
   @override
   final int? $currentIndex;
   @override
-  final bool $shuffleMode;
-  @override
-  final List<int>? $shuffleIndices;
+  final bool shuffled;
   @override
   final bool $playing;
   @override
-  final PlaylistMode $loopMode;
+  final PlaylistMode $playlistMode;
   @override
   final double $volume;
 
   AudioState copyWith(Map<String, dynamic> map) {
     return AudioState(
-      $sequence: map.containsKey("sequence")
-          ? map["sequence"] as List<Media>
-          : $sequence,
+      $medias:
+          map.containsKey("medias") ? map["medias"] as List<Media> : $medias,
       $currentIndex: map.containsKey("currentIndex")
           ? map["currentIndex"] as int?
           : $currentIndex,
-      $shuffleMode: map.containsKey("shuffleMode")
-          ? map["shuffleMode"] as bool
-          : $shuffleMode,
-      $shuffleIndices: map.containsKey("shuffleIndices")
-          ? map["shuffleIndices"] as List<int>?
-          : $shuffleIndices,
-      $playing: map.containsKey("playing")
-          ? map["playing"] as bool
-          : $playing,
-      $loopMode:
-          map.containsKey("loopMode") ? map["loopMode"] as PlaylistMode : $loopMode,
+      shuffled:
+          map.containsKey("shuffled") ? map["shuffled"] as bool : shuffled,
+      $playing: map.containsKey("playing") ? map["playing"] as bool : $playing,
+      $playlistMode: map.containsKey("playlistMode")
+          ? map["playlistMode"] as PlaylistMode
+          : $playlistMode,
       $volume: map.containsKey("volume") ? map["volume"] as double : $volume,
     );
   }
 
   static final AudioState defaultState = AudioState(
-    $sequence: [],
+    $medias: [],
     $currentIndex: null,
-    $shuffleMode: false,
-    $shuffleIndices: null,
+    shuffled: false,
     $playing: false,
-    $loopMode: PlaylistMode.none,
+    $playlistMode: PlaylistMode.none,
     $volume: 1.0,
   );
 }
@@ -101,16 +91,13 @@ class MainAudioStateNotifier extends AudioStateNotifier {
   AudioState getAppliedPausedState(
       AudioState oldAudioState, AudioState newAudioState) {
     return newAudioState.copyWith({
-      if (isChangePaused("sequence")) "sequence": oldAudioState.$sequence,
+      if (isChangePaused("medias")) "medias": oldAudioState.$medias,
       if (isChangePaused("currentIndex"))
         "currentIndex": oldAudioState.$currentIndex,
-      if (isChangePaused("shuffleMode"))
-        "shuffleMode": oldAudioState.$shuffleMode,
-      if (isChangePaused("shuffleIndices"))
-        "shuffleIndices": oldAudioState.$shuffleIndices,
-      if (isChangePaused("playing"))
-        "playing": oldAudioState.$playing,
-      if (isChangePaused("loopMode")) "loopMode": oldAudioState.$loopMode,
+      if (isChangePaused("shuffled")) "shuffled": oldAudioState.shuffled,
+      if (isChangePaused("playing")) "playing": oldAudioState.$playing,
+      if (isChangePaused("playlistMode"))
+        "playlistMode": oldAudioState.$playlistMode,
       if (isChangePaused("volume")) "volume": oldAudioState.$volume,
     });
   }
@@ -134,14 +121,8 @@ class AudioStateNotifier extends ChangeNotifier
     if (newAudioState.playlist != _value.playlist) {
       changes.add(AudioStateChange.playlist);
     }
-    if (newAudioState.shuffledPlaylist != _value.shuffledPlaylist) {
-      changes.add(AudioStateChange.shuffledPlaylist);
-    }
     if (newAudioState.currentIndex != _value.currentIndex) {
       changes.add(AudioStateChange.currentIndex);
-    }
-    if (newAudioState.currentShuffledIndex != _value.currentShuffledIndex) {
-      changes.add(AudioStateChange.currentShuffledIndex);
     }
     if (newAudioState.currentSong != _value.currentSong) {
       changes.add(AudioStateChange.currentSong);
@@ -163,9 +144,6 @@ class AudioStateNotifier extends ChangeNotifier
     }
     if (newAudioState.currentSongVolume != _value.currentSongVolume) {
       changes.add(AudioStateChange.currentSongVolume);
-    }
-    if (newAudioState.$shuffleIndices != _value.$shuffleIndices) {
-      changes.add(AudioStateChange.shuffledIndices);
     }
 
     _value = newAudioState;

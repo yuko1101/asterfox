@@ -13,8 +13,8 @@ class MusicListener {
   late AudioDataManager _audioDataManager;
 
   void init() {
-    _audioHandler.audioPlayer.stream.playlist.listen((sequenceState) {
-      _updatePlaylistAndIndex(sequenceState);
+    _audioHandler.audioPlayer.stream.playlist.listen((playlist) {
+      _updatePlaylistAndIndex(playlist);
     });
     _audioHandler.audioPlayer.stream.playing.listen((playing) {
       _updatePlaybackState(playing);
@@ -26,36 +26,33 @@ class MusicListener {
     _audioHandler.audioPlayer.stream.buffer.listen((buffered) {
       _updateProgress();
     });
-    _audioHandler.audioPlayer.stream.playlistMode.listen((loopMode) {
-      _updateLoopMode(loopMode);
+    _audioHandler.audioPlayer.stream.playlistMode.listen((playlistMode) {
+      _updatePlaylistMode(playlistMode);
     });
     _audioHandler.audioPlayer.stream.volume.listen((volume) {
       _updateVolume(volume);
     });
   }
 
-  void _updatePlaylistAndIndex(Playlist sequenceState) {
-    final sequence = sequenceState.medias;
-    final currentIndex = sequenceState.index;
-
+  void _updatePlaylistAndIndex(Playlist playlist) {
     _musicManager.audioStateManager.mainNotifier.update({
-      "sequence": sequence,
-      "currentIndex": currentIndex,
+      "medias": playlist.medias,
+      "currentIndex": playlist.index,
     });
   }
 
   void _updatePlaybackState(bool playing) {
-    final newAudioState = _musicManager.audioStateManager.mainNotifier.value
-        .copyWith({"playing": playing});
-    _musicManager.audioStateManager.mainNotifier.value = newAudioState;
+    _musicManager.audioStateManager.mainNotifier.update({
+      "playing": playing,
+    });
   }
 
   void _updateProgress() {
     _musicManager.progressNotifier.value = _audioDataManager.progress;
   }
 
-  void _updateLoopMode(PlaylistMode loopMode) {
-    _musicManager.audioStateManager.mainNotifier.update({"loopMode": loopMode});
+  void _updatePlaylistMode(PlaylistMode playlistMode) {
+    _musicManager.audioStateManager.mainNotifier.update({"playlistMode": playlistMode});
   }
 
   void _updateVolume(double volume) {

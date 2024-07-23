@@ -34,7 +34,7 @@ class HomeScreen extends ScaffoldScreen {
               ValueListenableBuilder<AudioState>(
                 valueListenable: musicManager.audioStateManager.songsNotifier,
                 builder: (context, audioState, child) => PlaylistWidget(
-                  songs: audioState.shuffledPlaylist,
+                  songs: audioState.playlist,
                   currentSong: audioState.currentSong,
                   isLinked: true,
                   padding: const EdgeInsets.only(top: 15),

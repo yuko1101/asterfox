@@ -9,7 +9,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../data/local_musics_data.dart';
 import '../data/settings_data.dart';
 import '../main.dart';
-import '../music/audio_source/music_data.dart';
+import '../music/music_data/music_data.dart';
 import '../music/music_downloader.dart';
 import '../music/utils/music_data_utils.dart';
 import '../screens/home_screen.dart';

@@ -16,8 +16,8 @@ import '../system/firebase/cloud_firestore.dart';
 import '../utils/async_utils.dart';
 import '../utils/network_utils.dart';
 import '../utils/pair.dart';
-import 'audio_source/music_data.dart';
-import 'audio_source/youtube_music_data.dart';
+import 'music_data/music_data.dart';
+import 'music_data/youtube_music_data.dart';
 
 class DownloadManager {
   static final Map<String, Pair<ValueNotifier<bool>, ValueNotifier<int>>>

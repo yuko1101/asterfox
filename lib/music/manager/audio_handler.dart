@@ -4,7 +4,7 @@ import 'package:media_kit/media_kit.dart';
 
 import '../../data/settings_data.dart';
 import '../../main.dart';
-import '../audio_source/music_data.dart';
+import '../music_data/music_data.dart';
 import 'audio_player.dart';
 import 'music_manager.dart';
 import 'notifiers/audio_state_notifier.dart';
@@ -40,7 +40,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     if (useSession) {
       _listenForDurationChanges();
       _listenForCurrentSongIndexChanges();
-      _listenForSequenceStateChanges();
+      _listenForPlaylistChanges();
     }
   }
 
@@ -109,28 +109,28 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
-    final Media audioSource = _createAudioSource(mediaItem);
-    await _add(audioSource);
+    final Media media = _createMedia(mediaItem);
+    await _add(media);
   }
 
-  Future<void> _add(Media audioSource) async {
+  Future<void> _add(Media media) async {
     if (!playerOpened) {
       playerOpened = true;
-      await _audioPlayer.open(Playlist([audioSource]));
+      await _audioPlayer.open(Playlist([media]));
     } else {
-      await _audioPlayer.add(audioSource);
+      await _audioPlayer.add(media);
     }
   }
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
-    final audioSource = mediaItems.map(_createAudioSource);
+    final medias = mediaItems.map(_createMedia);
     if (!playerOpened) {
       playerOpened = true;
-      await _audioPlayer.open(Playlist(audioSource.toList()));
+      await _audioPlayer.open(Playlist(medias.toList()));
     } else {
-      for (final source in audioSource) {
-        await _audioPlayer.add(source);
+      for (final media in medias) {
+        await _audioPlayer.add(media);
       }
     }
   }
@@ -179,7 +179,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     await super.onNotificationDeleted();
   }
 
-  Media _createAudioSource(MediaItem mediaItem) {
+  Media _createMedia(MediaItem mediaItem) {
     return Media(
       mediaItem.extras!['url'],
       extras: {
@@ -190,9 +190,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     );
   }
 
-  MediaItem _createMediaItem(Media audioSource) {
-    final MusicData musicData = audioSource.toMusicData();
-    return musicData.toMediaItemWithUrl(audioSource.extras!["url"]);
+  MediaItem _createMediaItem(Media media) {
+    final MusicData musicData = media.toMusicData();
+    return musicData.toMediaItemWithUrl(media.extras!["url"]);
   }
 
   Future<void> move(
@@ -233,7 +233,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> setSongs(List<MusicData> songs) async {
     final mediaItems = await Future.wait(songs.map((e) => e.toMediaItem()));
     await _audioPlayer
-        .open(Playlist(mediaItems.map(_createAudioSource).toList()));
+        .open(Playlist(mediaItems.map(_createMedia).toList()));
   }
 
   AudioPlayer get audioPlayer => _audioPlayer;
@@ -328,12 +328,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     });
   }
 
-  void _listenForSequenceStateChanges() {
+  void _listenForPlaylistChanges() {
     _audioPlayer.stream.playlist.listen((playlist) async {
-      // print("sequenceState: ${sequenceState?.effectiveSequence.length ?? 0} songs");
-      var sequence = playlist.medias;
-      final items = sequence.map(_createMediaItem);
-      // print(items.length.toString() + " added songs");
+      final items = playlist.medias.map(_createMediaItem);
       setQueueItems(items.toList());
     });
   }

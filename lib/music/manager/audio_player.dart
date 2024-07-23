@@ -31,7 +31,7 @@ class AudioPlayer extends Player {
       await super.setShuffle(false);
     }
     musicManager.audioStateManager.mainNotifier.update({
-      "shuffleMode": _shuffled,
+      "shuffled": _shuffled,
       "shuffledIndices": _shuffledIndices,
     });
   }

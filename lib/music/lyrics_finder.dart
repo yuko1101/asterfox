@@ -4,7 +4,7 @@ import 'package:lyrics/lyrics.dart';
 
 import '../data/local_musics_data.dart';
 import '../system/firebase/cloud_firestore.dart';
-import 'audio_source/music_data.dart';
+import 'music_data/music_data.dart';
 
 class LyricsFinder {
   static Future<String> search(String title, String artist) async {

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import '../main.dart';
-import '../music/audio_source/music_data.dart';
+import '../music/music_data/music_data.dart';
 import '../music/manager/music_manager.dart';
 import '../utils/config_file.dart';
 

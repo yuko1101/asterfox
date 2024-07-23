@@ -291,13 +291,13 @@ class MusicData<T extends Caching> {
 
 enum MusicType { youtube, url }
 
-extension MediaItemParseMusicData on MediaItem {
+extension MediaItemParseIntoMusicData on MediaItem {
   MusicData toMusicData() {
     return MusicData.fromKey(id)!;
   }
 }
 
-extension AudioSourceParseMusicData on Media {
+extension MediaParseIntoMusicData on Media {
   MusicData toMusicData() {
     return MusicData.fromKey(extras!["key"])!;
   }

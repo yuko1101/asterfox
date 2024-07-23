@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../data/local_musics_data.dart';
 import '../main.dart';
-import '../music/audio_source/music_data.dart';
+import '../music/music_data/music_data.dart';
 import '../music/manager/audio_data_manager.dart';
 import '../music/manager/notifiers/audio_state_notifier.dart';
 import '../system/theme/theme.dart';

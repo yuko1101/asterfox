@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../main.dart';
-import '../music/audio_source/music_data.dart';
+import '../music/music_data/music_data.dart';
 import '../music/music_downloader.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
 import '../system/exceptions/network_exception.dart';

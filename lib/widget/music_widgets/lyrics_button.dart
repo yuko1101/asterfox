@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../main.dart';
-import '../../music/audio_source/music_data.dart';
+import '../../music/music_data/music_data.dart';
 import '../../music/lyrics_finder.dart';
 import '../../music/manager/notifiers/audio_state_notifier.dart';
 import '../../system/theme/theme.dart';

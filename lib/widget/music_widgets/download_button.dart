@@ -26,14 +26,14 @@ class DownloadButton extends StatelessWidget {
 
             final List<Media> songs =
                 musicManager.audioHandler.audioPlayer.state.playlist.medias;
-            final audioSourceIndex = songs
+            final mediaIndex = songs
                 .indexWhere((element) => element.extras!["key"] == song?.key);
-            final Media? audioSource =
-                audioSourceIndex != -1 ? songs[audioSourceIndex] : null;
+            final Media? media =
+                mediaIndex != -1 ? songs[mediaIndex] : null;
             final isDownloaded = song != null &&
-                audioSource != null &&
+                media != null &&
                 LocalMusicsData.isInstalled(audioId: song.audioId) &&
-                (audioSource.extras!["url"] as String).isUrl;
+                (media.extras!["url"] as String).isUrl;
 
             if (isDownloading) {
               return Container(

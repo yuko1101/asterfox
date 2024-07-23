@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../main.dart';
-import '../music/audio_source/music_data.dart';
+import '../music/music_data/music_data.dart';
 import 'music_card.dart';
 
 class PlaylistWidget extends StatefulWidget {

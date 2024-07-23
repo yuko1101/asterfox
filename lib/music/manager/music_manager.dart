@@ -10,7 +10,7 @@ import '../../data/local_musics_data.dart';
 import '../../data/settings_data.dart';
 import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
-import '../audio_source/music_data.dart';
+import '../music_data/music_data.dart';
 import 'audio_data_manager.dart';
 import 'audio_handler.dart';
 import 'music_listener.dart';
@@ -165,7 +165,7 @@ class MusicManager {
     if (audioDataManager.progress.current.inMilliseconds < 5000) {
       // if current index is 0 and repeat mode is none, replay the current song.
       if (audioDataManager.repeatState == RepeatState.none &&
-          audioDataManager.currentShuffledIndex == 0) {
+          audioDataManager.currentIndex == 0) {
         await seek(Duration.zero);
       } else {
         await previous(force);

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
-import '../music/audio_source/music_data.dart';
+import '../music/music_data/music_data.dart';
 import '../music/utils/music_data_utils.dart';
 import 'exceptions/invalid_type_of_media_url_exception.dart';
 import 'home_screen_music_manager.dart';

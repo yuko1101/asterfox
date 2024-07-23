@@ -1,4 +1,4 @@
-import '../../music/audio_source/music_data.dart';
+import '../../music/music_data/music_data.dart';
 import '../../music/utils/music_data_utils.dart';
 
 abstract class Suggestion {

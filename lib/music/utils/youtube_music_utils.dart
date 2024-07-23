@@ -7,8 +7,8 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../system/exceptions/unable_to_load_from_playlist_exception.dart';
-import '../audio_source/music_data.dart';
-import '../audio_source/youtube_music_data.dart';
+import '../music_data/music_data.dart';
+import '../music_data/youtube_music_data.dart';
 import '../../system/exceptions/network_exception.dart';
 import '../../utils/network_utils.dart';
 
