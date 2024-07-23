@@ -50,8 +50,6 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
         if (oldIndex == newIndex) return;
 
-        print("oldIndex: $oldIndex, newIndex: $newIndex");
-
         if (widget.isLinked && widget.onMove == null) {
           await musicManager.move(oldIndex, newIndex);
         }

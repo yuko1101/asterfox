@@ -20,7 +20,6 @@ class MusicThumbnail extends StatelessWidget {
     return ValueListenableBuilder<AudioState>(
       valueListenable: musicManager.audioStateManager.currentSongNotifier,
       builder: (context, audioState, child) {
-        print("thumbnail: ${audioState.currentSong?.title.toString() ?? "null"}");
         return MusicImageWidget(
           audioState.currentSong?.imageUrl,
           fit: fit,

@@ -46,7 +46,6 @@ class MusicManager {
             androidShowNotificationBadge: true,
           ));
     } else {
-      print("windowsMode");
       _audioHandler = SessionAudioHandler(this, false, handleInterruptions);
     }
     MusicListener(this, _audioHandler).init();
@@ -54,8 +53,6 @@ class MusicManager {
   }
 
   Future<void> play() async {
-    print(
-        "Played a playlist: ${audioDataManager.playlist.length.toString()} songs");
     await _audioHandler.play();
   }
 
@@ -184,7 +181,6 @@ class MusicManager {
   }
 
   Future<void> setBaseVolume(double volume) async {
-    print("setBaseVolume: " + volume.toString());
     baseVolumeNotifier.value = volume;
     DeviceSettingsData.data.set(key: "baseVolume", value: volume);
     await updateVolume();

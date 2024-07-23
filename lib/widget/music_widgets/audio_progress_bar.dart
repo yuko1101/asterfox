@@ -12,7 +12,6 @@ class AudioProgressBar extends StatelessWidget {
     return ValueListenableBuilder<ProgressBarState>(
       valueListenable: musicManager.progressNotifier,
       builder: (_, value, __) {
-        // print( "current: "+ value.current.inMilliseconds.toString());
         final Color color = CustomColors.getColor("accent");
         return ProgressBar(
           progressBarColor: color,

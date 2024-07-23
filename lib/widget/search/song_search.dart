@@ -163,7 +163,6 @@ class SongSearch
     if (lastQuery != query) {
       searchedAt = DateTime.now().millisecondsSinceEpoch;
       if (timer != null && timer!.isActive) {
-        print("timer.cancel");
         timer!.cancel();
       }
 
@@ -174,7 +173,6 @@ class SongSearch
           final time = DateTime.now().millisecondsSinceEpoch;
           timer = Timer(const Duration(milliseconds: 500), () {
             loadSuggestions(query, time: time);
-            print("loading suggestions");
           });
         }
       } else {
@@ -183,7 +181,6 @@ class SongSearch
 
       lastQuery = query;
     }
-    print(MediaQuery.of(context).viewPadding.bottom);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -284,7 +281,6 @@ class SongSearch
 
   Future<void> loadOfflineSongs(String text) async {
     loading.value = true;
-    print("loading offline songs");
     final List<SongSuggestion> list = [];
 
     final List<MusicData<CachingDisabled>> storedSongs =

@@ -49,9 +49,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> play() async {
-    print("before play()");
     await _audioPlayer.play();
-    print("after play() playing: ${_audioPlayer.state.playing}");
   }
 
   @override
@@ -244,7 +242,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   void _listenForCurrentSongIndexChanges() {
     _audioPlayer.stream.playlist.listen((playlist) {
       final index = playlist.index;
-      print("index:$index");
       final q = queue.value;
 
       if (q.isEmpty) return;
@@ -269,7 +266,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       ..clear()
       ..addAll(songs.toSet().toList());
     queue.add(newQueue);
-    // print("set to ${queue.valueOrNull?.length ?? 0} songs");
     final songCount = queue.value.length;
     if (songCount == 0 && preQueue.isNotEmpty) {
       // remove music notification

@@ -31,7 +31,6 @@ class AuthScreen extends StatefulWidget {
     if (!formKey.currentState!.validate()) return;
     final String email = emailController.text.trim();
     final String password = passwordController.text.trim();
-    // print("email: $email, password: $value");
 
     final future = () async {
       try {
