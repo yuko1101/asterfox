@@ -102,37 +102,7 @@ class MusicManager {
 
     if (index == -1) return;
 
-    // fix index (https://github.com/yuko1101/asterfox/issues/47)
-    final int? currentPlayingIndex = audioDataManager.currentIndex;
-    final bool isPlaying =
-        audioDataManager.playingState == PlayingState.playing;
-    final int songsCount = audioDataManager.playlist.length;
-    final bool isCertainRepeatMode =
-        audioDataManager.repeatState != RepeatState.all;
-
-    if (index == currentPlayingIndex &&
-        isPlaying &&
-        index == songsCount - 1 &&
-        isCertainRepeatMode &&
-        songsCount > 1) {
-      if (audioDataManager.repeatState == RepeatState.none) pause();
-      seek(Duration.zero, index: 0);
-    }
-
-    // https://github.com/yuko1101/asterfox/issues/56
-    if (currentPlayingIndex != null &&
-        index < currentPlayingIndex &&
-        currentPlayingIndex + 1 < songsCount) {
-      audioStateManager.mainNotifier
-          .update({AudioRawData.currentIndex: currentPlayingIndex - 1});
-      audioStateManager.mainNotifier.pauseChange(AudioRawData.currentIndex);
-
-      await _audioHandler.removeQueueItemAt(index);
-
-      audioStateManager.mainNotifier.resumeChange(AudioRawData.currentIndex);
-    } else {
-      await _audioHandler.removeQueueItemAt(index);
-    }
+    await _audioHandler.removeQueueItemAt(index);
   }
 
   Future<void> clear() async {
@@ -141,11 +111,7 @@ class MusicManager {
 
   Future<void> move(int currentIndex, int newIndex) async {
     // await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
-    await _audioHandler.move(
-      currentIndex,
-      newIndex,
-      audioStateManager.mainNotifier,
-    );
+    await _audioHandler.move(currentIndex, newIndex);
   }
 
   Future<void> stop() async {

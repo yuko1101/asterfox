@@ -8,7 +8,6 @@ import '../music_data/music_data.dart';
 import 'audio_data_manager.dart';
 import 'audio_player.dart';
 import 'music_manager.dart';
-import 'notifiers/audio_state_notifier.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   late final AudioPlayer _audioPlayer;
@@ -156,35 +155,8 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     return musicData.toMediaItemWithUrl(media.extras!["url"]);
   }
 
-  Future<void> move(
-      int oldIndex, int newIndex, MainAudioStateNotifier? mainNotifier) async {
-    final currentIndex = _audioPlayer.state.playlist.index;
-    final newCurrentIndex = () {
-      if (oldIndex == newIndex) return currentIndex;
-      if (currentIndex == oldIndex) return newIndex;
-
-      if (oldIndex < newIndex) {
-        if (currentIndex > oldIndex && currentIndex <= newIndex) {
-          return currentIndex - 1;
-        } else {
-          return currentIndex;
-        }
-      }
-
-      if (currentIndex >= newIndex && currentIndex < oldIndex) {
-        return currentIndex + 1;
-      } else {
-        return currentIndex;
-      }
-    }();
-    if (mainNotifier != null) {
-      mainNotifier.update({AudioRawData.currentIndex: newCurrentIndex});
-      mainNotifier.pauseChange(AudioRawData.currentIndex);
-    }
+  Future<void> move(int oldIndex, int newIndex) async {
     await _audioPlayer.move(oldIndex, newIndex);
-    if (mainNotifier != null) {
-      mainNotifier.resumeChange(AudioRawData.currentIndex);
-    }
   }
 
   Future<void> clear() async {

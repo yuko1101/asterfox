@@ -48,6 +48,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       onReorder: (oldIndex, newIndex) async {
         if (oldIndex < newIndex) newIndex -= 1;
 
+        if (oldIndex == newIndex) return;
+
         print("oldIndex: $oldIndex, newIndex: $newIndex");
 
         if (widget.isLinked && widget.onMove == null) {

@@ -24,6 +24,15 @@ class AudioPlayer extends Player {
   }
 
   @override
+  Future<void> move(int from, int to) async {
+    if (from == to) return;
+    if (from < to) {
+      to++;
+    }
+    await super.move(from, to);
+  }
+
+  @override
   Future<void> add(Media media) async {
     if (_isEmpty) {
       _isEmpty = false;
