@@ -2,90 +2,8 @@ import 'dart:math';
 
 import 'package:media_kit/media_kit.dart';
 
-import '../../widget/music_widgets/audio_progress_bar.dart';
 import '../../widget/music_widgets/repeat_button.dart';
 import '../music_data/music_data.dart';
-import 'audio_player.dart';
-
-class AudioDataManager extends AudioDataContainer {
-  AudioDataManager(this.audioPlayer);
-  final AudioPlayer audioPlayer;
-
-  @override
-  List<Media> get $medias => audioPlayer.state.playlist.medias;
-  @override
-  int? get $currentIndex => audioPlayer.state.playlist.index;
-  @override
-  bool get $shuffled => audioPlayer.shuffled;
-  @override
-  bool get $playing => audioPlayer.state.playing;
-  @override
-  PlaylistMode get $playlistMode => audioPlayer.state.playlistMode;
-  @override
-  double get $volume => audioPlayer.state.volume;
-  @override
-  Duration get $buffer => audioPlayer.state.buffer;
-  @override
-  Duration get $position => audioPlayer.state.position;
-  @override
-  Duration get $duration => audioPlayer.state.duration;
-  @override
-  double get $rate => audioPlayer.state.rate;
-
-  static List<MusicData> getPlaylist(List<Media> medias) {
-    final playlist = medias;
-    return playlist.map((media) => media.toMusicData()).toList();
-  }
-
-  static int? getCurrentIndex(int? index, List<Media> medias) {
-    if (medias.isEmpty) return null;
-    if (medias.isNotEmpty && index == null) return 0;
-    if (index == null) return null;
-    return min(index, medias.length - 1);
-  }
-
-  static MusicData? getCurrentSong(int? index, List<Media> medias) {
-    if (index == null) return null;
-    final playlist = getPlaylist(medias);
-    if (index >= playlist.length || index < 0) return null;
-    return playlist[index];
-  }
-
-  static PlayingState getPlayingState(bool playing, List<Media> medias) {
-    // TODO: implement PlayingState.loading
-    if (medias.isEmpty) {
-      return PlayingState.disabled;
-    } else if (!playing) {
-      return PlayingState.paused;
-    } else {
-      return PlayingState.playing;
-    }
-  }
-
-  static ProgressBarState getProgress(
-      Duration current, Duration buffered, Duration total) {
-    return ProgressBarState(current: current, buffered: buffered, total: total);
-  }
-
-  static RepeatState getRepeatState(PlaylistMode playlistMode) {
-    return playlistModeToRepeatState(playlistMode);
-  }
-
-  static bool getHasNext(
-      int? index, List<Media> medias, PlaylistMode playlistMode) {
-    final max = medias.length;
-    final current = getCurrentIndex(index, medias);
-    final repeat = getRepeatState(playlistMode);
-    if (max == 0) {
-      return false;
-    } else if (current == null) {
-      return false;
-    } else if ([RepeatState.one, RepeatState.all].contains(repeat)) {
-      return true;
-    }
-    return current < max - 1;
-  }
-}
 
 class AudioState extends AudioDataContainer {
   AudioState({
@@ -166,25 +84,20 @@ abstract class AudioDataContainer {
   Duration get $duration;
   double get $rate;
 
-  List<MusicData> get playlist => AudioDataManager.getPlaylist($medias);
-  int? get currentIndex =>
-      AudioDataManager.getCurrentIndex($currentIndex, $medias);
-  MusicData? get currentSong =>
-      AudioDataManager.getCurrentSong($currentIndex, $medias);
-  PlayingState get playingState =>
-      AudioDataManager.getPlayingState($playing, $medias);
-  RepeatState get repeatState => AudioDataManager.getRepeatState($playlistMode);
+  List<MusicData> get playlist => getPlaylist($medias);
+  int? get currentIndex => getCurrentIndex($currentIndex, $medias);
+  MusicData? get currentSong => getCurrentSong($currentIndex, $medias);
+  PlayingState get playingState => getPlayingState($playing, $medias);
+  RepeatState get repeatState => getRepeatState($playlistMode);
   bool get shuffled => $shuffled;
-  bool get hasNext =>
-      AudioDataManager.getHasNext($currentIndex, $medias, $playlistMode);
+  bool get hasNext => getHasNext($currentIndex, $medias, $playlistMode);
   double get currentSongVolume => currentSong?.volume ?? 1.0;
   double get volume => $volume;
 
   Duration get buffer => $buffer;
   Duration get position => $position;
   Duration get duration => $duration;
-  ProgressBarState get progress =>
-      AudioDataManager.getProgress($position, $buffer, $duration);
+  ProgressBarState get progress => getProgress($position, $buffer, $duration);
 
   double get speed => $rate;
 
@@ -245,6 +158,61 @@ abstract class AudioDataContainer {
         return speed;
     }
   }
+
+  static List<MusicData> getPlaylist(List<Media> medias) {
+    final playlist = medias;
+    return playlist.map((media) => media.toMusicData()).toList();
+  }
+
+  static int? getCurrentIndex(int? index, List<Media> medias) {
+    if (medias.isEmpty) return null;
+    if (medias.isNotEmpty && index == null) return 0;
+    if (index == null) return null;
+    return min(index, medias.length - 1);
+  }
+
+  static MusicData? getCurrentSong(int? index, List<Media> medias) {
+    if (index == null) return null;
+    final playlist = getPlaylist(medias);
+    if (index >= playlist.length || index < 0) return null;
+    return playlist[index];
+  }
+
+  static PlayingState getPlayingState(bool playing, List<Media> medias) {
+    // TODO: implement PlayingState.loading
+    if (medias.isEmpty) {
+      return PlayingState.disabled;
+    } else if (!playing) {
+      return PlayingState.paused;
+    } else {
+      return PlayingState.playing;
+    }
+  }
+
+  static ProgressBarState getProgress(
+      Duration position, Duration buffer, Duration duration) {
+    return ProgressBarState(
+        position: position, buffer: buffer, duration: duration);
+  }
+
+  static RepeatState getRepeatState(PlaylistMode playlistMode) {
+    return playlistModeToRepeatState(playlistMode);
+  }
+
+  static bool getHasNext(
+      int? index, List<Media> medias, PlaylistMode playlistMode) {
+    final max = medias.length;
+    final current = getCurrentIndex(index, medias);
+    final repeat = getRepeatState(playlistMode);
+    if (max == 0) {
+      return false;
+    } else if (current == null) {
+      return false;
+    } else if ([RepeatState.one, RepeatState.all].contains(repeat)) {
+      return true;
+    }
+    return current < max - 1;
+  }
 }
 
 enum PlayingState { paused, playing, loading, disabled }
@@ -277,4 +245,15 @@ enum AudioRichData {
   duration,
   progress,
   speed,
+}
+
+class ProgressBarState {
+  const ProgressBarState({
+    required this.position,
+    required this.buffer,
+    required this.duration,
+  });
+  final Duration position;
+  final Duration buffer;
+  final Duration duration;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../main.dart';
+import '../music/manager/audio_data_manager.dart';
 import '../music/music_data/music_data.dart';
 import 'music_card.dart';
 
@@ -51,13 +52,20 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         if (oldIndex == newIndex) return;
 
         if (widget.isLinked && widget.onMove == null) {
-          await musicManager.move(oldIndex, newIndex);
+          () async {
+            final medias = [...musicManager.state.$medias];
+            final song = medias.removeAt(oldIndex);
+            medias.insert(newIndex, song);
+            musicManager.notifier.pauseChange(AudioRawData.medias,
+                faking: true, fakeValue: medias);
+            await musicManager.move(oldIndex, newIndex);
+            musicManager.notifier.resumeChange(AudioRawData.medias);
+          }();
         }
+
         setState(() {
-          if (!widget.isLinked) {
-            final song = widget.songs.removeAt(oldIndex);
-            widget.songs.insert(newIndex, song);
-          }
+          final song = widget.songs.removeAt(oldIndex);
+          widget.songs.insert(newIndex, song);
 
           if (widget.onMove != null) widget.onMove!(oldIndex, newIndex);
         });

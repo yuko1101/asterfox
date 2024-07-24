@@ -217,7 +217,7 @@ class _Action extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon),
         title: Text(title(context)),
-        onTap: () => onTap(musicManager.audioDataManager.currentSong, context),
+        onTap: () => onTap(musicManager.state.currentSong, context),
         tileColor: Theme.of(context).scaffoldBackgroundColor,
       ),
     );

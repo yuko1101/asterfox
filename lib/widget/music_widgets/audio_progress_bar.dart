@@ -3,49 +3,31 @@ import 'package:flutter/material.dart';
 
 import '../../data/custom_colors.dart';
 import '../../main.dart';
+import '../../music/manager/audio_data_manager.dart';
 import '../../utils/responsive.dart';
 
 class AudioProgressBar extends StatelessWidget {
   const AudioProgressBar({super.key});
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ProgressBarState>(
-      valueListenable: musicManager.progressNotifier,
-      builder: (_, value, __) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.progressNotifier,
+      builder: (_, state, __) {
         final Color color = CustomColors.getColor("accent");
+        final progress = state.progress;
         return ProgressBar(
           progressBarColor: color,
           thumbColor: color,
           bufferedBarColor: color.withOpacity(0.35),
           baseBarColor: color.withOpacity(0.175),
           thumbRadius: Responsive.isMobile(context) ? 10 : 5,
-          progress: value.current,
-          buffered: value.buffered,
-          total: value.total,
+          progress: progress.position,
+          buffered: progress.buffer,
+          total: progress.duration,
           onSeek: musicManager.seek,
           timeLabelLocation: TimeLabelLocation.none,
         );
       },
     );
   }
-}
-
-class ProgressNotifier extends ValueNotifier<ProgressBarState> {
-  ProgressNotifier() : super(_initialValue);
-  static const _initialValue = ProgressBarState(
-    current: Duration.zero,
-    buffered: Duration.zero,
-    total: Duration.zero,
-  );
-}
-
-class ProgressBarState {
-  const ProgressBarState({
-    required this.current,
-    required this.buffered,
-    required this.total,
-  });
-  final Duration current;
-  final Duration buffered;
-  final Duration total;
 }

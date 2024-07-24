@@ -7,26 +7,22 @@ import '../../widget/music_widgets/repeat_button.dart';
 import '../music_data/music_data.dart';
 import 'audio_data_manager.dart';
 import 'audio_player.dart';
-import 'music_manager.dart';
 
 class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
-  late final AudioPlayer _audioPlayer;
+  final AudioPlayer _audioPlayer;
 
   final bool useSession;
   final bool handleInterruptions;
 
   /// Initialize the audio handler.
   SessionAudioHandler(
-      MusicManager musicManager, this.useSession, this.handleInterruptions) {
-    _audioPlayer = AudioPlayer(musicManager);
-
+      this._audioPlayer, this.useSession, this.handleInterruptions) {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
     if (useSession) {
-      _audioPlayer.musicManager.audioStateManager.mainNotifier.addListener(() {
-        final state = _transformEvent(
-            _audioPlayer.musicManager.audioStateManager.mainNotifier.value);
+      _audioPlayer.musicManager.notifier.addListener(() {
+        final state = _transformEvent(_audioPlayer.musicManager.notifier.value);
         playbackState.add(state);
       });
       _activateAudioSession();
@@ -142,15 +138,13 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
       mediaItem.extras!['url'],
       extras: {
         "key": mediaItem.id,
-        "url": mediaItem.extras!['url'],
-        "duration": mediaItem.duration?.inMilliseconds ?? 0,
       },
     );
   }
 
   MediaItem _createMediaItem(Media media) {
     final MusicData musicData = media.toMusicData();
-    return musicData.toMediaItemWithUrl(media.extras!["url"]);
+    return musicData.toMediaItemWithUrl(media.uri);
   }
 
   Future<void> move(int oldIndex, int newIndex) async {
@@ -165,8 +159,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     final mediaItems = await Future.wait(songs.map((e) => e.toMediaItem()));
     await _audioPlayer.setMedias(mediaItems.map(_createMedia).toList());
   }
-
-  AudioPlayer get audioPlayer => _audioPlayer;
 
   PlaybackState _transformEvent(AudioState state) {
     return PlaybackState(

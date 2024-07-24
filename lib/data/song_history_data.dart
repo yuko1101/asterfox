@@ -17,8 +17,8 @@ class SongHistoryData {
 
     // when song is played, add it to history.
     manager.audioStateManager.currentSongNotifier.addListener(() {
-      if (manager.audioDataManager.currentSong != null) {
-        addAndSave(manager.audioDataManager.currentSong!);
+      if (manager.state.currentSong != null) {
+        addAndSave(manager.state.currentSong!);
       }
     });
   }

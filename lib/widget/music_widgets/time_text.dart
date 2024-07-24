@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
+import '../../music/manager/audio_data_manager.dart';
 import '../../system/theme/theme.dart';
-import 'audio_progress_bar.dart';
 
 class TimeText extends StatelessWidget {
   const TimeText({super.key});
 
-  String getProgress(progress, total) {
+  String getProgress(Duration progress, Duration total) {
     return total.inHours < 1
         ? total.inMinutes < 10
             ? progress.toString().split(".")[0].replaceFirst("0:0", "")
@@ -15,7 +15,7 @@ class TimeText extends StatelessWidget {
         : progress.toString().split(".")[0];
   }
 
-  String getTotal(total) {
+  String getTotal(Duration total) {
     return total.inHours < 1
         ? total.inMinutes < 10
             ? total.toString().split(".")[0].replaceFirst("0:0", "")
@@ -25,11 +25,12 @@ class TimeText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ProgressBarState>(
-      valueListenable: musicManager.progressNotifier,
-      builder: (_, value, __) {
+    return ValueListenableBuilder<AudioState>(
+      valueListenable: musicManager.audioStateManager.progressNotifier,
+      builder: (_, state, __) {
+        final progress = state.progress;
         return Text(
-          "${getProgress(value.current, value.total)} / ${getTotal(value.total)}",
+          "${getProgress(progress.position, progress.duration)} / ${getTotal(progress.duration)}",
           style: TextStyle(
             color: Theme.of(context).extraColors.secondary,
           ),

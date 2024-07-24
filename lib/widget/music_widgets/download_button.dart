@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
@@ -20,21 +19,14 @@ class DownloadButton extends StatelessWidget {
         return ValueListenableBuilder<List<String>>(
           valueListenable: DownloadManager.downloadingNotifier,
           builder: (_, downloadingSongs, __) {
-            final downloadable = song != null && !song.isInstalled;
-            final isDownloading = downloadingSongs.contains(song?.audioId);
+            if (song == null) {
+              return const IconButton(
+                onPressed: null,
+                icon: Icon(Icons.file_download),
+              );
+            }
 
-            final List<Media> songs =
-                musicManager.audioHandler.audioPlayer.state.playlist.medias;
-            final mediaIndex = songs
-                .indexWhere((element) => element.extras!["key"] == song?.key);
-            final Media? media =
-                mediaIndex != -1 ? songs[mediaIndex] : null;
-            final isDownloaded = song != null &&
-                media != null &&
-                LocalMusicsData.isInstalled(audioId: song.audioId) &&
-                (media.extras!["url"] as String).isUrl;
-
-            if (isDownloading) {
+            if (downloadingSongs.contains(song.audioId)) {
               return Container(
                 height: 24,
                 width: 24,
@@ -45,31 +37,29 @@ class DownloadButton extends StatelessWidget {
                 ),
               );
             }
-            if (isDownloaded) {
+
+            final isDownloaded = song.isInstalled;
+            if (!isDownloaded) {
+              return IconButton(
+                onPressed: () => HomeScreenMusicManager.download(song),
+                icon: const Icon(Icons.file_download),
+              );
+            }
+
+            final medias = musicManager.audioStateManager.songsNotifier.value
+                .$medias[audioState.currentIndex!];
+            if (medias.uri.isUrl) {
               return IconButton(
                 icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  musicManager.refreshSongs(
-                      musicManager.audioDataManager.currentIndex!);
-                },
+                onPressed: () =>
+                    musicManager.refreshSongs(musicManager.state.currentIndex!),
               );
             }
-            if (downloadable) {
-              return IconButton(
-                  onPressed: () {
-                    HomeScreenMusicManager.download(song);
-                  },
-                  icon: const Icon(Icons.file_download));
-            }
-            if (song != null && song.isInstalled) {
-              return const IconButton(
-                // TODO: uninstall, delete
-                onPressed: null,
-                icon: Icon(Icons.file_download_done),
-              );
-            }
+            // TODO: implement deleting and uninstalling
             return const IconButton(
-                onPressed: null, icon: Icon(Icons.file_download));
+              onPressed: null,
+              icon: Icon(Icons.file_download),
+            );
           },
         );
       },

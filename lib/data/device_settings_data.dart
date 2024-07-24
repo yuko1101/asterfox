@@ -43,7 +43,7 @@ class DeviceSettingsData {
       musicManager.audioStateManager.repeatStateNotifier.addListener(() {
         data.set(
           key: "repeatMode",
-          value: repeatStateToString(musicManager.audioDataManager.repeatState),
+          value: repeatStateToString(musicManager.state.repeatState),
         );
         save();
       });

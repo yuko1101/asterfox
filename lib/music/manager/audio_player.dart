@@ -18,7 +18,7 @@ class AudioPlayer extends Player {
   Future<void> setShuffle(bool shuffle) async {
     _shuffled = shuffle;
     await setShuffle(shuffle);
-    musicManager.audioStateManager.mainNotifier.update({
+    musicManager.notifier.update({
       AudioRawData.shuffled: _shuffled,
     });
   }
@@ -26,9 +26,7 @@ class AudioPlayer extends Player {
   @override
   Future<void> move(int from, int to) async {
     if (from == to) return;
-    if (from < to) {
-      to++;
-    }
+    if (from < to) to++;
     await super.move(from, to);
   }
 

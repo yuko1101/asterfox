@@ -2,39 +2,53 @@ import 'package:flutter/foundation.dart';
 
 import '../audio_data_manager.dart';
 
-class MainAudioStateNotifier extends AudioStateNotifier {
-  MainAudioStateNotifier(
-    super.value,
-    super.targetChanges,
-  );
-
+class MainAudioStateNotifier extends ChangeNotifier
+    implements ValueListenable<AudioState> {
   /// Paused changes are changes that are not notified to listeners.
   /// The integer value is the number of processes pausing the change right now.
-  final Map<AudioRawData, int> _pausedChanges = {};
+  final Map<AudioRawData, PausedState> _pausedChanges = {};
 
-  void pauseChange(AudioRawData dataType) {
-    _pausedChanges[dataType] = (_pausedChanges[dataType] ?? 0) + 1;
+  final Set<AudioRawData> lastChanges = {};
+
+  AudioState _value = AudioState.defaultState;
+  @override
+  AudioState get value => _value;
+
+  void pauseChange(AudioRawData dataType,
+      {bool faking = false, dynamic fakeValue}) {
+    var pausedState = _pausedChanges[dataType];
+    if (pausedState == null) {
+      _pausedChanges[dataType] = PausedState();
+      pausedState = _pausedChanges[dataType]!;
+    }
+
+    pausedState.processCount++;
+    if (faking) {
+      pausedState.faking = true;
+      pausedState.fakeValue = fakeValue;
+    }
+
     print("pausing $dataType");
   }
 
   void resumeChange(AudioRawData dataType) {
-    final pausingProcesses = _pausedChanges[dataType];
-    if (pausingProcesses == null) return;
-    if (pausingProcesses == 1) {
+    final pausedState = _pausedChanges[dataType];
+    if (pausedState == null) return;
+    if (pausedState.processCount == 1) {
       // all processes have resumed
 
       _pausedChanges.remove(dataType);
 
       notifyListeners();
     } else {
-      _pausedChanges[dataType] = pausingProcesses - 1;
+      pausedState.processCount--;
     }
     print("resuming $dataType");
   }
 
   bool isChangePaused(AudioRawData dataType) {
     final pausingProcesses = _pausedChanges[dataType];
-    return pausingProcesses != null && pausingProcesses > 0;
+    return pausingProcesses != null && pausingProcesses.processCount > 0;
   }
 
   AudioState getAppliedPausedState(
@@ -42,128 +56,134 @@ class MainAudioStateNotifier extends AudioStateNotifier {
     return newAudioState.copyWith({
       for (final dataType in AudioRawData.values)
         if (isChangePaused(dataType))
-          dataType: oldAudioState.getRawData(dataType),
+          dataType:
+              getAppliedPausedData(dataType, oldAudioState, newAudioState),
     });
+  }
+
+  dynamic getAppliedPausedData(AudioRawData dataType, AudioState oldAudioState,
+      AudioState newAudioState) {
+    final pausedState = _pausedChanges[dataType];
+    final isPaused = pausedState != null && pausedState.processCount > 0;
+    if (!isPaused) return newAudioState.getRawData(dataType);
+
+    return pausedState.faking
+        ? pausedState.fakeValue
+        : oldAudioState.getRawData(dataType);
+  }
+
+  void update(Map<AudioRawData, dynamic> changes) {
+    lastChanges.clear();
+    for (final entry in changes.entries) {
+      if (_value.getRawData(entry.key) != entry.value) {
+        lastChanges.add(entry.key);
+      }
+    }
+    _value = _value.copyWith(changes);
+    notifyListeners();
   }
 }
 
 class AudioStateNotifier extends ChangeNotifier
     implements ValueListenable<AudioState> {
   AudioStateNotifier(
-    this._value,
     this.targetChanges,
   );
 
-  AudioState _value;
-  Set<AudioRichData> targetChanges;
+  AudioState _value = AudioState.defaultState;
+  Set<AudioRawData> targetChanges;
 
   @override
   AudioState get value => _value;
-  set value(newAudioState) {
-    final changes = <AudioRichData>[];
-
-    if (newAudioState.playlist != _value.playlist) {
-      changes.add(AudioRichData.playlist);
-    }
-    if (newAudioState.currentIndex != _value.currentIndex) {
-      changes.add(AudioRichData.currentIndex);
-    }
-    if (newAudioState.currentSong != _value.currentSong) {
-      changes.add(AudioRichData.currentSong);
-    }
-    if (newAudioState.playingState != _value.playingState) {
-      changes.add(AudioRichData.playingState);
-    }
-    if (newAudioState.repeatState != _value.repeatState) {
-      changes.add(AudioRichData.repeatState);
-    }
-    if (newAudioState.shuffled != _value.shuffled) {
-      changes.add(AudioRichData.shuffled);
-    }
-    if (newAudioState.hasNext != _value.hasNext) {
-      changes.add(AudioRichData.hasNext);
-    }
-    if (newAudioState.currentSongVolume != _value.currentSongVolume) {
-      changes.add(AudioRichData.currentSongVolume);
-    }
-
-    _value = newAudioState;
-
-    if (changes.any((change) => targetChanges.contains(change))) {
-      notifyListeners();
-    }
-  }
-
-  void update(Map<AudioRawData, dynamic> changes) {
-    value = value.copyWith(changes);
+  set value(AudioState newValue) {
+    _value = newValue;
+    notifyListeners();
   }
 }
 
 class AudioStateManager {
-  AudioStateManager() {
+  AudioStateManager();
+
+  void init() {
+    final subNotifiers = [
+      songsNotifier,
+      currentSongNotifier,
+      playingStateNotifier,
+      repeatStateNotifier,
+      hasNextNotifier,
+      shuffleNotifier,
+      progressNotifier,
+    ];
+
     mainNotifier.addListener(() {
-      final value = mainNotifier.value;
-      songsNotifier.value =
-          mainNotifier.getAppliedPausedState(songsNotifier.value, value);
-      currentSongNotifier.value =
-          mainNotifier.getAppliedPausedState(currentSongNotifier.value, value);
-      playingStateNotifier.value =
-          mainNotifier.getAppliedPausedState(playingStateNotifier.value, value);
-      repeatStateNotifier.value =
-          mainNotifier.getAppliedPausedState(repeatStateNotifier.value, value);
-      hasNextNotifier.value =
-          mainNotifier.getAppliedPausedState(hasNextNotifier.value, value);
-      shuffleNotifier.value =
-          mainNotifier.getAppliedPausedState(shuffleNotifier.value, value);
+      final state = mainNotifier.value;
+      final changes = mainNotifier.lastChanges;
+      for (final notifier in subNotifiers) {
+        if (notifier.targetChanges.intersection(changes).isNotEmpty) {
+          notifier.value = mainNotifier.getAppliedPausedState(
+            notifier.value,
+            state,
+          );
+        }
+      }
     });
   }
 
-  final MainAudioStateNotifier mainNotifier = MainAudioStateNotifier(
-    AudioState.defaultState,
-    AudioRichData.values.toSet(),
-  );
+  final MainAudioStateNotifier mainNotifier = MainAudioStateNotifier();
 
   final AudioStateNotifier songsNotifier = AudioStateNotifier(
-    AudioState.defaultState,
     {
-      AudioRichData.playlist,
-      AudioRichData.currentSong,
-      AudioRichData.playingState,
+      AudioRawData.medias,
+      AudioRawData.currentIndex,
+      AudioRawData.playing,
     },
   );
 
   final AudioStateNotifier currentSongNotifier = AudioStateNotifier(
-    AudioState.defaultState,
     {
-      AudioRichData.currentSong,
+      AudioRawData.medias,
+      AudioRawData.currentIndex,
     },
   );
 
   final AudioStateNotifier playingStateNotifier = AudioStateNotifier(
-    AudioState.defaultState,
     {
-      AudioRichData.playingState,
+      AudioRawData.medias,
+      AudioRawData.playing,
     },
   );
 
   final AudioStateNotifier repeatStateNotifier = AudioStateNotifier(
-    AudioState.defaultState,
     {
-      AudioRichData.repeatState,
+      AudioRawData.playlistMode,
     },
   );
 
   final AudioStateNotifier hasNextNotifier = AudioStateNotifier(
-    AudioState.defaultState,
     {
-      AudioRichData.hasNext,
+      AudioRawData.currentIndex,
+      AudioRawData.medias,
+      AudioRawData.playlistMode,
     },
   );
 
   final AudioStateNotifier shuffleNotifier = AudioStateNotifier(
-    AudioState.defaultState,
     {
-      AudioRichData.shuffled,
+      AudioRawData.shuffled,
     },
   );
+
+  final AudioStateNotifier progressNotifier = AudioStateNotifier(
+    {
+      AudioRawData.position,
+      AudioRawData.buffer,
+      AudioRawData.duration,
+    },
+  );
+}
+
+class PausedState {
+  int processCount = 0;
+  bool faking = false;
+  dynamic fakeValue;
 }

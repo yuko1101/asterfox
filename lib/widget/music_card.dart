@@ -33,7 +33,10 @@ class MusicCardWidget extends StatelessWidget {
       background: Container(
         color: Theme.of(context).extraColors.primary.withOpacity(0.07),
       ),
-      dismissThresholds: const {DismissDirection.endToStart: 0.6, DismissDirection.startToEnd: 0.6},
+      dismissThresholds: const {
+        DismissDirection.endToStart: 0.6,
+        DismissDirection.startToEnd: 0.6
+      },
       child: buildCard(context),
       onDismissed: (DismissDirection dismissDirection) async {
         if (onRemove != null) {
@@ -97,7 +100,7 @@ class MusicCardWidget extends StatelessWidget {
         if (isLinked) {
           musicManager.seek(
             Duration.zero,
-            index: musicManager.audioDataManager.playlist
+            index: musicManager.state.playlist
                 .indexWhere((element) => element.key == song.key),
           );
         }
