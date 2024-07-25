@@ -39,14 +39,14 @@ dependencies:
 
   collection: ^1.18.0
 
-  http: ^1.2.1
+  http: ^1.2.2
   html: ^0.15.4
 
   intl: ^0.19.0
 
   path_provider: 2.1.3
   provider: ^6.1.2
-  uuid: ^4.4.0
+  uuid: ^4.4.2
 
   connectivity_plus: ^6.0.3
 
@@ -58,7 +58,7 @@ dependencies:
   # use this version since newer versions break the fast-forward/rewind buttons in the notification.
   # TODO: update to the latest version when the issue is fixed.
   audio_service: 0.18.10
-  audio_session: ^0.1.19
+  audio_session: ^0.1.21
 
   youtube_explode_dart: ^2.2.1
 
@@ -67,17 +67,16 @@ dependencies:
   receive_sharing_intent: ^1.8.0
 
   share_plus: ^9.0.0
-  cross_file: ^0.3.4
 
   url_launcher: ^6.3.0
 
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^3.0.0
-  firebase_crashlytics: ^4.0.0
-  firebase_auth: ^5.0.0
-  cloud_firestore: ^5.0.0
+  firebase_core: ^3.2.0
+  firebase_crashlytics: ^4.0.3
+  firebase_auth: ^5.1.2
+  cloud_firestore: ^5.1.0
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -114,7 +113,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   msix: ^3.16.7
   flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.4.0
+  flutter_native_splash: ^2.4.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
