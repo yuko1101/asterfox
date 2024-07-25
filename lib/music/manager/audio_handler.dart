@@ -22,7 +22,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     // playback state changes as they happen via playbackState...
     if (useSession) {
       _audioPlayer.musicManager.notifier.addListener(() {
-        final state = _transformEvent(_audioPlayer.musicManager.notifier.value);
+        final state = _transformEvent(_audioPlayer.musicManager.state);
         playbackState.add(state);
       });
       _activateAudioSession();
@@ -173,7 +173,9 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
           label: "Fast Rewind",
           action: MediaAction.rewind,
         ),
-        state.$playing ? MediaControl.pause : MediaControl.play,
+        state.playingState == PlayingState.playing
+            ? MediaControl.pause
+            : MediaControl.play,
         const MediaControl(
           androidIcon: "drawable/ic_fast_forward",
           label: "Fast Forward",
@@ -199,14 +201,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
           ? AudioServiceShuffleMode.all
           : AudioServiceShuffleMode.none,
       androidCompactActionIndices: const [0, 2, 4],
-      // TODO: implement this
-      // processingState: const {
-      //   ProcessingState.idle: AudioProcessingState.idle,
-      //   ProcessingState.loading: AudioProcessingState.loading,
-      //   ProcessingState.buffering: AudioProcessingState.buffering,
-      //   ProcessingState.ready: AudioProcessingState.ready,
-      //   ProcessingState.completed: AudioProcessingState.completed,
-      // }[_player.processingState]!,
+      processingState: state.processingState,
       playing: state.playingState == PlayingState.playing,
       updatePosition: state.position,
       bufferedPosition: state.buffer,

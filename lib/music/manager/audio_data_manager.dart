@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:media_kit/media_kit.dart';
 
 import '../../widget/music_widgets/repeat_button.dart';
@@ -17,6 +18,8 @@ class AudioState extends AudioDataContainer {
     required this.$position,
     required this.$duration,
     required this.$rate,
+    required this.$buffering,
+    required this.$completed,
   });
 
   @override
@@ -39,6 +42,10 @@ class AudioState extends AudioDataContainer {
   final Duration $duration;
   @override
   final double $rate;
+  @override
+  final bool $buffering;
+  @override
+  final bool $completed;
 
   AudioState copyWith(Map<AudioRawData, dynamic> map) {
     dynamic getData(AudioRawData dataType) =>
@@ -55,6 +62,8 @@ class AudioState extends AudioDataContainer {
       $position: getData(AudioRawData.position),
       $duration: getData(AudioRawData.duration),
       $rate: getData(AudioRawData.rate),
+      $buffering: getData(AudioRawData.buffering),
+      $completed: getData(AudioRawData.completed),
     );
   }
 
@@ -69,6 +78,8 @@ class AudioState extends AudioDataContainer {
     $position: Duration.zero,
     $duration: Duration.zero,
     $rate: 1.0,
+    $buffering: false,
+    $completed: false,
   );
 }
 
@@ -83,6 +94,8 @@ abstract class AudioDataContainer {
   Duration get $position;
   Duration get $duration;
   double get $rate;
+  bool get $buffering;
+  bool get $completed;
 
   List<MusicData> get playlist => getPlaylist($medias);
   int? get currentIndex => getCurrentIndex($currentIndex, $medias);
@@ -100,6 +113,9 @@ abstract class AudioDataContainer {
   ProgressBarState get progress => getProgress($position, $buffer, $duration);
 
   double get speed => $rate;
+  bool get buffering => $buffering;
+  bool get completed => $completed;
+  AudioProcessingState get processingState => getProcessingState($medias, $buffering, $completed);
 
   dynamic getRawData(AudioRawData data) {
     switch (data) {
@@ -123,6 +139,10 @@ abstract class AudioDataContainer {
         return $duration;
       case AudioRawData.rate:
         return $rate;
+      case AudioRawData.buffering:
+        return $buffering;
+      case AudioRawData.completed:
+        return $completed;
     }
   }
 
@@ -156,6 +176,10 @@ abstract class AudioDataContainer {
         return progress;
       case AudioRichData.speed:
         return speed;
+      case AudioRichData.buffering:
+        return buffering;
+      case AudioRichData.completed:
+        return completed;
     }
   }
 
@@ -213,6 +237,19 @@ abstract class AudioDataContainer {
     }
     return current < max - 1;
   }
+
+  static AudioProcessingState getProcessingState(
+      List<Media> medias, bool buffering, bool completed) {
+    if (medias.isEmpty) {
+      return AudioProcessingState.idle;
+    } else if (buffering) {
+      return AudioProcessingState.buffering;
+    } else if (completed) {
+      return AudioProcessingState.completed;
+    } else {
+      return AudioProcessingState.ready;
+    }
+  }
 }
 
 enum PlayingState { paused, playing, loading, disabled }
@@ -228,6 +265,8 @@ enum AudioRawData {
   position,
   duration,
   rate,
+  buffering,
+  completed,
 }
 
 enum AudioRichData {
@@ -245,6 +284,8 @@ enum AudioRichData {
   duration,
   progress,
   speed,
+  buffering,
+  completed,
 }
 
 class ProgressBarState {
