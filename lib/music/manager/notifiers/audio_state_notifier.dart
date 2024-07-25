@@ -175,6 +175,8 @@ class AudioStateManager {
 
   final AudioStateNotifier progressNotifier = AudioStateNotifier(
     {
+      AudioRawData.currentIndex,
+      AudioRawData.medias,
       AudioRawData.position,
       AudioRawData.buffer,
       AudioRawData.duration,

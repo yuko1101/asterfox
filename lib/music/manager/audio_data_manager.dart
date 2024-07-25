@@ -25,7 +25,7 @@ class AudioState extends AudioDataContainer {
   @override
   final List<Media> $medias;
   @override
-  final int? $currentIndex;
+  final int $currentIndex;
   @override
   final bool $shuffled;
   @override
@@ -69,7 +69,7 @@ class AudioState extends AudioDataContainer {
 
   static final AudioState defaultState = AudioState(
     $medias: [],
-    $currentIndex: null,
+    $currentIndex: 0,
     $shuffled: false,
     $playing: false,
     $playlistMode: PlaylistMode.none,
@@ -85,7 +85,7 @@ class AudioState extends AudioDataContainer {
 
 abstract class AudioDataContainer {
   List<Media> get $medias;
-  int? get $currentIndex;
+  int get $currentIndex;
   bool get $shuffled;
   bool get $playing;
   PlaylistMode get $playlistMode;
@@ -108,14 +108,15 @@ abstract class AudioDataContainer {
   double get volume => $volume / 100;
 
   Duration get buffer => $buffer;
-  Duration get position => $position;
+  Duration get position => currentIndex == null ? Duration.zero : $position;
   Duration get duration => $duration;
-  ProgressBarState get progress => getProgress($position, $buffer, $duration);
+  ProgressBarState get progress => getProgress(position, $buffer, $duration);
 
   double get speed => $rate;
   bool get buffering => $buffering;
   bool get completed => $completed;
-  AudioProcessingState get processingState => getProcessingState($medias, $buffering, $completed);
+  AudioProcessingState get processingState =>
+      getProcessingState($medias, $buffering, $completed);
 
   dynamic getRawData(AudioRawData data) {
     switch (data) {
@@ -188,18 +189,14 @@ abstract class AudioDataContainer {
     return playlist.map((media) => media.toMusicData()).toList();
   }
 
-  static int? getCurrentIndex(int? index, List<Media> medias) {
+  static int? getCurrentIndex(int index, List<Media> medias) {
     if (medias.isEmpty) return null;
-    if (medias.isNotEmpty && index == null) return 0;
-    if (index == null) return null;
     return min(index, medias.length - 1);
   }
 
-  static MusicData? getCurrentSong(int? index, List<Media> medias) {
-    if (index == null) return null;
-    final playlist = getPlaylist(medias);
-    if (index >= playlist.length || index < 0) return null;
-    return playlist[index];
+  static MusicData? getCurrentSong(int index, List<Media> medias) {
+    if (index >= medias.length || index < 0) return null;
+    return medias[index].toMusicData();
   }
 
   static PlayingState getPlayingState(bool playing, List<Media> medias) {
@@ -224,7 +221,7 @@ abstract class AudioDataContainer {
   }
 
   static bool getHasNext(
-      int? index, List<Media> medias, PlaylistMode playlistMode) {
+      int index, List<Media> medias, PlaylistMode playlistMode) {
     final max = medias.length;
     final current = getCurrentIndex(index, medias);
     final repeat = getRepeatState(playlistMode);
