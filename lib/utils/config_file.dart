@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'os.dart';
+
 /// ConfigFile is a class that helps you to create JSON config files easily.
 class ConfigFile {
   ConfigFile(this.file, this.defaultValue, {this.route = const []});
@@ -19,6 +21,7 @@ class ConfigFile {
 
   /// Save the config data to the file.
   Future<ConfigFile> save({bool compact = false}) async {
+    if (OS.isWeb) return this;
     if (!file.existsSync()) {
       file.createSync(recursive: true);
       data = defaultValue;
@@ -34,6 +37,10 @@ class ConfigFile {
 
   /// Load the config data from the file.
   Future<ConfigFile> load() async {
+    if (OS.isWeb) {
+      data = defaultValue;
+      return this;
+    }
     if (!file.existsSync()) await save();
     data = jsonDecode(file.readAsStringSync());
     return this;

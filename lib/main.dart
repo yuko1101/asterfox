@@ -36,12 +36,13 @@ import 'system/sharing_intent.dart';
 import 'system/theme/theme.dart';
 import 'utils/late_value_notifier.dart';
 import 'utils/network_utils.dart';
+import 'utils/os.dart';
 import 'widget/process_notifications/process_notification_list.dart';
 
 final MusicManager musicManager = MusicManager(true);
 late final bool isWearOS;
 final bool shouldInitializeFirebase =
-    Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+    OS.isWeb || OS.isAndroid || OS.isIOS || OS.isMacOS;
 
 late final String localPath;
 late final String tempPath;
@@ -76,18 +77,18 @@ Future<void> main() async {
         isWearOS = false;
       }
 
-      if (Platform.isAndroid) {
+      if (OS.isAndroid) {
         final modes = await FlutterDisplayMode.supported;
         modes.forEach(print);
         await FlutterDisplayMode.setHighRefreshRate();
       }
 
-      if (!kIsWeb) {
+      if (!OS.isWeb) {
         var documentsDir = (await getApplicationDocumentsDirectory()).path;
         var tempDir = (await getTemporaryDirectory()).path;
 
         final appDir = "${Platform.pathSeparator}Asterfox";
-        if (Platform.isWindows) {
+        if (OS.isWindows) {
           documentsDir += appDir;
           tempDir += appDir;
         }
@@ -95,14 +96,9 @@ Future<void> main() async {
 
         localPath = documentsDir;
         tempPath = tempDir;
-      }
-
-      final wearOSCheckFile = File("$localPath/wear_os");
-      final wearOSCheckFileExists = wearOSCheckFile.existsSync();
-      if (isWearOS && !wearOSCheckFileExists) {
-        wearOSCheckFile.createSync();
-      } else if (!isWearOS && wearOSCheckFileExists) {
-        wearOSCheckFile.deleteSync();
+      } else {
+        localPath = "";
+        tempPath = "";
       }
 
       MediaKit.ensureInitialized();
@@ -138,8 +134,10 @@ Future<void> main() async {
 
       HomeScreen.processNotificationList = ProcessNotificationList();
 
-      final shareFilesDir = Directory("$tempPath/share_files");
-      if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
+      if (!OS.isWeb) {
+        final shareFilesDir = Directory("$tempPath/share_files");
+        if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
+      }
 
       SharingIntent.init();
 
@@ -200,7 +198,7 @@ class AsterfoxApp extends StatelessWidget {
 }
 
 void exitApp([bool force = false]) {
-  if (Platform.isAndroid && !force) {
+  if (OS.isAndroid && !force) {
     SystemNavigator.pop();
   } else {
     exit(0);

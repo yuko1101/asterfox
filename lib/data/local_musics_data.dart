@@ -11,6 +11,7 @@ import '../system/exceptions/network_exception.dart';
 import '../system/exceptions/song_not_stored_exception.dart';
 import '../system/firebase/cloud_firestore.dart';
 import '../utils/config_file.dart';
+import '../utils/os.dart';
 import '../utils/result.dart';
 
 // TODO: add install system which enables you to download particular songs in music.json (https://github.com/yuko1101/asterfox/issues/29)
@@ -31,6 +32,7 @@ class LocalMusicsData {
 
   static bool isInstalled({MusicData? song, String? audioId}) {
     assert(song != null || audioId != null);
+    if (OS.isWeb) return false;
     final file =
         File(MusicData.getInstallCompleteFilePath(song?.audioId ?? audioId!));
     return file.existsSync();

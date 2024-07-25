@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../system/exceptions/network_exception.dart';
+import 'os.dart';
 
 class NetworkUtils {
   /// Stream of connectivity status.
@@ -35,12 +36,13 @@ class NetworkUtils {
 
   /// Check if there is internet connection
   static bool networkConnected() {
-    return connectivityResults.any((c) => c != ConnectivityResult.none);
+    return OS.isWeb ||
+        connectivityResults.any((c) => c != ConnectivityResult.none);
   }
 
   /// Check if the internet connection is accessible
   static bool networkAccessible() {
-    return connectivityResults.any((c) => c.index <= minimum.index);
+    return OS.isWeb || connectivityResults.any((c) => c.index <= minimum.index);
   }
 
   /// Show a message when there is no internet connection

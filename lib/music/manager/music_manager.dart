@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../data/device_settings_data.dart';
 import '../../data/local_musics_data.dart';
 import '../../data/settings_data.dart';
+import '../../utils/os.dart';
 import '../../widget/music_widgets/repeat_button.dart';
 import '../music_data/music_data.dart';
 import 'audio_data_manager.dart';
@@ -16,6 +17,8 @@ import 'audio_player.dart';
 import 'music_listener.dart';
 import 'notifiers/audio_state_notifier.dart';
 
+final bool canNotify = OS.isWeb || OS.isAndroid || OS.isIOS || OS.isMacOS;
+
 class MusicManager {
   MusicManager(this.showNotification);
   final bool showNotification;
@@ -23,8 +26,6 @@ class MusicManager {
   late final AudioPlayer _audioPlayer = AudioPlayer(this);
   late final SessionAudioHandler _audioHandler;
   late final AudioSession _audioSession;
-
-  static bool windowsMode = Platform.isWindows;
 
   // notifiers
   final audioStateManager = AudioStateManager();
@@ -35,7 +36,7 @@ class MusicManager {
   Future<void> init() async {
     final bool handleInterruptions =
         !SettingsData.getValue(key: "disableInterruptions");
-    if (!windowsMode && showNotification) {
+    if (canNotify && showNotification) {
       _audioHandler = await AudioService.init(
           builder: () =>
               SessionAudioHandler(_audioPlayer, true, handleInterruptions),

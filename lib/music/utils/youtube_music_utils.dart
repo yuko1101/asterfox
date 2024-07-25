@@ -7,6 +7,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../system/exceptions/unable_to_load_from_playlist_exception.dart';
+import '../../utils/os.dart';
 import '../music_data/music_data.dart';
 import '../music_data/youtube_music_data.dart';
 import '../../system/exceptions/network_exception.dart';
@@ -24,6 +25,14 @@ class YouTubeMusicUtils {
       final song = LocalMusicsData.getByAudioId(
           audioId: videoId, key: key, caching: CachingDisabled());
       return song.audioUrl;
+    } else if (OS.isWeb) {
+      final res = await http
+          .get(Uri.parse("https://tools.asterity.net/api/yt/audio/$videoId"));
+      if (res.statusCode != 200) {
+        throw NetworkException();
+      }
+
+      return res.body;
     } else {
       // オンライン上から取得
 

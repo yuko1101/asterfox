@@ -1,15 +1,14 @@
-import 'dart:io';
-
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import '../music/music_data/music_data.dart';
 import '../music/utils/music_data_utils.dart';
+import '../utils/os.dart';
 import 'exceptions/invalid_type_of_media_url_exception.dart';
 import 'home_screen_music_manager.dart';
 
 class SharingIntent {
   static void init() {
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (OS.isAndroid || OS.isIOS) {
       ReceiveSharingIntent.instance.getMediaStream().listen((mediaList) {
         addSongs(mediaList, false);
       });
@@ -28,7 +27,8 @@ class SharingIntent {
     final List<MusicData<CachingDisabled>> musicDataList = [];
 
     for (final media in mediaList) {
-      if (media.type == SharedMediaType.url || (media.type == SharedMediaType.text && media.path.isUrl)) {
+      if (media.type == SharedMediaType.url ||
+          (media.type == SharedMediaType.text && media.path.isUrl)) {
         musicDataList.addAll(await fetchSongsFromUrl(media.path));
       } else if (media.type == SharedMediaType.text) {
         musicDataList.add(await fetchSongsByQuery(media.path));

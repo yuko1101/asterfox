@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         return android;
       // throw UnsupportedError(
@@ -64,8 +58,30 @@ class DefaultFirebaseOptions {
     messagingSenderId: '306826868375',
     projectId: 'asterfox',
     storageBucket: 'asterfox.appspot.com',
-    iosClientId:
-        '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
+    androidClientId: '306826868375-70i4g7bbr2jr9lc66mik2rt13laql4il.apps.googleusercontent.com',
+    iosClientId: '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
     iosBundleId: 'net.asterfox.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDbUaDEeX27IkqT4VlwVb5UfQb7cjJPWBE',
+    appId: '1:306826868375:web:300c28fc8fba5c278a5bd2',
+    messagingSenderId: '306826868375',
+    projectId: 'asterfox',
+    authDomain: 'asterfox.firebaseapp.com',
+    storageBucket: 'asterfox.appspot.com',
+    measurementId: 'G-7JRPLL6R76',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyC-NwJxZObo4usjhcdPHtpATqIw7WCBWiI',
+    appId: '1:306826868375:ios:f940baa2b42c83588a5bd2',
+    messagingSenderId: '306826868375',
+    projectId: 'asterfox',
+    storageBucket: 'asterfox.appspot.com',
+    androidClientId: '306826868375-70i4g7bbr2jr9lc66mik2rt13laql4il.apps.googleusercontent.com',
+    iosClientId: '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
+    iosBundleId: 'net.asterfox.app',
+  );
+
 }
