@@ -30,6 +30,12 @@ class AudioPlayer extends Player {
     await super.move(from, to);
   }
 
+  /// Sets the volume to a range between 0.0 and 1.0.
+  @override
+  Future<void> setVolume(double volume) async {
+    await super.setVolume(volume * 100);
+  }
+
   @override
   Future<void> add(Media media) async {
     if (_isEmpty) {

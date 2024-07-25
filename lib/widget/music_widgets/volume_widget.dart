@@ -121,8 +121,7 @@ class VolumeWidgetState extends State<VolumeWidget>
                             setState(() {
                               _sliderValue = value;
                               musicManager.setBaseVolume(
-                                  pow(VolumeWidget.base, value).toDouble() *
-                                      100);
+                                  pow(VolumeWidget.base, value).toDouble());
                             });
                           },
                           onChangeStart: (value) {

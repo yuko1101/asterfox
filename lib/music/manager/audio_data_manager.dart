@@ -92,7 +92,7 @@ abstract class AudioDataContainer {
   bool get shuffled => $shuffled;
   bool get hasNext => getHasNext($currentIndex, $medias, $playlistMode);
   double get currentSongVolume => currentSong?.volume ?? 1.0;
-  double get volume => $volume;
+  double get volume => $volume / 100;
 
   Duration get buffer => $buffer;
   Duration get position => $position;
