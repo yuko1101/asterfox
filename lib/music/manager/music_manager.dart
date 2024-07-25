@@ -105,10 +105,6 @@ class MusicManager {
     await _audioHandler.removeQueueItemAt(index);
   }
 
-  Future<void> clear() async {
-    await _audioHandler.clear();
-  }
-
   Future<void> move(int currentIndex, int newIndex) async {
     // await _audioHandler.customAction("move", {"oldIndex": currentIndex, "newIndex": newIndex});
     await _audioHandler.move(currentIndex, newIndex);

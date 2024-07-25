@@ -151,10 +151,6 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     await _audioPlayer.move(oldIndex, newIndex);
   }
 
-  Future<void> clear() async {
-    await _audioPlayer.clear();
-  }
-
   Future<void> setSongs(List<MusicData> songs) async {
     final mediaItems = await Future.wait(songs.map((e) => e.toMediaItem()));
     await _audioPlayer.setMedias(mediaItems.map(_createMedia).toList());

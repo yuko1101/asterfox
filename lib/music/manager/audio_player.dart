@@ -24,6 +24,12 @@ class AudioPlayer extends Player {
   }
 
   @override
+  Future<void> stop() async {
+    _isEmpty = true;
+    await super.stop();
+  }
+
+  @override
   Future<void> move(int from, int to) async {
     if (from == to) return;
     if (from < to) to++;
@@ -46,6 +52,15 @@ class AudioPlayer extends Player {
     }
   }
 
+  @override
+  Future<void> remove(int index) async {
+    if (state.playlist.medias.length > 1) {
+      await super.remove(index);
+    } else {
+      await stop();
+    }
+  }
+
   Future<void> addAll(List<Media> medias) async {
     if (_isEmpty) {
       _isEmpty = false;
@@ -62,14 +77,9 @@ class AudioPlayer extends Player {
     await move(state.playlist.medias.length, index);
   }
 
-  Future<void> clear() async {
-    _isEmpty = true;
-    await open(const Playlist([]));
-  }
-
   Future<void> setMedias(List<Media> medias) async {
     if (medias.isEmpty) {
-      await clear();
+      await stop();
     } else {
       await open(Playlist(medias));
     }
