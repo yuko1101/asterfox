@@ -27,11 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        return android;
-      // throw UnsupportedError(
-      //   'DefaultFirebaseOptions have not been configured for windows - '
-      //   'you can reconfigure this by running the FlutterFire CLI again.',
-      // );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -82,6 +78,16 @@ class DefaultFirebaseOptions {
     androidClientId: '306826868375-70i4g7bbr2jr9lc66mik2rt13laql4il.apps.googleusercontent.com',
     iosClientId: '306826868375-dsgrqo62t3915uj713ntn9eom46bhjtf.apps.googleusercontent.com',
     iosBundleId: 'net.asterfox.app',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDbUaDEeX27IkqT4VlwVb5UfQb7cjJPWBE',
+    appId: '1:306826868375:web:0c3dcf57a53f5fb58a5bd2',
+    messagingSenderId: '306826868375',
+    projectId: 'asterfox',
+    authDomain: 'asterfox.firebaseapp.com',
+    storageBucket: 'asterfox.appspot.com',
+    measurementId: 'G-9YR9H8ZDKR',
   );
 
 }

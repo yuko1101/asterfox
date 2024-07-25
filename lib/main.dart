@@ -42,7 +42,7 @@ import 'widget/process_notifications/process_notification_list.dart';
 final MusicManager musicManager = MusicManager(true);
 late final bool isWearOS;
 final bool shouldInitializeFirebase =
-    OS.isWeb || OS.isAndroid || OS.isIOS || OS.isMacOS;
+    OS.isWeb || OS.isAndroid || OS.isIOS || OS.isMacOS || OS.isWindows;
 
 late final String localPath;
 late final String tempPath;
