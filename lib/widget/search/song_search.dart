@@ -228,10 +228,12 @@ class SongSearch
 
   void loadSuggestions(String text, {int? time}) async {
     loading.value = true;
+    final yt = YoutubeExplode();
     final fetched = await Future.wait([
-      YouTubeMusicUtils.searchYouTubeVideo(text),
-      YouTubeMusicUtils.searchWords(text),
+      YouTubeMusicUtils.searchYouTubeVideo(text, yt),
+      YouTubeMusicUtils.searchWords(text, yt),
     ]);
+    yt.close();
     final List<Video> videos = fetched[0].map((e) => e as Video).toList();
     final List<String> words = fetched[1].map((e) => e as String).toList();
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
 import '../../music/manager/audio_data_manager.dart';
-import '../../music/music_downloader.dart';
+import '../../music/downloader/downloader_manager.dart';
 import '../../music/utils/music_data_utils.dart';
 import '../../system/home_screen_music_manager.dart';
 

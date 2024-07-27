@@ -7,10 +7,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../main.dart';
+import '../../music/downloader/audio_downloader.dart';
 import '../../music/manager/audio_data_manager.dart';
 import '../../music/music_data/music_data.dart';
 import '../../music/music_data/youtube_music_data.dart';
-import '../../music/music_downloader.dart';
+import '../../music/downloader/downloader_manager.dart';
 import '../../system/theme/theme.dart';
 import '../loading_dialog.dart';
 
@@ -39,9 +40,8 @@ class MoreActionsButton extends StatelessWidget {
         Navigator.of(context).pop();
         if (!song!.isInstalled) {
           final key = "share-${song.key}";
-          final downloadPath = File("$tempPath/share_files/${song.key}.mp3");
-          final downloadFuture = DownloadManager.download(song,
-              customPath: downloadPath, customDownloadKey: key);
+          final downloadPath = File("$tempPath/share_files/${song.key}");
+          final downloadFuture = AudioDownloader.download(song, customPath: downloadPath.path);
 
           await LoadingDialog.showLoading(
             context: context,
@@ -50,6 +50,7 @@ class MoreActionsButton extends StatelessWidget {
             }(),
             percentageNotifier: DownloadManager.getNotifiers(key).second,
           );
+          // TODO: rename file
           await Share.shareXFiles([XFile(downloadPath.path)]);
         } else {
           await Share.shareXFiles([XFile(song.audioSavePath)]);

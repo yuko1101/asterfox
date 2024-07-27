@@ -77,7 +77,7 @@ class MusicData<T extends Caching> {
   String get directoryPath => getDirectoryPath(audioId);
   String get audioSavePath => getAudioSavePath(audioId);
   String get imageSavePath => getImageSavePath(audioId);
-  String get installCompleteFilePath => getInstallCompleteFilePath(audioId);
+  String get audioInfoPath => getAudioInfoPath(audioId);
 
   void destroy() {
     _created.remove(key);
@@ -168,13 +168,13 @@ class MusicData<T extends Caching> {
   static String getDirectoryPath(String audioId) =>
       "$localPath/music/$audioId".replaceAll("/", Platform.pathSeparator);
   static String getAudioSavePath(String audioId) =>
-      "${getDirectoryPath(audioId)}/audio.mp3"
+      "${getDirectoryPath(audioId)}/audio"
           .replaceAll("/", Platform.pathSeparator);
   static String getImageSavePath(String audioId) =>
       "${getDirectoryPath(audioId)}/image.png"
           .replaceAll("/", Platform.pathSeparator);
-  static String getInstallCompleteFilePath(String audioId) =>
-      "${getDirectoryPath(audioId)}/installed.txt"
+  static String getAudioInfoPath(String audioId) =>
+      "${getDirectoryPath(audioId)}/info.json"
           .replaceAll("/", Platform.pathSeparator);
 
   static final Map<String, MusicData<CachingEnabled>> _created = {};
@@ -196,11 +196,16 @@ class MusicData<T extends Caching> {
     required String key,
     required T caching,
   }) async {
-    return await YouTubeMusicUtils.getYouTubeAudio(
-      videoId: audioId,
+    final yt = YoutubeExplode();
+    final video = await yt.videos.get(audioId);
+    final song = await YouTubeMusicUtils.getYouTubeMusicData(
+      video: video,
+      yt: yt,
       key: key,
       caching: caching,
     );
+    yt.close();
+    return song;
   }
 
   static Future<MusicData<T>> get<T extends Caching>({
@@ -268,6 +273,7 @@ class MusicData<T extends Caching> {
       final playlistStream = YouTubeMusicUtils.getMusicDataFromPlaylist(
         playlistId: youtubePlaylist,
         caching: caching,
+        yt: null,
       );
 
       playlistStream.listen(

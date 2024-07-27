@@ -10,7 +10,7 @@ import '../data/local_musics_data.dart';
 import '../data/settings_data.dart';
 import '../main.dart';
 import '../music/music_data/music_data.dart';
-import '../music/music_downloader.dart';
+import '../music/downloader/downloader_manager.dart';
 import '../music/utils/music_data_utils.dart';
 import '../screens/home_screen.dart';
 import '../music/utils/youtube_music_utils.dart';

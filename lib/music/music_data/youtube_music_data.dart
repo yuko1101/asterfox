@@ -1,4 +1,3 @@
-import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
@@ -11,7 +10,6 @@ import 'music_data.dart';
 class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   YouTubeMusicData({
     required this.id,
-    required super.remoteAudioUrl,
     required super.remoteImageUrl,
     required super.title,
     required super.description,
@@ -25,13 +23,16 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     required super.key,
     required super.caching,
     required this.authorId,
+    required this.streamInfo,
   }) : super(
           type: MusicType.youtube,
           audioId: id,
+          remoteAudioUrl: streamInfo?.url.toString() ?? "",
         );
 
   final String id;
   final String authorId;
+  StreamInfo? streamInfo;
 
   @override
   String get mediaURL => "https://www.youtube.com/watch?v=$id";
@@ -46,9 +47,10 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   @override
   Future<String> refreshAudioUrl() async {
     print("refreshing youtube audio url...");
+    final yt = YoutubeExplode();
     try {
-      final url = await YouTubeMusicUtils.getAudioURL(id, const Uuid().v4(),
-          forceRemote: true);
+      final streamInfo = await refreshStreamInfo(yt);
+      final url = streamInfo.url.toString();
       remoteAudioUrl = url;
       await LocalMusicsData.localMusicData
           .get([audioId])
@@ -61,6 +63,12 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     } on VideoUnplayableException {
       throw RefreshUrlFailedException();
     }
+  }
+
+  Future<StreamInfo> refreshStreamInfo(YoutubeExplode? yt) async {
+    final streamInfo = await YouTubeMusicUtils.getStreamInfo(id, yt);
+    this.streamInfo = streamInfo;
+    return streamInfo;
   }
 
   final _expiresRegex = RegExp("expire=([0-9]+)");
@@ -90,7 +98,6 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     return YouTubeMusicData(
       key: key,
       id: json["id"] as String,
-      remoteAudioUrl: json["remoteAudioUrl"] as String,
       remoteImageUrl: json["remoteImageUrl"] as String,
       title: json["title"] as String,
       description: json["description"] as String,
@@ -103,6 +110,7 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
       songStoredAt: json["songStoredAt"] as int?,
       size: json["size"] as int?,
       caching: caching,
+      streamInfo: null,
     );
   }
 }

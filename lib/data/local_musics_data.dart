@@ -5,7 +5,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../main.dart';
 import '../music/music_data/music_data.dart';
-import '../music/music_downloader.dart';
+import '../music/downloader/downloader_manager.dart';
 import '../system/exceptions/local_song_not_found_exception.dart';
 import '../system/exceptions/network_exception.dart';
 import '../system/exceptions/song_not_stored_exception.dart';
@@ -34,7 +34,7 @@ class LocalMusicsData {
     assert(song != null || audioId != null);
     if (OS.isWeb) return false;
     final file =
-        File(MusicData.getInstallCompleteFilePath(song?.audioId ?? audioId!));
+        File(MusicData.getAudioInfoPath(song?.audioId ?? audioId!));
     return file.existsSync();
   }
 

@@ -27,13 +27,19 @@ class MusicDataUtils {
   }
 
   static Future<MusicData<CachingDisabled>> search(String query) async {
-    if (query.isUrl) {}
-    final list = await YouTubeMusicUtils.searchYouTubeVideo(query);
+    if (query.isUrl) {
+      return fetchFromUrl(query);
+    }
+    final yt = YoutubeExplode();
+    final videos = await YouTubeMusicUtils.searchYouTubeVideo(query, yt);
 
-    return list.first.fetchMusicData(
+    final song = videos.first.fetchMusicData(
       key: const Uuid().v4(),
       caching: CachingDisabled(),
+      yt: yt,
     );
+    yt.close();
+    return song;
   }
 
   static Future<MusicData<CachingDisabled>> fetchFromUrl(String url) {
@@ -55,8 +61,14 @@ class MusicDataUtils {
     }
     final playlistId = match.group(4)!;
 
-    return YouTubeMusicUtils.getMusicDataFromPlaylist(
-        playlistId: playlistId, caching: CachingDisabled());
+    final yt = YoutubeExplode();
+    final stream = YouTubeMusicUtils.getMusicDataFromPlaylist(
+      playlistId: playlistId,
+      caching: CachingDisabled(),
+      yt: yt,
+    );
+    yt.close();
+    return stream;
   }
 }
 

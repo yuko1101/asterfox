@@ -7,7 +7,6 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../system/exceptions/unable_to_load_from_playlist_exception.dart';
-import '../../utils/os.dart';
 import '../music_data/music_data.dart';
 import '../music_data/youtube_music_data.dart';
 import '../../system/exceptions/network_exception.dart';
@@ -17,58 +16,26 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  static Future<String> getAudioURL(String videoId, String key,
-      {bool forceRemote = false}) async {
-    // 曲が保存されているかどうか
-    bool local = LocalMusicsData.isStored(audioId: videoId);
-    if (local && !forceRemote) {
-      final song = LocalMusicsData.getByAudioId(
-          audioId: videoId, key: key, caching: CachingDisabled());
-      return song.audioUrl;
-    } else if (OS.isWeb) {
-      final res = await http
-          .get(Uri.parse("https://tools.asterity.net/api/yt/audio/$videoId"));
-      if (res.statusCode != 200) {
-        throw NetworkException();
-      }
+  static Future<StreamInfo> getStreamInfo(
+      String videoId, YoutubeExplode? yt) async {
+    NetworkUtils.check();
 
-      return res.body;
-    } else {
-      // オンライン上から取得
-
-      // インターネット接続確認
-      NetworkUtils.check();
-
-      final YoutubeExplode yt = YoutubeExplode();
-      StreamManifest manifest;
-      try {
-        manifest = await yt.videos.streamsClient.getManifest(videoId);
-      } on VideoUnplayableException {
-        yt.close();
-        rethrow;
-      }
-
-      // if (manifest.audio.isEmpty && manifest.audioOnly.isEmpty) {
-      //   Fluttertoast.showToast(msg: "この曲の音声データが見つかりませんでした");
-      //   return null;
-      // }
-
-      yt.close();
-
-      return manifest.audioOnly.withHighestBitrate().url.toString();
-    }
+    return withYT(yt, (yt) async {
+      final manifest = await yt.videos.streamsClient.getManifest(videoId);
+      return manifest.audioOnly.withHighestBitrate();
+    });
   }
 
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  static Future<YouTubeMusicData<T>> getYouTubeAudio<T extends Caching>({
-    required String videoId,
-    Video? video,
+  static Future<YouTubeMusicData<T>> getYouTubeMusicData<T extends Caching>({
+    required Video video,
+    required YoutubeExplode? yt,
     required String key,
     required T caching,
   }) async {
-    // 曲が保存されているかどうか
+    final videoId = video.id.value;
     bool local = LocalMusicsData.isStored(audioId: videoId);
     if (local) {
       // throws LocalSongNotFoundException
@@ -78,32 +45,13 @@ class YouTubeMusicUtils {
         caching: caching,
       ) as YouTubeMusicData<T>;
     } else {
-      // オンライン上から取得
-
-      // インターネット接続確認
       NetworkUtils.check();
 
-      final YoutubeExplode yt = YoutubeExplode();
-      StreamManifest manifest;
-      try {
-        manifest = await yt.videos.streamsClient.getManifest(videoId);
-      } on VideoUnplayableException {
-        yt.close();
-        rethrow;
-      }
-
-      // if (manifest.audio.isEmpty && manifest.audioOnly.isEmpty) {
-      //   Fluttertoast.showToast(msg: "この曲の音声データが見つかりませんでした");
-      //   return null;
-      // }
-
-      final Video v = video ?? await yt.videos.get(videoId);
-
-      yt.close();
+      final streamInfo = await getStreamInfo(videoId, yt);
 
       return getFromVideo(
-        video: v,
-        manifest: manifest,
+        video: video,
+        streamInfo: streamInfo,
         key: key,
         caching: caching,
       );
@@ -119,28 +67,29 @@ class YouTubeMusicUtils {
       getMusicDataFromPlaylist<T extends Caching>({
     required String playlistId,
     required T caching,
+    required YoutubeExplode? yt,
   }) {
-    // インターネット接続確認
     NetworkUtils.check();
 
+    final ytContainer = YTContainer(yt);
+
     final controller = StreamController<YouTubeMusicData<T>>();
-    final YoutubeExplode yt = YoutubeExplode();
-    final videoStream = yt.playlists.getVideos(playlistId);
+    final videoStream = ytContainer.get().playlists.getVideos(playlistId);
 
     int processingCount = 0;
     bool done = false;
 
     void close() {
       controller.sink.close();
-      yt.close();
+      ytContainer.close();
     }
 
     videoStream.listen((video) async {
       processingCount++;
       try {
-        final musicData = await _getFromVideoWithoutStreamManifest(
+        final musicData = await _getFromVideoWithoutStreamInfo(
           video: video,
-          yt: yt,
+          yt: ytContainer.get(),
           key: const Uuid().v4(),
           caching: caching,
         );
@@ -167,9 +116,9 @@ class YouTubeMusicUtils {
   }
 
   static Future<YouTubeMusicData<T>>
-      _getFromVideoWithoutStreamManifest<T extends Caching>({
+      _getFromVideoWithoutStreamInfo<T extends Caching>({
     required Video video,
-    required YoutubeExplode yt,
+    required YoutubeExplode? yt,
     required String key,
     required T caching,
   }) async {
@@ -183,12 +132,11 @@ class YouTubeMusicUtils {
       return song;
     }
 
-    final StreamManifest manifest =
-        await yt.videos.streamsClient.getManifest(video.id);
+    final streamInfo = await getStreamInfo(video.id.value, yt);
 
     return await getFromVideo(
       video: video,
-      manifest: manifest,
+      streamInfo: streamInfo,
       key: key,
       caching: caching,
     );
@@ -197,7 +145,7 @@ class YouTubeMusicUtils {
   // even if the song is stored, this fetches it from remote.
   static Future<YouTubeMusicData<T>> getFromVideo<T extends Caching>({
     required Video video,
-    required StreamManifest manifest,
+    required StreamInfo streamInfo,
     required String key,
     required T caching,
   }) async {
@@ -208,7 +156,6 @@ class YouTubeMusicUtils {
     }
 
     return YouTubeMusicData(
-      remoteAudioUrl: manifest.audioOnly.withHighestBitrate().url.toString(),
       id: video.id.value,
       title: video.title,
       description: video.description,
@@ -223,29 +170,66 @@ class YouTubeMusicUtils {
       songStoredAt: null,
       size: null,
       caching: caching,
+      streamInfo: streamInfo,
     );
   }
 
   /// Throws [NetworkException] if the network is not accessible.
-  static Future<List<Video>> searchYouTubeVideo(String query) async {
-    // インターネット接続確認
+  static Future<List<Video>> searchYouTubeVideo(
+    String query,
+    YoutubeExplode? yt,
+  ) async {
     NetworkUtils.check();
 
-    final YoutubeExplode yt = YoutubeExplode();
-    final results = await yt.search.search(query);
-    yt.close();
-    return results.toList();
+    return withYT(yt, (yt) async {
+      final results = await yt.search.search(query);
+      return results.toList();
+    });
   }
 
   /// Throws [NetworkException] if the network is not accessible.
-  static Future<List<String>> searchWords(String query) async {
-    // インターネット接続確認
+  static Future<List<String>> searchWords(
+    String query,
+    YoutubeExplode? yt,
+  ) async {
     NetworkUtils.check();
 
-    final YoutubeExplode yt = YoutubeExplode();
-    final results = await yt.search.getQuerySuggestions(query);
-    yt.close();
-    return results.toList();
+    return withYT(yt, (yt) async {
+      final results = await yt.search.getQuerySuggestions(query);
+      return results.toList();
+    });
+  }
+
+  static T withYT<T>(YoutubeExplode? yt, T Function(YoutubeExplode yt) f) {
+    if (yt == null) {
+      final temp = YoutubeExplode();
+      final result = f(YoutubeExplode());
+      temp.close();
+      return result;
+    } else {
+      return f(yt);
+    }
+  }
+}
+
+class YTContainer {
+  final YoutubeExplode? yt;
+  late final YoutubeExplode? tempYT;
+  late final bool isTemp;
+
+  YTContainer(this.yt) {
+    if (yt == null) {
+      tempYT = YoutubeExplode();
+      isTemp = true;
+    } else {
+      isTemp = false;
+    }
+  }
+
+  YoutubeExplode get() => yt ?? tempYT!;
+
+  void close() {
+    tempYT?.close();
   }
 }
 
@@ -253,12 +237,12 @@ extension MusicDataUtil on Video {
   Future<YouTubeMusicData<T>> fetchMusicData<T extends Caching>({
     required String key,
     required T caching,
-  }) {
-    return YouTubeMusicUtils.getYouTubeAudio(
-      videoId: id.value,
-      video: this,
-      key: key,
-      caching: caching,
-    );
-  }
+    required YoutubeExplode? yt,
+  }) =>
+      YouTubeMusicUtils.getYouTubeMusicData(
+        yt: yt,
+        video: this,
+        key: key,
+        caching: caching,
+      );
 }
