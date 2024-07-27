@@ -1,9 +1,7 @@
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import '../../data/local_musics_data.dart';
 import '../../system/exceptions/network_exception.dart';
 import '../../system/exceptions/refresh_url_failed_exception.dart';
-import '../../system/firebase/cloud_firestore.dart';
 import '../utils/youtube_music_utils.dart';
 import 'music_data.dart';
 
@@ -39,9 +37,16 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
 
   @override
   Map<String, dynamic> get jsonExtras => {
-        'id': id,
-        'authorId': authorId,
+        "id": id,
+        "authorId": authorId,
       };
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json.remove("remoteAudioUrl");
+    return json;
+  }
 
   /// Throws [RefreshUrlFailedException] if failed to refresh the url.
   @override
@@ -52,16 +57,13 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
       final streamInfo = await refreshStreamInfo(yt);
       final url = streamInfo.url.toString();
       remoteAudioUrl = url;
-      await LocalMusicsData.localMusicData
-          .get([audioId])
-          .set(key: "remoteAudioUrl", value: url)
-          .save(compact: LocalMusicsData.compact);
-      await CloudFirestoreManager.addOrUpdateSongs([this]);
       return url;
     } on NetworkException {
       throw RefreshUrlFailedException();
     } on VideoUnplayableException {
       throw RefreshUrlFailedException();
+    } finally {
+      yt.close();
     }
   }
 

@@ -33,7 +33,7 @@ class MusicDataUtils {
     final yt = YoutubeExplode();
     final videos = await YouTubeMusicUtils.searchYouTubeVideo(query, yt);
 
-    final song = videos.first.fetchMusicData(
+    final song = await videos.first.fetchMusicData(
       key: const Uuid().v4(),
       caching: CachingDisabled(),
       yt: yt,
@@ -61,13 +61,11 @@ class MusicDataUtils {
     }
     final playlistId = match.group(4)!;
 
-    final yt = YoutubeExplode();
     final stream = YouTubeMusicUtils.getMusicDataFromPlaylist(
       playlistId: playlistId,
       caching: CachingDisabled(),
-      yt: yt,
+      yt: null,
     );
-    yt.close();
     return stream;
   }
 }

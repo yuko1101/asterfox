@@ -203,7 +203,7 @@ class YouTubeMusicUtils {
   static T withYT<T>(YoutubeExplode? yt, T Function(YoutubeExplode yt) f) {
     if (yt == null) {
       final temp = YoutubeExplode();
-      final result = f(YoutubeExplode());
+      final result = f(temp);
       temp.close();
       return result;
     } else {
