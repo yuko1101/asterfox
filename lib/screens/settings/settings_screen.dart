@@ -162,7 +162,7 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       await CloudFirestoreManager.cancelListeners();
                       await CloudFirestoreManager.waitForTasks();
-                      if (await GoogleSignInWidget.googleSignIn.isSignedIn()) {
+                      if (GoogleSignInWidget.isAvailable && await GoogleSignInWidget.googleSignIn.isSignedIn()) {
                         GoogleSignInWidget.googleSignIn.disconnect();
                       }
                       FirebaseAuth.instance.signOut();

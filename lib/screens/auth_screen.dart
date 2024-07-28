@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../main.dart';
 import '../system/theme/theme.dart';
+import '../utils/os.dart';
 import '../widget/loading_dialog.dart';
 
 // TODO: alert users to connect to the Internet when offline
@@ -182,7 +183,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    const GoogleSignInWidget(),
+                    if (GoogleSignInWidget.isAvailable)
+                      const GoogleSignInWidget(),
                   ],
                 ),
               ),
@@ -557,6 +559,9 @@ class ForgotPassword extends StatelessWidget {
 // https://developers.google.com/identity/branding-guidelines?hl=ja
 class GoogleSignInWidget extends StatelessWidget {
   const GoogleSignInWidget({super.key});
+
+  static final bool isAvailable =
+      OS.isAndroid || OS.isIOS || OS.isWeb || OS.isMacOS;
 
   @override
   Widget build(BuildContext context) {
