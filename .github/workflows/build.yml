@@ -7,7 +7,8 @@ on:
 jobs:
   build:
     name: Generate build files
-    strategy: 
+    strategy:
+      fail-fast: false
       matrix:
         target: [windows, linux, macos]
         arch: [x64, arm64]
