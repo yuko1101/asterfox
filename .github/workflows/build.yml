@@ -25,17 +25,17 @@ jobs:
             runner: ubuntu-latest
             build: sudo $(which flutter) build linux
             artifact: ./build/linux/{0}/release/bundle
-          - target: macos
-            runner: macos-latest
-            build: flutter build macos
-            artifact: build/macos/Build/Products/Release
+          # - target: macos
+          #   runner: macos-latest
+          #   build: flutter build macos
+          #   artifact: build/macos/Build/Products/Release
         exclude:
           - target: windows
             arch: arm64
           - target: linux
             arch: arm64
           - target: macos
-            arch: x64
+            # arch: x64
     runs-on: ${{ matrix.runner }}
     env:
       branch: ${{ github.ref }}
