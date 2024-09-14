@@ -46,14 +46,14 @@ dependencies:
 
   path_provider: 2.1.3
   provider: ^6.1.2
-  uuid: ^4.4.2
+  uuid: ^4.5.0
 
-  connectivity_plus: ^6.0.3
+  connectivity_plus: ^6.0.5
 
-  fluttertoast: ^8.2.6
+  fluttertoast: ^8.2.8
 
-  media_kit: ^1.1.10+1
-  media_kit_libs_audio: ^1.0.4    
+  media_kit: ^1.1.11
+  media_kit_libs_audio: ^1.0.5    
 
   # use this version since newer versions break the fast-forward/rewind buttons in the notification.
   # TODO: update to the latest version when the issue is fixed.
@@ -66,17 +66,17 @@ dependencies:
 
   receive_sharing_intent: ^1.8.0
 
-  share_plus: ^9.0.0
+  share_plus: ^10.0.2
 
   url_launcher: ^6.3.0
 
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^3.2.0
-  firebase_crashlytics: ^4.0.3
-  firebase_auth: ^5.1.2
-  cloud_firestore: ^5.1.0
+  firebase_core: ^3.4.1
+  firebase_crashlytics: ^4.1.1
+  firebase_auth: ^5.2.1
+  cloud_firestore: ^5.4.1
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -95,7 +95,7 @@ dependencies:
       url: https://github.com/yuko1101/dart-lyrics.git
       ref: main
 
-  device_info_plus: ^10.1.0
+  device_info_plus: ^10.1.2
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
   colored_json: ^1.1.2
@@ -111,7 +111,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
-  msix: ^3.16.7
+  msix: ^3.16.8
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.1
 
@@ -168,7 +168,7 @@ msix_config:
   display_name: Asterfox
   publisher_display_name: Asterity
   identity_name: asterity.github.io
-  msix_version: 1.0.2.0
+  msix_version: 1.0.2.1
   logo_path: ./assets/images/asterfox.png
   certificate_path: ./certificate.pfx
   certificate_password: ""
