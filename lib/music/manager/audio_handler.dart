@@ -143,7 +143,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   MediaItem _createMediaItem(Media media) {
-    final MusicData musicData = media.toMusicData();
+    final musicData = media.toMusicData();
     return musicData.toMediaItemWithUrl(media.uri);
   }
 
@@ -151,7 +151,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     await _audioPlayer.move(oldIndex, newIndex);
   }
 
-  Future<void> setSongs(List<MusicData> songs) async {
+  Future<void> setSongs(List<MusicData<CachingEnabled>> songs) async {
     final mediaItems = await Future.wait(songs.map((e) => e.toMediaItem()));
     await _audioPlayer.setMedias(mediaItems.map(_createMedia).toList());
   }

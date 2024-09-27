@@ -29,11 +29,11 @@ class MusicData<T extends Caching> {
     required this.lyrics,
     required this.songStoredAt,
     required this.size,
-    required this.key,
     required this.caching,
   }) {
     print("MusicData created : caching = $caching");
     if (!caching.enabled) return;
+    final key = (caching as CachingEnabled).key;
     print("MusicData: {key: $key, title: $title}");
     _created[key] = this as MusicData<CachingEnabled>;
   }
@@ -48,29 +48,10 @@ class MusicData<T extends Caching> {
   String lyrics;
   int? songStoredAt;
   int? size; // file size in Bytes
-  final String key;
   String remoteAudioUrl;
   String remoteImageUrl;
 
   final T caching;
-
-  Future<MediaItem> toMediaItem() async {
-    return toMediaItemWithUrl(await audioUrl);
-  }
-
-  MediaItem toMediaItemWithUrl(String url) {
-    return MediaItem(
-      id: key,
-      title: title,
-      artist: author,
-      artUri: Uri.parse(isInstalled ? "file://$imageSavePath" : remoteImageUrl),
-      duration: duration,
-      displayDescription: description,
-      extras: {
-        "url": url,
-      },
-    );
-  }
 
   String get mediaURL => remoteAudioUrl;
 
@@ -79,12 +60,7 @@ class MusicData<T extends Caching> {
   String get imageSavePath => getImageSavePath(audioId);
   String get audioInfoPath => getAudioInfoPath(audioId);
 
-  void destroy() {
-    _created.remove(key);
-    print("MusicData destroyed : remaining = ${_created.length}");
-  }
-
-  static MusicData? fromKey(String key) {
+  static MusicData<CachingEnabled>? fromKey(String key) {
     return _created[key];
   }
 
@@ -114,7 +90,6 @@ class MusicData<T extends Caching> {
 
   static MusicData<T> fromJson<T extends Caching>({
     required Map<String, dynamic> json,
-    required String key,
     required T caching,
   }) {
     final type = MusicType.values
@@ -123,18 +98,15 @@ class MusicData<T extends Caching> {
       case MusicType.youtube:
         return YouTubeMusicData.fromJson(
           json: json,
-          key: key,
           caching: caching,
         );
       case MusicType.url:
         return UrlMusicData.fromJson(
           json: json,
-          key: key,
           caching: caching,
         );
       // default:
       //   return MusicData(
-      //     key: key,
       //     type: type,
       //     remoteAudioUrl: json["remoteAudioUrl"] as String,
       //     remoteImageUrl: json["remoteImageUrl"] as String,
@@ -144,7 +116,7 @@ class MusicData<T extends Caching> {
       //     audioId: json["audioId"] as String,
       //     duration: Duration(milliseconds: json["duration"] as int),
       //     isDataStored: isLocal,
-      //     keywords: (json["keywords"] as List).map((e) => e as String).toList(),
+      //     keywords: (json["keywords"] as List).cast<String>(),
       //     volume: json["volume"] as double,
       //     lyrics: json["lyrics"] as String,
       //     caching: caching,
@@ -193,7 +165,6 @@ class MusicData<T extends Caching> {
   /// Throws [VideoUnplayableException], [NetworkException]
   static Future<MusicData<T>> getByAudioId<T extends Caching>({
     required String audioId,
-    required String key,
     required T caching,
   }) async {
     final yt = YoutubeExplode();
@@ -201,7 +172,6 @@ class MusicData<T extends Caching> {
     final song = await YouTubeMusicUtils.getYouTubeMusicData(
       video: video,
       yt: yt,
-      key: key,
       caching: caching,
     );
     yt.close();
@@ -212,28 +182,27 @@ class MusicData<T extends Caching> {
     String? audioId,
     String? mediaUrl,
     MusicData? musicData,
-    required String key,
     required T caching,
   }) async {
     assert(audioId != null || mediaUrl != null || musicData != null);
 
     if (musicData != null) {
-      return musicData.renew(key: key, caching: caching);
+      return musicData.renew(caching: caching);
     }
 
     final id = audioId ?? MusicDataUtils.getAudioIdFromUrl(mediaUrl!);
 
-    return await getByAudioId(audioId: id, key: key, caching: caching);
+    return await getByAudioId(audioId: id, caching: caching);
   }
 
   /// if renew is false, musicData in musicDataList won't be renewed by MusicData#renew().
-  static Stream<MusicData<T>> getList<T extends Caching>({
+  static Stream<MusicData> _getList({
     List<MusicData>? musicDataList,
     List<String>? mediaUrlList,
     String? youtubePlaylist,
-    required T caching,
+    required bool caching,
   }) {
-    final controller = StreamController<MusicData<T>>();
+    final controller = StreamController<MusicData>();
 
     int remaining = (musicDataList?.length ?? 0) + (mediaUrlList?.length ?? 0);
     bool isYouTubePlaylistDone = youtubePlaylist == null;
@@ -242,7 +211,7 @@ class MusicData<T extends Caching> {
       controller.sink.close();
     }
 
-    void add(MusicData<T> event) {
+    void add(MusicData event) {
       controller.sink.add(event);
       remaining--;
       if (remaining == 0 && isYouTubePlaylistDone) {
@@ -253,10 +222,10 @@ class MusicData<T extends Caching> {
     if (musicDataList != null) {
       for (final musicData in musicDataList) {
         add(
-          musicData.renew(
-            key: const Uuid().v4(),
-            caching: caching,
-          ),
+          caching
+              ? musicData.renew<CachingEnabled>(
+                  caching: CachingEnabled(const Uuid().v4()))
+              : musicData.renew<CachingDisabled>(caching: CachingDisabled()),
         );
       }
     }
@@ -264,13 +233,13 @@ class MusicData<T extends Caching> {
       for (final mediaUrl in mediaUrlList) {
         MusicData.get(
           mediaUrl: mediaUrl,
-          key: const Uuid().v4(),
-          caching: caching,
+          caching:
+              caching ? CachingEnabled(const Uuid().v4()) : CachingDisabled(),
         ).then(add);
       }
     }
     if (youtubePlaylist != null) {
-      final playlistStream = YouTubeMusicUtils.getMusicDataFromPlaylist(
+      final playlistStream = YouTubeMusicUtils.$getMusicDataFromPlaylist(
         playlistId: youtubePlaylist,
         caching: caching,
         yt: null,
@@ -293,6 +262,30 @@ class MusicData<T extends Caching> {
 
     return controller.stream;
   }
+
+  static Stream<MusicData<CachingEnabled>> getListWithCaching({
+    List<MusicData>? musicDataList,
+    List<String>? mediaUrlList,
+    String? youtubePlaylist,
+  }) =>
+      _getList(
+        musicDataList: musicDataList,
+        mediaUrlList: mediaUrlList,
+        youtubePlaylist: youtubePlaylist,
+        caching: true,
+      ).cast<MusicData<CachingEnabled>>();
+
+  static Stream<MusicData<CachingDisabled>> getListWithoutCaching({
+    List<MusicData>? musicDataList,
+    List<String>? mediaUrlList,
+    String? youtubePlaylist,
+  }) =>
+      _getList(
+        musicDataList: musicDataList,
+        mediaUrlList: mediaUrlList,
+        youtubePlaylist: youtubePlaylist,
+        caching: false,
+      ) as Stream<MusicData<CachingDisabled>>;
 }
 
 enum MusicType { youtube, url }
@@ -304,8 +297,33 @@ extension MediaItemParseIntoMusicData on MediaItem {
 }
 
 extension MediaParseIntoMusicData on Media {
-  MusicData toMusicData() {
+  MusicData<CachingEnabled> toMusicData() {
     return MusicData.fromKey(extras!["key"])!;
+  }
+}
+
+extension MusicDataExtension on MusicData<CachingEnabled> {
+  Future<MediaItem> toMediaItem() async {
+    return toMediaItemWithUrl(await audioUrl);
+  }
+
+  MediaItem toMediaItemWithUrl(String url) {
+    return MediaItem(
+      id: caching.key,
+      title: title,
+      artist: author,
+      artUri: Uri.parse(isInstalled ? "file://$imageSavePath" : remoteImageUrl),
+      duration: duration,
+      displayDescription: description,
+      extras: {
+        "url": url,
+      },
+    );
+  }
+
+  void destroy() {
+    MusicData._created.remove(caching.key);
+    print("MusicData destroyed : remaining = ${MusicData._created.length}");
   }
 }
 
@@ -314,6 +332,10 @@ abstract class Caching {
   bool get enabled => this is CachingEnabled;
 }
 
-class CachingEnabled extends Caching {}
+class CachingEnabled extends Caching {
+  CachingEnabled(this.key);
+
+  final String key;
+}
 
 class CachingDisabled extends Caching {}

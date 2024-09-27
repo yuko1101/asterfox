@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../music/manager/audio_data_manager.dart';
+import '../music/music_data/music_data.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 import '../utils/responsive.dart';
@@ -36,8 +37,27 @@ class HomeScreen extends ScaffoldScreen {
                 builder: (context, audioState, child) => PlaylistWidget(
                   songs: audioState.playlist,
                   currentSong: audioState.currentSong,
-                  isLinked: true,
                   padding: const EdgeInsets.only(top: 15),
+                  onRemovePre: (i, song, direction) async {
+                    final s = song as MusicData<CachingEnabled>;
+                    await musicManager.remove(s.caching.key);
+                    s.destroy();
+                  },
+                  onMovePre: (oldIndex, newIndex, song) async {
+                    final medias = [...musicManager.state.$medias];
+                    final song = medias.removeAt(oldIndex);
+                    medias.insert(newIndex, song);
+                    musicManager.notifier.pauseChange(AudioRawData.medias,
+                        faking: true, fakeValue: medias);
+                    await musicManager.move(oldIndex, newIndex);
+                    musicManager.notifier.resumeChange(AudioRawData.medias);
+                  },
+                  onTap: (i, song) {
+                    musicManager.seek(
+                      Duration.zero,
+                      index: musicManager.state.playlist.indexOf(song),
+                    );
+                  },
                 ),
               ),
               const Align(

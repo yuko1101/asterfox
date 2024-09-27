@@ -286,7 +286,7 @@ class SongSearch
     final List<SongSuggestion> list = [];
 
     final List<MusicData<CachingDisabled>> storedSongs =
-        LocalMusicsData.getAll(caching: CachingDisabled());
+        LocalMusicsData.getAllWithoutCaching();
     list.addAll(storedSongs.map((e) {
       final List<SongTag> tags = [SongTag.stored];
       if (e.isInstalled) tags.add(SongTag.installed);

@@ -33,8 +33,7 @@ class LocalMusicsData {
   static bool isInstalled({MusicData? song, String? audioId}) {
     assert(song != null || audioId != null);
     if (OS.isWeb) return false;
-    final file =
-        File(MusicData.getAudioInfoPath(song?.audioId ?? audioId!));
+    final file = File(MusicData.getAudioInfoPath(song?.audioId ?? audioId!));
     return file.existsSync();
   }
 
@@ -104,16 +103,27 @@ class LocalMusicsData {
     await CloudFirestoreManager.removeSongs(audioIds);
   }
 
-  static List<MusicData<T>> getAll<T extends Caching>({required T caching}) {
+  static List<MusicData> _getAll({required bool caching}) {
     final data = Map<String, dynamic>.from(localMusicData.getValue());
     return data.values
-        .map((e) => MusicData.fromJson(
-              json: e,
-              key: const Uuid().v4(),
-              caching: caching,
-            ))
+        .map(
+          (e) => caching
+              ? MusicData.fromJson<CachingEnabled>(
+                  json: e,
+                  caching: CachingEnabled(const Uuid().v4()),
+                )
+              : MusicData.fromJson<CachingDisabled>(
+                  json: e,
+                  caching: CachingDisabled(),
+                ),
+        )
         .toList();
   }
+
+  static List<MusicData<CachingEnabled>> getAllWithCaching() =>
+      _getAll(caching: true).cast<MusicData<CachingEnabled>>();
+  static List<MusicData<CachingDisabled>> getAllWithoutCaching() =>
+      _getAll(caching: false).cast<MusicData<CachingDisabled>>();
 
   // static List<String> getYouTubeIds() {
   //   final data = musicData.getValue(null) as Map<String, dynamic>;
@@ -130,12 +140,11 @@ class LocalMusicsData {
 
   static MusicData<T> getByAudioId<T extends Caching>({
     required String audioId,
-    required String key,
     required T caching,
   }) {
     if (!localMusicData.has(audioId)) throw LocalSongNotFoundException(audioId);
     final data = localMusicData.getValue(audioId) as Map<String, dynamic>;
-    return MusicData.fromJson(json: data, key: key, caching: caching);
+    return MusicData.fromJson(json: data, caching: caching);
   }
 }
 

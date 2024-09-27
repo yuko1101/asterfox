@@ -69,8 +69,7 @@ class HomeScreenMusicManager {
             song = await MusicData.get(
               musicData: musicData,
               audioId: audioId,
-              key: key,
-              caching: CachingEnabled(),
+              caching: CachingEnabled(key),
             );
           } on VideoUnplayableException {
             Fluttertoast.showToast(msg: l10n.value.song_unplayable);
@@ -148,13 +147,12 @@ class HomeScreenMusicManager {
         errorListNotifier: errorListNotifier,
         icon: const Icon(Icons.queue_music),
         future: () async {
-          List<MusicData> songs = [];
+          List<MusicData<CachingEnabled>> songs = [];
 
-          final songStream = MusicData.getList(
+          final songStream = MusicData.getListWithCaching(
             musicDataList: musicDataList,
             mediaUrlList: mediaUrlList,
             youtubePlaylist: youtubePlaylist,
-            caching: CachingEnabled(),
           );
 
           final completer = Completer();

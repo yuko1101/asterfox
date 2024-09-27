@@ -24,7 +24,7 @@ class _PlaylistInfoScreenState
     extends StatefulScaffoldScreenState<PlaylistInfoScreen> {
   bool editMode = false;
   late final List<MusicData> editingSongs = [
-    ...widget.playlist.getMusicDataList(CachingDisabled())
+    ...widget.playlist.getMusicDataListWithoutCaching()
   ];
 
   @override
@@ -99,8 +99,8 @@ class _PlaylistInfoScreenState
                     ? () {
                         HomeScreenMusicManager.addSongs(
                           count: widget.playlist.songs.length,
-                          musicDataList: widget.playlist
-                              .getMusicDataList(CachingDisabled()),
+                          musicDataList:
+                              widget.playlist.getMusicDataListWithoutCaching(),
                         );
                         Navigator.of(context).pushNamed("/home");
                       }
@@ -114,7 +114,7 @@ class _PlaylistInfoScreenState
   Widget body(BuildContext context) {
     return PlaylistWidgetWithEditMode(
       songs: editingSongs,
-      onRemove: (i, _) {
+      onRemove: (i, song, direction) {
         editingSongs.removeAt(i);
       },
       editMode: editMode,
@@ -126,7 +126,7 @@ class _PlaylistInfoScreenState
 
   void resetChanges() {
     editingSongs.clear();
-    editingSongs.addAll(widget.playlist.getMusicDataList(CachingDisabled()));
+    editingSongs.addAll(widget.playlist.getMusicDataListWithoutCaching());
   }
 
   void applyChanges() {

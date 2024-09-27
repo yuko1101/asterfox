@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../data/local_musics_data.dart';
@@ -11,25 +13,25 @@ class MusicCardWidget extends StatelessWidget {
   const MusicCardWidget({
     required this.song,
     this.isCurrentSong = false,
-    this.isLinked = false,
     required this.index,
     this.onTap,
+    this.onRemovePre,
     this.onRemove,
     super.key,
   });
 
   final MusicData song;
   final bool isCurrentSong;
-  final bool isLinked;
   final int index;
 
-  final dynamic Function(int)? onTap;
-  final dynamic Function(int, DismissDirection)? onRemove;
+  final dynamic Function(int, MusicData)? onTap;
+  final FutureOr Function(int, MusicData, DismissDirection)? onRemovePre;
+  final dynamic Function(int, MusicData, DismissDirection)? onRemove;
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(song.key),
+      key: Key(song.hashCode.toString()),
       background: Container(
         color: Theme.of(context).extraColors.primary.withOpacity(0.07),
       ),
@@ -39,12 +41,8 @@ class MusicCardWidget extends StatelessWidget {
       },
       child: buildCard(context),
       onDismissed: (DismissDirection dismissDirection) async {
-        if (onRemove != null) {
-          onRemove!(index, dismissDirection);
-          return;
-        }
-        if (isLinked) await musicManager.remove(song.key);
-        song.destroy();
+        await onRemovePre?.call(index, song, dismissDirection);
+        onRemove?.call(index, song, dismissDirection);
       },
     );
   }
@@ -93,17 +91,7 @@ class MusicCardWidget extends StatelessWidget {
         ),
       ),
       onTap: () {
-        if (onTap != null) {
-          onTap!(index);
-          return;
-        }
-        if (isLinked) {
-          musicManager.seek(
-            Duration.zero,
-            index: musicManager.state.playlist
-                .indexWhere((element) => element.key == song.key),
-          );
-        }
+        onTap?.call(index, song);
       },
     );
   }
@@ -112,9 +100,9 @@ class MusicCardWidget extends StatelessWidget {
     return MusicCardWidgetWithEditMode(
       song: song,
       isCurrentSong: isCurrentSong,
-      isLinked: isLinked,
       index: index,
       onTap: onTap,
+      onRemovePre: onRemovePre,
       onRemove: onRemove,
       key: key,
       editMode: editMode,
@@ -181,12 +169,12 @@ class MusicCardLeading extends StatelessWidget {
 }
 
 class MusicCardWidgetWithEditMode extends MusicCardWidget {
-  const MusicCardWidgetWithEditMode({
+  MusicCardWidgetWithEditMode({
     required super.song,
     super.isCurrentSong,
-    super.isLinked,
     required super.index,
     super.onTap,
+    super.onRemovePre,
     super.onRemove,
     super.key,
     required this.editMode,

@@ -18,7 +18,6 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     required super.lyrics,
     required super.songStoredAt,
     required super.size,
-    required super.key,
     required super.caching,
     required this.authorId,
     required this.streamInfo,
@@ -94,11 +93,9 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   // from json
   static YouTubeMusicData<T> fromJson<T extends Caching>({
     required Map<String, dynamic> json,
-    required String key,
     required T caching,
   }) {
     return YouTubeMusicData(
-      key: key,
       id: json["id"] as String,
       remoteImageUrl: json["remoteImageUrl"] as String,
       title: json["title"] as String,
@@ -106,7 +103,7 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
       author: json["author"] as String,
       authorId: json["authorId"] as String,
       duration: Duration(milliseconds: json["duration"] as int),
-      keywords: (json["keywords"] as List).map((e) => e as String).toList(),
+      keywords: (json["keywords"] as List).cast<String>(),
       volume: (json["volume"] as num).toDouble(),
       lyrics: json["lyrics"] as String,
       songStoredAt: json["songStoredAt"] as int?,

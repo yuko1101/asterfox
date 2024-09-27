@@ -78,17 +78,17 @@ class MusicManager {
     await _audioHandler.skipToNext();
   }
 
-  Future<void> add(MusicData song) async {
+  Future<void> add(MusicData<CachingEnabled> song) async {
     if (!song.isInstalled && !await song.isAudioUrlAvailable()) {
       await song.refreshAudioUrl();
     }
     await _audioHandler.addQueueItem(await song.toMediaItem());
   }
 
-  Future<void> addAll(List<MusicData> songs) async {
+  Future<void> addAll(List<MusicData<CachingEnabled>> songs) async {
     await _audioHandler.addQueueItems(
       await Future.wait(
-        songs.map((e) => (MusicData e) async {
+        songs.map((e) => (MusicData<CachingEnabled> e) async {
               if (!e.isInstalled && !await e.isAudioUrlAvailable()) {
                 await e.refreshAudioUrl();
               }
@@ -99,7 +99,7 @@ class MusicManager {
   }
 
   Future<void> remove(String key) async {
-    final int index = state.playlist.indexWhere((song) => song.key == key);
+    final int index = state.playlist.indexWhere((song) => (song as MusicData<CachingEnabled>).caching.key == key);
 
     if (index == -1) return;
 
@@ -152,7 +152,7 @@ class MusicManager {
         enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }
 
-  Future<void> setSongs(List<MusicData> songs) async {
+  Future<void> setSongs(List<MusicData<CachingEnabled>> songs) async {
     await _audioHandler.setSongs(songs);
   }
 
@@ -163,9 +163,9 @@ class MusicManager {
     final currentPosition = state.progress.position;
     final wasPlaying = state.playingState == PlayingState.playing;
     if (index == -1) {
-      await _audioHandler.setSongs(state.playlist);
+      await _audioHandler.setSongs(state.playlist.cast<MusicData<CachingEnabled>>());
     } else {
-      final MusicData song = state.playlist[index];
+      final song = state.playlist[index] as MusicData<CachingEnabled>;
 
       await _audioHandler.removeQueueItemAt(index);
       await _audioHandler.insertQueueItem(index, await song.toMediaItem());

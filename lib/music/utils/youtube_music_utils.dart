@@ -32,7 +32,6 @@ class YouTubeMusicUtils {
   static Future<YouTubeMusicData<T>> getYouTubeMusicData<T extends Caching>({
     required Video video,
     required YoutubeExplode? yt,
-    required String key,
     required T caching,
   }) async {
     final videoId = video.id.value;
@@ -41,7 +40,6 @@ class YouTubeMusicUtils {
       // throws LocalSongNotFoundException
       return LocalMusicsData.getByAudioId(
         audioId: videoId,
-        key: key,
         caching: caching,
       ) as YouTubeMusicData<T>;
     } else {
@@ -52,7 +50,6 @@ class YouTubeMusicUtils {
       return getFromVideo(
         video: video,
         streamInfo: streamInfo,
-        key: key,
         caching: caching,
       );
     }
@@ -63,17 +60,17 @@ class YouTubeMusicUtils {
   /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
   ///
   /// Throws [NetworkException] if the network is not accessible.
-  static Stream<YouTubeMusicData<T>>
-      getMusicDataFromPlaylist<T extends Caching>({
+  static Stream<YouTubeMusicData>
+      $getMusicDataFromPlaylist({
     required String playlistId,
-    required T caching,
+    required bool caching,
     required YoutubeExplode? yt,
   }) {
     NetworkUtils.check();
 
     final ytContainer = YTContainer(yt);
 
-    final controller = StreamController<YouTubeMusicData<T>>();
+    final controller = StreamController<YouTubeMusicData>();
     final videoStream = ytContainer.get().playlists.getVideos(playlistId);
 
     int processingCount = 0;
@@ -90,8 +87,7 @@ class YouTubeMusicUtils {
         final musicData = await _getFromVideoWithoutStreamInfo(
           video: video,
           yt: ytContainer.get(),
-          key: const Uuid().v4(),
-          caching: caching,
+          caching: caching ? CachingEnabled(const Uuid().v4()) : CachingDisabled(),
         );
         controller.sink.add(musicData);
       } catch (e, stacktrace) {
@@ -115,17 +111,35 @@ class YouTubeMusicUtils {
     return controller.stream;
   }
 
+  static Stream<YouTubeMusicData<CachingEnabled>> getMusicDataFromPlaylistWithCaching({
+    required String playlistId,
+    required YoutubeExplode? yt,
+  }) =>
+      $getMusicDataFromPlaylist(
+        playlistId: playlistId,
+        caching: true,
+        yt: yt,
+      ) as Stream<YouTubeMusicData<CachingEnabled>>;
+
+  static Stream<YouTubeMusicData<CachingDisabled>> getMusicDataFromPlaylistWithoutCaching({
+    required String playlistId,
+    required YoutubeExplode? yt,
+  }) =>
+      $getMusicDataFromPlaylist(
+        playlistId: playlistId,
+        caching: false,
+        yt: yt,
+      ) as Stream<YouTubeMusicData<CachingDisabled>>;
+
   static Future<YouTubeMusicData<T>>
       _getFromVideoWithoutStreamInfo<T extends Caching>({
     required Video video,
     required YoutubeExplode? yt,
-    required String key,
     required T caching,
   }) async {
     if (LocalMusicsData.isStored(audioId: video.id.value)) {
       final song = LocalMusicsData.getByAudioId(
         audioId: video.id.value,
-        key: key,
         caching: caching,
       ) as YouTubeMusicData<T>;
       if (!await song.isAudioUrlAvailable()) await song.refreshAudioUrl();
@@ -137,7 +151,6 @@ class YouTubeMusicUtils {
     return await getFromVideo(
       video: video,
       streamInfo: streamInfo,
-      key: key,
       caching: caching,
     );
   }
@@ -146,7 +159,6 @@ class YouTubeMusicUtils {
   static Future<YouTubeMusicData<T>> getFromVideo<T extends Caching>({
     required Video video,
     required StreamInfo streamInfo,
-    required String key,
     required T caching,
   }) async {
     String imageUrl = video.thumbnails.maxResUrl;
@@ -165,7 +177,6 @@ class YouTubeMusicUtils {
       keywords: video.keywords,
       volume: 1.0,
       remoteImageUrl: imageUrl,
-      key: key,
       lyrics: "", // TODO: by default, get from closed captions
       songStoredAt: null,
       size: null,
@@ -235,14 +246,12 @@ class YTContainer {
 
 extension MusicDataUtil on Video {
   Future<YouTubeMusicData<T>> fetchMusicData<T extends Caching>({
-    required String key,
     required T caching,
     required YoutubeExplode? yt,
   }) =>
       YouTubeMusicUtils.getYouTubeMusicData(
         yt: yt,
         video: this,
-        key: key,
         caching: caching,
       );
 }

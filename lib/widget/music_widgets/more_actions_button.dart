@@ -39,8 +39,8 @@ class MoreActionsButton extends StatelessWidget {
       onTap: (song, context) async {
         Navigator.of(context).pop();
         if (!song!.isInstalled) {
-          final key = "share-${song.key}";
-          final downloadPath = File("$tempPath/share_files/${song.key}");
+          final key = "share-${song.audioId}";
+          final downloadPath = File("$tempPath/share_files/${song.audioId}");
           final downloadFuture = AudioDownloader.download(song, customPath: downloadPath.path);
 
           await LoadingDialog.showLoading(

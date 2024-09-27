@@ -82,8 +82,7 @@ class DebugMainScreen extends StatelessWidget {
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 LocalMusicsData.deleteSongs(
-                                    LocalMusicsData.getAll(
-                                            caching: CachingDisabled())
+                                    LocalMusicsData.getAllWithoutCaching()
                                         .map((e) => e.audioId)
                                         .toList());
                               },
@@ -109,7 +108,7 @@ class DebugMainScreen extends StatelessWidget {
                     icon: const Icon(Icons.download),
                     onPressed: () {
                       final songsToInstall =
-                          LocalMusicsData.getAll(caching: CachingDisabled())
+                          LocalMusicsData.getAllWithoutCaching()
                               .where((song) => !song.isInstalled);
                       int sizeInBytes = 0;
                       bool isAccurate = true;
@@ -185,7 +184,7 @@ class DebugMainScreen extends StatelessWidget {
                     icon: const Icon(Icons.clear_all),
                     onPressed: () {
                       final songsToUninstall =
-                          LocalMusicsData.getAll(caching: CachingDisabled())
+                          LocalMusicsData.getAllWithoutCaching()
                               .where((song) => song.isInstalled);
                       showDialog(
                         context: context,

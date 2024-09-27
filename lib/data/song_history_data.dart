@@ -77,10 +77,9 @@ extension SongHistoryDataExtension on MusicData {
   }
 
   MusicData<T> renew<T extends Caching>(
-      {required String key, required T caching}) {
+      {required T caching}) {
     return MusicData.fromJson(
       json: toJson(),
-      key: key,
       caching: caching,
     );
   }

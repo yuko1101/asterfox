@@ -1,4 +1,3 @@
-import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../../system/exceptions/invalid_type_of_media_url_exception.dart';
@@ -34,7 +33,6 @@ class MusicDataUtils {
     final videos = await YouTubeMusicUtils.searchYouTubeVideo(query, yt);
 
     final song = await videos.first.fetchMusicData(
-      key: const Uuid().v4(),
       caching: CachingDisabled(),
       yt: yt,
     );
@@ -46,7 +44,6 @@ class MusicDataUtils {
     final audioId = getAudioIdFromUrl(url);
     return MusicData.getByAudioId(
       audioId: audioId,
-      key: const Uuid().v4(),
       caching: CachingDisabled(),
     );
   }
@@ -61,9 +58,8 @@ class MusicDataUtils {
     }
     final playlistId = match.group(4)!;
 
-    final stream = YouTubeMusicUtils.getMusicDataFromPlaylist(
+    final stream = YouTubeMusicUtils.getMusicDataFromPlaylistWithoutCaching(
       playlistId: playlistId,
-      caching: CachingDisabled(),
       yt: null,
     );
     return stream;
