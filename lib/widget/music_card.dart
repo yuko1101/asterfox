@@ -31,7 +31,7 @@ class MusicCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(song.hashCode.toString()),
+      key: ObjectKey(song),
       background: Container(
         color: Theme.of(context).extraColors.primary.withOpacity(0.07),
       ),

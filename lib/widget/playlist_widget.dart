@@ -72,21 +72,24 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     );
   }
 
-  MusicCardWidget buildItem(BuildContext context, int index) => MusicCardWidget(
-        key: Key(widget.songs[index].hashCode.toString()),
-        song: widget.songs[index],
-        isCurrentSong: widget.songs[index] == widget.currentSong,
-        index: index,
-        onTap: widget.onTap,
-        onRemovePre: widget.onRemovePre,
-        onRemove: widget.onRemove == null
-            ? null
-            : (i, song, direction) {
-                setState(() {
-                  widget.onRemove!(i, song, direction);
-                });
-              },
-      );
+  MusicCardWidget buildItem(BuildContext context, int index) {
+    final song = widget.songs[index];
+    return MusicCardWidget(
+      key: ObjectKey(song),
+      song: song,
+      isCurrentSong: song == widget.currentSong,
+      index: index,
+      onTap: widget.onTap,
+      onRemovePre: widget.onRemovePre,
+      onRemove: widget.onRemove == null
+          ? null
+          : (i, song, direction) {
+              setState(() {
+                widget.onRemove!(i, song, direction);
+              });
+            },
+    );
+  }
 }
 
 class PlaylistWidgetWithEditMode extends PlaylistWidget {

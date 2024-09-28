@@ -135,7 +135,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   Media _createMedia(MediaItem mediaItem) {
     return Media(
-      mediaItem.extras!['url'],
+      mediaItem.extras!["url"],
       extras: {
         "key": mediaItem.id,
       },
