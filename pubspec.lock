@@ -565,15 +565,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
-  lyrics:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: main
-      resolved-ref: b4efbb534845ef19a175b96454a153d120776bc8
-      url: "https://github.com/yuko1101/dart-lyrics.git"
-    source: git
-    version: "0.0.7"
   matcher:
     dependency: transitive
     description:

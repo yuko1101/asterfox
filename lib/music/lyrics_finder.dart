@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
-import 'package:lyrics/lyrics.dart';
 
 import '../data/local_musics_data.dart';
 import '../system/firebase/cloud_firestore.dart';
@@ -94,7 +93,30 @@ class LyricsFinder {
 
   static Future<String> getFromGoogle(String title, String artist) async {
     try {
-      return await Lyrics().getLyrics(artist: artist, track: title);
+      final query = "$title $artist 歌詞";
+      final userAgent =
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
+      final searchUrl =
+          "https://www.google.com/search?q=${Uri.encodeFull(query)}";
+
+      final response = await http
+          .get(Uri.parse(searchUrl), headers: {"User-Agent": userAgent});
+
+      final doc = parse(response.body);
+
+      final lyricsNode = doc.querySelector(
+          "div[data-attrid='kc:/music/recording_cluster:lyrics']");
+      if (lyricsNode == null) return "";
+
+      final lyrics =
+          lyricsNode.firstChild?.nodes[1].firstChild?.firstChild?.nodes[1].nodes
+              .map((node) => node.children.map((e) {
+                    if (e.localName == "br") return "\n";
+                    return e.text;
+                  }).join(""))
+              .join("\n\n");
+
+      return lyrics ?? "";
     } catch (e) {
       return "";
     }

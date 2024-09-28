@@ -91,11 +91,6 @@ dependencies:
 
   wear: ^1.1.0
 
-  lyrics: #^0.0.7
-    git:
-      url: https://github.com/yuko1101/dart-lyrics.git
-      ref: main
-
   device_info_plus: ^10.1.2
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
