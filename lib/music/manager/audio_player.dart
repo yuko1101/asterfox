@@ -48,6 +48,15 @@ class AudioPlayer extends Player {
       _isEmpty = false;
       await open(Playlist([media]));
     } else {
+      // TODO: remove this if statement when the bug is fixed
+      // this bug is caused by the media_kit package not being able to handle the same uri in the playlist
+      // media_kit caches the `extras` field by the uri of the media, and all medias have the same caching key
+      // so we can't determine which media for which music data
+      if (state.playlist.medias.any((e) => e.uri == media.uri)) {
+        throw Exception(
+            "Media with the same uri already exists in the playlist");
+      }
+
       await super.add(media);
     }
   }
@@ -67,6 +76,15 @@ class AudioPlayer extends Player {
       await open(Playlist(medias));
     } else {
       for (final media in medias) {
+        // TODO: remove this if statement when the bug is fixed
+        // this bug is caused by the media_kit package not being able to handle the same uri in the playlist
+        // media_kit caches the `extras` field by the uri of the media, and all medias have the same caching key
+        // so we can't determine which media for which music data
+        if (state.playlist.medias.any((e) => e.uri == media.uri)) {
+          throw Exception(
+              "Media with the same uri already exists in the playlist");
+        }
+
         await super.add(media);
       }
     }
