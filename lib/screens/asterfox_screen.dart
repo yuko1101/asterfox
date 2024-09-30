@@ -9,6 +9,7 @@ import 'package:wear/wear.dart';
 
 import '../main.dart';
 import '../system/home_screen_music_manager.dart';
+import '../utils/responsive.dart';
 import '../widget/music_widgets/music_buttons.dart';
 import '../widget/music_widgets/music_thumbnail.dart';
 import '../widget/theme_icon_button.dart';
@@ -206,7 +207,9 @@ class AsterfoxSideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: min(320, MediaQuery.of(context).size.width * 0.8),
+      width: Responsive.isDesktop(context)
+          ? 250
+          : min(320, MediaQuery.of(context).size.width * 0.8),
       child: Drawer(
         child: Container(
           color: Theme.of(context).scaffoldBackgroundColor,
@@ -231,16 +234,23 @@ class _SideMenuContentState extends State<_SideMenuContent> {
   Widget build(BuildContext context) {
     final items = [
       DrawerHeader(
-        child: Center(
-          child: ListTile(
-            leading: Image.asset(
-              "assets/images/asterfox.png",
-              scale: 0.1,
-            ),
-            title: const Text(
-              "Asterfox",
-              textScaler: TextScaler.linear(1.3),
-            ),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(width: 30),
+              Image.asset(
+                "assets/images/asterfox.png",
+                width: 40,
+                height: 40,
+              ),
+              SizedBox(width: 12),
+              Text(
+                "Asterfox",
+                textScaler: TextScaler.linear(1.4),
+              ),
+            ],
           ),
         ),
       ),
@@ -361,7 +371,7 @@ class SideMenuItem extends StatelessWidget {
       child: InkWell(
         child: ListTile(
           onTap: onPressed,
-          horizontalTitleGap: 0.0,
+          horizontalTitleGap: 10,
           leading: icon,
           title: title,
         ),

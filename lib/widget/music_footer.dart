@@ -21,7 +21,7 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     if (!Responsive.isMobile(context)) {
       return const SizedBox(
-        height: 75,
+        height: 90,
         child: Column(
           children: [
             Expanded(
@@ -65,6 +65,7 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
                 MoreActionsButton(),
               ],
             ),
+            SizedBox(height: 7),
           ],
         ),
       );

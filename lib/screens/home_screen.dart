@@ -120,7 +120,7 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Image.asset("assets/images/asterfox.png"),
             ),
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 12),
           const Text("Asterfox")
         ],
       ),
