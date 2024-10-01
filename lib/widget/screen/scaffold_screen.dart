@@ -51,6 +51,7 @@ Widget buildScaffold(BuildContext context, IScaffoldScreen screen) {
 
   if (Responsive.isDesktop(context)) {
     return Scaffold(
+      appBar: appBar,
       resizeToAvoidBottomInset: false,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,

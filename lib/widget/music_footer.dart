@@ -20,7 +20,8 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     if (!Responsive.isMobile(context)) {
-      return const SizedBox(
+      final theme = Theme.of(context);
+      return SizedBox(
         height: 90,
         child: Column(
           children: [
@@ -40,19 +41,24 @@ class MusicFooter extends StatelessWidget implements PreferredSizeWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
+                        width: 50,
                         height: 50,
                         child: MusicThumbnail(fit: BoxFit.fitHeight),
                       ),
                       SizedBox(width: 30),
-                      Flexible(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CurrentSongTitle(),
-                            CurrentSongAuthor(),
-                          ],
-                        ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CurrentSongTitle(style: TextStyle(fontSize: 18)),
+                          CurrentSongAuthor(
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: theme.extraColors.secondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -102,13 +108,18 @@ class MobileMusicFooter extends StatelessWidget {
                     width: 70,
                     child: const MusicThumbnail(fit: BoxFit.fitHeight),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CurrentSongTitle(),
-                        CurrentSongAuthor(),
+                        CurrentSongTitle(style: TextStyle(fontSize: 20)),
+                        CurrentSongAuthor(
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).extraColors.secondary,
+                          ),
+                        ),
                       ],
                     ),
                   ),

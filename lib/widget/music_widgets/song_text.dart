@@ -4,7 +4,13 @@ import '../../main.dart';
 import '../../music/manager/audio_data_manager.dart';
 
 class CurrentSongTitle extends StatelessWidget {
-  const CurrentSongTitle({super.key});
+  const CurrentSongTitle({
+    this.style,
+    super.key,
+  });
+
+  final TextStyle? style;
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
@@ -18,9 +24,7 @@ class CurrentSongTitle extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Text(
               musicData?.title ?? "",
-              style: const TextStyle(
-                fontSize: 20,
-              ),
+              style: style,
             ),
           ),
         );
@@ -30,7 +34,13 @@ class CurrentSongTitle extends StatelessWidget {
 }
 
 class CurrentSongAuthor extends StatelessWidget {
-  const CurrentSongAuthor({super.key});
+  const CurrentSongAuthor({
+    this.style,
+    super.key,
+  });
+
+  final TextStyle? style;
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<AudioState>(
@@ -44,10 +54,7 @@ class CurrentSongAuthor extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Text(
               musicData?.author ?? "",
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-              ),
+              style: style,
             ),
           ),
         );

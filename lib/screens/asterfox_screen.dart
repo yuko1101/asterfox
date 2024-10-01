@@ -206,11 +206,13 @@ class AsterfoxSideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+
     return SizedBox(
-      width: Responsive.isDesktop(context)
-          ? 250
-          : min(320, MediaQuery.of(context).size.width * 0.8),
+      width:
+          isDesktop ? 250 : min(320, MediaQuery.of(context).size.width * 0.8),
       child: Drawer(
+        shape: isDesktop ? Border() : null,
         child: Container(
           color: Theme.of(context).scaffoldBackgroundColor,
           child: const _SideMenuContent(),
@@ -232,28 +234,31 @@ class _SideMenuContentState extends State<_SideMenuContent> {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = Responsive.isDesktop(context);
+
     final items = [
-      DrawerHeader(
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(width: 30),
-              Image.asset(
-                "assets/images/asterfox.png",
-                width: 40,
-                height: 40,
-              ),
-              SizedBox(width: 12),
-              Text(
-                "Asterfox",
-                textScaler: TextScaler.linear(1.4),
-              ),
-            ],
+      if (!isDesktop)
+        DrawerHeader(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(width: 30),
+                Image.asset(
+                  "assets/images/asterfox.png",
+                  width: 40,
+                  height: 40,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  "Asterfox",
+                  textScaler: TextScaler.linear(1.4),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       SideMenuItem(
         title: const Text("Home"),
         icon: const Icon(Icons.home),
