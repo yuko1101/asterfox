@@ -94,17 +94,20 @@ class PlaylistsScreen extends ScaffoldScreen {
 
   @override
   Widget body(BuildContext context) {
-    return ValueListenableBuilder<List<AppPlaylist>>(
-        valueListenable: playlistsNotifier,
-        builder: (context, playlists, child) {
-          return GridView.count(
-            crossAxisCount: MediaQuery.of(context).size.width ~/ 150,
-            children: List.generate(playlists.length, (index) {
-              return SelectablePlaylistCard(
-                  selectedPlaylistsNotifier, playlists[index]);
-            }),
-          );
-        });
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: ValueListenableBuilder<List<AppPlaylist>>(
+          valueListenable: playlistsNotifier,
+          builder: (context, playlists, child) {
+            return GridView.count(
+              crossAxisCount: MediaQuery.of(context).size.width ~/ 150,
+              children: List.generate(playlists.length, (index) {
+                return SelectablePlaylistCard(
+                    selectedPlaylistsNotifier, playlists[index]);
+              }),
+            );
+          }),
+    );
   }
 
   @override

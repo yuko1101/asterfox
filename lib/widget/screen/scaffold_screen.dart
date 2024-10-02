@@ -61,7 +61,17 @@ Widget buildScaffold(BuildContext context, IScaffoldScreen screen) {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 if (drawer != null) drawer,
+                if (drawer != null)
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 0,
+                  ),
                 Expanded(child: body),
+                if (endDrawer != null)
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 0,
+                  ),
                 if (endDrawer != null) endDrawer,
               ],
             ),
