@@ -24,6 +24,17 @@ class AudioPlayer extends Player {
   }
 
   @override
+  Future<void> next() async {
+    // allows to replay the queue even if it's in single loop mode (https://github.com/media-kit/media-kit/blob/88c49c6c0f6187a131a4053f0f1a3a42f2922a8a/media_kit/lib/src/player/native/player/real.dart#L508-L515)
+    if (state.playlistMode == PlaylistMode.single &&
+        state.playlist.index == state.playlist.medias.length - 1) {
+      await jump(0);
+    } else {
+      await super.next();
+    }
+  }
+
+  @override
   Future<void> stop() async {
     _isEmpty = true;
     await super.stop();
