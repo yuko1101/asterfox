@@ -4,14 +4,14 @@ import '../../data/local_musics_data.dart';
 import '../music_data/music_data.dart';
 
 class AppPlaylist {
-  const AppPlaylist({
+  AppPlaylist({
     required this.id,
     required this.name,
     required this.songs,
   });
 
   final String id;
-  final String name;
+  String name;
   final List<String> songs;
 
   List<MusicData> _getMusicDataList(bool caching) => songs

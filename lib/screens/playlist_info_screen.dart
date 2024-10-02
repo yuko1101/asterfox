@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/custom_colors.dart';
 import '../data/local_musics_data.dart';
 import '../data/playlist_data.dart';
 import '../main.dart';
@@ -27,10 +28,27 @@ class _PlaylistInfoScreenState
     ...widget.playlist.getMusicDataListWithoutCaching()
   ];
 
+  late String editingTitle = widget.playlist.name;
+
   @override
   PreferredSizeWidget? appBar(BuildContext context) {
     return AppBar(
-      title: Text("${widget.playlist.name} (${widget.playlist.songs.length})"),
+      title: editMode
+          ? TextFormField(
+              initialValue: widget.playlist.name,
+              cursorColor: CustomColors.getColor("accent"),
+              decoration: InputDecoration(
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: CustomColors.getColor("accent"),
+                  ),
+                ),
+              ),
+              onChanged: (value) {
+                editingTitle = value;
+              },
+            )
+          : Text("${widget.playlist.name} (${widget.playlist.songs.length})"),
       leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back),
@@ -127,11 +145,15 @@ class _PlaylistInfoScreenState
   void resetChanges() {
     editingSongs.clear();
     editingSongs.addAll(widget.playlist.getMusicDataListWithoutCaching());
+    editingTitle = widget.playlist.name;
   }
 
   void applyChanges() {
     widget.playlist.songs.clear();
     widget.playlist.songs.addAll(editingSongs.map((s) => s.audioId));
+    if (editingTitle.isNotEmpty) {
+      widget.playlist.name = editingTitle;
+    }
     PlaylistsData.addAndSave(widget.playlist);
   }
 }
