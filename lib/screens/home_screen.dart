@@ -144,11 +144,14 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
             },
             icon: const Icon(Icons.search)),
       ],
-      leading: IconButton(
-        onPressed: () => AppDrawerController(context).openDrawer(),
-        icon: const AnimatedMenuIcon(),
-        tooltip: l10n.value.menu,
-      ),
+      leading: Responsive.isDesktop(context)
+          ? null
+          : IconButton(
+              onPressed: () => AppDrawerController(context).openDrawer(),
+              icon: const AnimatedMenuIcon(),
+              tooltip: l10n.value.menu,
+            ),
+      automaticallyImplyLeading: false,
       bottom: AppBarDivider(
         height: 1,
         color: Theme.of(context).extraColors.primary.withOpacity(0.04),
