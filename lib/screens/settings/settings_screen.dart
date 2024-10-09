@@ -162,7 +162,8 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       await CloudFirestoreManager.cancelListeners();
                       await CloudFirestoreManager.waitForTasks();
-                      if (GoogleSignInWidget.isAvailable && await GoogleSignInWidget.googleSignIn.isSignedIn()) {
+                      if (GoogleSignInWidget.isAvailable &&
+                          await GoogleSignInWidget.googleSignIn.isSignedIn()) {
                         GoogleSignInWidget.googleSignIn.disconnect();
                       }
                       FirebaseAuth.instance.signOut();
@@ -183,8 +184,11 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 description: FutureBuilder<Pair<String, String>>(
                   future: getGitInfo(),
                   builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    }
                     return snapshot.data == null
-                        ? const Text("")
+                        ? const Text("No info")
                         : GestureDetector(
                             child: Text(
                               "${snapshot.data!.first}/${snapshot.data!.second}",
