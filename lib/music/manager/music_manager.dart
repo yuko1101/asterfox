@@ -98,8 +98,10 @@ class MusicManager {
     );
   }
 
+  // TODO: not to call "remove" or "move" method (reordering method) multiple times at the same time
   Future<void> remove(String key) async {
-    final int index = state.playlist.indexWhere((song) => (song as MusicData<CachingEnabled>).caching.key == key);
+    final int index = state.playlist.indexWhere(
+        (song) => (song as MusicData<CachingEnabled>).caching.key == key);
 
     if (index == -1) return;
 
@@ -163,7 +165,8 @@ class MusicManager {
     final currentPosition = state.progress.position;
     final wasPlaying = state.playingState == PlayingState.playing;
     if (index == -1) {
-      await _audioHandler.setSongs(state.playlist.cast<MusicData<CachingEnabled>>());
+      await _audioHandler
+          .setSongs(state.playlist.cast<MusicData<CachingEnabled>>());
     } else {
       final song = state.playlist[index] as MusicData<CachingEnabled>;
 
