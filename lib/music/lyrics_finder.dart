@@ -58,8 +58,7 @@ class LyricsFinder {
       }
       final artistElement = element.children[1];
       if (!artistElement.hasChildNodes()) return false;
-      final String? artistName = artistElement.children[0].text;
-      if (artistName == null) return false;
+      final String artistName = artistElement.children[0].text;
       if (!artistName.contains(artist)) return false;
       return true;
     });

@@ -196,7 +196,6 @@ class MoreActionsButton extends StatelessWidget {
 
 class _Action extends StatelessWidget {
   const _Action({
-    super.key,
     required this.id,
     required this.icon,
     required this.title,

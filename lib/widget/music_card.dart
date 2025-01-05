@@ -169,7 +169,7 @@ class MusicCardLeading extends StatelessWidget {
 }
 
 class MusicCardWidgetWithEditMode extends MusicCardWidget {
-  MusicCardWidgetWithEditMode({
+  const MusicCardWidgetWithEditMode({
     required super.song,
     super.isCurrentSong,
     required super.index,

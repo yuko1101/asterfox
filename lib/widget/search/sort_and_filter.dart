@@ -70,7 +70,9 @@ int _getScore(Suggestion suggestion, String query) {
   int score = 0;
   if (suggestion.title.toLowerCase().contains(query.toLowerCase())) score += 1;
   if (suggestion.keywords
-      .any((e) => e.toLowerCase().contains(query.toLowerCase()))) score += 1;
+      .any((e) => e.toLowerCase().contains(query.toLowerCase()))) {
+    score += 1;
+  }
   if (suggestion is SongSuggestion &&
       suggestion.lyrics != null &&
       suggestion.lyrics!.contains(query)) {
