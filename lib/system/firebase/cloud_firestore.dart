@@ -54,7 +54,7 @@ class CloudFirestoreManager {
             .save(compact: LocalMusicsData.compact);
         await CloudFirestoreManager.removeAllSongs();
         await CloudFirestoreManager.addOrUpdateSongs(
-            LocalMusicsData.getAllWithoutCaching());
+            LocalMusicsData.getAll(caching: CachingDisabled()));
       }
       if (data.containsKey("playlists")) {
         PlaylistsData.playlistsData.data = data["playlists"];

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 import '../data/song_history_data.dart';
 import '../main.dart';
+import '../music/music_data/music_data.dart';
 import '../system/home_screen_music_manager.dart';
 import '../system/theme/theme.dart';
 import '../widget/screen/scaffold_screen.dart';
@@ -101,9 +101,8 @@ class _SongHistoryState extends State<_SongHistory> {
             },
           ),
           onTap: () async {
-            final key = const Uuid().v4();
             HomeScreenMusicManager.addSong(
-              key: key,
+              caching: CachingEnabled.random(),
               audioId: song["audioId"],
             );
             Navigator.of(context).pop();

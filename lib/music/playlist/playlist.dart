@@ -14,24 +14,12 @@ class AppPlaylist {
   String name;
   final List<String> songs;
 
-  List<MusicData> _getMusicDataList(bool caching) => songs
-      .map(
-        (audioId) => caching
-            ? LocalMusicsData.getByAudioId<CachingEnabled>(
-                audioId: audioId,
-                caching: CachingEnabled(const Uuid().v4()),
-              )
-            : LocalMusicsData.getByAudioId<CachingDisabled>(
-                audioId: audioId,
-                caching: CachingDisabled(),
-              ),
-      )
+  List<MusicData<T>> getMusicDataList<T extends Caching>(T caching) => songs
+      .map((audioId) => LocalMusicsData.getByAudioId<T>(
+            audioId: audioId,
+            caching: caching.unique(),
+          ))
       .toList();
-
-  List<MusicData<CachingEnabled>> getMusicDataListWithCaching() =>
-      _getMusicDataList(true).cast<MusicData<CachingEnabled>>();
-  List<MusicData<CachingDisabled>> getMusicDataListWithoutCaching() =>
-      _getMusicDataList(false).cast<MusicData<CachingDisabled>>();
 
   Map<String, dynamic> toJson() {
     return {

@@ -305,7 +305,7 @@ abstract class Caching {
 
   T unique<T extends Caching>() {
     if (enabled) {
-      return CachingEnabled(const Uuid().v4()) as T;
+      return CachingEnabled.random() as T;
     }
     return this as T;
   }

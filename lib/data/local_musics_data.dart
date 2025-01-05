@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../main.dart';
@@ -103,27 +102,15 @@ class LocalMusicsData {
     await CloudFirestoreManager.removeSongs(audioIds);
   }
 
-  static List<MusicData> _getAll({required bool caching}) {
+  static List<MusicData<T>> getAll<T extends Caching>({required T caching}) {
     final data = Map<String, dynamic>.from(localMusicData.getValue());
     return data.values
-        .map(
-          (e) => caching
-              ? MusicData.fromJson<CachingEnabled>(
-                  json: e,
-                  caching: CachingEnabled(const Uuid().v4()),
-                )
-              : MusicData.fromJson<CachingDisabled>(
-                  json: e,
-                  caching: CachingDisabled(),
-                ),
-        )
+        .map((e) => MusicData.fromJson<T>(
+              json: e,
+              caching: caching.unique(),
+            ))
         .toList();
   }
-
-  static List<MusicData<CachingEnabled>> getAllWithCaching() =>
-      _getAll(caching: true).cast<MusicData<CachingEnabled>>();
-  static List<MusicData<CachingDisabled>> getAllWithoutCaching() =>
-      _getAll(caching: false).cast<MusicData<CachingDisabled>>();
 
   // static List<String> getYouTubeIds() {
   //   final data = musicData.getValue(null) as Map<String, dynamic>;

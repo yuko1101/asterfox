@@ -24,7 +24,7 @@ import 'exceptions/unable_to_load_from_playlist_exception.dart';
 
 class HomeScreenMusicManager {
   static Future<void> addSong({
-    required String key,
+    required CachingEnabled caching,
     String? audioId,
     MusicData<CachingDisabled>? musicData,
     String? mediaUrl,
@@ -69,7 +69,7 @@ class HomeScreenMusicManager {
             song = await MusicData.get(
               musicData: musicData,
               audioId: audioId,
-              caching: CachingEnabled(key),
+              caching: caching,
             );
           } on VideoUnplayableException {
             Fluttertoast.showToast(msg: l10n.value.song_unplayable);

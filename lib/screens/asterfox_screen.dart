@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:uuid/uuid.dart';
 import 'package:wear/wear.dart';
 
 import '../main.dart';
+import '../music/music_data/music_data.dart';
 import '../system/home_screen_music_manager.dart';
 import '../utils/responsive.dart';
 import '../widget/music_widgets/music_buttons.dart';
@@ -163,7 +163,7 @@ class AsterfoxMainWatchScreen extends StatelessWidget {
                         icon: const Icon(Icons.add),
                         onPressed: () {
                           HomeScreenMusicManager.addSong(
-                            key: const Uuid().v4(),
+                            caching: CachingEnabled.random(),
                             audioId: "ZRtdQ81jPUQ",
                           );
                         },
