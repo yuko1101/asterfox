@@ -58,11 +58,21 @@ class MusicDataUtils {
     }
     final playlistId = match.group(4)!;
 
-    final stream = YouTubeMusicUtils.getMusicDataFromPlaylistWithoutCaching(
+    final stream = YouTubeMusicUtils.getMusicDataFromPlaylist(
       playlistId: playlistId,
       yt: null,
+      caching: CachingDisabled(),
     );
     return stream;
+  }
+
+  static Future<List<MusicData<CachingDisabled>>> searchList(
+      String query) async {
+    try {
+      return [await MusicDataUtils.search(query)];
+    } on InvalidTypeOfMediaUrlException {
+      return MusicDataUtils.fetchPlaylistFromUrl(query).toList();
+    }
   }
 }
 

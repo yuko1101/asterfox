@@ -149,10 +149,11 @@ class HomeScreenMusicManager {
         future: () async {
           List<MusicData<CachingEnabled>> songs = [];
 
-          final songStream = MusicData.getListWithCaching(
+          final songStream = MusicData.getList(
             musicDataList: musicDataList,
             mediaUrlList: mediaUrlList,
             youtubePlaylist: youtubePlaylist,
+            caching: CachingEnabled.random(),
           );
 
           final completer = Completer();

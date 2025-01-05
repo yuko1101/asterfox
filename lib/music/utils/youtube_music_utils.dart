@@ -60,17 +60,17 @@ class YouTubeMusicUtils {
   /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
   ///
   /// Throws [NetworkException] if the network is not accessible.
-  static Stream<YouTubeMusicData>
-      $getMusicDataFromPlaylist({
+  static Stream<YouTubeMusicData<T>>
+      getMusicDataFromPlaylist<T extends Caching>({
     required String playlistId,
-    required bool caching,
+    required T caching,
     required YoutubeExplode? yt,
   }) {
     NetworkUtils.check();
 
     final ytContainer = YTContainer(yt);
 
-    final controller = StreamController<YouTubeMusicData>();
+    final controller = StreamController<YouTubeMusicData<T>>();
     final videoStream = ytContainer.get().playlists.getVideos(playlistId);
 
     int processingCount = 0;
@@ -87,7 +87,7 @@ class YouTubeMusicUtils {
         final musicData = await _getFromVideoWithoutStreamInfo(
           video: video,
           yt: ytContainer.get(),
-          caching: caching ? CachingEnabled(const Uuid().v4()) : CachingDisabled(),
+          caching: caching,
         );
         controller.sink.add(musicData);
       } catch (e, stacktrace) {
@@ -110,26 +110,6 @@ class YouTubeMusicUtils {
 
     return controller.stream;
   }
-
-  static Stream<YouTubeMusicData<CachingEnabled>> getMusicDataFromPlaylistWithCaching({
-    required String playlistId,
-    required YoutubeExplode? yt,
-  }) =>
-      $getMusicDataFromPlaylist(
-        playlistId: playlistId,
-        caching: true,
-        yt: yt,
-      ) as Stream<YouTubeMusicData<CachingEnabled>>;
-
-  static Stream<YouTubeMusicData<CachingDisabled>> getMusicDataFromPlaylistWithoutCaching({
-    required String playlistId,
-    required YoutubeExplode? yt,
-  }) =>
-      $getMusicDataFromPlaylist(
-        playlistId: playlistId,
-        caching: false,
-        yt: yt,
-      ) as Stream<YouTubeMusicData<CachingDisabled>>;
 
   static Future<YouTubeMusicData<T>>
       _getFromVideoWithoutStreamInfo<T extends Caching>({

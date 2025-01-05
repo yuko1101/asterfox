@@ -196,13 +196,13 @@ class MusicData<T extends Caching> {
   }
 
   /// if renew is false, musicData in musicDataList won't be renewed by MusicData#renew().
-  static Stream<MusicData> _getList({
+  static Stream<MusicData<T>> getList<T extends Caching>({
     List<MusicData>? musicDataList,
     List<String>? mediaUrlList,
     String? youtubePlaylist,
-    required bool caching,
+    required T caching,
   }) {
-    final controller = StreamController<MusicData>();
+    final controller = StreamController<MusicData<T>>();
 
     int remaining = (musicDataList?.length ?? 0) + (mediaUrlList?.length ?? 0);
     bool isYouTubePlaylistDone = youtubePlaylist == null;
@@ -211,7 +211,7 @@ class MusicData<T extends Caching> {
       controller.sink.close();
     }
 
-    void add(MusicData event) {
+    void add(MusicData<T> event) {
       controller.sink.add(event);
       remaining--;
       if (remaining == 0 && isYouTubePlaylistDone) {
@@ -222,24 +222,20 @@ class MusicData<T extends Caching> {
     if (musicDataList != null) {
       for (final musicData in musicDataList) {
         add(
-          caching
-              ? musicData.renew<CachingEnabled>(
-                  caching: CachingEnabled(const Uuid().v4()))
-              : musicData.renew<CachingDisabled>(caching: CachingDisabled()),
+          musicData.renew(caching: caching.unique()),
         );
       }
     }
     if (mediaUrlList != null) {
       for (final mediaUrl in mediaUrlList) {
-        MusicData.get(
+        MusicData.get<T>(
           mediaUrl: mediaUrl,
-          caching:
-              caching ? CachingEnabled(const Uuid().v4()) : CachingDisabled(),
+          caching: caching.unique(),
         ).then(add);
       }
     }
     if (youtubePlaylist != null) {
-      final playlistStream = YouTubeMusicUtils.$getMusicDataFromPlaylist(
+      final playlistStream = YouTubeMusicUtils.getMusicDataFromPlaylist(
         playlistId: youtubePlaylist,
         caching: caching,
         yt: null,
@@ -262,30 +258,6 @@ class MusicData<T extends Caching> {
 
     return controller.stream;
   }
-
-  static Stream<MusicData<CachingEnabled>> getListWithCaching({
-    List<MusicData>? musicDataList,
-    List<String>? mediaUrlList,
-    String? youtubePlaylist,
-  }) =>
-      _getList(
-        musicDataList: musicDataList,
-        mediaUrlList: mediaUrlList,
-        youtubePlaylist: youtubePlaylist,
-        caching: true,
-      ).cast<MusicData<CachingEnabled>>();
-
-  static Stream<MusicData<CachingDisabled>> getListWithoutCaching({
-    List<MusicData>? musicDataList,
-    List<String>? mediaUrlList,
-    String? youtubePlaylist,
-  }) =>
-      _getList(
-        musicDataList: musicDataList,
-        mediaUrlList: mediaUrlList,
-        youtubePlaylist: youtubePlaylist,
-        caching: false,
-      ) as Stream<MusicData<CachingDisabled>>;
 }
 
 enum MusicType { youtube, url }
@@ -330,12 +302,23 @@ extension MusicDataExtension on MusicData<CachingEnabled> {
 abstract class Caching {
   // whether to cache the instance into the `created`.
   bool get enabled => this is CachingEnabled;
+
+  T unique<T extends Caching>() {
+    if (enabled) {
+      return CachingEnabled(const Uuid().v4()) as T;
+    }
+    return this as T;
+  }
 }
 
 class CachingEnabled extends Caching {
   CachingEnabled(this.key);
 
   final String key;
+
+  factory CachingEnabled.random() {
+    return CachingEnabled(const Uuid().v4());
+  }
 }
 
 class CachingDisabled extends Caching {}

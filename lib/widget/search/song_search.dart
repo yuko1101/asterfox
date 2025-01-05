@@ -106,7 +106,7 @@ class SongSearch
                     (tile.suggestion as SongSuggestion).fetchMusicData()));
           } else {
             if (query.isEmpty || query == "") return;
-            songs = Future.wait([MusicDataUtils.search(query)]);
+            songs = MusicDataUtils.searchList(query);
           }
           close(context, songs);
         },
@@ -143,7 +143,7 @@ class SongSearch
           .map((tile) => (tile.suggestion as SongSuggestion).fetchMusicData()));
     } else {
       if (query.isEmpty || query == "") return close(context, Future.value([]));
-      songs = Future.wait([MusicDataUtils.search(query)]);
+      songs = MusicDataUtils.searchList(query);
     }
     close(context, songs);
   }
