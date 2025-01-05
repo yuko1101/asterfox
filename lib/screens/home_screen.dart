@@ -129,10 +129,10 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: () async {
               final searchDelegate =
                   SongSearch(animationController: _menuIconAnimationController);
-              _menuIconAnimationController.forward();
+              _menuIconAnimationController?.forward();
               final result =
                   await showSearch(context: context, delegate: searchDelegate);
-              _menuIconAnimationController.reverse();
+              _menuIconAnimationController?.reverse();
 
               final songs = await result;
               if (songs != null && songs.isNotEmpty) {
@@ -188,7 +188,7 @@ class AnimatedMenuIcon extends StatefulWidget {
   State<AnimatedMenuIcon> createState() => AnimatedMenuIconState();
 }
 
-late AnimationController _menuIconAnimationController;
+AnimationController? _menuIconAnimationController;
 
 class AnimatedMenuIconState extends State<AnimatedMenuIcon>
     with SingleTickerProviderStateMixin {
@@ -204,7 +204,9 @@ class AnimatedMenuIconState extends State<AnimatedMenuIcon>
   @override
   Widget build(BuildContext context) {
     return AnimatedIcon(
-        icon: AnimatedIcons.menu_arrow, progress: _menuIconAnimationController);
+      icon: AnimatedIcons.menu_arrow,
+      progress: _menuIconAnimationController!,
+    );
   }
 }
 
