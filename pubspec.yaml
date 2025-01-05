@@ -38,20 +38,20 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.10
 
-  collection: ^1.18.0
+  collection: ^1.19.0
 
   http: ^1.2.2
-  html: ^0.15.4
+  html: ^0.15.5
 
   intl: ^0.19.0
 
   path_provider: 2.1.3
   provider: ^6.1.2
-  uuid: ^4.5.0
+  uuid: ^4.5.1
 
-  connectivity_plus: ^6.0.5
+  connectivity_plus: ^6.1.1
 
-  fluttertoast: ^8.2.8
+  fluttertoast: ^8.2.10
 
   media_kit: ^1.1.11
   media_kit_libs_audio: ^1.0.5    
@@ -59,25 +59,29 @@ dependencies:
   # use this version since newer versions break the notification for some cases on ColorOS.
   # TODO: update to the latest version when the issue is fixed.
   audio_service: 0.18.10
-  audio_session: ^0.1.21
+  audio_session: ^0.1.23
 
-  youtube_explode_dart: ^2.2.3
+  youtube_explode_dart: ^2.3.6
 
   audio_video_progress_bar: ^2.0.3
 
-  receive_sharing_intent: ^1.8.0
+  receive_sharing_intent: ^1.8.1
 
-  share_plus: ^10.0.3
+  share_plus: ^10.1.3
 
   url_launcher: ^6.3.1
 
   settings_ui: ^2.0.2
 
   # firebase
-  firebase_core: ^3.6.0
-  firebase_crashlytics: ^4.1.3
-  firebase_auth: ^5.3.1
-  cloud_firestore: ^5.4.4
+  firebase_core: ^3.9.0
+  firebase_crashlytics: ^4.2.0
+  firebase_auth: # ^5.3.4
+    git:
+      url: https://github.com/firebase/flutterfire.git
+      ref: e3e3944eca4ae3d29a3162b99f6ab74554556080
+      path: packages/firebase_auth/firebase_auth
+  cloud_firestore: ^5.6.0
 
   # # firebase for desktop os
   # firebase_core_desktop: ^1.0.2
@@ -85,7 +89,7 @@ dependencies:
   # # TODO: support Firestore for desktop os
 
 
-  google_sign_in: ^6.2.1
+  google_sign_in: ^6.2.2
 
   flutter_displaymode: ^0.6.0
 
@@ -108,8 +112,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   msix: ^3.16.8
-  flutter_launcher_icons: ^0.14.1
-  flutter_native_splash: ^2.4.1
+  flutter_launcher_icons: ^0.14.2
+  flutter_native_splash: ^2.4.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
