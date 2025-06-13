@@ -88,7 +88,7 @@ Future<void> main() async {
         var tempDir = (await getTemporaryDirectory()).path;
 
         final appDir = "${Platform.pathSeparator}Asterfox";
-        if (OS.isWindows) {
+        if (OS.isWindows || OS.isLinux || OS.isMacOS) {
           documentsDir += appDir;
           tempDir += appDir;
         }
