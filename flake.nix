@@ -88,7 +88,7 @@
 
             mkdir -p .git/refs/heads
             echo "ref: refs/heads/nix" > .git/HEAD
-            echo "${src}" > .git/refs/heads/nix
+            echo "${self.rev}" > .git/refs/heads/nix
           '';
 
           postFixup = ''
