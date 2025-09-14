@@ -639,12 +639,8 @@ class GoogleSignInWidget extends StatelessWidget {
       GoogleSignInAccount? googleUser;
       try {
         googleUser = await GoogleSignIn.instance.authenticate();
-      } on PlatformException catch (e) {
-        if (e.code == "sign_in_failed") {
-          Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
-        } else {
-          rethrow;
-        }
+      } on GoogleSignInException {
+        Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
       }
 
       if (googleUser == null) {
