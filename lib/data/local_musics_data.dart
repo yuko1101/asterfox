@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 
 import '../main.dart';
 import '../music/music_data/music_data.dart';

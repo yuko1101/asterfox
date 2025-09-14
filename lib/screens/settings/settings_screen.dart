@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../../main.dart';
@@ -162,9 +163,12 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                       await CloudFirestoreManager.cancelListeners();
                       await CloudFirestoreManager.waitForTasks();
+                      final signInState = GoogleSignInWidget.signInState.value;
+
                       if (GoogleSignInWidget.isAvailable &&
-                          await GoogleSignInWidget.googleSignIn.isSignedIn()) {
-                        GoogleSignInWidget.googleSignIn.disconnect();
+                          signInState
+                              is GoogleSignInAuthenticationEventSignIn) {
+                        GoogleSignIn.instance.disconnect();
                       }
                       FirebaseAuth.instance.signOut();
                     }();

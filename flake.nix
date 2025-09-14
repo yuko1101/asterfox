@@ -79,10 +79,6 @@
           autoDepsList = true;
           autoPubspecLock = "${src}/pubspec.lock";
 
-          gitHashes = {
-            firebase_auth = "sha256-JiLugiDGod07ynW7MCWCBxDtkjvqRT+dZzHbizLGMNc=";
-          };
-
           preBuild = ''
             flutter gen-l10n
 

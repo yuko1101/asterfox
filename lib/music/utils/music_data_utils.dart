@@ -1,4 +1,4 @@
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 
 import '../../system/exceptions/invalid_type_of_media_url_exception.dart';
 import '../music_data/music_data.dart';

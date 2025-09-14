@@ -623,12 +623,22 @@ class GoogleSignInWidget extends StatelessWidget {
     );
   }
 
-  static final GoogleSignIn googleSignIn = GoogleSignIn();
+  static bool _initialized = false;
+  static final ValueNotifier<GoogleSignInAuthenticationEvent?> signInState =
+      ValueNotifier(null);
   static Future<void> googleLogin(BuildContext context) async {
     final future = () async {
+      if (!_initialized) {
+        GoogleSignIn.instance.authenticationEvents.listen((event) {
+          signInState.value = event;
+        });
+        await GoogleSignIn.instance.initialize();
+        _initialized = true;
+      }
+
       GoogleSignInAccount? googleUser;
       try {
-        googleUser = await googleSignIn.signIn();
+        googleUser = await GoogleSignIn.instance.authenticate();
       } on PlatformException catch (e) {
         if (e.code == "sign_in_failed") {
           Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
@@ -637,16 +647,22 @@ class GoogleSignInWidget extends StatelessWidget {
         }
       }
 
-      if (googleUser != null) {
-        final googleAuth = await googleUser.authentication;
-
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        await FirebaseAuth.instance.signInWithCredential(credential);
+      if (googleUser == null) {
+        // The user canceled the sign-in
+        return;
       }
+
+      final authzClient = googleUser.authorizationClient;
+      final scopes = ["email", "profile"];
+
+      final authz = await authzClient.authorizeScopes(scopes);
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: authz.accessToken,
+        idToken: googleUser.authentication.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
     }();
 
     await LoadingDialog.showLoading(context: context, future: future);
