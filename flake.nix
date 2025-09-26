@@ -4,65 +4,61 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      ...
-    }:
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
     flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        fromYAMLFile =
-          path:
+      system: let
+        pkgs = import nixpkgs {
+          inherit system;
+          config = {
+            android_sdk.accept_license = true;
+            allowUnfree = true;
+          };
+        };
+        fromYAMLFile = path:
           builtins.fromJSON (
             builtins.readFile (
-              pkgs.runCommand "fromYAMLFile" { } ''
+              pkgs.runCommand "fromYAMLFile" {} ''
                 ${pkgs.remarshal}/bin/remarshal -if yaml -i "${path}" -of json -o $out
               ''
             )
           );
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
-          ];
+      in {
+        devShells.default = let
+          androidConfig = {
+            buildToolsVersion = "34.0.0";
+            platformVersion = "34";
+            abiVersion = "x86_64";
+          };
 
-          buildInputs = with pkgs; [
-          ];
+          androidComposition = pkgs.androidenv.composeAndroidPackages (with androidConfig; {
+            buildToolsVersions = [buildToolsVersion];
+            platformVersions = [platformVersion];
+            abiVersions = [abiVersion];
+          });
+          androidSdk = androidComposition.androidsdk;
 
-          packages = with pkgs; [
-            flutter
-            android-tools
-            temurin-bin-17
-          ];
+          emulator = pkgs.androidenv.emulateApp {
+            name = "emulator";
+            inherit (androidConfig) platformVersion abiVersion;
+            systemImageType = "google_apis_playstore";
+          };
+        in
+          pkgs.mkShell {
+            packages = with pkgs; [
+              flutter
+              android-tools
+              temurin-bin-17
+              androidSdk
+              emulator
+            ];
 
-          LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (
-            with pkgs;
-            [
-              # to launch android emulators (e.g. ldd path/to/android-sdk/emulator/lib64/qt/plugins/platforms/libqxcbAndroidEmu.so)
-              libpulseaudio
-              libpng
-              libdrm
-              xorg.libXi
-              xorg.libxkbfile
-              libbsd
-              xorg.libxcb
-              libxkbcommon
-              xorg.libX11
-              xcb-util-cursor
-              libcxx
-              xorg.libSM
-              xorg.libICE
-              xorg.xcbutilrenderutil
-              xorg.xcbutilkeysyms
-              xorg.xcbutilimage
-              xorg.xcbutilwm
-            ]
-          )}";
-        };
+            ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+          };
         packages.default = pkgs.flutter.buildFlutterApplication rec {
           pname = "asterfox";
           src = self;
@@ -89,7 +85,7 @@
 
           postFixup = ''
             wrapProgram $out/bin/asterfox \
-              --set LD_LIBRARY_PATH ${pkgs.lib.makeLibraryPath [ pkgs.mpv ]}
+              --set LD_LIBRARY_PATH ${pkgs.lib.makeLibraryPath [pkgs.mpv]}
           '';
         };
       }
