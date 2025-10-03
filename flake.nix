@@ -39,6 +39,8 @@
             buildToolsVersions = [buildToolsVersion];
             platformVersions = [platformVersion];
             abiVersions = [abiVersion];
+            includeNDK = true;
+            ndkVersion = "26.3.11579264";
           });
           androidSdk = androidComposition.androidsdk;
 
@@ -48,16 +50,17 @@
             systemImageType = "google_apis_playstore";
           };
         in
-          pkgs.mkShell {
+          pkgs.mkShell rec {
             packages = with pkgs; [
               flutter
               android-tools
-              temurin-bin-17
-              androidSdk
+              temurin-bin-21
+              # androidSdk
               emulator
             ];
 
-            ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+            # ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+            # ANDROID_NDK_ROOT = "${ANDROID_SDK_ROOT}/ndk-bundle";
           };
         packages.default = pkgs.flutter.buildFlutterApplication rec {
           pname = "asterfox";

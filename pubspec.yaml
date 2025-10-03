@@ -3,7 +3,7 @@ description: A flutter app for music.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -54,18 +54,20 @@ dependencies:
   fluttertoast: ^8.2.10
 
   media_kit: ^1.1.11
-  media_kit_libs_audio: ^1.0.5    
+  media_kit_libs_audio: ^1.0.5
 
-  # use this version since newer versions break the notification for some cases on ColorOS.
-  # TODO: update to the latest version when the issue is fixed.
-  audio_service: 0.18.10
+  # TODO: fix notification
+  audio_service: ^0.18.18
   audio_session: ^0.1.23
 
   youtube_explode_dart: ^2.5.2
 
   audio_video_progress_bar: ^2.0.3
 
-  receive_sharing_intent: ^1.8.1
+  receive_sharing_intent:
+    git:
+      url: https://github.com/KasemJaffer/receive_sharing_intent
+      ref: 2cea396843cd3ab1b5ec4334be4233864637874e
 
   share_plus: ^12.0.0
 
@@ -84,18 +86,14 @@ dependencies:
   # firebase_auth_desktop: ^1.0.2
   # # TODO: support Firestore for desktop os
 
-
   google_sign_in: ^7.1.1
 
   flutter_displaymode: ^0.6.0
-
-  wear: ^1.1.0
 
   device_info_plus: ^12.1.0
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
   colored_json: ^1.1.2
-  
 
 dev_dependencies:
   flutter_test:
@@ -116,7 +114,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -124,15 +121,14 @@ flutter:
 
   generate: true
 
-
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
-    - .git/HEAD         # This file points out the current branch of the project.
-    - .git/refs/heads/  # This directory includes files for each branch which points to the last commit id (local repo).
+    - .git/HEAD # This file points out the current branch of the project.
+    - .git/refs/heads/ # This directory includes files for each branch which points to the last commit id (local repo).
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

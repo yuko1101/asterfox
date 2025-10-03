@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:wear/wear.dart';
 
 import '../l10n/app_localizations.dart';
 import '../main.dart';
@@ -125,22 +124,22 @@ class AsterfoxMainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isWearOS) {
-      return DefaultTextStyle(
-        style: const TextStyle(),
-        child: WatchShape(
-            builder: (_, shape, __) => AsterfoxMainWatchScreen(shape)),
-      );
-    }
+    // if (isWearOS) {
+    //   return DefaultTextStyle(
+    //     style: const TextStyle(),
+    //     child: WatchShape(
+    //         builder: (_, shape, __) => AsterfoxMainWatchScreen(shape)),
+    //   );
+    // }
     return const HomeScreen();
   }
 }
 
 // TODO: support sharing intent
 class AsterfoxMainWatchScreen extends StatelessWidget {
-  const AsterfoxMainWatchScreen(this.shape, {super.key});
+  const AsterfoxMainWatchScreen(/* this.shape , */ {super.key});
 
-  final WearShape shape;
+  // final WearShape shape;
 
   @override
   Widget build(BuildContext context) {

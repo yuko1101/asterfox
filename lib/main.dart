@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:wear/wear.dart';
 
 import 'data/custom_colors.dart';
 import 'data/device_settings_data.dart';
@@ -70,12 +69,14 @@ Future<void> main() async {
         overlays: [SystemUiOverlay.top],
       );
 
-      try {
-        await Wear.instance.getShape();
-        isWearOS = true;
-      } on Exception {
-        isWearOS = false;
-      }
+      // TODO: disabled wear os detection for now
+      // try {
+      //   await Wear.instance.getShape();
+      //   isWearOS = true;
+      // } on Exception {
+      //   isWearOS = false;
+      // }
+      isWearOS = false;
 
       if (OS.isAndroid) {
         final modes = await FlutterDisplayMode.supported;
