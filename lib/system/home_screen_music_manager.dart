@@ -107,7 +107,19 @@ class HomeScreenMusicManager {
               );
             }
           }
-          await musicManager.add(song);
+          try {
+            await musicManager.add(song);
+          } on Exception catch (e) {
+            errorListNotifier.value = errorListNotifier.value.toList()
+              ..add(
+                ResultFailedReason(
+                  cause: e,
+                  title: l10n.value.something_went_wrong,
+                  description: e.toString(),
+                ),
+              );
+            return;
+          }
           completer.complete();
         }(),
       ),
