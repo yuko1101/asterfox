@@ -16,7 +16,7 @@ class AppTheme {
     ThemeData(
       brightness: Brightness.light,
       appBarTheme: const AppBarTheme(
-        color: Colors.white,
+        backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -45,7 +45,7 @@ class AppTheme {
     ThemeData(
       brightness: Brightness.dark,
       appBarTheme: AppBarTheme(
-        color: getMaterialColor(Colors.black87),
+        backgroundColor: getMaterialColor(Colors.black87),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
@@ -53,7 +53,6 @@ class AppTheme {
         ),
       ),
       scaffoldBackgroundColor: getGrey(20),
-      dialogBackgroundColor: getGrey(20),
       focusColor: Colors.orange,
       drawerTheme: DrawerThemeData(
         backgroundColor: getGrey(20),
@@ -72,6 +71,7 @@ class AppTheme {
         ),
         ThemeOptions(shadow: ShadowLevel.low),
       ],
+      dialogTheme: DialogThemeData(backgroundColor: getGrey(20)),
     )
   ];
 

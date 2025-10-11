@@ -165,7 +165,7 @@ class OptionSwitchState extends State<OptionSwitch> {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      activeColor: widget.activeColor,
+      activeThumbColor: widget.activeColor,
       activeThumbImage: widget.activeThumbImage,
       activeTrackColor: widget.activeTrackColor,
       autofocus: widget.autofocus,

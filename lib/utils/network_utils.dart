@@ -46,7 +46,7 @@ class NetworkUtils {
   }
 
   /// Show a message when there is no internet connection
-  static showNetworkAccessDeniedMessage({
+  static void showNetworkAccessDeniedMessage({
     required String notConnectedMessage,
     required String notAccessibleMessage,
   }) {

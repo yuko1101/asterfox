@@ -90,14 +90,14 @@ class DownloadManager {
         _downloadingState[key]!.first.value;
   }
 
-  static _downloadStarted(String key) {
+  static void _downloadStarted(String key) {
     final notifiers = _getNotifiers(key);
     notifiers.first.value = true;
 
     downloadingNotifier.value = downloadingNotifier.value.toList()..add(key);
   }
 
-  static _downloadFinished(String key) {
+  static void _downloadFinished(String key) {
     _downloadingState.remove(key);
 
     downloadingNotifier.value = downloadingNotifier.value.toList()..remove(key);
