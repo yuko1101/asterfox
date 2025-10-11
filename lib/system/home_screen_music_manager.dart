@@ -77,7 +77,18 @@ class HomeScreenMusicManager {
           } on NetworkException {
             Fluttertoast.showToast(msg: l10n.value.network_not_accessible);
             return;
+          } on Exception catch (e) {
+            errorListNotifier.value = errorListNotifier.value.toList()
+              ..add(
+                ResultFailedReason(
+                  cause: e,
+                  title: l10n.value.something_went_wrong,
+                  description: e.toString(),
+                ),
+              );
+            return;
           }
+
           songTitleNotifier.value = song.title;
 
           if (autoDownload) {
