@@ -60,7 +60,8 @@ dependencies:
   audio_service: ^0.18.18
   audio_session: ^0.1.23
 
-  youtube_explode_dart: ^2.5.2
+  # stick to 2.3.9 due to an issue with resolving audioUrl in 2.3.10 and later
+  youtube_explode_dart: 2.3.9
 
   audio_video_progress_bar: ^2.0.3
 
