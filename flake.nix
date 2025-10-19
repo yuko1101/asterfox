@@ -78,12 +78,16 @@
           autoDepsList = true;
           autoPubspecLock = "${src}/pubspec.lock";
 
+          gitHashes = {
+            receive_sharing_intent = "sha256-8D5ZENARPZ7FGrdIErxOoV3Ao35/XoQ2tleegI42ZUY=";
+          };
+
           preBuild = ''
             flutter gen-l10n
 
             mkdir -p .git/refs/heads
             echo "ref: refs/heads/nix" > .git/HEAD
-            echo "${self.rev}" > .git/refs/heads/nix
+            echo "${self.rev or "unknown"}" > .git/refs/heads/nix
           '';
 
           postFixup = ''
