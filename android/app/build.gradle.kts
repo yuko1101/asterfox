@@ -3,6 +3,7 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.chaquo.python")
 }
 
 android {
@@ -20,6 +21,12 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        python {
+            version "3.8"
+        }
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -36,3 +43,13 @@ kotlin {
 }
 
 flutter { source = "../.." }
+
+chaquopy {
+    defaultConfig {
+        version = "3.11"
+        buildPython("/nix/store/gf7b5x6vh2g3bq054lm5pj7zqzfx7vjc-python3-3.11.13/bin/python")
+        pip {
+            install("yt-dlp")
+        }
+    }
+}

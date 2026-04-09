@@ -53,7 +53,8 @@
           pkgs.mkShell rec {
             packages = with pkgs; [
               flutter
-              android-tools
+              android-tools # this provides python 3.13 which is the same version as chaquopy's python
+              python311
               temurin-bin-21
               # androidSdk
               emulator

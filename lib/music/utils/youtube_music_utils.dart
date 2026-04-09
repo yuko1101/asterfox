@@ -15,13 +15,12 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  static Future<StreamInfo> getStreamInfo(
-      String videoId, YoutubeExplode? yt) async {
+  static Future<String> getAudioUrl(String videoId, YoutubeExplode? yt) async {
     NetworkUtils.check();
 
     return withYT(yt, (yt) async {
       final manifest = await yt.videos.streamsClient.getManifest(videoId);
-      return manifest.audioOnly.withHighestBitrate();
+      return manifest.audioOnly.withHighestBitrate().url.toString();
     });
   }
 
@@ -44,11 +43,11 @@ class YouTubeMusicUtils {
     } else {
       NetworkUtils.check();
 
-      final streamInfo = await getStreamInfo(videoId, yt);
+      final remoteAudioUrl = await getAudioUrl(videoId, yt);
 
       return getFromVideo(
         video: video,
-        streamInfo: streamInfo,
+        remoteAudioUrl: remoteAudioUrl,
         caching: caching,
       );
     }
@@ -125,11 +124,11 @@ class YouTubeMusicUtils {
       return song;
     }
 
-    final streamInfo = await getStreamInfo(video.id.value, yt);
+    final remoteAudioUrl = await getAudioUrl(video.id.value, yt);
 
     return await getFromVideo(
       video: video,
-      streamInfo: streamInfo,
+      remoteAudioUrl: remoteAudioUrl,
       caching: caching,
     );
   }
@@ -137,7 +136,7 @@ class YouTubeMusicUtils {
   // even if the song is stored, this fetches it from remote.
   static Future<YouTubeMusicData<T>> getFromVideo<T extends Caching>({
     required Video video,
-    required StreamInfo streamInfo,
+    required String remoteAudioUrl,
     required T caching,
   }) async {
     String imageUrl = video.thumbnails.maxResUrl;
@@ -155,12 +154,12 @@ class YouTubeMusicUtils {
       duration: video.duration ?? Duration.zero,
       keywords: video.keywords,
       volume: 1.0,
+      remoteAudioUrl: remoteAudioUrl,
       remoteImageUrl: imageUrl,
       lyrics: "", // TODO: by default, get from closed captions
       songStoredAt: null,
       size: null,
       caching: caching,
-      streamInfo: streamInfo,
     );
   }
 
