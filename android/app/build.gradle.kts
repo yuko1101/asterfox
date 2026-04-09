@@ -44,6 +44,7 @@ flutter { source = "../.." }
 chaquopy {
     defaultConfig {
         version = "3.11"
+        buildPython("python")
         pip {
             install("yt-dlp")
         }
