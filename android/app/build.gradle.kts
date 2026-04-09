@@ -21,9 +21,6 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        python {
-            version "3.8"
-        }
         ndk {
             abiFilters += listOf("arm64-v8a", "x86_64")
         }
@@ -47,7 +44,6 @@ flutter { source = "../.." }
 chaquopy {
     defaultConfig {
         version = "3.11"
-        buildPython("/nix/store/gf7b5x6vh2g3bq054lm5pj7zqzfx7vjc-python3-3.11.13/bin/python")
         pip {
             install("yt-dlp")
         }
