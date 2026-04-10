@@ -43,7 +43,7 @@ class DownloadManager {
     // download
     await ImageDownloader.download(song);
 
-    final bytesNotifier = ValueNotifier<Pair<int, int>>(Pair(0, 0));
+    final bytesNotifier = ValueNotifier<Pair<int, int>>(Pair(0, 1));
     bytesNotifier.addListener(() {
       notifiers.second.value =
           bytesNotifier.value.first * 100 ~/ bytesNotifier.value.second;

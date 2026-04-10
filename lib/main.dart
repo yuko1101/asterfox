@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_ytdlp_plugin/flutter_ytdlp_plugin.dart';
 
 import 'data/custom_colors.dart';
 import 'data/device_settings_data.dart';
@@ -48,7 +47,6 @@ late final String localPath;
 late final String tempPath;
 
 final LateValueNotifier<AppLocalizations> l10n = LateValueNotifier();
-final ytdlp = FlutterYtdlpPlugin();
 
 Future<void> main() async {
   await runZonedGuarded<Future<void>>(

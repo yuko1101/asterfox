@@ -408,10 +408,9 @@ packages:
   flutter_ytdlp_plugin:
     dependency: "direct main"
     description:
-      name: flutter_ytdlp_plugin
-      sha256: "03b45e7b04392a70c80ad1ea78748e432795f00eb222ac50fda75f4a68cc0c73"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../flutter_ytdlp_plugin"
+      relative: true
+    source: path
     version: "2.0.2"
   fluttertoast:
     dependency: "direct main"

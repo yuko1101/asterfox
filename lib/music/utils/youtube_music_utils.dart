@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_ytdlp_plugin/flutter_ytdlp_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -18,10 +19,30 @@ class YouTubeMusicUtils {
   static Future<String> getAudioUrl(String videoId, YoutubeExplode? yt) async {
     NetworkUtils.check();
 
-    return withYT(yt, (yt) async {
-      final manifest = await yt.videos.streamsClient.getManifest(videoId);
-      return manifest.audioOnly.withHighestBitrate().url.toString();
-    });
+    final streams = await FlutterYtdlpPlugin.getAudioStreams(
+      videoId,
+    );
+
+    if (streams.isEmpty) {
+      throw VideoUnplayableException(
+          "No audio streams found for video ID: $videoId");
+    }
+
+    var highestBitrate = 0.0;
+    var highestBitrateUrl = "";
+    for (final stream in streams) {
+      if (stream["bitrate"] > highestBitrate) {
+        highestBitrate = stream["bitrate"];
+        highestBitrateUrl = stream["url"] as String;
+      }
+    }
+
+    return highestBitrateUrl;
+
+    // return withYT(yt, (yt) async {
+    //   final manifest = await yt.videos.streamsClient.getManifest(videoId);
+    //   return manifest.audioOnly.withHighestBitrate().url.toString();
+    // });
   }
 
   /// Throws [NetworkException] if the network is not accessible.

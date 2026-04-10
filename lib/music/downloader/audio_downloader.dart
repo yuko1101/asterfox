@@ -13,6 +13,7 @@ class AudioDownloader {
     String? customPath,
     ValueNotifier<Pair<int, int>>? bytesNotifier,
   }) async {
+    print("Starting audio download for ${song.title}: ${song.remoteAudioUrl}");
     final path = customPath ?? song.audioSavePath;
     final file = File(path);
     if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
@@ -24,6 +25,12 @@ class AudioDownloader {
     final client = http.Client();
     final request = http.Request('GET', Uri.parse(url));
     final response = await client.send(request);
+
+    if (response.statusCode != 200) {
+      client.close();
+      throw Exception(
+          "Failed to download audio. Status code: ${response.statusCode}");
+    }
 
     final audioStream = response.stream;
     if (bytesNotifier != null) {
