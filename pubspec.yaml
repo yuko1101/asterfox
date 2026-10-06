@@ -60,7 +60,11 @@ dependencies:
   audio_service: ^0.18.18
   audio_session: ^0.1.23
 
-  youtube_explode_dart: ^3.0.5
+  youtube_explode_dart: #^3.0.5
+    git:
+      url: https://github.com/Bikram-Kumar/youtube_explode_dart.git
+      branch: master
+      ref: 6f28a8bf0f00c1ef7073c335bafe48f8bab05edc
   flutter_ytdlp_plugin: #^2.0.2
     path: ../flutter_ytdlp_plugin
 
