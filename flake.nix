@@ -19,6 +19,9 @@
             allowUnfree = true;
           };
         };
+        # nixpkgs' `flutter` tracks the newest stable (3.47 here); this app is built
+        # against the 3.35 line it was developed on.
+        flutter = pkgs.flutter335;
         fromYAMLFile = path:
           builtins.fromJSON (
             builtins.readFile (
@@ -30,23 +33,33 @@
       in {
         devShells.default = let
           androidConfig = {
-            buildToolsVersion = "34.0.0";
-            platformVersion = "34";
+            # AGP defaults to build-tools 35.0.0, while the app's compileSdk 36 wants
+            # 36.0.0.
+            buildToolsVersions = ["35.0.0" "36.0.0"];
+            # The app compiles against 36, but plugins still declare their own older
+            # compileSdk (media_kit_libs_android_audio 31, flutter_displaymode 33,
+            # audio_session 34, ...). AGP fails the build when a plugin's platform is
+            # absent, and it cannot install it because this SDK is read-only.
+            platformVersions = ["31" "32" "33" "34" "35" "36"];
+            # a native dependency configures CMake through the SDK's own cmake package
+            cmakeVersions = ["3.22.1"];
             abiVersion = "x86_64";
+            ndkVersion = "27.0.12077973";
+            emulatorPlatformVersion = "36";
           };
 
           androidComposition = pkgs.androidenv.composeAndroidPackages (with androidConfig; {
-            buildToolsVersions = [buildToolsVersion];
-            platformVersions = [platformVersion];
+            inherit buildToolsVersions platformVersions cmakeVersions;
             abiVersions = [abiVersion];
             includeNDK = true;
-            ndkVersion = "26.3.11579264";
+            inherit ndkVersion;
           });
           androidSdk = androidComposition.androidsdk;
 
           emulator = pkgs.androidenv.emulateApp {
             name = "emulator";
-            inherit (androidConfig) platformVersion abiVersion;
+            platformVersion = androidConfig.emulatorPlatformVersion;
+            abiVersion = androidConfig.abiVersion;
             systemImageType = "google_apis_playstore";
           };
         in
@@ -56,14 +69,23 @@
               android-tools # this provides python 3.13 which is the same version as chaquopy's python
               python311
               temurin-bin-21
-              # androidSdk
+              androidSdk
               emulator
             ];
 
-            # ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
-            # ANDROID_NDK_ROOT = "${ANDROID_SDK_ROOT}/ndk-bundle";
+            ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
+            ANDROID_SDK_ROOT = ANDROID_HOME;
+            ANDROID_NDK_ROOT = "${androidSdk}/libexec/android-sdk/ndk/${androidConfig.ndkVersion}";
+            JAVA_HOME = "${pkgs.temurin-bin-21}";
+
+            # flutter prefers its own settings file (~/.config/flutter/settings) over
+            # ANDROID_HOME when locating the SDK, and that file outlives this repo, so a
+            # stale path in it would outlive any change to the SDK in this flake.
+            shellHook = ''
+              flutter config --android-sdk "$ANDROID_SDK_ROOT" >/dev/null 2>&1 || true
+            '';
           };
-        packages.default = pkgs.flutter.buildFlutterApplication rec {
+        packages.default = flutter.buildFlutterApplication rec {
           pname = "asterfox";
           src = self;
           version = (fromYAMLFile "${src}/pubspec.yaml").version;
