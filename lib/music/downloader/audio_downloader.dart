@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 
 import '../../utils/pair.dart';
 import '../music_data/music_data.dart';
+import '../music_data/youtube_music_data.dart';
+import '../utils/youtube_music_utils.dart';
 import 'audio_info.dart';
 
 class AudioDownloader {
@@ -13,28 +15,38 @@ class AudioDownloader {
     String? customPath,
     ValueNotifier<Pair<int, int>>? bytesNotifier,
   }) async {
-    print("Starting audio download for ${song.title}: ${song.remoteAudioUrl}");
+    if (song is YouTubeMusicData) {
+      return await _downloadYouTubeAudio(
+        song,
+        null,
+        customPath: customPath,
+        bytesNotifier: bytesNotifier,
+      );
+    } else {
+      throw UnimplementedError(
+          "Downloading ${song.type} is not implemented yet.");
+    }
+  }
+
+  static Future<AudioInfo> _downloadYouTubeAudio(
+    YouTubeMusicData song,
+    YoutubeExplode? yt, {
+    String? customPath,
+    ValueNotifier<Pair<int, int>>? bytesNotifier,
+  }) async {
     final path = customPath ?? song.audioSavePath;
     final file = File(path);
     if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
 
-    final url = await song.isAudioUrlAvailable()
-        ? song.remoteAudioUrl
-        : await song.refreshAudioUrl();
+    final ytContainer = YTContainer(yt);
+    final streamInfo =
+        (song.streamInfo == null || !await song.isAudioUrlAvailable())
+            ? await song.refreshStreamInfo(ytContainer.get())
+            : song.streamInfo!;
 
-    final client = http.Client();
-    final request = http.Request('GET', Uri.parse(url));
-    final response = await client.send(request);
-
-    if (response.statusCode != 200) {
-      client.close();
-      throw Exception(
-          "Failed to download audio. Status code: ${response.statusCode}");
-    }
-
-    final audioStream = response.stream;
+    final audioStream = ytContainer.get().videos.streamsClient.get(streamInfo);
     if (bytesNotifier != null) {
-      bytesNotifier.value = Pair(0, response.contentLength!);
+      bytesNotifier.value = Pair(0, streamInfo.size.totalBytes);
     }
 
     final fileStream = file.openWrite(mode: FileMode.writeOnlyAppend);
@@ -48,9 +60,8 @@ class AudioDownloader {
       }
     }
     await fileStream.close();
-    client.close();
+    ytContainer.close();
 
-    // TODO: get the extension from audioInfo
-    return AudioInfo(extension: "m4a");
+    return AudioInfo(extension: streamInfo.container.name);
   }
 }

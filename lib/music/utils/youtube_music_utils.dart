@@ -15,32 +15,12 @@ class YouTubeMusicUtils {
   /// Throws [NetworkException] if the network is not accessible.
   ///
   /// Throws [VideoUnplayableException] if the video is not playable.
-  static Future<String> getAudioUrl(String videoId, YoutubeExplode? yt) async {
+  static Future<StreamInfo> getStreamInfo(
+      String videoId, YoutubeExplode? yt) async {
     NetworkUtils.check();
-
-    // final streams = await FlutterYtdlpPlugin.getAudioStreams(
-    //   videoId,
-    // );
-
-    // if (streams.isEmpty) {
-    //   throw VideoUnplayableException(
-    //       "No audio streams found for video ID: $videoId");
-    // }
-
-    // var highestBitrate = 0.0;
-    // var highestBitrateUrl = "";
-    // for (final stream in streams) {
-    //   if (stream["bitrate"] > highestBitrate) {
-    //     highestBitrate = stream["bitrate"];
-    //     highestBitrateUrl = stream["url"] as String;
-    //   }
-    // }
-
-    // return highestBitrateUrl;
-
     return withYT(yt, (yt) async {
       final manifest = await yt.videos.streamsClient.getManifest(videoId);
-      return manifest.audioOnly.withHighestBitrate().url.toString();
+      return manifest.audioOnly.withHighestBitrate();
     });
   }
 
@@ -63,11 +43,11 @@ class YouTubeMusicUtils {
     } else {
       NetworkUtils.check();
 
-      final remoteAudioUrl = await getAudioUrl(videoId, yt);
+      final streamInfo = await getStreamInfo(videoId, yt);
 
       return getFromVideo(
         video: video,
-        remoteAudioUrl: remoteAudioUrl,
+        streamInfo: streamInfo,
         caching: caching,
       );
     }
@@ -144,11 +124,11 @@ class YouTubeMusicUtils {
       return song;
     }
 
-    final remoteAudioUrl = await getAudioUrl(video.id.value, yt);
+    final streamInfo = await getStreamInfo(video.id.value, yt);
 
     return await getFromVideo(
       video: video,
-      remoteAudioUrl: remoteAudioUrl,
+      streamInfo: streamInfo,
       caching: caching,
     );
   }
@@ -156,7 +136,7 @@ class YouTubeMusicUtils {
   // even if the song is stored, this fetches it from remote.
   static Future<YouTubeMusicData<T>> getFromVideo<T extends Caching>({
     required Video video,
-    required String remoteAudioUrl,
+    required StreamInfo streamInfo,
     required T caching,
   }) async {
     String imageUrl = video.thumbnails.maxResUrl;
@@ -174,7 +154,7 @@ class YouTubeMusicUtils {
       duration: video.duration ?? Duration.zero,
       keywords: video.keywords,
       volume: 1.0,
-      remoteAudioUrl: remoteAudioUrl,
+      streamInfo: streamInfo,
       remoteImageUrl: imageUrl,
       lyrics: "", // TODO: by default, get from closed captions
       songStoredAt: null,

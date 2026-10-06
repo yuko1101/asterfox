@@ -8,7 +8,6 @@ import 'music_data.dart';
 class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   YouTubeMusicData({
     required this.id,
-    required super.remoteAudioUrl,
     required super.remoteImageUrl,
     required super.title,
     required super.description,
@@ -21,13 +20,16 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     required super.size,
     required super.caching,
     required this.authorId,
+    this.streamInfo,
   }) : super(
           type: MusicType.youtube,
           audioId: id,
+          remoteAudioUrl: streamInfo?.url.toString() ?? "",
         );
 
   final String id;
   final String authorId;
+  StreamInfo? streamInfo;
 
   @override
   String get mediaURL => "https://www.youtube.com/watch?v=$id";
@@ -51,9 +53,8 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     print("refreshing youtube audio url...");
     final yt = YoutubeExplode();
     try {
-      final url = await YouTubeMusicUtils.getAudioUrl(id, yt);
-      remoteAudioUrl = url;
-      return url;
+      final streamInfo = await refreshStreamInfo(yt);
+      return streamInfo.url.toString();
     } on NetworkException {
       throw RefreshUrlFailedException();
     } on VideoUnplayableException {
@@ -61,6 +62,20 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
     } finally {
       yt.close();
     }
+  }
+
+  Future<StreamInfo> refreshStreamInfo(YoutubeExplode? yt) async {
+    final streamInfo = await YouTubeMusicUtils.getStreamInfo(id, yt);
+    this.streamInfo = streamInfo;
+    remoteAudioUrl = streamInfo.url.toString();
+    return streamInfo;
+  }
+
+  @override
+  String get remoteAudioUrl => streamInfo?.url.toString() ?? "";
+  @override
+  set remoteAudioUrl(String _) {
+    // do nothing, because the url is stored in streamInfo.
   }
 
   final _expiresRegex = RegExp("expire=([0-9]+)");
@@ -88,7 +103,6 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   }) {
     return YouTubeMusicData(
       id: json["id"] as String,
-      remoteAudioUrl: "",
       remoteImageUrl: json["remoteImageUrl"] as String,
       title: json["title"] as String,
       description: json["description"] as String,
