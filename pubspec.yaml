@@ -65,8 +65,6 @@ dependencies:
       url: https://github.com/Bikram-Kumar/youtube_explode_dart.git
       branch: master
       ref: 6f28a8bf0f00c1ef7073c335bafe48f8bab05edc
-  flutter_ytdlp_plugin: #^2.0.2
-    path: ../flutter_ytdlp_plugin
 
   audio_video_progress_bar: ^2.0.3
 

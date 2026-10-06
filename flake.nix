@@ -81,6 +81,7 @@
 
           gitHashes = {
             receive_sharing_intent = "sha256-8D5ZENARPZ7FGrdIErxOoV3Ao35/XoQ2tleegI42ZUY=";
+            youtube_explode_dart = "sha256-lKjNaQqi58vBZ12Nvx/kYJ/35kHxeyFiZEajyF4Pt5A=";
           };
 
           preBuild = ''
