@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'data/custom_colors.dart';
+import 'data/database.dart';
 import 'data/device_settings_data.dart';
 import 'data/local_musics_data.dart';
 import 'data/playlist_data.dart';
@@ -108,6 +110,15 @@ Future<void> main() async {
       // await player.open(
       //   Playlist([Media("https://drive.google.com/uc?export=download&id=1IX4JIZSEN6ZiIHDo8U5JNkojfwzKBXp0")]),
       // );
+
+      // The database must be opened before the data classes read their data.
+      await AppDatabase.open();
+
+      // The auth state decides whose data they read, so it runs before them.
+      if (shouldInitializeFirebase) {
+        await FirebaseAuth.instance.authStateChanges().first;
+        AppDatabase.currentUser = FirebaseAuth.instance.currentUser?.uid;
+      }
 
       await SettingsData.init();
       await SettingsData.applySettings();

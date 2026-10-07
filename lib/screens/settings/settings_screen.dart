@@ -92,12 +92,9 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 description: Text(l10n.value.auto_download_description),
                 initialValue: SettingsData.getValue(key: "autoDownload"),
                 activeSwitchColor: CustomColors.getColor("accent"),
-                onToggle: (value) {
-                  setState(() {
-                    SettingsData.settings
-                        .set(key: "autoDownload", value: value);
-                    SettingsData.save();
-                  });
+                onToggle: (value) async {
+                  await SettingsData.setValue(
+                      key: "autoDownload", value: value);
                 },
               ),
               SettingsTile.switchTile(
@@ -115,12 +112,9 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                 initialValue:
                     SettingsData.getValue(key: "disableInterruptions"),
                 activeSwitchColor: CustomColors.getColor("accent"),
-                onToggle: (value) {
-                  setState(() {
-                    SettingsData.settings
-                        .set(key: "disableInterruptions", value: value);
-                    SettingsData.save();
-                  });
+                onToggle: (value) async {
+                  await SettingsData.setValue(
+                      key: "disableInterruptions", value: value);
                 },
               ),
               SettingsTile.navigation(

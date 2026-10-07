@@ -55,14 +55,9 @@ class _ThemeChoiceState extends State<_ThemeChoice> {
                   title: Text(l10n.value.theme_names(name)),
                   value: name,
                   groupValue: AppTheme.themeNotifier.value.themeDetails.name,
-                  activeColor:
-                      Color(CustomColors.data.getValue("accent") as int),
+                  activeColor: CustomColors.getColor("accent"),
                   onChanged: (value) {
-                    setState(
-                      () {
-                        AppTheme.setTheme(value as String);
-                      },
-                    );
+                    AppTheme.setTheme(value as String);
                   }))
               .map((radioListTile) => CustomSettingsTile(child: radioListTile))
               .toList(),

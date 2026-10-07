@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   media_kit_libs_windows_audio
   share_plus
+  sqlite3_flutter_libs
   url_launcher_windows
 )
 

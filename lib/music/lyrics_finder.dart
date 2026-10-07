@@ -27,10 +27,7 @@ class LyricsFinder {
 
     // 保存されているデータを更新
     if (song.isStored) {
-      await LocalMusicsData.localMusicData
-          .get([song.audioId])
-          .set(key: "lyrics", value: lyrics)
-          .save(compact: LocalMusicsData.compact);
+      await LocalMusicsData.save(song);
       await CloudFirestoreManager.addOrUpdateSongs([song]);
     }
   }

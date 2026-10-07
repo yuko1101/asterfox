@@ -60,10 +60,7 @@ class DownloadManager {
     song.size = await Directory(song.directoryPath).length;
     // if the song has already stored, update file size property and save.
     if (song.isStored) {
-      await LocalMusicsData.localMusicData
-          .get([song.audioId])
-          .set(key: "size", value: song.size)
-          .save(compact: LocalMusicsData.compact);
+      await LocalMusicsData.save(song);
       await CloudFirestoreManager.addOrUpdateSongs([song]);
     }
 

@@ -80,7 +80,7 @@ class AppTheme {
       throw Exception("theme not found");
     }
     themeNotifier.value = getTheme(name);
-    SettingsData.settings.set(key: "theme", value: name);
+    await SettingsData.setValue(key: "theme", value: name);
     await SettingsData.save();
   }
 
