@@ -40,21 +40,13 @@ class PlaylistsData {
   }
 
   static Future<void> _upsert(String id, Map<String, dynamic> entry) async {
-    await _db.into(_db.documents).insert(
-          DocumentsCompanion.insert(
-            scope: _scope,
-            id: id,
-            json: jsonEncode(entry),
-          ),
-          onConflict: DoUpdate(
-            (old) => DocumentsCompanion.insert(
-              scope: _scope,
-              id: id,
-              json: jsonEncode(entry),
-            ),
-            target: [_db.documents.scope, _db.documents.id],
-          ),
-        );
+    await _db.documents.insertOnConflictUpdate(
+      DocumentsCompanion.insert(
+        scope: _scope,
+        id: id,
+        json: jsonEncode(entry),
+      ),
+    );
   }
 
   static List<AppPlaylist> getAll() {
@@ -99,6 +91,9 @@ class PlaylistsData {
     }
   }
 
+  /// The stored entries, in the shape the cloud stores them.
+  static Map<String, dynamic> getStoredData() => _data;
+
   /// Replaces the stored playlists, for example when importing an export.
   static Future<void> replaceAll(Map<String, dynamic> json) async {
     _data
@@ -107,18 +102,10 @@ class PlaylistsData {
         for (final entry in json.entries)
           entry.key: Map<String, dynamic>.from(entry.value as Map)
       });
-    await _db.transaction(() async {
-      await (_db.delete(_db.documents)
-            ..where((table) => table.scope.equals(_scope)))
-          .go();
-      for (final entry in _data.entries) {
-        await _upsert(entry.key, entry.value);
-      }
-    });
+    for (final entry in _data.entries) {
+      await _upsert(entry.key, entry.value);
+    }
   }
-
-  /// The stored entries, in the shape the cloud stores them.
-  static Map<String, dynamic> getStoredData() => _data;
 
   static Future<void> clear() async {
     _data.clear();

@@ -51,25 +51,16 @@ class SettingsData {
   static Future<void> setValue(
       {required String key, required dynamic value}) async {
     _data[key] = value;
-    await _db.into(_db.settingsEntries).insert(
-          SettingsEntriesCompanion.insert(
-            scope: _scope,
-            key: key,
-            value: jsonEncode(value),
-          ),
-          onConflict: DoUpdate(
-            (_) => SettingsEntriesCompanion.insert(
-              scope: _scope,
-              key: key,
-              value: jsonEncode(value),
-            ),
-            target: [_db.settingsEntries.scope, _db.settingsEntries.key],
-          ),
-        );
+    await _db.settingsEntries.insertOnConflictUpdate(
+      SettingsEntriesCompanion.insert(
+        scope: _scope,
+        key: key,
+        value: jsonEncode(value),
+      ),
+    );
   }
 
-  /// Removes the stored values and puts the defaults back, like the config
-  /// file it replaces did.
+  /// Removes the stored values and puts the defaults back.
   static Future<void> resetData() async {
     _data
       ..clear()
@@ -91,10 +82,9 @@ class SettingsData {
     }
   }
 
-  static Future<void> save({bool upload = true}) async {
+  static Future<void> save() async {
     if (shouldInitializeFirebase &&
-        FirebaseAuth.instance.currentUser != null &&
-        upload) {
+        FirebaseAuth.instance.currentUser != null) {
       await CloudFirestoreManager.updateUserData();
     }
   }

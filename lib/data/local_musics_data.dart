@@ -166,21 +166,13 @@ class LocalMusicsData {
   }
 
   static Future<void> _upsert(String audioId, Map<String, dynamic> entry) async {
-    await _db.into(_db.documents).insert(
-          DocumentsCompanion.insert(
-            scope: _scope,
-            id: audioId,
-            json: jsonEncode(entry),
-          ),
-          onConflict: DoUpdate(
-            (old) => DocumentsCompanion.insert(
-              scope: _scope,
-              id: audioId,
-              json: jsonEncode(entry),
-            ),
-            target: [_db.documents.scope, _db.documents.id],
-          ),
-        );
+    await _db.documents.insertOnConflictUpdate(
+      DocumentsCompanion.insert(
+        scope: _scope,
+        id: audioId,
+        json: jsonEncode(entry),
+      ),
+    );
   }
 
   static Future<void> _delete(String audioId) async {

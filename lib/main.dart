@@ -141,7 +141,7 @@ Future<void> main() async {
         await CloudFirestoreManager.init();
       }
 
-      await CustomColors.load();
+      await CustomColors.init();
       await SongHistoryData.init(musicManager);
 
       HomeScreen.processNotificationList = ProcessNotificationList();

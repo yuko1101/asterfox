@@ -62,21 +62,13 @@ class SongHistoryData {
   }
 
   static Future<void> _save(Map<String, dynamic> entry) async {
-    await _db.into(_db.documents).insert(
-          DocumentsCompanion.insert(
-            scope: _scope,
-            id: entry["audioId"] as String,
-            json: jsonEncode(entry),
-          ),
-          onConflict: DoUpdate(
-            (old) => DocumentsCompanion.insert(
-              scope: _scope,
-              id: entry["audioId"] as String,
-              json: jsonEncode(entry),
-            ),
-            target: [_db.documents.scope, _db.documents.id],
-          ),
-        );
+    await _db.documents.insertOnConflictUpdate(
+      DocumentsCompanion.insert(
+        scope: _scope,
+        id: entry["audioId"] as String,
+        json: jsonEncode(entry),
+      ),
+    );
   }
 
   static List<Map<String, dynamic>> getAll() => _data;

@@ -63,7 +63,22 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          // v1 stored the colors under "__custom_colors", before the scopes
+          // below were grouped under the device scope.
+          if (from < 2) {
+            await customStatement('''
+              UPDATE settings_entries SET scope = ?
+               WHERE scope = '__custom_colors'
+            ''', [AppScopes.customColors]);
+          }
+        },
+      );
 
   static AppDatabase? _instance;
 
@@ -88,8 +103,8 @@ class AppDatabase extends _$AppDatabase {
 
   /// Imports the JSON files this app used to store its data in.
   ///
-  /// The database must be empty; existing ids are kept as they are. The web
-  /// build never had files to import.
+  /// A row that is already stored wins, so this can run on every start. The
+  /// web build never had files to import.
   Future<void> importLegacyJsonFiles(String path) async {
     if (kIsWeb) return;
 
@@ -113,9 +128,10 @@ class AppDatabase extends _$AppDatabase {
     // settings.json, device_settings.json and custom_colors.json are all single
     // objects whose entries become key-value pairs.
     await _importSettings(File('$path/settings.json'), AppScopes.settings);
-    await _importSettings(File('$path/device_settings.json'),
-        '${AppScopes.local}/${AppScopes.deviceSettings}');
-    await _importSettings(File('$path/custom_colors.json'), AppScopes.customColors);
+    await _importSettings(
+        File('$path/device_settings.json'), AppScopes.deviceSettings);
+    await _importSettings(
+        File('$path/custom_colors.json'), AppScopes.customColors);
   }
 
   /// Imports an object of documents. The object is the file itself, unless
@@ -135,35 +151,27 @@ class AppDatabase extends _$AppDatabase {
       return;
     }
 
-    final List<MapEntry<String, dynamic>> entries = [];
+    // A history entry was stored inline, so its value keeps the entry's own
+    // fields next to its id.
+    final Map<String, String> entries;
     if (rootKey == null) {
-      for (final entry in (decoded as Map).entries) {
-        entries.add(MapEntry(entry.key as String, entry.value));
-      }
+      entries = {
+        for (final entry in (decoded as Map).entries)
+          entry.key as String: jsonEncode(entry.value)
+      };
     } else {
-      // A history entry was stored inline, so its value keeps the entry's own
-      // fields next to the id.
-      for (final entry in (decoded as Map)[rootKey] as List? ?? []) {
-        final map = Map<String, dynamic>.from(entry as Map);
-        entries.add(MapEntry(map["audioId"] as String, map));
-      }
+      entries = {
+        for (final entry in (decoded as Map)[rootKey] as List? ?? [])
+          (entry as Map)["audioId"] as String: jsonEncode(entry)
+      };
     }
 
-    await batch((batch) {
-      for (final entry in entries) {
-        batch.insert(
-          documents,
-          DocumentsCompanion.insert(
-            scope: scope,
-            id: entry.key,
-            json: jsonEncode(entry.value),
-          ),
-          mode: InsertMode.insertOrIgnore,
-        );
-      }
-    });
+    await _insertIfMissing(documents, entries, (key, json) =>
+        DocumentsCompanion.insert(scope: scope, id: key, json: json));
   }
 
+  /// Imports one of the single objects (`settings.json`, `device_settings.json`,
+  /// `custom_colors.json`), whose entries become key-value rows.
   Future<void> _importSettings(File file, String scope) async {
     if (!file.existsSync()) return;
 
@@ -176,15 +184,23 @@ class AppDatabase extends _$AppDatabase {
       return;
     }
 
-    await batch((batch) {
-      for (final entry in json.entries) {
+    await _insertIfMissing(settingsEntries, json.map(
+      (key, value) => MapEntry(key, jsonEncode(value)),
+    ), (key, value) =>
+        SettingsEntriesCompanion.insert(scope: scope, key: key, value: value));
+  }
+
+  /// Inserts [entries] into [table], skipping the rows that are stored already.
+  Future<void> _insertIfMissing<T extends Table, D>(
+    TableInfo<T, D> table,
+    Map<String, String> entries,
+    Insertable<D> Function(String key, String value) row,
+  ) {
+    return batch((batch) {
+      for (final entry in entries.entries) {
         batch.insert(
-          settingsEntries,
-          SettingsEntriesCompanion.insert(
-            scope: scope,
-            key: entry.key,
-            value: jsonEncode(entry.value),
-          ),
+          table,
+          row(entry.key, entry.value),
           mode: InsertMode.insertOrIgnore,
         );
       }

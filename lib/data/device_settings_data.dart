@@ -13,8 +13,7 @@ class DeviceSettingsData {
     "baseVolume": 1.0,
   };
 
-  static const String _scope =
-      '${AppScopes.local}/${AppScopes.deviceSettings}';
+  static const String _scope = AppScopes.deviceSettings;
 
   static final Map<String, dynamic> _data = {};
 
@@ -25,8 +24,8 @@ class DeviceSettingsData {
 
   static Future<void> init() async {
     await reloadDatabase();
-    // Store the defaults that have not been saved yet, like the config file
-    // used to be created with them.
+    // Store the defaults of the keys that are still missing, so that every
+    // stored setting has a row.
     for (final entry in defaultData.entries) {
       if (!_data.containsKey(entry.key)) {
         await setValue(key: entry.key, value: entry.value);
@@ -48,24 +47,14 @@ class DeviceSettingsData {
   static Future<void> setValue(
       {required String key, required dynamic value}) async {
     _data[key] = value;
-    await _db.into(_db.settingsEntries).insert(
-          SettingsEntriesCompanion.insert(
-            scope: _scope,
-            key: key,
-            value: jsonEncode(value),
-          ),
-          onConflict: DoUpdate(
-            (_) => SettingsEntriesCompanion.insert(
-              scope: _scope,
-              key: key,
-              value: jsonEncode(value),
-            ),
-            target: [_db.settingsEntries.scope, _db.settingsEntries.key],
-          ),
-        );
+    await _db.settingsEntries.insertOnConflictUpdate(
+      SettingsEntriesCompanion.insert(
+        scope: _scope,
+        key: key,
+        value: jsonEncode(value),
+      ),
+    );
   }
-
-  static Future<void> apply() async {}
 
   static dynamic getValue({String? key, List<String>? keys}) {
     if (key == null && keys == null) return _data;

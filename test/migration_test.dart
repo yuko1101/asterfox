@@ -87,8 +87,7 @@ void main() {
         '4278255615');
 
     // device_settings.json
-    final deviceSettings =
-        await entriesOf('${AppScopes.local}/${AppScopes.deviceSettings}');
+    final deviceSettings = await entriesOf(AppScopes.deviceSettings);
     expect(deviceSettings['repeatMode'], '"all"');
     expect(deviceSettings['baseVolume'], '0.25');
   });

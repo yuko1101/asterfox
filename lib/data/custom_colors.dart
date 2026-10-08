@@ -10,19 +10,14 @@ class CustomColors {
   static final Map<String, int> defaultData = {"accent": Colors.orange.value};
 
   static const String _scope = AppScopes.customColors;
-
   static final Map<String, dynamic> _data = {};
 
   static AppDatabase get _db => AppDatabase.instance;
 
-  static Future<void> load() async {
+  static Future<void> init() async {
     await reloadDatabase();
-    await restoreDefaults();
-  }
-
-  /// Stores the colors that have not been stored yet, like the config file
-  /// used to be created with them.
-  static Future<void> restoreDefaults() async {
+    // Store the defaults of the colors that are still missing, so that every
+    // stored color has a row.
     for (final entry in defaultData.entries) {
       if (!_data.containsKey(entry.key)) {
         await setValue(key: entry.key, value: entry.value);
@@ -44,21 +39,13 @@ class CustomColors {
   static Future<void> setValue(
       {required String key, required int value}) async {
     _data[key] = value;
-    await _db.into(_db.settingsEntries).insert(
-          SettingsEntriesCompanion.insert(
-            scope: _scope,
-            key: key,
-            value: jsonEncode(value),
-          ),
-          onConflict: DoUpdate(
-            (_) => SettingsEntriesCompanion.insert(
-              scope: _scope,
-              key: key,
-              value: jsonEncode(value),
-            ),
-            target: [_db.settingsEntries.scope, _db.settingsEntries.key],
-          ),
-        );
+    await _db.settingsEntries.insertOnConflictUpdate(
+      SettingsEntriesCompanion.insert(
+        scope: _scope,
+        key: key,
+        value: jsonEncode(value),
+      ),
+    );
   }
 
   /// The color behind [name].

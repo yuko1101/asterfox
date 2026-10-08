@@ -27,17 +27,9 @@ void main() {
 
   /// The same upsert as `LocalMusicsData._upsert`.
   Future<void> upsert(String scope, String id, Map<String, dynamic> json) {
-    return db.into(db.documents).insert(
-          DocumentsCompanion.insert(scope: scope, id: id, json: jsonEncode(json)),
-          onConflict: DoUpdate(
-            (_) => DocumentsCompanion.insert(
-              scope: scope,
-              id: id,
-              json: jsonEncode(json),
-            ),
-            target: [db.documents.scope, db.documents.id],
-          ),
-        );
+    return db.documents.insertOnConflictUpdate(
+      DocumentsCompanion.insert(scope: scope, id: id, json: jsonEncode(json)),
+    );
   }
 
   Future<List<Document>> documentsIn(String scope) async {
@@ -96,21 +88,13 @@ void main() {
 
   test('a settings upsert keeps one row per key', () async {
     Future<void> put(String key, dynamic value) async {
-      await db.into(db.settingsEntries).insert(
-            SettingsEntriesCompanion.insert(
-              scope: AppScopes.settings,
-              key: key,
-              value: jsonEncode(value),
-            ),
-            onConflict: DoUpdate(
-              (_) => SettingsEntriesCompanion.insert(
-                scope: AppScopes.settings,
-                key: key,
-                value: jsonEncode(value),
-              ),
-              target: [db.settingsEntries.scope, db.settingsEntries.key],
-            ),
-          );
+      await db.settingsEntries.insertOnConflictUpdate(
+        SettingsEntriesCompanion.insert(
+          scope: AppScopes.settings,
+          key: key,
+          value: jsonEncode(value),
+        ),
+      );
     }
 
     await put('theme', 'dark');
@@ -121,5 +105,26 @@ void main() {
         .get();
     expect(rows, hasLength(1));
     expect(rows.single.value, '"light"');
+  });
+
+  test('a version 1 database keeps its colors after the schema upgrade',
+      () async {
+    // v1 stored the colors under "__custom_colors"; they now live under the
+    // device scope, so opening the old file has to move the rows.
+    final file = File('${directory.path}/upgrade.sqlite');
+    final legacy = AppDatabase(NativeDatabase(file));
+    await legacy.customStatement(
+        "INSERT INTO settings_entries VALUES ('__custom_colors', 'accent', '17')");
+    // Pretend the file was written before the scope was renamed.
+    await legacy.customStatement('PRAGMA user_version = 1');
+    await legacy.close();
+
+    final upgraded = AppDatabase(NativeDatabase(file));
+    addTearDown(upgraded.close);
+
+    final rows = await (upgraded.select(upgraded.settingsEntries)
+          ..where((table) => table.scope.equals(AppScopes.customColors)))
+        .get();
+    expect(rows.single.value, '17');
   });
 }
