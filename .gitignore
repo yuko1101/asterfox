@@ -51,3 +51,6 @@ app.*.map.json
 
 # Direnv related
 .direnv/
+
+# Hermes plans (local, not part of the app)
+.hermes/
