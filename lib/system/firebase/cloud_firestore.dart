@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../data/database.dart';
 import '../../data/local_musics_data.dart';
 import '../../data/playlist_data.dart';
 import '../../data/settings_data.dart';
@@ -35,9 +36,10 @@ class CloudFirestoreManager {
   }
 
   static Future<void> _onUserUpdate() async {
-    LocalMusicsData.localMusicData.resetData();
-    SettingsData.settings.resetData();
-    PlaylistsData.playlistsData.resetData();
+    AppDatabase.currentUser = FirebaseAuth.instance.currentUser?.uid;
+    await LocalMusicsData.reloadDatabase();
+    await SettingsData.reloadDatabase();
+    await PlaylistsData.reloadDatabase();
     final tasks = <Future>[
       _listenUserDataUpdate(),
       _listenSongsUpdate(),
@@ -49,23 +51,22 @@ class CloudFirestoreManager {
   static Future<void> importData(Map<String, dynamic> data) async {
     await runTask(() async {
       if (data.containsKey("songs")) {
-        LocalMusicsData.localMusicData.data = data["songs"];
-        await LocalMusicsData.localMusicData
-            .save(compact: LocalMusicsData.compact);
+        await LocalMusicsData.replaceAll(
+            Map<String, dynamic>.from(data["songs"] as Map));
         await CloudFirestoreManager.removeAllSongs();
         await CloudFirestoreManager.addOrUpdateSongs(
             LocalMusicsData.getAll(caching: CachingDisabled()));
       }
       if (data.containsKey("playlists")) {
-        PlaylistsData.playlistsData.data = data["playlists"];
+        await PlaylistsData.replaceAll(
+            Map<String, dynamic>.from(data["playlists"] as Map));
         await CloudFirestoreManager.removeAllPlaylists();
         await CloudFirestoreManager.addOrUpdatePlaylists(
             PlaylistsData.getAll());
       }
       if (data.containsKey("settings")) {
-        SettingsData.settings.data = MapUtils.bindOptions(
-            SettingsData.settings.defaultValue, data["settings"]);
-        await SettingsData.save(upload: false);
+        await SettingsData.applyRemoteData(
+            MapUtils.bindOptions(SettingsData.defaultData, data["settings"]));
         await SettingsData.applySettings();
       }
     });
@@ -74,9 +75,9 @@ class CloudFirestoreManager {
   static Map<String, dynamic> exportData(
       {required bool songs, required bool settings, required bool playlists}) {
     return {
-      if (songs) "songs": LocalMusicsData.localMusicData.data,
-      if (playlists) "playlists": PlaylistsData.playlistsData.data,
-      if (settings) "settings": SettingsData.settings.data,
+      if (songs) "songs": LocalMusicsData.getStoredData(),
+      if (playlists) "playlists": PlaylistsData.getStoredData(),
+      if (settings) "settings": SettingsData.data,
     };
   }
 
@@ -191,7 +192,7 @@ class CloudFirestoreManager {
       final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
 
       final Map<String, dynamic> data = {
-        "settings": SettingsData.settings.data
+        "settings": SettingsData.data
       };
 
       await doc.set(data);
@@ -209,8 +210,7 @@ class CloudFirestoreManager {
 
       final data = await doc.get();
       if (data.data() == null) {
-        SettingsData.settings.resetData();
-        await SettingsData.save(upload: false);
+        await SettingsData.resetData();
         await updateUserData();
       }
 
@@ -220,9 +220,8 @@ class CloudFirestoreManager {
           final data = snapshot.data();
           print("database update (cache: ${snapshot.metadata.isFromCache})");
           if (data == null) return;
-          SettingsData.settings.data = MapUtils.bindOptions(
-              SettingsData.settings.defaultValue, data["settings"]);
-          await SettingsData.save(upload: false);
+          await SettingsData.applyRemoteData(MapUtils.bindOptions(
+              SettingsData.defaultData, data["settings"]));
           await SettingsData.applySettings();
         });
       });
@@ -249,15 +248,13 @@ class CloudFirestoreManager {
               "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} songs.");
           for (final change in changes) {
             final audioId = change.doc.id;
-            if (change.type == DocumentChangeType.removed) {
-              LocalMusicsData.localMusicData.delete(key: audioId);
-            } else {
-              LocalMusicsData.localMusicData
-                  .set(key: audioId, value: change.doc.data());
-            }
+            await LocalMusicsData.applyRemoteChange(
+              audioId: audioId,
+              json: change.type == DocumentChangeType.removed
+                  ? null
+                  : Map<String, dynamic>.from(change.doc.data()!),
+            );
           }
-          await LocalMusicsData.localMusicData
-              .save(compact: LocalMusicsData.compact);
         });
       });
     });
@@ -283,14 +280,13 @@ class CloudFirestoreManager {
               "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} playlists. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} playlists. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} playlists.");
           for (final change in changes) {
             final playlistId = change.doc.id;
-            if (change.type == DocumentChangeType.removed) {
-              PlaylistsData.playlistsData.delete(key: playlistId);
-            } else {
-              PlaylistsData.playlistsData
-                  .set(key: playlistId, value: change.doc.data());
-            }
+            await PlaylistsData.applyRemoteChange(
+              playlistId: playlistId,
+              json: change.type == DocumentChangeType.removed
+                  ? null
+                  : Map<String, dynamic>.from(change.doc.data()!),
+            );
           }
-          await PlaylistsData.playlistsData.save();
         });
       });
     });

@@ -11,6 +11,7 @@
 .buildlog/
 .history
 .svn/
+result
 
 # IntelliJ related
 *.iml
@@ -50,3 +51,6 @@ app.*.map.json
 
 # Direnv related
 .direnv/
+
+# Hermes plans (local, not part of the app)
+.hermes/

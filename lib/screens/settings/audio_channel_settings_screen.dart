@@ -88,16 +88,12 @@ class _AudioChannelChoiceState extends State<_AudioChannelChoice> {
                     ),
                     value: audioChannel["name"] as String,
                     groupValue: SettingsData.getValue(key: "audioChannel"),
-                    activeColor:
-                        Color(CustomColors.data.getValue("accent") as int),
-                    onChanged: (value) {
-                      setState(() {
-                        SettingsData.settings.set(
-                          key: "audioChannel",
-                          value: audioChannel["name"],
-                        );
-                        SettingsData.save();
-                      });
+                    activeColor: CustomColors.getColor("accent"),
+                    onChanged: (value) async {
+                      await SettingsData.setValue(
+                        key: "audioChannel",
+                        value: audioChannel["name"],
+                      );
                     },
                   ))
               .map((radioListTile) => CustomSettingsTile(child: radioListTile))

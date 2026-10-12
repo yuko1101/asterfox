@@ -70,12 +70,16 @@
               temurin-bin-21
               androidSdk
               emulator
+              # drift/sqlite3 loads libsqlite3.so at runtime, which sqlite3_flutter_libs
+              # only provides on Android/iOS.
+              sqlite
             ];
 
             ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
             ANDROID_SDK_ROOT = ANDROID_HOME;
             ANDROID_NDK_ROOT = "${androidSdk}/libexec/android-sdk/ndk/${androidConfig.ndkVersion}";
             JAVA_HOME = "${pkgs.temurin-bin-21}";
+            LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.sqlite ];
 
             # flutter prefers its own settings file (~/.config/flutter/settings) over
             # ANDROID_HOME when locating the SDK, and that file outlives this repo, so a
@@ -95,6 +99,8 @@
 
           propagatedBuildInputs = with pkgs; [
             mpv
+            # the Linux build loads libsqlite3.so at runtime
+            sqlite
           ];
 
           autoDepsList = true;
@@ -115,7 +121,7 @@
 
           postFixup = ''
             wrapProgram $out/bin/asterfox \
-              --set LD_LIBRARY_PATH ${pkgs.lib.makeLibraryPath [pkgs.mpv]}
+              --set LD_LIBRARY_PATH ${pkgs.lib.makeLibraryPath [pkgs.mpv pkgs.sqlite]}
           '';
         };
       }
