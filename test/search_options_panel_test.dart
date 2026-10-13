@@ -94,6 +94,19 @@ void main() {
     expect(find.byType(Switch), findsNWidgets(2)); // downloaded only, lyrics
   });
 
+  testWidgets('shuffling can be chosen as the order', (tester) async {
+    SearchOptions? told;
+    await tester.pumpWidget(panel(onOptionsChanged: (value) {
+      told = value;
+    }));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Random'));
+    await tester.pumpAndSettle();
+
+    expect(told?.sort, SearchSort.shuffled);
+  });
+
   testWidgets('choosing to group by artist is reported', (tester) async {
     SearchOptions? told;
     await tester.pumpWidget(panel(onOptionsChanged: (value) {

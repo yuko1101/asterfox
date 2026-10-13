@@ -300,6 +300,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sort_added_oldest => '古い順';
 
   @override
+  String get sort_shuffled => 'ランダム';
+
+  @override
   String get filter => 'フィルター';
 
   @override

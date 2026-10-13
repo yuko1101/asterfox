@@ -653,6 +653,12 @@ abstract class AppLocalizations {
   /// **'Oldest'**
   String get sort_added_oldest;
 
+  /// No description provided for @sort_shuffled.
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get sort_shuffled;
+
   /// No description provided for @filter.
   ///
   /// In en, this message translates to:

@@ -199,6 +199,8 @@
     "@sort_added_newest": {},
     "sort_added_oldest": "古い順",
     "@sort_added_oldest": {},
+    "sort_shuffled": "ランダム",
+    "@sort_shuffled": {},
     "filter": "フィルター",
     "@filter": {},
     "downloaded_only": "ダウンロード済みのみ",

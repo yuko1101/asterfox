@@ -72,6 +72,7 @@ class _SearchOptionsPanelState extends State<SearchOptionsPanel> {
               SearchSort.relevance: l10n.value.sort_relevance,
               SearchSort.addedNewest: l10n.value.sort_added_newest,
               SearchSort.addedOldest: l10n.value.sort_added_oldest,
+              SearchSort.shuffled: l10n.value.sort_shuffled,
             },
             selected: options.sort,
             onSelected: (value) => update(options.copyWith(sort: value)),

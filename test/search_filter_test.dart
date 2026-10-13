@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:asterfox/music/music_data/music_data.dart';
 import 'package:asterfox/widget/search/search_options.dart';
 import 'package:asterfox/widget/search/sort_and_filter.dart';
@@ -221,6 +223,36 @@ void main() {
 
       expect(groups.single.title, "");
       expect(titlesOf(groups.single.suggestions), ["second", "first"]);
+    });
+  });
+
+  group('shuffling', () {
+    test('keeps every song', () {
+      final list = <Suggestion>[
+        song(title: "a", storedAt: 1),
+        song(title: "b", storedAt: 2),
+        song(title: "c", storedAt: 3),
+        song(title: "d", storedAt: 4),
+      ];
+
+      final result = ShuffledSorting(Random(1)).apply(list);
+
+      expect(titlesOf(result)..sort(), ["a", "b", "c", "d"]);
+    });
+
+    test('does not keep the order it was given', () {
+      // A shuffle that happened to leave the list in order would look broken
+      // however correct it is, so the seed is one that moves the songs.
+      final list = <Suggestion>[
+        for (var i = 0; i < 20; i++) song(title: "song-$i"),
+      ];
+      // The sort shuffles the list it is given, so the order to compare
+      // against has to be taken before it runs.
+      final before = titlesOf(list);
+
+      final result = ShuffledSorting(Random(7)).apply(list);
+
+      expect(titlesOf(result), isNot(before));
     });
   });
 

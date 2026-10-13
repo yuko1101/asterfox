@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'search_options.dart';
 import 'suggestion.dart';
 
@@ -145,6 +147,21 @@ class AddedSorting extends FilterSorting {
 
 int? _storedAt(Suggestion suggestion) =>
     suggestion is SongSuggestion ? suggestion.musicData?.songStoredAt : null;
+
+/// Shows the songs in a random order.
+///
+/// The [Random] is given rather than made here so the shuffle can be checked in
+/// a test; the search makes one per call.
+class ShuffledSorting extends FilterSorting {
+  ShuffledSorting(this.random);
+  final Random random;
+
+  @override
+  List<Suggestion> apply(List<Suggestion> list) {
+    list.shuffle(random);
+    return list;
+  }
+}
 
 /// A heading the results are shown under, e.g. one artist or one playlist.
 class SuggestionGroup {

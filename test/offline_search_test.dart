@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:asterfox/data/app_scopes.dart';
 import 'package:asterfox/data/custom_colors.dart';
@@ -8,6 +9,7 @@ import 'package:asterfox/data/local_musics_data.dart';
 import 'package:asterfox/data/playlist_data.dart';
 import 'package:asterfox/l10n/app_localizations.dart';
 import 'package:asterfox/main.dart';
+import 'package:asterfox/music/music_data/music_data.dart';
 import 'package:asterfox/music/playlist/playlist.dart';
 import 'package:asterfox/widget/search/search_options.dart';
 import 'package:asterfox/widget/search/song_search.dart';
@@ -151,6 +153,50 @@ void main() {
     expect(
       search.songGroups.value.single.suggestions.map((s) => s.title).toList(),
       ["Alpha"],
+    );
+  });
+
+  test('shuffling keeps every song of the library', () async {
+    // A shuffle is an order, not a filter: it must not drop or duplicate.
+    for (final title in ["A", "B", "C", "D", "E"]) {
+      await storeSong(audioId: title, title: title);
+    }
+    await LocalMusicsData.reloadDatabase();
+
+    final search = SongSearch();
+    search.searchOptions =
+        const SearchOptions().copyWith(sort: SearchSort.shuffled);
+    await search.loadOfflineSongs("");
+
+    final shuffled = search.songGroups.value.single.suggestions
+        .map((s) => s.title)
+        .toList();
+    expect(shuffled..sort(), ["A", "B", "C", "D", "E"]);
+  });
+
+  test('choosing to shuffle shuffles the results', () async {
+    // Compared against the same shuffle done here rather than against a fixed
+    // order, so the check does not depend on how List.shuffle picks, only on
+    // the search having done it at all.
+    for (final title in ["A", "B", "C", "D", "E", "F"]) {
+      await storeSong(audioId: title, title: title);
+    }
+    await LocalMusicsData.reloadDatabase();
+
+    final expectedOrder = [
+      for (final song in LocalMusicsData.getAll(caching: CachingDisabled()))
+        song.title,
+    ]..shuffle(Random(7));
+
+    final search = SongSearch();
+    search.random = () => Random(7);
+    search.searchOptions =
+        const SearchOptions().copyWith(sort: SearchSort.shuffled);
+    await search.loadOfflineSongs("");
+
+    expect(
+      search.songGroups.value.single.suggestions.map((s) => s.title).toList(),
+      expectedOrder,
     );
   });
 

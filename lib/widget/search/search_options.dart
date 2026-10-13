@@ -12,7 +12,7 @@ enum SearchStateFilter { all, installed }
 enum SearchLyricsFilter { all, withLyrics, withoutLyrics }
 
 /// The order the offline results are shown in.
-enum SearchSort { relevance, addedNewest, addedOldest }
+enum SearchSort { relevance, addedNewest, addedOldest, shuffled }
 
 /// What the offline search shows, as chosen by the user.
 ///

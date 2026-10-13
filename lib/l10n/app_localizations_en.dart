@@ -300,6 +300,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sort_added_oldest => 'Oldest';
 
   @override
+  String get sort_shuffled => 'Random';
+
+  @override
   String get filter => 'Filter';
 
   @override

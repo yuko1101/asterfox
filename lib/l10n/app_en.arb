@@ -198,6 +198,8 @@
     "@sort_added_newest": {},
     "sort_added_oldest": "Oldest",
     "@sort_added_oldest": {},
+    "sort_shuffled": "Random",
+    "@sort_shuffled": {},
     "filter": "Filter",
     "@filter": {},
     "downloaded_only": "Downloaded only",

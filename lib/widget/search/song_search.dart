@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,12 @@ class SongSearch
 
   /// How the stored songs are grouped, filtered and ordered.
   SearchOptions searchOptions = const SearchOptions();
+
+  /// Where the randomness of the shuffled order comes from.
+  ///
+  /// Replaced in tests, so a shuffle can be checked without depending on how
+  /// the generator picks.
+  Random Function() random = Random.new;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -381,6 +388,7 @@ class SongSearch
           SearchSort.relevance => RelevanceSorting(text),
           SearchSort.addedNewest => AddedSorting(newestFirst: true),
           SearchSort.addedOldest => AddedSorting(newestFirst: false),
+          SearchSort.shuffled => ShuffledSorting(random()),
         },
       ],
     );
