@@ -599,6 +599,78 @@ abstract class AppLocalizations {
   /// **'Offline Search'**
   String get offline_search;
 
+  /// No description provided for @offline_search_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the songs stored on this device. Turn off to search YouTube instead.'**
+  String get offline_search_description;
+
+  /// No description provided for @group_by.
+  ///
+  /// In en, this message translates to:
+  /// **'Group by'**
+  String get group_by;
+
+  /// No description provided for @group_none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get group_none;
+
+  /// No description provided for @sort_by.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sort_by;
+
+  /// No description provided for @sort_relevance.
+  ///
+  /// In en, this message translates to:
+  /// **'Relevance'**
+  String get sort_relevance;
+
+  /// No description provided for @sort_added_newest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get sort_added_newest;
+
+  /// No description provided for @sort_added_oldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get sort_added_oldest;
+
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
+  /// No description provided for @downloaded_only.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded only'**
+  String get downloaded_only;
+
+  /// No description provided for @no_playlist.
+  ///
+  /// In en, this message translates to:
+  /// **'No playlist'**
+  String get no_playlist;
+
+  /// No description provided for @with_lyrics.
+  ///
+  /// In en, this message translates to:
+  /// **'With lyrics'**
+  String get with_lyrics;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
   /// No description provided for @share_mp3.
   ///
   /// In en, this message translates to:

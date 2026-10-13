@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../system/theme/theme.dart';
 import '../notifiers_widget.dart';
 import 'song_search.dart';
+import 'sort_and_filter.dart';
 import 'suggestion.dart';
 
 class SongSearchTile extends StatelessWidget {
@@ -137,6 +138,19 @@ class SongSearchTile extends StatelessWidget {
                       ],
                     ),
                   ),
+                  // Whether the song has lyrics is not visible in its title, so
+                  // a song that has them is marked.
+                  if (suggestion is SongSuggestion &&
+                      hasLyrics(suggestion) &&
+                      !multiSelect)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Icon(
+                        Icons.lyrics_outlined,
+                        size: 18,
+                        color: Theme.of(context).extraColors.secondary,
+                      ),
+                    ),
                 ],
               ),
             ),

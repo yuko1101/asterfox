@@ -273,6 +273,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offline_search => 'Offline Search';
 
   @override
+  String get offline_search_description => 'Search the songs stored on this device. Turn off to search YouTube instead.';
+
+  @override
+  String get group_by => 'Group by';
+
+  @override
+  String get group_none => 'None';
+
+  @override
+  String get sort_by => 'Sort by';
+
+  @override
+  String get sort_relevance => 'Relevance';
+
+  @override
+  String get sort_added_newest => 'Newest';
+
+  @override
+  String get sort_added_oldest => 'Oldest';
+
+  @override
+  String get filter => 'Filter';
+
+  @override
+  String get downloaded_only => 'Downloaded only';
+
+  @override
+  String get no_playlist => 'No playlist';
+
+  @override
+  String get with_lyrics => 'With lyrics';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
   String get share_mp3 => 'Share MP3 File';
 
   @override

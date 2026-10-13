@@ -6,6 +6,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 
 import '../../data/custom_colors.dart';
 import '../../data/local_musics_data.dart';
+import '../../data/playlist_data.dart';
 import '../../main.dart';
 import '../../music/music_data/music_data.dart';
 import '../../music/music_data/youtube_music_data.dart';
@@ -13,7 +14,8 @@ import '../../music/utils/music_data_utils.dart';
 import '../../music/utils/youtube_music_utils.dart';
 import '../../system/theme/theme.dart';
 import '../../utils/network_utils.dart';
-import '../option_widgets/option_switch.dart';
+import 'search_options.dart';
+import 'search_options_panel.dart';
 import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
 import 'suggestion.dart';
@@ -28,7 +30,13 @@ class SongSearch
   final Set<SongSearchTile> selectedTiles = {};
 
   // search options
-  bool forceOfflineSearch = false;
+  /// Whether the results come from the songs stored on this device rather than
+  /// from YouTube. Searching the library is the default, and the switch in the
+  /// options panel turns it off.
+  bool offlineSearch = true;
+
+  /// How the stored songs are grouped, filtered and ordered.
+  SearchOptions searchOptions = const SearchOptions();
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -72,20 +80,21 @@ class SongSearch
                     Theme.of(context).extraColors.themeColor.withOpacity(0.9),
                 clipBehavior: Clip.antiAlias,
                 child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: OptionSwitch(
-                          title: Text(l10n.value.offline_search),
-                          value: forceOfflineSearch,
-                          onChanged: (from, to) {
-                            forceOfflineSearch = to;
-                          },
-                        ),
-                      ),
-                    ],
+                  child: SearchOptionsPanel(
+                    options: searchOptions,
+                    offline: offlineSearch,
+                    onOptionsChanged: (options) {
+                      searchOptions = options;
+                      // The results are already on screen, so they are rebuilt
+                      // with the new selection rather than waiting for the
+                      // query to change.
+                      loadOfflineSongs(query);
+                    },
+                    onOfflineChanged: (offline) {
+                      offlineSearch = offline;
+                      lastQuery = null;
+                      searchResults();
+                    },
                   ),
                 ),
               ),
@@ -149,6 +158,10 @@ class SongSearch
   }
 
   final ValueNotifier<List<SongSearchTile>> suggestionTiles = ValueNotifier([]);
+
+  /// The tiles of the offline results, under the headings the chosen grouping
+  /// asks for. With no grouping there is a single group with no title.
+  final ValueNotifier<List<SuggestionGroup>> songGroups = ValueNotifier([]);
   final ValueNotifier<List<SongSearchTile>> otherSelectedTilesNotifier =
       ValueNotifier([]);
 
@@ -161,24 +174,7 @@ class SongSearch
   @override
   Widget buildSuggestions(BuildContext context) {
     if (lastQuery != query) {
-      searchedAt = DateTime.now().millisecondsSinceEpoch;
-      if (timer != null && timer!.isActive) {
-        timer!.cancel();
-      }
-
-      if (NetworkUtils.networkAccessible() && !forceOfflineSearch) {
-        if (query.isEmpty) {
-          loadOfflineSongs(query);
-        } else {
-          final time = DateTime.now().millisecondsSinceEpoch;
-          timer = Timer(const Duration(milliseconds: 500), () {
-            loadSuggestions(query, time: time);
-          });
-        }
-      } else {
-        loadOfflineSongs(query);
-      }
-
+      searchResults();
       lastQuery = query;
     }
     return Column(
@@ -210,20 +206,69 @@ class SongSearch
         Expanded(
           child: Material(
             clipBehavior: Clip.antiAlias,
-            child: ValueListenableBuilder<List<SongSearchTile>>(
-              valueListenable: suggestionTiles,
-              builder: (_, value, __) => ListView.builder(
+            child: ValueListenableBuilder<List<SuggestionGroup>>(
+              valueListenable: songGroups,
+              builder: (_, groups, __) => ListView.builder(
                 shrinkWrap: false,
-                itemBuilder: (context, index) {
-                  return value[index];
-                },
-                itemCount: value.length,
+                itemBuilder: (context, index) => _buildGroup(context, groups[index]),
+                itemCount: groups.length,
               ),
             ),
           ),
         ),
       ],
     );
+  }
+
+  /// One heading and the songs under it.
+  ///
+  /// A heading with no title is the whole list when no grouping is chosen, so
+  /// it is shown as plain rows rather than a collapsed section.
+  Widget _buildGroup(BuildContext context, SuggestionGroup group) {
+    final tiles = group.suggestions.map(_getSongSearchTile).toList();
+    if (group.title.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: tiles,
+      );
+    }
+    return ExpansionTile(
+      initiallyExpanded: true,
+      title: Text(
+        group.title,
+        style: TextStyle(
+          fontSize: 14,
+          color: Theme.of(context).extraColors.primary,
+        ),
+      ),
+      children: tiles,
+    );
+  }
+
+  /// Runs the search the current query and options ask for.
+  ///
+  /// The stored songs are the default: they are what the user is most likely
+  /// looking for, and they need no network. YouTube is searched when the
+  /// offline search has been turned off, or when there is no network to reach
+  /// it with and there is a query to look up.
+  void searchResults() {
+    searchedAt = DateTime.now().millisecondsSinceEpoch;
+    if (timer != null && timer!.isActive) {
+      timer!.cancel();
+    }
+
+    if (offlineSearch || !NetworkUtils.networkAccessible()) {
+      loadOfflineSongs(query);
+      return;
+    }
+    if (query.isEmpty) {
+      loadOfflineSongs(query);
+      return;
+    }
+    final time = DateTime.now().millisecondsSinceEpoch;
+    timer = Timer(const Duration(milliseconds: 500), () {
+      loadSuggestions(query, time: time);
+    });
   }
 
   void loadSuggestions(String text, {int? time}) async {
@@ -283,6 +328,10 @@ class SongSearch
 
   Future<void> loadOfflineSongs(String text) async {
     loading.value = true;
+    // The tiles of the previous search are dropped, so a song that changed
+    // state (it was downloaded, say) is shown with its state now rather than
+    // the one it had when the tile was made.
+    _tiles.clear();
     final List<SongSuggestion> list = [];
 
     final List<MusicData<CachingDisabled>> storedSongs =
@@ -303,9 +352,35 @@ class SongSearch
 
     final List<Suggestion> result = filterAndSort(
       list: list,
-      filterSortingList: [RelatedFilter(text), RelevanceSorting(text)],
+      filterSortingList: [
+        RelatedFilter(text),
+        // The order these run in decides what is narrowed first: the
+        // relevance of the query is settled before the list is narrowed or
+        // reordered, so a chosen sort survives the text filter.
+        if (searchOptions.state == SearchStateFilter.installed)
+          InstalledFilter(),
+        if (searchOptions.lyrics != SearchLyricsFilter.all)
+          LyricsFilter(searchOptions.lyrics),
+        switch (searchOptions.sort) {
+          SearchSort.relevance => RelevanceSorting(text),
+          SearchSort.addedNewest => AddedSorting(newestFirst: true),
+          SearchSort.addedOldest => AddedSorting(newestFirst: false),
+        },
+      ],
     );
     suggestionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
+    songGroups.value = groupSuggestions(
+      result,
+      searchOptions.grouping,
+      noPlaylistTitle: l10n.value.no_playlist,
+      playlists: [
+        for (final playlist in PlaylistsData.getAll())
+          PlaylistMembership(
+            name: playlist.name,
+            audioIds: playlist.songs.toSet(),
+          ),
+      ],
+    );
     // suggestionTiles.valueに含まれていない、選択されたSongSearchTile
     otherSelectedTilesNotifier.value = selectedTiles
         .where((s1) => !suggestionTiles.value
@@ -314,15 +389,40 @@ class SongSearch
     loading.value = false;
   }
 
+  /// The tiles of the results, so that the same suggestion is shown as the
+  /// same tile wherever it appears.
+  final Map<String, SongSearchTile> _tiles = {};
+
   SongSearchTile _getSongSearchTile(Suggestion suggestion) {
     final matched = selectedTiles
         .firstWhereOrNull((s) => suggestion.isSameSuggestion(s.suggestion));
     if (matched != null) {
       return matched;
-    } else {
-      return SongSearchTile(suggestion: suggestion, parent: this);
     }
+    // A song listed under two playlists is drawn once per playlist, and the
+    // selection is held by the tile, so both have to be the same object.
+    return _tiles.putIfAbsent(
+      _suggestionKey(suggestion),
+      () => SongSearchTile(suggestion: suggestion, parent: this),
+    );
   }
+
+  /// What makes two suggestions the same one to the user.
+  String _suggestionKey(Suggestion suggestion) {
+    if (suggestion is SongSuggestion) {
+      return suggestion.musicData?.audioId ?? suggestion.mediaUrl ?? "";
+    }
+    if (suggestion is WordSuggestion) return suggestion.word;
+    return suggestion.title;
+  }
+
+  /// The tile that shows [suggestion] in the results.
+  ///
+  /// A song that is listed under more than one playlist goes through here once
+  /// per group, and comes back as the same tile each time: selecting it in one
+  /// group has to be the same selection as in the other, or it ends up in the
+  /// queue twice.
+  SongSearchTile tileFor(Suggestion suggestion) => _getSongSearchTile(suggestion);
 
   void setQuery(newQuery) => query = newQuery;
 

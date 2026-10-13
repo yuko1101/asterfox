@@ -273,6 +273,42 @@ class AppLocalizationsJa extends AppLocalizations {
   String get offline_search => 'オフライン検索';
 
   @override
+  String get offline_search_description => 'この端末に保存された曲を検索します。オフにすると代わりにYouTubeを検索します。';
+
+  @override
+  String get group_by => 'グループ化';
+
+  @override
+  String get group_none => 'なし';
+
+  @override
+  String get sort_by => '並び替え';
+
+  @override
+  String get sort_relevance => '関連度';
+
+  @override
+  String get sort_added_newest => '新しい順';
+
+  @override
+  String get sort_added_oldest => '古い順';
+
+  @override
+  String get filter => 'フィルター';
+
+  @override
+  String get downloaded_only => 'ダウンロード済みのみ';
+
+  @override
+  String get no_playlist => 'プレイリストなし';
+
+  @override
+  String get with_lyrics => '歌詞あり';
+
+  @override
+  String get reset => 'リセット';
+
+  @override
   String get share_mp3 => 'MP3ファイルを共有';
 
   @override
