@@ -172,54 +172,65 @@ class HomeScreenMusicManager {
         future: () async {
           List<MusicData<CachingEnabled>> songs = [];
 
-          final songStream = MusicData.getList(
-            musicDataList: musicDataList,
-            mediaUrlList: mediaUrlList,
-            youtubePlaylist: youtubePlaylist,
-            caching: CachingEnabled.random(),
-          );
+          try {
+            final songStream = MusicData.getList(
+              musicDataList: musicDataList,
+              mediaUrlList: mediaUrlList,
+              youtubePlaylist: youtubePlaylist,
+              caching: CachingEnabled.random(),
+            );
 
-          final completer = Completer();
+            final completer = Completer();
 
-          songStream.listen((song) {
-            songs.add(song);
-            progressNotifier.value = songs.length;
-          }, onError: (e) {
-            e as UnableToLoadFromPlaylistException;
+            songStream.listen((song) {
+              songs.add(song);
+              progressNotifier.value = songs.length;
+            }, onError: (e) {
+              e as UnableToLoadFromPlaylistException;
+              errorListNotifier.value = errorListNotifier.value.toList()
+                ..add(
+                  ResultFailedReason(
+                    cause: e,
+                    title: e.title,
+                    description: e.description,
+                  ),
+                );
+              maxProgressNotifier.value = maxProgressNotifier.value - 1;
+            }, onDone: completer.complete);
+
+            await completer.future;
+
+            if (autoDownloadEnabled) {
+              downloadModeNotifier.value = true;
+              progressNotifier.value = 0;
+              maxProgressNotifier.value = songs.length;
+
+              final asyncCore = AsyncCore<Result<void>>(limit: 10);
+
+              await Future.wait(songs.map((song) async {
+                if (song.isInstalled) {
+                  maxProgressNotifier.value = maxProgressNotifier.value - 1;
+                  return;
+                }
+                final result = await asyncCore.run(song.download);
+                if (result.status == ResultStatus.failed) {
+                  errorListNotifier.value = errorListNotifier.value.toList()
+                    ..add(result.getReason());
+                }
+                progressNotifier.value = progressNotifier.value + 1;
+              }));
+            }
+            await musicManager.addAll(songs);
+          } on Exception catch (e) {
             errorListNotifier.value = errorListNotifier.value.toList()
               ..add(
                 ResultFailedReason(
                   cause: e,
-                  title: e.title,
-                  description: e.description,
+                  title: l10n.value.something_went_wrong,
+                  description: e.toString(),
                 ),
               );
-            maxProgressNotifier.value = maxProgressNotifier.value - 1;
-          }, onDone: completer.complete);
-
-          await completer.future;
-
-          if (autoDownloadEnabled) {
-            downloadModeNotifier.value = true;
-            progressNotifier.value = 0;
-            maxProgressNotifier.value = songs.length;
-
-            final asyncCore = AsyncCore<Result<void>>(limit: 10);
-
-            await Future.wait(songs.map((song) async {
-              if (song.isInstalled) {
-                maxProgressNotifier.value = maxProgressNotifier.value - 1;
-                return;
-              }
-              final result = await asyncCore.run(song.download);
-              if (result.status == ResultStatus.failed) {
-                errorListNotifier.value = errorListNotifier.value.toList()
-                  ..add(result.getReason());
-              }
-              progressNotifier.value = progressNotifier.value + 1;
-            }));
           }
-          await musicManager.addAll(songs);
         }(),
       ),
     );

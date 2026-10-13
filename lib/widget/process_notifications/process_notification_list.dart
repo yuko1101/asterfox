@@ -16,15 +16,17 @@ class ProcessNotificationList {
       notificationData
     ];
 
-    await notificationData.future;
+    try {
+      await notificationData.future;
+    } finally {
+      notificationsNotifier.value = [...notificationsNotifier.value]
+        ..remove(notificationData);
 
-    notificationsNotifier.value = [...notificationsNotifier.value]
-      ..remove(notificationData);
-
-    if (notificationData.errorListNotifier != null &&
-        notificationData.errorListNotifier!.value.isNotEmpty) {
-      erroredProcessList.value = erroredProcessList.value.toList()
-        ..add(notificationData);
+      if (notificationData.errorListNotifier != null &&
+          notificationData.errorListNotifier!.value.isNotEmpty) {
+        erroredProcessList.value = erroredProcessList.value.toList()
+          ..add(notificationData);
+      }
     }
   }
 }
