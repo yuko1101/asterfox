@@ -57,11 +57,17 @@ class _BackupAndRestoreState extends State<_BackupAndRestore> {
   Future<void> _export() async {
     String? error;
     String? path;
+    // Packing a large library takes a while, and the zip is written before any
+    // dialog opens, so the progress of it is shown.
+    final progress = ValueNotifier<int>(0);
     await LoadingDialog.showLoading(
       context: context,
+      percentageNotifier: progress,
       future: () async {
         try {
-          path = await service.exportToFile();
+          path = await service.exportToFile(onProgress: (percent) {
+            progress.value = percent;
+          });
         } catch (e) {
           // The save dialog is provided by the system, and can fail on its
           // own (no file manager, a denied permission). Report it rather than
@@ -70,6 +76,7 @@ class _BackupAndRestoreState extends State<_BackupAndRestore> {
         }
       }(),
     );
+    progress.dispose();
     if (!mounted) return;
 
     if (error != null) return _showError(l10n.value.export_data, error!);

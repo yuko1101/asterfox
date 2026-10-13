@@ -43,37 +43,51 @@ class BackupService {
   /// Asks where to write a backup, writes it and returns the path, or null
   /// when the user cancelled or the dialog did not answer.
   ///
+  /// [onProgress] is given a percentage 0-100 covering the whole export: the
+  /// library is packed first, then the finished zip is handed to the save
+  /// dialog. Packing is the slow part and dominates the range.
+  ///
   /// The zip holds the whole music library, so it is never held in memory:
   /// every step works with the file on disk.
-  Future<String?> exportToFile() async {
-    final backup = await manager.createBackup();
+  Future<String?> exportToFile({
+    void Function(int percent)? onProgress,
+  }) async {
+    // Packing is most of the work; copying the finished file is quick, so it
+    // only gets the last sliver of the range.
+    const packing = 0.95;
+    final zip = await manager.createBackup(
+      onProgress: (percent) => onProgress?.call((percent * packing).round()),
+    );
     try {
       if (Platform.isAndroid || Platform.isIOS) {
         // The mobile save dialog does not hand back a usable path (the target
         // is a content uri) and takes the file as bytes, which a large backup
         // cannot be. The share sheet streams the file instead, and doubles as
         // the way to put it in storage or send it elsewhere.
+        onProgress?.call(96);
         await SharePlus.instance.share(ShareParams(
-          files: [XFile(backup.path)],
-          fileNameOverrides: [p.basename(backup.path)],
+          files: [XFile(zip.path)],
+          fileNameOverrides: [p.basename(zip.path)],
         ));
-        return backup.path;
+        onProgress?.call(100);
+        return zip.path;
       }
 
       final picked = await _openDialog(() => FilePicker.platform.saveFile(
             dialogTitle: "Save backup",
-            fileName: p.basename(backup.path),
+            fileName: p.basename(zip.path),
             type: FileType.any,
           ));
       if (picked == null) return null;
       final target = File(picked);
-      if (target.absolute.path != backup.absolute.path) {
+      if (target.absolute.path != zip.absolute.path) {
         // Copied in chunks, not loaded whole.
-        await backup.openRead().pipe(target.openWrite());
+        await zip.openRead().pipe(target.openWrite());
       }
+      onProgress?.call(100);
       return picked;
     } finally {
-      if (backup.existsSync()) backup.deleteSync();
+      if (zip.existsSync()) zip.deleteSync();
     }
   }
 

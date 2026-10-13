@@ -85,6 +85,15 @@ class AppDatabase extends _$AppDatabase {
   /// The opened database. Only valid after [open] has completed.
   static AppDatabase get instance => _instance!;
 
+  /// Opens [db] as the database of the app, for a test that drives the real
+  /// screens against a throwaway file.
+  @visibleForTesting
+  static void setInstanceForTest(AppDatabase db) => _instance = db;
+
+  /// Forgets the open database, so the next test starts clean.
+  @visibleForTesting
+  static void clearInstanceForTest() => _instance = null;
+
   /// The id of the signed in user, or null when no user is signed in.
   static String? currentUser;
 

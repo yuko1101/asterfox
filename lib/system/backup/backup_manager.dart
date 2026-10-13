@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
+import 'package:path/path.dart' as p;
 
 import '../../data/database.dart';
 
@@ -76,8 +77,12 @@ class BackupManager {
 
   /// Writes a backup of the current data and returns the file it wrote.
   ///
+  /// [onProgress] is called with a percentage from 0 to 100 while the zip is
+  /// written, so a caller can show how far it has got. Packing a large library
+  /// takes a while, and the work is otherwise invisible.
+  ///
   /// The caller owns the returned file and may move or delete it.
-  Future<File> createBackup() async {
+  Future<File> createBackup({void Function(int percent)? onProgress}) async {
     final directory = Directory(tempPath);
     if (!directory.existsSync()) directory.createSync(recursive: true);
 
@@ -85,6 +90,8 @@ class BackupManager {
     // enough that a second call would land on a different second and name a
     // file that was never written.
     final zip = File("$tempPath/${suggestedFileName()}");
+
+    onProgress?.call(0);
 
     final snapshot = File(_snapshotPath);
     if (snapshot.existsSync()) snapshot.deleteSync();
@@ -95,14 +102,18 @@ class BackupManager {
     await _db.customStatement("VACUUM INTO ?", [_snapshotPath]);
 
     final music = Directory(musicPath);
+    final songs =
+        music.existsSync() ? music.listSync(recursive: true) : <FileSystemEntity>[];
 
     final encoder = ZipFileEncoder();
     encoder.create(zip.path);
     try {
+      // Every part is written through the encoder one file at a time, so the
+      // progress of the whole zip can be reported. addDirectory() has no
+      // callback of its own.
       await encoder.addFile(snapshot, _databaseName);
-      if (music.existsSync()) {
-        await encoder.addDirectory(music, includeDirName: true);
-      }
+      // The manifest is added here rather than at the end, so the count below
+      // covers everything that goes into the zip.
       encoder.addArchiveFile(ArchiveFile.string(
         manifestName,
         jsonEncode({
@@ -113,6 +124,24 @@ class BackupManager {
           "includesMusic": music.existsSync(),
         }),
       ));
+
+      // The database and the manifest are written before this, and the songs
+      // and their folders make up the rest.
+      final total = songs.length + 2;
+      var written = 2;
+      for (final entry in songs) {
+        final name = p.relative(entry.path, from: music.path);
+        if (entry is Directory) {
+          final file = ArchiveFile.directory("$_musicDirName/$name/");
+          file.lastModTime =
+              entry.statSync().modified.millisecondsSinceEpoch ~/ 1000;
+          encoder.addArchiveFile(file);
+        } else if (entry is File) {
+          await encoder.addFile(entry, "$_musicDirName/$name");
+        }
+        onProgress?.call((++written * 100 / total).round());
+      }
+
       await encoder.close();
     } catch (e) {
       // An encoder that was started but not closed holds the file open.
@@ -122,6 +151,7 @@ class BackupManager {
       if (snapshot.existsSync()) snapshot.deleteSync();
     }
 
+    onProgress?.call(100);
     return zip;
   }
 

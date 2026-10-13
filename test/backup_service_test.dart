@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -11,72 +10,7 @@ import 'package:drift/native.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Stands in for the system file dialogs, which cannot open in a test.
-class FakeFilePicker extends FilePicker {
-  FakeFilePicker({
-    this.savePath,
-    this.openFile,
-    this.throwOnSave = false,
-    this.hang = false,
-  });
-
-  /// What the save dialog returns; null means the user cancelled.
-  final String? savePath;
-
-  /// What the open dialog returns.
-  final PlatformFile? openFile;
-
-  /// Whether the save dialog fails, as it does with no file manager.
-  final bool throwOnSave;
-
-  /// Whether the dialog never answers, as it does with no dialog service.
-  final bool hang;
-
-  /// The bytes the save dialog was handed, if any. A backup must never be
-  /// passed this way, because the zip does not fit in memory.
-  Uint8List? savedBytes;
-  bool exported = false;
-
-  /// A future that never completes, to stand in for a dialog that hangs.
-  Future<T> _never<T>() => Completer<T>().future;
-
-  @override
-  Future<String?> saveFile({
-    String? dialogTitle,
-    String? fileName,
-    String? initialDirectory,
-    FileType type = FileType.any,
-    List<String>? allowedExtensions,
-    Uint8List? bytes,
-    bool lockParentWindow = false,
-  }) async {
-    if (hang) return _never();
-    if (throwOnSave) throw Exception('no file manager');
-    exported = true;
-    savedBytes = bytes;
-    return savePath;
-  }
-
-  @override
-  Future<FilePickerResult?> pickFiles({
-    String? dialogTitle,
-    String? initialDirectory,
-    FileType type = FileType.any,
-    List<String>? allowedExtensions,
-    Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = false,
-    bool allowMultiple = false,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-    bool readSequential = false,
-    int compressionQuality = 0,
-  }) async {
-    if (hang) return _never();
-    if (openFile == null) return null;
-    return FilePickerResult([openFile!]);
-  }
-}
+import 'support/fake_file_picker.dart';
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -159,6 +93,25 @@ void main() {
 
     expect(await service().exportToFile(), isNull);
     expect(Directory(temp.path).listSync().whereType<File>(), isEmpty);
+  });
+
+  test('export reports progress over the whole range', () async {
+    await storeSongs(6, 64 * 1024);
+    FilePicker.platform = FakeFilePicker(savePath: '${temp.path}/p.zip');
+
+    final seen = <int>[];
+    await service().exportToFile(onProgress: seen.add);
+
+    expect(seen, isNotEmpty);
+    // It starts at nothing done and ends at everything done.
+    expect(seen.first, 0);
+    expect(seen.last, 100);
+    // Progress only ever moves forward, so the bar cannot jump backwards.
+    expect(seen, orderedEquals(List<int>.from(seen)..sort()));
+    expect(seen.every((percent) => percent >= 0 && percent <= 100), isTrue);
+    // The songs are the slow part, so the range covers them rather than
+    // sitting at 0 until they are done.
+    expect(seen.where((percent) => percent > 0 && percent < 100), isNotEmpty);
   });
 
   test('a failing save dialog is reported, not swallowed', () async {
