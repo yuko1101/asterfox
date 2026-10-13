@@ -276,6 +276,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get offline_search_description => 'この端末に保存された曲を検索します。オフにすると代わりにYouTubeを検索します。';
 
   @override
+  String get youtube_search => 'YouTube検索';
+
+  @override
+  String get search_options => '検索オプション';
+
+  @override
   String get group_by => 'グループ化';
 
   @override

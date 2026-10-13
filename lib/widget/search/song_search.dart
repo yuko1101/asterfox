@@ -16,6 +16,7 @@ import '../../system/theme/theme.dart';
 import '../../utils/network_utils.dart';
 import 'search_options.dart';
 import 'search_options_panel.dart';
+import 'search_scope_button.dart';
 import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
 import 'suggestion.dart';
@@ -66,9 +67,20 @@ class SongSearch
           query = "";
         },
       ),
+      // Which of the two scopes is searched is switched from here, in one
+      // press, rather than from inside the options.
+      SearchScopeButton(
+        offline: offlineSearch,
+        onChanged: (offline) {
+          offlineSearch = offline;
+          lastQuery = null;
+          searchResults();
+        },
+      ),
       IconButton(
         icon: const Icon(Icons.tune),
         color: Theme.of(context).extraColors.primary,
+        tooltip: l10n.value.search_options,
         onPressed: () {
           showDialog(
             context: context,
@@ -89,11 +101,6 @@ class SongSearch
                       // with the new selection rather than waiting for the
                       // query to change.
                       loadOfflineSongs(query);
-                    },
-                    onOfflineChanged: (offline) {
-                      offlineSearch = offline;
-                      lastQuery = null;
-                      searchResults();
                     },
                   ),
                 ),

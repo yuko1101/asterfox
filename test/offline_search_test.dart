@@ -135,6 +135,25 @@ void main() {
     expect(results.map((s) => s.title).toList()..sort(), ["Alpha", "Beta"]);
   });
 
+  test('with the offline scope a query searches the library', () async {
+    // The scope is read where the search is started, not where the results are
+    // drawn. With the offline scope on, a query is answered from the library
+    // without reaching for the network at all.
+    await storeSong(audioId: "a", title: "Alpha");
+    await storeSong(audioId: "b", title: "Beta");
+    await LocalMusicsData.reloadDatabase();
+
+    final search = SongSearch();
+    expect(search.offlineSearch, isTrue, reason: 'the stored songs by default');
+    search.query = "Alpha";
+    search.searchResults();
+    // The offline search is synchronous, so the results are already in place.
+    expect(
+      search.songGroups.value.single.suggestions.map((s) => s.title).toList(),
+      ["Alpha"],
+    );
+  });
+
   test('the offline search only offers stored songs', () async {
     await storeSong(audioId: "stored", title: "Stored");
     // Nothing is stored for "missing", so it is not in the library.

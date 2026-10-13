@@ -605,6 +605,18 @@ abstract class AppLocalizations {
   /// **'Search the songs stored on this device. Turn off to search YouTube instead.'**
   String get offline_search_description;
 
+  /// No description provided for @youtube_search.
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube Search'**
+  String get youtube_search;
+
+  /// No description provided for @search_options.
+  ///
+  /// In en, this message translates to:
+  /// **'Search options'**
+  String get search_options;
+
   /// No description provided for @group_by.
   ///
   /// In en, this message translates to:

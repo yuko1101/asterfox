@@ -5,7 +5,6 @@ import 'package:asterfox/data/database.dart';
 import 'package:asterfox/l10n/app_localizations.dart';
 import 'package:asterfox/main.dart';
 import 'package:asterfox/system/theme/theme.dart';
-import 'package:asterfox/widget/option_widgets/option_switch.dart';
 import 'package:asterfox/widget/search/search_options.dart';
 import 'package:asterfox/widget/search/search_options_panel.dart';
 import 'package:drift/drift.dart' hide isNotNull, isNull;
@@ -45,7 +44,6 @@ void main() {
     SearchOptions options = const SearchOptions(),
     bool offline = true,
     ValueChanged<SearchOptions>? onOptionsChanged,
-    ValueChanged<bool>? onOfflineChanged,
   }) {
     return MaterialApp(
       theme: AppTheme.themes[0],
@@ -56,23 +54,10 @@ void main() {
           options: options,
           offline: offline,
           onOptionsChanged: onOptionsChanged ?? (_) {},
-          onOfflineChanged: onOfflineChanged ?? (_) {},
         ),
       ),
     );
   }
-
-  /// The switch that turns the offline search on and off.
-  OptionSwitch offlineSwitch(WidgetTester tester) => tester
-      .widgetList<OptionSwitch>(find.byType(OptionSwitch))
-      .firstWhere((widget) => (widget.title as Text).data == 'Offline Search');
-
-  testWidgets('the offline search is on by default', (tester) async {
-    await tester.pumpWidget(panel(offline: true));
-    await tester.pumpAndSettle();
-
-    expect(offlineSwitch(tester).value, isTrue);
-  });
 
   testWidgets('the titles of the stored songs options are shown',
       (tester) async {
@@ -88,27 +73,25 @@ void main() {
   testWidgets('the stored songs options are hidden when YouTube is used',
       (tester) async {
     // A song fetched from YouTube has no playlists, no lyrics and no date it
-    // was added, so none of these can be answered for it.
+    // was added, so none of these can be answered for it. The scope itself is
+    // changed by the button in the app bar, not from here.
     await tester.pumpWidget(panel(offline: false));
     await tester.pumpAndSettle();
 
     expect(find.text('Group by'), findsNothing);
     expect(find.text('Sort by'), findsNothing);
     expect(find.text('Filter'), findsNothing);
-    expect(offlineSwitch(tester).value, isFalse);
+    expect(find.text('Downloaded only'), findsNothing);
   });
 
-  testWidgets('turning the offline search off is reported', (tester) async {
-    bool? told;
-    await tester.pumpWidget(panel(offline: true, onOfflineChanged: (value) {
-      told = value;
-    }));
+  testWidgets('the scope is not switched from the options', (tester) async {
+    // It belongs to the button in the app bar, so the options must not offer a
+    // second way to change it.
+    await tester.pumpWidget(panel(offline: true));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(Switch).first);
-    await tester.pumpAndSettle();
-
-    expect(told, isFalse);
+    expect(find.text('Offline Search'), findsNothing);
+    expect(find.byType(Switch), findsNWidgets(2)); // downloaded only, lyrics
   });
 
   testWidgets('choosing to group by artist is reported', (tester) async {

@@ -6,25 +6,26 @@ import '../../system/theme/theme.dart';
 import '../option_widgets/option_switch.dart';
 import 'search_options.dart';
 
-/// The settings of the offline search: whether it is used at all, and how its
-/// results are grouped, filtered and ordered.
+/// How the stored songs of the offline search are grouped, filtered and
+/// ordered.
 ///
 /// The options that describe a stored song are only shown while the offline
 /// search is on: a suggestion fetched from YouTube has no playlists, no lyrics
 /// and no date it was added, so none of them can be answered for it.
+///
+/// Which of the two scopes is searched is not chosen here but from the button
+/// in the app bar, so it is one press away rather than three.
 class SearchOptionsPanel extends StatefulWidget {
   const SearchOptionsPanel({
     required this.options,
     required this.offline,
     required this.onOptionsChanged,
-    required this.onOfflineChanged,
     super.key,
   });
 
   final SearchOptions options;
   final bool offline;
   final ValueChanged<SearchOptions> onOptionsChanged;
-  final ValueChanged<bool> onOfflineChanged;
 
   @override
   State<SearchOptionsPanel> createState() => _SearchOptionsPanelState();
@@ -32,7 +33,6 @@ class SearchOptionsPanel extends StatefulWidget {
 
 class _SearchOptionsPanelState extends State<SearchOptionsPanel> {
   late SearchOptions options = widget.options;
-  late bool offline = widget.offline;
 
   @override
   void didUpdateWidget(SearchOptionsPanel oldWidget) {
@@ -40,17 +40,11 @@ class _SearchOptionsPanelState extends State<SearchOptionsPanel> {
     // The panel is rebuilt with new values by its owner, so it follows them
     // instead of keeping the ones it was first given.
     if (widget.options != oldWidget.options) options = widget.options;
-    if (widget.offline != oldWidget.offline) offline = widget.offline;
   }
 
   void update(SearchOptions next) {
     setState(() => options = next);
     widget.onOptionsChanged(next);
-  }
-
-  void updateOffline(bool next) {
-    setState(() => offline = next);
-    widget.onOfflineChanged(next);
   }
 
   @override
@@ -59,13 +53,9 @@ class _SearchOptionsPanelState extends State<SearchOptionsPanel> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        OptionSwitch(
-          title: Text(l10n.value.offline_search),
-          subtitle: Text(l10n.value.offline_search_description),
-          value: offline,
-          onChanged: (_, to) => updateOffline(to),
-        ),
-        if (offline) ...[
+        // Nothing but the stored songs can be grouped, filtered or sorted, so
+        // with YouTube being searched there is nothing to offer.
+        if (widget.offline) ...[
           _heading(l10n.value.group_by),
           _choice<SearchGrouping>(
             labels: {
