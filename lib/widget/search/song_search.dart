@@ -210,7 +210,8 @@ class SongSearch
               valueListenable: songGroups,
               builder: (_, groups, __) => ListView.builder(
                 shrinkWrap: false,
-                itemBuilder: (context, index) => _buildGroup(context, groups[index]),
+                itemBuilder: (context, index) =>
+                    _buildGroup(context, groups[index], index),
                 itemCount: groups.length,
               ),
             ),
@@ -220,11 +221,11 @@ class SongSearch
     );
   }
 
-  /// One heading and the songs under it.
+  /// One heading and the songs under it, at [index] in the list.
   ///
   /// A heading with no title is the whole list when no grouping is chosen, so
   /// it is shown as plain rows rather than a collapsed section.
-  Widget _buildGroup(BuildContext context, SuggestionGroup group) {
+  Widget _buildGroup(BuildContext context, SuggestionGroup group, int index) {
     final tiles = group.suggestions.map(_getSongSearchTile).toList();
     if (group.title.isEmpty) {
       return Column(
@@ -233,6 +234,14 @@ class SongSearch
       );
     }
     return ExpansionTile(
+      // Without a key the state of a heading is lost as soon as it is scrolled
+      // out of view, and it comes back open: the list is a ListView, which
+      // builds only what is on screen. The key is what lets the tile save its
+      // open-or-closed state and restore it.
+      //
+      // The position is part of the key because two playlists can have the
+      // same name, and they are not the same heading.
+      key: PageStorageKey<String>('search-group-$index-${group.title}'),
       initiallyExpanded: true,
       title: Text(
         group.title,
