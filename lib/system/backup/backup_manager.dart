@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive_io.dart';
-import 'package:path/path.dart' as p;
 
 import '../../data/database.dart';
 
@@ -102,18 +101,14 @@ class BackupManager {
     await _db.customStatement("VACUUM INTO ?", [_snapshotPath]);
 
     final music = Directory(musicPath);
-    final songs =
-        music.existsSync() ? music.listSync(recursive: true) : <FileSystemEntity>[];
 
     final encoder = ZipFileEncoder();
     encoder.create(zip.path);
     try {
-      // Every part is written through the encoder one file at a time, so the
-      // progress of the whole zip can be reported. addDirectory() has no
-      // callback of its own.
+      // The database and the manifest are quick, and they are written before
+      // the songs so that the rest of the range is theirs.
+      const beforeMusic = 2 / 100;
       await encoder.addFile(snapshot, _databaseName);
-      // The manifest is added here rather than at the end, so the count below
-      // covers everything that goes into the zip.
       encoder.addArchiveFile(ArchiveFile.string(
         manifestName,
         jsonEncode({
@@ -125,21 +120,17 @@ class BackupManager {
         }),
       ));
 
-      // The database and the manifest are written before this, and the songs
-      // and their folders make up the rest.
-      final total = songs.length + 2;
-      var written = 2;
-      for (final entry in songs) {
-        final name = p.relative(entry.path, from: music.path);
-        if (entry is Directory) {
-          final file = ArchiveFile.directory("$_musicDirName/$name/");
-          file.lastModTime =
-              entry.statSync().modified.millisecondsSinceEpoch ~/ 1000;
-          encoder.addArchiveFile(file);
-        } else if (entry is File) {
-          await encoder.addFile(entry, "$_musicDirName/$name");
-        }
-        onProgress?.call((++written * 100 / total).round());
+      if (music.existsSync()) {
+        // addDirectory walks the tree itself — including the mode of each
+        // folder — and reports how far it has got.
+        await encoder.addDirectory(
+          music,
+          includeDirName: true,
+          onProgress: (fraction) =>
+              onProgress?.call(((beforeMusic + fraction * (1 - beforeMusic)) *
+                      100)
+                  .round()),
+        );
       }
 
       await encoder.close();

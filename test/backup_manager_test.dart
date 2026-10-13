@@ -78,6 +78,26 @@ void main() {
     await db.close();
   });
 
+  test('the folders of the music keep their mode in the zip', () async {
+    // The zip is unpacked elsewhere, so a folder without the directory bit
+    // does not come back as a folder. Only the library's own walk sets it;
+    // writing the entries by hand silently drops it.
+    final db = await openDatabase();
+    final manager =
+        BackupManager(dataPath: data.path, tempPath: temp.path, database: db);
+    final backup = await manager.createBackup();
+
+    final folders = ZipDecoder()
+        .decodeBytes(backup.readAsBytesSync())
+        .files
+        .where((file) => file.isDirectory);
+    expect(folders, isNotEmpty);
+    for (final folder in folders) {
+      expect(folder.mode & 0xF000, 0x4000, reason: folder.name);
+    }
+    await db.close();
+  });
+
   test('restoring replaces the database and the music folder', () async {
     final db = await openDatabase();
     final manager =
