@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:asterfox/data/database.dart';
 import 'package:asterfox/system/backup/backup_manager.dart';
@@ -31,6 +32,8 @@ class FakeFilePicker extends FilePicker {
   /// Whether the dialog never answers, as it does with no dialog service.
   final bool hang;
 
+  /// The bytes the save dialog was handed, if any. A backup must never be
+  /// passed this way, because the zip does not fit in memory.
   Uint8List? savedBytes;
   bool exported = false;
 
@@ -92,7 +95,8 @@ void main() {
     await db.customStatement(
       "INSERT INTO documents (scope, id, json) VALUES ('local/songs', 'songA', '{\"title\":\"A\"}')",
     );
-    manager = BackupManager(dataPath: data.path, tempPath: temp.path, database: db);
+    manager =
+        BackupManager(dataPath: data.path, tempPath: temp.path, database: db);
   });
 
   tearDown(() async {
@@ -102,6 +106,18 @@ void main() {
   });
 
   BackupService service() => BackupService(manager: manager);
+
+  /// Fills the library with [count] songs of [bytes] of incompressible data
+  /// each, so a backup is genuinely large rather than a deflate of zeros.
+  Future<void> storeSongs(int count, int bytes) async {
+    final random = Random(7);
+    for (var song = 0; song < count; song++) {
+      final dir = Directory('${data.path}/music/song$song');
+      await dir.create(recursive: true);
+      final audio = List<int>.generate(bytes, (_) => random.nextInt(256));
+      await File('${dir.path}/audio').writeAsBytes(audio);
+    }
+  }
 
   test('export writes the backup where the dialog says', () async {
     final target = '${temp.path}/chosen/asterfox.zip';
@@ -113,10 +129,27 @@ void main() {
 
     expect(path, target);
     expect(File(target).existsSync(), isTrue);
-    // The file the dialog was handed is a real zip, and the copy left in the
-    // temporary folder is cleaned up.
     expect(File(target).lengthSync(), greaterThan(0));
+    // The zip went to the dialog as a path, not as bytes: loading it whole is
+    // what runs a large library out of memory.
+    expect(picker.savedBytes, isNull);
+    // The copy left in the temporary folder is cleaned up.
     expect(Directory(temp.path).listSync().whereType<File>(), isEmpty);
+  });
+
+  test('a backup larger than memory can be exported', () async {
+    // 48 MB of music: the point is that the export never holds the zip in
+    // memory, so its size does not matter.
+    await storeSongs(24, 2 * 1024 * 1024);
+    final target = '${temp.path}/big.zip';
+    final picker = FakeFilePicker(savePath: target);
+    FilePicker.platform = picker;
+
+    final path = await service().exportToFile();
+
+    expect(path, target);
+    expect(File(target).lengthSync(), greaterThan(40 * 1024 * 1024));
+    expect(picker.savedBytes, isNull);
   });
 
   test('export reports a cancelled dialog and leaves nothing behind',
@@ -129,7 +162,8 @@ void main() {
   });
 
   test('a failing save dialog is reported, not swallowed', () async {
-    FilePicker.platform = FakeFilePicker(savePath: '/tmp/x.zip', throwOnSave: true);
+    FilePicker.platform =
+        FakeFilePicker(savePath: '/tmp/x.zip', throwOnSave: true);
 
     await expectLater(service().exportToFile(), throwsA(isA<Exception>()));
     // The backup written before the dialog failed is cleaned up.
@@ -147,8 +181,8 @@ void main() {
     );
 
     FilePicker.platform = FakeFilePicker(
-        openFile: PlatformFile(
-            name: 'picked.zip', path: chosen.path, size: 0));
+        openFile:
+            PlatformFile(name: 'picked.zip', path: chosen.path, size: 0));
 
     expect(await service().importFromFile(), isTrue);
 

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
+import 'package:share_plus/share_plus.dart';
 
 import '../../main.dart';
 import 'backup_manager.dart';
@@ -41,24 +42,34 @@ class BackupService {
 
   /// Asks where to write a backup, writes it and returns the path, or null
   /// when the user cancelled or the dialog did not answer.
+  ///
+  /// The zip holds the whole music library, so it is never held in memory:
+  /// every step works with the file on disk.
   Future<String?> exportToFile() async {
     final backup = await manager.createBackup();
     try {
-      // Android and iOS are handed the bytes and write the file themselves,
-      // because the picked location is not a plain file path there.
-      final picksContents = Platform.isAndroid || Platform.isIOS;
+      if (Platform.isAndroid || Platform.isIOS) {
+        // The mobile save dialog does not hand back a usable path (the target
+        // is a content uri) and takes the file as bytes, which a large backup
+        // cannot be. The share sheet streams the file instead, and doubles as
+        // the way to put it in storage or send it elsewhere.
+        await SharePlus.instance.share(ShareParams(
+          files: [XFile(backup.path)],
+          fileNameOverrides: [p.basename(backup.path)],
+        ));
+        return backup.path;
+      }
+
       final picked = await _openDialog(() => FilePicker.platform.saveFile(
             dialogTitle: "Save backup",
             fileName: p.basename(backup.path),
             type: FileType.any,
-            bytes: picksContents ? backup.readAsBytesSync() : null,
           ));
       if (picked == null) return null;
-      if (!picksContents) {
-        final target = File(picked);
-        if (target.absolute.path != backup.absolute.path) {
-          target.writeAsBytesSync(backup.readAsBytesSync());
-        }
+      final target = File(picked);
+      if (target.absolute.path != backup.absolute.path) {
+        // Copied in chunks, not loaded whole.
+        await backup.openRead().pipe(target.openWrite());
       }
       return picked;
     } finally {
@@ -69,33 +80,22 @@ class BackupService {
   /// Asks for a backup file and restores it, returning whether one was
   /// restored. Throws [BackupException] when the file cannot be used.
   Future<bool> importFromFile() async {
+    // `withData` is left off so the chosen zip is not read into memory. On
+    // mobile the plugin caches a picked uri to a file of its own and returns
+    // that path.
     final result = await _openDialog(() => FilePicker.platform.pickFiles(
           dialogTitle: "Open backup",
           type: FileType.any,
-          // A file picked on Android or iOS can be a content:// uri, which the
-          // plugin hands over as contents instead of a path.
-          withData: Platform.isAndroid || Platform.isIOS,
         ));
     if (result == null || result.files.isEmpty) return false;
     final picked = result.files.first;
 
-    // A picked file is never modified, so a path is used as it is.
-    final File file;
-    if (picked.path != null) {
-      file = File(picked.path!);
-    } else if (picked.bytes != null) {
-      file = File("$tempPath/backup-import.zip")
-        ..writeAsBytesSync(picked.bytes!);
-    } else {
-      // Neither a path nor the contents were handed over, so there is nothing
-      // to read.
+    // A picked file is never modified, so its path is used as it is.
+    final path = picked.path;
+    if (path == null) {
       throw BackupException("Could not read the selected file");
     }
-    try {
-      await manager.restoreBackup(file);
-      return true;
-    } finally {
-      if (picked.path == null && file.existsSync()) file.deleteSync();
-    }
+    await manager.restoreBackup(File(path));
+    return true;
   }
 }
