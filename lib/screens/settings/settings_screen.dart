@@ -134,6 +134,14 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                   Navigator.of(context).pushNamed("/settings/audioChannel");
                 },
                 trailing: const Icon(Icons.keyboard_arrow_right),
+              ),
+              SettingsTile.navigation(
+                title: Text(l10n.value.backup_and_restore),
+                description: Text(l10n.value.backup_and_restore_description),
+                onPressed: (context) {
+                  Navigator.of(context).pushNamed("/settings/backup");
+                },
+                trailing: const Icon(Icons.keyboard_arrow_right),
               )
             ],
           ),

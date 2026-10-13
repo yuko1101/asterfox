@@ -227,5 +227,31 @@
                 "type": "num"
             }
         }
-    }
+    },
+    "backup_and_restore": "Backup and restore",
+    "@backup_and_restore": {},
+    "backup_and_restore_description": "Save and load the data on this device",
+    "@backup_and_restore_description": {},
+    "export_data": "Export data",
+    "@export_data": {},
+    "export_data_description": "Saves the database and the stored music to a file",
+    "@export_data_description": {},
+    "restore_backup": "Restore a backup",
+    "@restore_backup": {},
+    "restore_backup_description": "Replaces the data on this device with a backup",
+    "@restore_backup_description": {},
+    "restore_backup_confirmation": "The songs and the settings on this device are replaced by the backup. Are you sure?",
+    "@restore_backup_confirmation": {},
+    "restore": "Restore",
+    "@restore": {},
+    "failed": "Failed",
+    "@failed": {},
+    "restart_required": "Restart required",
+    "@restart_required": {},
+    "restart_to_apply_backup": "The data was replaced. Restart the app to use it.",
+    "@restart_to_apply_backup": {},
+    "exported": "Exported",
+    "@exported": {},
+    "cancelled": "Cancelled",
+    "@cancelled": {}
 }

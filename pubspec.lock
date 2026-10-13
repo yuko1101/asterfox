@@ -34,7 +34,7 @@ packages:
     source: hosted
     version: "2.0.3"
   archive:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: archive
       sha256: "2fde1607386ab523f7a36bb3e7edb43bd58e6edaf2ffb29d8a6d578b297fdbbd"
@@ -377,6 +377,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  file_picker:
+    dependency: "direct main"
+    description:
+      name: file_picker
+      sha256: "57d9a1dd5063f85fa3107fb42d1faffda52fdc948cefd5fe5ea85267a5fc7343"
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.3.10"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -499,6 +507,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.6"
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      sha256: "38d1c268de9097ff59cf0e844ac38759fc78f76836d37edad06fa21e182055a0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.34"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -838,7 +854,7 @@ packages:
     source: hosted
     version: "2.2.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
@@ -1430,4 +1446,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=3.9.0 <4.0.0"
-  flutter: ">=3.29.0"
+  flutter: ">=3.35.0"

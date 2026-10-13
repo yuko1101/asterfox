@@ -620,7 +620,7 @@ abstract class AppLocalizations {
   /// No description provided for @restart_required.
   ///
   /// In en, this message translates to:
-  /// **'Changing this option requires a restart to take effect.'**
+  /// **'Restart required'**
   String get restart_required;
 
   /// No description provided for @audio_channel.
@@ -706,6 +706,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Selected ({count})'**
   String selected(num count);
+
+  /// No description provided for @backup_and_restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and restore'**
+  String get backup_and_restore;
+
+  /// No description provided for @backup_and_restore_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and load the data on this device'**
+  String get backup_and_restore_description;
+
+  /// No description provided for @export_data.
+  ///
+  /// In en, this message translates to:
+  /// **'Export data'**
+  String get export_data;
+
+  /// No description provided for @export_data_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves the database and the stored music to a file'**
+  String get export_data_description;
+
+  /// No description provided for @restore_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a backup'**
+  String get restore_backup;
+
+  /// No description provided for @restore_backup_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaces the data on this device with a backup'**
+  String get restore_backup_description;
+
+  /// No description provided for @restore_backup_confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'The songs and the settings on this device are replaced by the backup. Are you sure?'**
+  String get restore_backup_confirmation;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failed;
+
+  /// No description provided for @restart_to_apply_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'The data was replaced. Restart the app to use it.'**
+  String get restart_to_apply_backup;
+
+  /// No description provided for @exported.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported'**
+  String get exported;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

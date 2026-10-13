@@ -282,7 +282,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get disable_interruptions_description => '他のアプリによる音楽の一時停止などの妨害を無効化します。';
 
   @override
-  String get restart_required => 'このオプションを適用するにはアプリの再起動が必要です。';
+  String get restart_required => '再起動が必要です';
 
   @override
   String get audio_channel => 'オーディオチャンネル';
@@ -340,4 +340,40 @@ class AppLocalizationsJa extends AppLocalizations {
   String selected(num count) {
     return '選択中 ($count個)';
   }
+
+  @override
+  String get backup_and_restore => 'バックアップと復元';
+
+  @override
+  String get backup_and_restore_description => 'この端末のデータを保存・読み込みします';
+
+  @override
+  String get export_data => 'データをエクスポート';
+
+  @override
+  String get export_data_description => 'データベースと保存した曲をファイルに書き出します';
+
+  @override
+  String get restore_backup => 'バックアップを復元';
+
+  @override
+  String get restore_backup_description => 'この端末のデータをバックアップで置き換えます';
+
+  @override
+  String get restore_backup_confirmation => 'この端末の曲と設定は、バックアップの内容で置き換えられます。よろしいですか？';
+
+  @override
+  String get restore => '復元';
+
+  @override
+  String get failed => '失敗';
+
+  @override
+  String get restart_to_apply_backup => 'データを置き換えました。アプリを再起動すると反映されます。';
+
+  @override
+  String get exported => 'エクスポートしました';
+
+  @override
+  String get cancelled => 'キャンセルしました';
 }

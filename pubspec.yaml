@@ -53,6 +53,9 @@ dependencies:
 
   fluttertoast: ^8.2.10
 
+  file_picker: ^10.3.10
+  path: ^1.9.0
+
   media_kit: ^1.2.6
   media_kit_libs_audio: ^1.0.5
 
@@ -98,6 +101,7 @@ dependencies:
 
   # Below are the dependencies for debugging, and don't need to be included in the release.
   colored_json: ^1.1.2
+  archive: ^4.0.7
   drift: ^2.31.0
   drift_flutter: ^0.2.3
   sqlite3_flutter_libs: ^0.5.42

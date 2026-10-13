@@ -282,7 +282,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get disable_interruptions_description => 'Protects music from being interrupted by other applications.';
 
   @override
-  String get restart_required => 'Changing this option requires a restart to take effect.';
+  String get restart_required => 'Restart required';
 
   @override
   String get audio_channel => 'Audio Channel';
@@ -340,4 +340,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String selected(num count) {
     return 'Selected ($count)';
   }
+
+  @override
+  String get backup_and_restore => 'Backup and restore';
+
+  @override
+  String get backup_and_restore_description => 'Save and load the data on this device';
+
+  @override
+  String get export_data => 'Export data';
+
+  @override
+  String get export_data_description => 'Saves the database and the stored music to a file';
+
+  @override
+  String get restore_backup => 'Restore a backup';
+
+  @override
+  String get restore_backup_description => 'Replaces the data on this device with a backup';
+
+  @override
+  String get restore_backup_confirmation => 'The songs and the settings on this device are replaced by the backup. Are you sure?';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get failed => 'Failed';
+
+  @override
+  String get restart_to_apply_backup => 'The data was replaced. Restart the app to use it.';
+
+  @override
+  String get exported => 'Exported';
+
+  @override
+  String get cancelled => 'Cancelled';
 }

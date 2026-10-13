@@ -228,5 +228,31 @@
                 "type": "num"
             }
         }
-    }
+    },
+    "backup_and_restore": "バックアップと復元",
+    "@backup_and_restore": {},
+    "backup_and_restore_description": "この端末のデータを保存・読み込みします",
+    "@backup_and_restore_description": {},
+    "export_data": "データをエクスポート",
+    "@export_data": {},
+    "export_data_description": "データベースと保存した曲をファイルに書き出します",
+    "@export_data_description": {},
+    "restore_backup": "バックアップを復元",
+    "@restore_backup": {},
+    "restore_backup_description": "この端末のデータをバックアップで置き換えます",
+    "@restore_backup_description": {},
+    "restore_backup_confirmation": "この端末の曲と設定は、バックアップの内容で置き換えられます。よろしいですか？",
+    "@restore_backup_confirmation": {},
+    "restore": "復元",
+    "@restore": {},
+    "failed": "失敗",
+    "@failed": {},
+    "restart_required": "再起動が必要です",
+    "@restart_required": {},
+    "restart_to_apply_backup": "データを置き換えました。アプリを再起動すると反映されます。",
+    "@restart_to_apply_backup": {},
+    "exported": "エクスポートしました",
+    "@exported": {},
+    "cancelled": "キャンセルしました",
+    "@cancelled": {}
 }

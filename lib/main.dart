@@ -29,6 +29,7 @@ import 'screens/home_screen.dart';
 import 'screens/playlist_info_screen.dart';
 import 'screens/playlists_screen.dart';
 import 'screens/settings/audio_channel_settings_screen.dart';
+import 'screens/settings/backup_settings_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/settings/theme_settings_screen.dart';
 import 'screens/song_history_screen.dart';
@@ -190,6 +191,7 @@ class AsterfoxApp extends StatelessWidget {
             "/settings/theme": (context) => const ThemeSettingsScreen(),
             "/settings/audioChannel": (context) =>
                 const AudioChannelSettingsScreen(),
+            "/settings/backup": (context) => const BackupSettingsScreen(),
             "/debug": (context) => const DebugScreen(),
           },
           onGenerateRoute: (settings) {
