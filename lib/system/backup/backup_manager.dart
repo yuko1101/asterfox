@@ -28,7 +28,9 @@ class BackupManager {
     required this.dataPath,
     required this.tempPath,
     AppDatabase? database,
-  }) : _database = database;
+    DateTime Function()? now,
+  })  : _database = database,
+        _now = now ?? DateTime.now;
 
   /// The folder the database and `music/` are stored in (`localPath` of
   /// main.dart).
@@ -39,6 +41,9 @@ class BackupManager {
 
   /// The database to export. Defaults to the one the app opened.
   final AppDatabase? _database;
+
+  /// The clock the backup file name is stamped with.
+  final DateTime Function() _now;
 
   AppDatabase get _db => _database ?? AppDatabase.instance;
 
@@ -59,11 +64,10 @@ class BackupManager {
   /// The names the parts of a backup are stored under.
   String get _snapshotPath => "$tempPath/$_databaseName";
   String get _extractPath => "$dataPath/.restore";
-  String get _zipPath => "$tempPath/${suggestedFileName()}";
 
   /// A name for a new backup file, e.g. `asterfox-backup-20261013-120000.zip`.
   String suggestedFileName() {
-    final now = DateTime.now();
+    final now = _now();
     String two(int value) => value.toString().padLeft(2, "0");
     final stamp = "${now.year}${two(now.month)}${two(now.day)}"
         "-${two(now.hour)}${two(now.minute)}${two(now.second)}";
@@ -77,6 +81,11 @@ class BackupManager {
     final directory = Directory(tempPath);
     if (!directory.existsSync()) directory.createSync(recursive: true);
 
+    // Stamp the name once: packing the music of a real device takes long
+    // enough that a second call would land on a different second and name a
+    // file that was never written.
+    final zip = File("$tempPath/${suggestedFileName()}");
+
     final snapshot = File(_snapshotPath);
     if (snapshot.existsSync()) snapshot.deleteSync();
 
@@ -88,7 +97,7 @@ class BackupManager {
     final music = Directory(musicPath);
 
     final encoder = ZipFileEncoder();
-    encoder.create(_zipPath);
+    encoder.create(zip.path);
     try {
       await encoder.addFile(snapshot, _databaseName);
       if (music.existsSync()) {
@@ -99,7 +108,7 @@ class BackupManager {
         jsonEncode({
           "app": "asterfox",
           "format": formatVersion,
-          "createdAt": DateTime.now().toIso8601String(),
+          "createdAt": _now().toIso8601String(),
           "databaseVersion": _db.schemaVersion,
           "includesMusic": music.existsSync(),
         }),
@@ -113,7 +122,7 @@ class BackupManager {
       if (snapshot.existsSync()) snapshot.deleteSync();
     }
 
-    return File(_zipPath);
+    return zip;
   }
 
   /// Replaces the stored data with the contents of [backup].
