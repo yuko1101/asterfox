@@ -17,7 +17,7 @@ import '../../system/theme/theme.dart';
 import '../../utils/network_utils.dart';
 import 'search_options.dart';
 import 'search_options_panel.dart';
-import 'search_scope_button.dart';
+import 'song_search_skeleton.dart';
 import 'song_search_tile.dart';
 import 'sort_and_filter.dart';
 import 'suggestion.dart';
@@ -32,11 +32,6 @@ class SongSearch
   final Set<SongSearchTile> selectedTiles = {};
 
   // search options
-  /// Whether the results come from the songs stored on this device rather than
-  /// from YouTube. Searching the library is the default, and the switch in the
-  /// options panel turns it off.
-  bool offlineSearch = true;
-
   /// How the stored songs are grouped, filtered and ordered.
   SearchOptions searchOptions = const SearchOptions();
 
@@ -45,6 +40,19 @@ class SongSearch
   /// Replaced in tests, so a shuffle can be checked without depending on how
   /// the generator picks.
   Random Function() random = Random.new;
+
+  /// How long typing has to stop for before YouTube is asked.
+  ///
+  /// Searching YouTube costs a request, so it is not done for every keystroke,
+  /// while the stored songs are shown as they are typed.
+  Duration searchDelay = const Duration(milliseconds: 500);
+
+  /// Fetches the YouTube suggestions for a query.
+  ///
+  /// The whole of the YouTube side of the search is behind this, so a test can
+  /// drive it without a network.
+  Future<List<Suggestion>> Function(String query) youtubeSearch =
+      _searchYouTube;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -74,16 +82,6 @@ class SongSearch
           query = "";
         },
       ),
-      // Which of the two scopes is searched is switched from here, in one
-      // press, rather than from inside the options.
-      SearchScopeButton(
-        offline: offlineSearch,
-        onChanged: (offline) {
-          offlineSearch = offline;
-          lastQuery = null;
-          searchResults();
-        },
-      ),
       IconButton(
         icon: const Icon(Icons.tune),
         color: Theme.of(context).extraColors.primary,
@@ -101,7 +99,6 @@ class SongSearch
                 child: SingleChildScrollView(
                   child: SearchOptionsPanel(
                     options: searchOptions,
-                    offline: offlineSearch,
                     onOptionsChanged: (options) {
                       searchOptions = options;
                       // The results are already on screen, so they are rebuilt
@@ -179,10 +176,22 @@ class SongSearch
   final ValueNotifier<List<SongSearchTile>> otherSelectedTilesNotifier =
       ValueNotifier([]);
 
+  /// The tiles of the YouTube results, under the stored songs. Empty while
+  /// nothing has come back yet.
+  final ValueNotifier<List<SongSearchTile>> youtubeTiles = ValueNotifier([]);
+
+  /// Whether the YouTube results are on their way, so a placeholder is shown
+  /// under the stored songs.
+  final ValueNotifier<bool> youtubeLoading = ValueNotifier(false);
+
   String? lastQuery;
 
   Timer? timer;
-  int searchedAt = 0;
+
+  /// Counts the searches, so the results of an older one can be told apart from
+  /// the results of the one that replaced it.
+  int searchId = 0;
+
   final ValueNotifier<bool> loading = ValueNotifier(false);
 
   @override
@@ -220,14 +229,35 @@ class SongSearch
         Expanded(
           child: Material(
             clipBehavior: Clip.antiAlias,
-            child: ValueListenableBuilder<List<SuggestionGroup>>(
-              valueListenable: songGroups,
-              builder: (_, groups, __) => ListView.builder(
-                shrinkWrap: false,
-                itemBuilder: (context, index) =>
-                    _buildGroup(context, groups[index], index),
-                itemCount: groups.length,
-              ),
+            child: ListView(
+              children: [
+                ValueListenableBuilder<List<SuggestionGroup>>(
+                  valueListenable: songGroups,
+                  builder: (context, groups, __) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var index = 0; index < groups.length; index++)
+                        _buildGroup(context, groups[index], index),
+                    ],
+                  ),
+                ),
+                // What YouTube found for the query, under the stored songs. A
+                // placeholder stands in for them until they arrive.
+                ValueListenableBuilder<List<SongSearchTile>>(
+                  valueListenable: youtubeTiles,
+                  builder: (context, tiles, __) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: tiles,
+                  ),
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: youtubeLoading,
+                  builder: (context, isLoading, __) => Visibility(
+                    visible: isLoading,
+                    child: const _YoutubeResultSkeletons(),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -268,89 +298,101 @@ class SongSearch
     );
   }
 
-  /// Runs the search the current query and options ask for.
+  /// Runs the search the current query asks for.
   ///
-  /// The stored songs are the default: they are what the user is most likely
-  /// looking for, and they need no network. YouTube is searched when the
-  /// offline search has been turned off, or when there is no network to reach
-  /// it with and there is a query to look up.
+  /// The stored songs are answered at once, since they need no network, and the
+  /// YouTube results follow underneath them once the typing has stopped. There
+  /// is no border between the two: YouTube is only worth asking when there is a
+  /// query, and only when there is a network.
   void searchResults() {
-    searchedAt = DateTime.now().millisecondsSinceEpoch;
     if (timer != null && timer!.isActive) {
       timer!.cancel();
     }
 
-    if (offlineSearch || !NetworkUtils.networkAccessible()) {
-      loadOfflineSongs(query);
+    loadOfflineSongs(query);
+
+    final wanted = query;
+    final time = ++searchId;
+    final noQuery = wanted.isEmpty;
+    final offline = !NetworkUtils.networkAccessible();
+    if (noQuery || offline) {
+      // Nothing from YouTube is coming, so no placeholder is left behind.
+      youtubeTiles.value = [];
+      youtubeLoading.value = false;
       return;
     }
-    if (query.isEmpty) {
-      loadOfflineSongs(query);
-      return;
-    }
-    final time = DateTime.now().millisecondsSinceEpoch;
-    timer = Timer(const Duration(milliseconds: 500), () {
-      loadSuggestions(query, time: time);
+
+    // A placeholder under the stored songs while the request is on its way.
+    youtubeTiles.value = [];
+    youtubeLoading.value = true;
+    timer = Timer(searchDelay, () {
+      loadYoutubeResults(wanted, time: time);
     });
   }
 
-  void loadSuggestions(String text, {int? time}) async {
-    loading.value = true;
-    final yt = YoutubeExplode();
-    final fetched = await Future.wait([
-      YouTubeMusicUtils.searchYouTubeVideo(text, yt),
-      YouTubeMusicUtils.searchWords(text, yt),
-    ]);
-    yt.close();
-    final List<Video> videos = fetched[0].map((e) => e as Video).toList();
-    final List<String> words = fetched[1].map((e) => e as String).toList();
-
-    final videoSuggestions = videos.map((e) {
-      final List<SongTag> tags = [SongTag.youtube];
-      if (LocalMusicsData.isStored(audioId: e.id.value)) {
-        tags.add(SongTag.stored);
-        if (LocalMusicsData.isInstalled(audioId: e.id.value)) {
-          tags.add(SongTag.installed);
-        }
+  /// Adds the YouTube results under the stored songs.
+  ///
+  /// [time] is the search this belongs to; a later search makes it stale, and
+  /// its results are dropped rather than shown under the newer ones.
+  Future<void> loadYoutubeResults(String text, {required int time}) async {
+    final List<Suggestion> result;
+    try {
+      result = await youtubeSearch(text);
+    } catch (_) {
+      // A failed request is not worth an error over the songs that are already
+      // on screen: the placeholder simply goes away.
+      if (time == searchId) {
+        youtubeTiles.value = [];
+        youtubeLoading.value = false;
       }
+      return;
+    }
+    if (time != searchId) return;
 
-      return SongSuggestion(
-        tags: tags,
-        title: e.title,
-        subtitle: e.author,
-        mediaUrl: e.url,
-        keywords: e.keywords,
+    youtubeTiles.value = result.map(_getSongSearchTile).toList();
+    youtubeLoading.value = false;
+  }
+
+  /// Asks YouTube for [text] and maps the answers to suggestions.
+  static Future<List<Suggestion>> _searchYouTube(String text) async {
+    final yt = YoutubeExplode();
+    try {
+      final fetched = await Future.wait([
+        YouTubeMusicUtils.searchYouTubeVideo(text, yt),
+        YouTubeMusicUtils.searchWords(text, yt),
+      ]);
+      final List<Video> videos = fetched[0].map((e) => e as Video).toList();
+      final List<String> words = fetched[1].map((e) => e as String).toList();
+
+      final videoSuggestions = videos.map((e) {
+        final List<SongTag> tags = [SongTag.youtube];
+        if (LocalMusicsData.isStored(audioId: e.id.value)) {
+          tags.add(SongTag.stored);
+          if (LocalMusicsData.isInstalled(audioId: e.id.value)) {
+            tags.add(SongTag.installed);
+          }
+        }
+
+        return SongSuggestion(
+          tags: tags,
+          title: e.title,
+          subtitle: e.author,
+          mediaUrl: e.url,
+          keywords: e.keywords,
+        );
+      });
+
+      final wordSuggestions = words.map(
+        (e) => WordSuggestion(title: e, word: e, keywords: []),
       );
-    }).toList();
 
-    final wordsSuggestions = words
-        .map((e) => WordSuggestion(title: e, word: e, keywords: []))
-        .toList();
-
-    final videoResult = filterAndSort(
-      list: videoSuggestions,
-      filterSortingList: [],
-    );
-    final wordResult = filterAndSort(
-      list: wordsSuggestions,
-      filterSortingList: [],
-    );
-
-    final result = [...videoResult, ...wordResult];
-
-    if (time == null || (time >= searchedAt)) {
-      suggestionTiles.value = result.map((s) => _getSongSearchTile(s)).toList();
-      // suggestionTiles.valueに含まれていない、選択されたSongSearchTile
-      otherSelectedTilesNotifier.value = selectedTiles
-          .where((s1) => !suggestionTiles.value
-              .any((s2) => s1.suggestion.isSameSuggestion(s2.suggestion)))
-          .toList();
-      loading.value = false;
+      return [...videoSuggestions, ...wordSuggestions];
+    } finally {
+      yt.close();
     }
   }
 
   Future<void> loadOfflineSongs(String text) async {
-    loading.value = true;
     // The tiles of the previous search are dropped, so a song that changed
     // state (it was downloaded, say) is shown with its state now rather than
     // the one it had when the tile was made.
@@ -410,7 +452,6 @@ class SongSearch
         .where((s1) => !suggestionTiles.value
             .any((s2) => s1.suggestion.isSameSuggestion(s2.suggestion)))
         .toList();
-    loading.value = false;
   }
 
   /// The tiles of the results, so that the same suggestion is shown as the
@@ -459,6 +500,24 @@ class SongSearch
 
     return theme.copyWith(
       appBarTheme: fixedAppBarTheme,
+    );
+  }
+}
+
+/// The placeholders shown under the stored songs while the YouTube results are
+/// on their way.
+class _YoutubeResultSkeletons extends StatelessWidget {
+  const _YoutubeResultSkeletons();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: const [
+        SongSearchTileSkeleton(),
+        SongSearchTileSkeleton(),
+        SongSearchTileSkeleton(),
+      ],
     );
   }
 }

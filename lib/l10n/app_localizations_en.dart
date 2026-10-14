@@ -273,12 +273,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offline_search => 'Offline Search';
 
   @override
-  String get offline_search_description => 'Search the songs stored on this device. Turn off to search YouTube instead.';
-
-  @override
-  String get youtube_search => 'YouTube Search';
-
-  @override
   String get search_options => 'Search options';
 
   @override

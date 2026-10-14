@@ -42,7 +42,6 @@ void main() {
 
   Widget panel({
     SearchOptions options = const SearchOptions(),
-    bool offline = true,
     ValueChanged<SearchOptions>? onOptionsChanged,
   }) {
     return MaterialApp(
@@ -52,7 +51,6 @@ void main() {
       home: Scaffold(
         body: SearchOptionsPanel(
           options: options,
-          offline: offline,
           onOptionsChanged: onOptionsChanged ?? (_) {},
         ),
       ),
@@ -61,7 +59,7 @@ void main() {
 
   testWidgets('the titles of the stored songs options are shown',
       (tester) async {
-    await tester.pumpWidget(panel(offline: true));
+    await tester.pumpWidget(panel());
     await tester.pumpAndSettle();
 
     expect(find.text('Group by'), findsOneWidget);
@@ -70,27 +68,13 @@ void main() {
     expect(find.text('Downloaded only'), findsOneWidget);
   });
 
-  testWidgets('the stored songs options are hidden when YouTube is used',
-      (tester) async {
-    // A song fetched from YouTube has no playlists, no lyrics and no date it
-    // was added, so none of these can be answered for it. The scope itself is
-    // changed by the button in the app bar, not from here.
-    await tester.pumpWidget(panel(offline: false));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Group by'), findsNothing);
-    expect(find.text('Sort by'), findsNothing);
-    expect(find.text('Filter'), findsNothing);
-    expect(find.text('Downloaded only'), findsNothing);
-  });
-
   testWidgets('the scope is not switched from the options', (tester) async {
-    // It belongs to the button in the app bar, so the options must not offer a
-    // second way to change it.
-    await tester.pumpWidget(panel(offline: true));
+    // The two searches are one list now, so there is no scope to switch.
+    await tester.pumpWidget(panel());
     await tester.pumpAndSettle();
 
     expect(find.text('Offline Search'), findsNothing);
+    expect(find.text('YouTube Search'), findsNothing);
     expect(find.byType(Switch), findsNWidgets(2)); // downloaded only, lyrics
   });
 

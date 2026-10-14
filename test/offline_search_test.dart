@@ -15,6 +15,8 @@ import 'package:asterfox/widget/search/search_options.dart';
 import 'package:asterfox/widget/search/song_search.dart';
 import 'package:asterfox/widget/search/sort_and_filter.dart';
 import 'package:asterfox/widget/search/suggestion.dart';
+import 'package:asterfox/utils/network_utils.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +57,10 @@ void main() {
     AppDatabase.setInstanceForTest(db);
     await CustomColors.init();
     l10n.value = lookupAppLocalizations(const Locale('en'));
+    // A search of the library still asks whether the network is there, since
+    // the YouTube results below it are only worth looking for when it is.
+    NetworkUtils.connectivityResults = [ConnectivityResult.wifi];
+    NetworkUtils.minimum = ConnectivityResult.wifi;
   });
 
   tearDown(() async {
@@ -137,16 +143,14 @@ void main() {
     expect(results.map((s) => s.title).toList()..sort(), ["Alpha", "Beta"]);
   });
 
-  test('with the offline scope a query searches the library', () async {
-    // The scope is read where the search is started, not where the results are
-    // drawn. With the offline scope on, a query is answered from the library
-    // without reaching for the network at all.
+  test('a query is answered from the library without the network', () async {
+    // The stored songs are shown as the query is typed, without waiting for
+    // YouTube: they need no request, so there is nothing to wait for.
     await storeSong(audioId: "a", title: "Alpha");
     await storeSong(audioId: "b", title: "Beta");
     await LocalMusicsData.reloadDatabase();
 
     final search = SongSearch();
-    expect(search.offlineSearch, isTrue, reason: 'the stored songs by default');
     search.query = "Alpha";
     search.searchResults();
     // The offline search is synchronous, so the results are already in place.
