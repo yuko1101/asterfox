@@ -415,4 +415,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancelled => 'Cancelled';
+
+  @override
+  String get related_videos => 'Related Videos';
+
+  @override
+  String get no_related_videos => 'No related videos found';
+
+  @override
+  String get stop_preview => 'Stop the preview';
+
+  @override
+  String get add_to_queue => 'Add to queue';
+
+  @override
+  String get in_queue => 'Already in the queue';
 }

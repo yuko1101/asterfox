@@ -279,5 +279,15 @@
     "exported": "Exported",
     "@exported": {},
     "cancelled": "Cancelled",
-    "@cancelled": {}
+    "@cancelled": {},
+    "related_videos": "Related Videos",
+    "@related_videos": {},
+    "no_related_videos": "No related videos found",
+    "@no_related_videos": {},
+    "stop_preview": "Stop the preview",
+    "@stop_preview": {},
+    "add_to_queue": "Add to queue",
+    "@add_to_queue": {},
+    "in_queue": "Already in the queue",
+    "@in_queue": {}
 }

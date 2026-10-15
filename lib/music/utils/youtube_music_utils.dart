@@ -176,6 +176,34 @@ class YouTubeMusicUtils {
     });
   }
 
+  /// The videos YouTube lists next to [videoId], most related first.
+  ///
+  /// Throws [NetworkException] if the network is not accessible.
+  static Future<List<Video>> getRelatedVideos(
+    String videoId,
+    YoutubeExplode? yt,
+  ) async {
+    NetworkUtils.check();
+
+    // The client is closed only when it was made here: a caller that passes its
+    // own wants to use it again. (Unlike [withYT], which closes a temporary one
+    // as soon as the call has been started.)
+    final client = yt ?? YoutubeExplode();
+    try {
+      final video = await client.videos.get(videoId);
+      final related = await client.videos.getRelatedVideos(video);
+      final videos = related?.toList() ?? <Video>[];
+      // A video is not related to itself, and the same one is not listed twice.
+      final seen = <String>{videoId};
+      return [
+        for (final video in videos)
+          if (seen.add(video.id.value)) video,
+      ];
+    } finally {
+      if (yt == null) client.close();
+    }
+  }
+
   /// Throws [NetworkException] if the network is not accessible.
   static Future<List<String>> searchWords(
     String query,

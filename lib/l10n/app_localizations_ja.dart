@@ -415,4 +415,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get cancelled => 'キャンセルしました';
+
+  @override
+  String get related_videos => '関連動画';
+
+  @override
+  String get no_related_videos => '関連動画が見つかりませんでした';
+
+  @override
+  String get stop_preview => '試し聴きをやめる';
+
+  @override
+  String get add_to_queue => 'キューに追加';
+
+  @override
+  String get in_queue => 'キューに追加済み';
 }

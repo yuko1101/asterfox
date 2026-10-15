@@ -14,6 +14,7 @@ import '../../music/music_data/youtube_music_data.dart';
 import '../../music/downloader/downloader_manager.dart';
 import '../../system/theme/theme.dart';
 import '../loading_dialog.dart';
+import '../preview/related_videos_screen.dart';
 
 class MoreActionsButton extends StatelessWidget {
   const MoreActionsButton({
@@ -22,6 +23,20 @@ class MoreActionsButton extends StatelessWidget {
 
   // TODO: Add more actions
   static final List<_Action> _actions = [
+    _Action(
+      id: "related_videos",
+      icon: Icons.auto_awesome,
+      title: (context) => l10n.value.related_videos,
+      onTap: (song, context) {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => RelatedVideosScreen(song: song!),
+          ),
+        );
+      },
+      songFilter: (MusicData? song) => song != null,
+    ),
     _Action(
       id: "share",
       icon: Icons.share,

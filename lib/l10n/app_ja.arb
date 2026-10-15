@@ -280,5 +280,15 @@
     "exported": "エクスポートしました",
     "@exported": {},
     "cancelled": "キャンセルしました",
-    "@cancelled": {}
+    "@cancelled": {},
+    "related_videos": "関連動画",
+    "@related_videos": {},
+    "no_related_videos": "関連動画が見つかりませんでした",
+    "@no_related_videos": {},
+    "stop_preview": "試し聴きをやめる",
+    "@stop_preview": {},
+    "add_to_queue": "キューに追加",
+    "@add_to_queue": {},
+    "in_queue": "キューに追加済み",
+    "@in_queue": {}
 }

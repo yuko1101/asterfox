@@ -856,6 +856,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancelled'**
   String get cancelled;
+
+  /// No description provided for @related_videos.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Videos'**
+  String get related_videos;
+
+  /// No description provided for @no_related_videos.
+  ///
+  /// In en, this message translates to:
+  /// **'No related videos found'**
+  String get no_related_videos;
+
+  /// No description provided for @stop_preview.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the preview'**
+  String get stop_preview;
+
+  /// No description provided for @add_to_queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to queue'**
+  String get add_to_queue;
+
+  /// No description provided for @in_queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Already in the queue'**
+  String get in_queue;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
