@@ -106,6 +106,13 @@ class _SyncedLyricsListState extends State<SyncedLyricsList> {
     });
   }
 
+  /// Plays from [line], and follows it at once even after a manual scroll.
+  void _tap(SyncedLyricLine line) {
+    _resumeTimer?.cancel();
+    _userScrolledAt = DateTime.fromMillisecondsSinceEpoch(0);
+    widget.onTapLine!(line);
+  }
+
   bool _onScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.idle) return false;
     _userScrolledAt = DateTime.now();
@@ -125,13 +132,18 @@ class _SyncedLyricsListState extends State<SyncedLyricsList> {
 
     return NotificationListener<UserScrollNotification>(
       onNotification: _onScroll,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(vertical: height * 0.2, horizontal: 16),
-        child: Column(
-          children: [
-            for (var i = 0; i < widget.lines.length; i++)
-              _line(context, i, i == current, i < current, base, theme),
-          ],
+      // Its own Material, so that a tapped line ripples above the sheet's
+      // background colour instead of under it.
+      child: Material(
+        type: MaterialType.transparency,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: height * 0.2, horizontal: 16),
+          child: Column(
+            children: [
+              for (var i = 0; i < widget.lines.length; i++)
+                _line(context, i, i == current, i < current, base, theme),
+            ],
+          ),
         ),
       ),
     );
@@ -146,7 +158,7 @@ class _SyncedLyricsListState extends State<SyncedLyricsList> {
             ?.withValues(alpha: isPast ? 0.4 : 0.65);
     return InkWell(
       key: _keys[index],
-      onTap: widget.onTapLine == null ? null : () => widget.onTapLine!(line),
+      onTap: widget.onTapLine == null ? null : () => _tap(line),
       borderRadius: BorderRadius.circular(8),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),

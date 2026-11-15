@@ -301,5 +301,30 @@ void main() {
       await tester.tap(find.text("line 2"));
       expect(tapped, lines[2]);
     });
+
+    testWidgets("follows a line tapped right after scrolling by hand",
+        (tester) async {
+      SyncedLyricLine? tapped;
+      void onTap(SyncedLyricLine line) => tapped = line;
+      await pump(tester, ms(0), onTap: onTap);
+      await tester.pumpAndSettle();
+
+      await tester.drag(
+          find.byType(SingleChildScrollView), const Offset(0, -600));
+      await tester.pumpAndSettle();
+      final target = find.text("line 12");
+      await tester.ensureVisible(target);
+      await tester.pumpAndSettle();
+      await tester.tap(target);
+      expect(tapped, lines[12]);
+
+      // The player then reports the tapped line's time.
+      await pump(tester, tapped!.start, onTap: onTap);
+      await tester.pumpAndSettle();
+      expect(styleOf(tester, "line 12").fontWeight, FontWeight.bold);
+      final screen = tester.getSize(find.byType(Scaffold));
+      expect(tester.getCenter(target).dy,
+          closeTo(screen.height / 2, screen.height / 4));
+    });
   });
 }
