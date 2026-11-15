@@ -886,6 +886,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already in the queue'**
   String get in_queue;
+
+  /// No description provided for @lyrics_timing.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics timing'**
+  String get lyrics_timing;
+
+  /// No description provided for @lyrics_as_fetched.
+  ///
+  /// In en, this message translates to:
+  /// **'As fetched'**
+  String get lyrics_as_fetched;
+
+  /// No description provided for @lyrics_later.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s later'**
+  String lyrics_later(String seconds);
+
+  /// No description provided for @lyrics_earlier.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s earlier'**
+  String lyrics_earlier(String seconds);
+
+  /// No description provided for @lyrics_timing_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to as fetched'**
+  String get lyrics_timing_reset;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

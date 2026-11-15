@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:asterfox/l10n/app_localizations.dart';
+import 'package:asterfox/main.dart';
 import 'package:asterfox/music/lyrics/lrc.dart';
 import 'package:asterfox/music/lyrics/synced_lyrics_providers.dart';
 import 'package:asterfox/widget/music_widgets/synced_lyrics_view.dart';
@@ -56,6 +58,23 @@ void main() {
       expect(Lrc.format(lines), "[00:09.69] The club\n[01:01.00] ");
       expect(Lrc.parse(Lrc.format(lines)), lines);
       expect(Lrc.toPlainText(Lrc.format(lines)), "The club");
+    });
+
+    test("keeps the fetched timestamps under an offset it can change", () {
+      const fetched = "[ar: 40mP]\n[00:01.00] a\n[00:02.00] b";
+      expect(Lrc.offsetOf(fetched), 0);
+
+      final sooner = Lrc.withOffset(fetched, 300);
+      expect(Lrc.offsetOf(sooner), 300);
+      expect(Lrc.parse(sooner),
+          [SyncedLyricLine(ms(700), "a"), SyncedLyricLine(ms(1700), "b")]);
+
+      final later = Lrc.withOffset(sooner, -1500);
+      expect(Lrc.offsetOf(later), -1500);
+      expect("[offset:".allMatches(later).length, 1);
+      expect(Lrc.parse(later).first, SyncedLyricLine(ms(2500), "a"));
+
+      expect(Lrc.withOffset(later, 0), fetched);
     });
 
     test("tells the line being sung", () {
@@ -325,6 +344,46 @@ void main() {
       final screen = tester.getSize(find.byType(Scaffold));
       expect(tester.getCenter(target).dy,
           closeTo(screen.height / 2, screen.height / 4));
+    });
+  });
+  group("LyricsOffsetBar", () {
+    setUp(() => l10n.value = lookupAppLocalizations(const Locale("en")));
+
+    Future<List<int>> pumpBar(WidgetTester tester, int offset) async {
+      final changes = <int>[];
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: LyricsOffsetBar(offset: offset, onChanged: changes.add),
+        ),
+      ));
+      return changes;
+    }
+
+    testWidgets("moves the lyrics sooner or later by small and large steps",
+        (tester) async {
+      final changes = await pumpBar(tester, 200);
+      expect(find.text("0.2 s earlier"), findsOneWidget);
+
+      for (final tooltip in [
+        "0.5 s earlier",
+        "0.1 s earlier",
+        "0.1 s later",
+        "0.5 s later",
+        "Back to as fetched",
+      ]) {
+        await tester.tap(find.byTooltip(tooltip));
+      }
+      expect(changes, [700, 300, 100, -300, 0]);
+    });
+
+    testWidgets("says when the timing is as fetched", (tester) async {
+      final changes = await pumpBar(tester, 0);
+      expect(find.text("As fetched"), findsOneWidget);
+      await tester.tap(find.byTooltip("Back to as fetched"));
+      expect(changes, isEmpty);
+
+      await pumpBar(tester, -1200);
+      expect(find.text("1.2 s later"), findsOneWidget);
     });
   });
 }

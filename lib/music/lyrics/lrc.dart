@@ -76,6 +76,33 @@ class Lrc {
     ];
   }
 
+  /// The `[offset:]` of [text] in milliseconds: how much sooner its lines are
+  /// shown than their timestamps say. 0 when it has none.
+  static int offsetOf(String text) {
+    var offset = 0;
+    for (final line in text.split("\n")) {
+      final tag = _tag.firstMatch(line.trim());
+      if (tag != null && tag.group(1) == "offset") {
+        offset = int.tryParse(tag.group(2)!) ?? 0;
+      }
+    }
+    return offset;
+  }
+
+  /// [text] shown [offset] milliseconds sooner than its timestamps say, by
+  /// rewriting its `[offset:]` tag. The timestamps stay as they were fetched,
+  /// so going back to 0 gives the fetched timing again.
+  static String withOffset(String text, int offset) {
+    final lines = text.split("\n").where((line) {
+      final tag = _tag.firstMatch(line.trim());
+      return tag == null || tag.group(1) != "offset";
+    });
+    return [
+      if (offset != 0) "[offset:${offset > 0 ? "+" : ""}$offset]",
+      ...lines,
+    ].join("\n");
+  }
+
   /// Whether [text] holds timed lyrics rather than plain ones.
   static bool isSynced(String text) => parse(text).isNotEmpty;
 

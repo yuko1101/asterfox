@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -45,56 +47,117 @@ class LyricsButton extends StatelessWidget {
   }
 
   static void showLyrics(MusicData song, BuildContext context) {
-    final syncedLines = Lrc.parse(song.lyrics);
     showModalBottomSheet(
       context: context,
-      builder: (context) => Material(
-        child: Column(
-          children: [
-            AppBar(
-              title: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                scrollDirection: Axis.horizontal,
-                child: Text(
-                  song.title,
-                  style: TextStyle(
-                    color: Theme.of(context).extraColors.secondary,
-                  ),
+      builder: (context) => LyricsSheet(song: song),
+    );
+  }
+}
+
+/// A song's lyrics. Timed ones follow playback, and their timing can be
+/// shifted by hand from the button in the app bar.
+class LyricsSheet extends StatefulWidget {
+  const LyricsSheet({super.key, required this.song});
+
+  final MusicData song;
+
+  /// How long the timing waits to be saved after the last change, so that
+  /// tapping a step button several times saves once.
+  static const saveDelay = Duration(milliseconds: 800);
+
+  @override
+  State<LyricsSheet> createState() => _LyricsSheetState();
+}
+
+class _LyricsSheetState extends State<LyricsSheet> {
+  MusicData get song => widget.song;
+
+  late String _lyrics = song.lyrics;
+  late List<SyncedLyricLine> _lines = Lrc.parse(_lyrics);
+  bool _adjusting = false;
+  Timer? _saveTimer;
+
+  @override
+  void dispose() {
+    if (_saveTimer?.isActive ?? false) {
+      _saveTimer!.cancel();
+      _save();
+    }
+    super.dispose();
+  }
+
+  void _setOffset(int offset) {
+    setState(() {
+      _lyrics = Lrc.withOffset(_lyrics, offset);
+      _lines = Lrc.parse(_lyrics);
+    });
+    _saveTimer?.cancel();
+    _saveTimer = Timer(LyricsSheet.saveDelay, _save);
+  }
+
+  void _save() => LyricsFinder.applyLyrics(song, _lyrics, true);
+
+  @override
+  Widget build(BuildContext context) {
+    final synced = _lines.isNotEmpty;
+    return Material(
+      child: Column(
+        children: [
+          AppBar(
+            title: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                song.title,
+                style: TextStyle(
+                  color: Theme.of(context).extraColors.secondary,
                 ),
               ),
-              leading: IconButton(
-                icon: const Icon(Icons.expand_more),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                tooltip: l10n.value.close,
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.edit_note),
-                  onPressed: () {
-                    final navigator = Navigator.of(context)..pop();
-                    FindLyricsDialog(song).show(navigator.context);
-                  },
-                )
-              ],
             ),
-            Flexible(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: syncedLines.isNotEmpty
-                    ? SyncedLyricsView(song: song, lines: syncedLines)
-                    : SingleChildScrollView(
-                        child: Text(
-                          song.lyrics,
-                          textAlign: TextAlign.center,
-                        ),
+            leading: IconButton(
+              icon: const Icon(Icons.expand_more),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              tooltip: l10n.value.close,
+            ),
+            actions: [
+              if (synced)
+                IconButton(
+                  icon: const Icon(Icons.av_timer),
+                  tooltip: l10n.value.lyrics_timing,
+                  isSelected: _adjusting,
+                  onPressed: () => setState(() => _adjusting = !_adjusting),
+                ),
+              IconButton(
+                icon: const Icon(Icons.edit_note),
+                onPressed: () {
+                  final navigator = Navigator.of(context)..pop();
+                  FindLyricsDialog(song).show(navigator.context);
+                },
+              )
+            ],
+          ),
+          Flexible(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: synced
+                  ? SyncedLyricsView(song: song, lines: _lines)
+                  : SingleChildScrollView(
+                      child: Text(
+                        _lyrics,
+                        textAlign: TextAlign.center,
                       ),
-              ),
-            )
-          ],
-        ),
+                    ),
+            ),
+          ),
+          if (synced && _adjusting)
+            LyricsOffsetBar(
+              offset: Lrc.offsetOf(_lyrics),
+              onChanged: _setOffset,
+            ),
+        ],
       ),
     );
   }

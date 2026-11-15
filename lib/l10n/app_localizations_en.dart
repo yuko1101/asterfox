@@ -430,4 +430,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get in_queue => 'Already in the queue';
+
+  @override
+  String get lyrics_timing => 'Lyrics timing';
+
+  @override
+  String get lyrics_as_fetched => 'As fetched';
+
+  @override
+  String lyrics_later(String seconds) {
+    return '$seconds s later';
+  }
+
+  @override
+  String lyrics_earlier(String seconds) {
+    return '$seconds s earlier';
+  }
+
+  @override
+  String get lyrics_timing_reset => 'Back to as fetched';
 }

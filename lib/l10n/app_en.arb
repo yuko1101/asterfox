@@ -289,5 +289,27 @@
     "add_to_queue": "Add to queue",
     "@add_to_queue": {},
     "in_queue": "Already in the queue",
-    "@in_queue": {}
+    "@in_queue": {},
+    "lyrics_timing": "Lyrics timing",
+    "@lyrics_timing": {},
+    "lyrics_as_fetched": "As fetched",
+    "@lyrics_as_fetched": {},
+    "lyrics_later": "{seconds} s later",
+    "@lyrics_later": {
+        "placeholders": {
+            "seconds": {
+                "type": "String"
+            }
+        }
+    },
+    "lyrics_earlier": "{seconds} s earlier",
+    "@lyrics_earlier": {
+        "placeholders": {
+            "seconds": {
+                "type": "String"
+            }
+        }
+    },
+    "lyrics_timing_reset": "Back to as fetched",
+    "@lyrics_timing_reset": {}
 }

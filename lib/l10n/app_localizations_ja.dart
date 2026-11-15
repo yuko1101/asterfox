@@ -430,4 +430,23 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get in_queue => 'キューに追加済み';
+
+  @override
+  String get lyrics_timing => '歌詞のタイミング';
+
+  @override
+  String get lyrics_as_fetched => '取得したまま';
+
+  @override
+  String lyrics_later(String seconds) {
+    return '$seconds 秒遅く';
+  }
+
+  @override
+  String lyrics_earlier(String seconds) {
+    return '$seconds 秒早く';
+  }
+
+  @override
+  String get lyrics_timing_reset => '取得したままに戻す';
 }

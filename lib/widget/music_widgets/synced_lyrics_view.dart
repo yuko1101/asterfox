@@ -184,3 +184,76 @@ class _SyncedLyricsListState extends State<SyncedLyricsList> {
     );
   }
 }
+
+/// Shifts timed lyrics by hand when they run ahead of or behind the song.
+///
+/// [offset] is the LRC offset in milliseconds: positive shows the lyrics
+/// sooner. The buttons read as moving the lyrics, not the offset.
+class LyricsOffsetBar extends StatelessWidget {
+  const LyricsOffsetBar({
+    super.key,
+    required this.offset,
+    required this.onChanged,
+  });
+
+  final int offset;
+  final ValueChanged<int> onChanged;
+
+  static const smallStep = 100;
+  static const largeStep = 500;
+
+  static String describe(int offset) {
+    if (offset == 0) return l10n.value.lyrics_as_fetched;
+    final seconds = (offset.abs() / 1000).toStringAsFixed(1);
+    return offset > 0
+        ? l10n.value.lyrics_earlier(seconds)
+        : l10n.value.lyrics_later(seconds);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget step(IconData icon, int by, String tooltip) => IconButton(
+          icon: Icon(icon),
+          tooltip: tooltip,
+          onPressed: () => onChanged(offset + by),
+        );
+    String seconds(int millis) => (millis / 1000).toStringAsFixed(1);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.value.lyrics_timing,
+              style: Theme.of(context).textTheme.labelMedium),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              step(Icons.keyboard_double_arrow_left, largeStep,
+                  l10n.value.lyrics_earlier(seconds(largeStep))),
+              step(Icons.chevron_left, smallStep,
+                  l10n.value.lyrics_earlier(seconds(smallStep))),
+              SizedBox(
+                width: 120,
+                child: Text(
+                  describe(offset),
+                  key: const ValueKey("lyrics-offset"),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              step(Icons.chevron_right, -smallStep,
+                  l10n.value.lyrics_later(seconds(smallStep))),
+              step(Icons.keyboard_double_arrow_right, -largeStep,
+                  l10n.value.lyrics_later(seconds(largeStep))),
+              IconButton(
+                icon: const Icon(Icons.restart_alt),
+                tooltip: l10n.value.lyrics_timing_reset,
+                onPressed: offset == 0 ? null : () => onChanged(0),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

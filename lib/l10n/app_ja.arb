@@ -290,5 +290,27 @@
     "add_to_queue": "キューに追加",
     "@add_to_queue": {},
     "in_queue": "キューに追加済み",
-    "@in_queue": {}
+    "@in_queue": {},
+    "lyrics_timing": "歌詞のタイミング",
+    "@lyrics_timing": {},
+    "lyrics_as_fetched": "取得したまま",
+    "@lyrics_as_fetched": {},
+    "lyrics_later": "{seconds} 秒遅く",
+    "@lyrics_later": {
+        "placeholders": {
+            "seconds": {
+                "type": "String"
+            }
+        }
+    },
+    "lyrics_earlier": "{seconds} 秒早く",
+    "@lyrics_earlier": {
+        "placeholders": {
+            "seconds": {
+                "type": "String"
+            }
+        }
+    },
+    "lyrics_timing_reset": "取得したままに戻す",
+    "@lyrics_timing_reset": {}
 }
