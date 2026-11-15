@@ -1,67 +1,44 @@
+import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
+import '../main.dart';
 import '../music/music_data/music_data.dart';
 import '../music/utils/music_data_utils.dart';
 import '../utils/os.dart';
-import 'exceptions/invalid_type_of_media_url_exception.dart';
 import 'home_screen_music_manager.dart';
 
 class SharingIntent {
   static void init() {
     if (OS.isAndroid || OS.isIOS) {
-      ReceiveSharingIntent.instance.getMediaStream().listen((mediaList) {
-        addSongs(mediaList, false);
-      });
-
-      ReceiveSharingIntent.instance.getInitialMedia().then((mediaList) {
-        addSongs(mediaList, true);
-      });
+      ReceiveSharingIntent.instance.getMediaStream().listen(addSongs);
+      ReceiveSharingIntent.instance.getInitialMedia().then(addSongs);
     }
   }
 
-  static Future<void> addSongs(
-      List<SharedMediaFile> mediaList, bool initial) async {
-    // Fluttertoast.showToast(msg: "${initial ? "Initial " : ""}Loading from $text");
-    if (mediaList.isEmpty) return;
-
+  /// Adds the songs of what was shared to the app: a url of a song or of a
+  /// playlist, or a text to search for.
+  static Future<void> addSongs(List<SharedMediaFile> mediaList) async {
     final List<MusicData<CachingDisabled>> musicDataList = [];
 
     for (final media in mediaList) {
-      if (media.type == SharedMediaType.url ||
-          (media.type == SharedMediaType.text && media.path.isUrl)) {
-        musicDataList.addAll(await fetchSongsFromUrl(media.path));
-      } else if (media.type == SharedMediaType.text) {
-        musicDataList.add(await fetchSongsByQuery(media.path));
-      }
-    }
-
-    await HomeScreenMusicManager.addSongs(
-      count: musicDataList.length,
-      musicDataList: musicDataList,
-    );
-  }
-
-  static Future<MusicData<CachingDisabled>> fetchSongsByQuery(String query) {
-    return MusicDataUtils.search(query);
-  }
-
-  static Future<List<MusicData<CachingDisabled>>> fetchSongsFromUrl(
-      String url) async {
-    final List<MusicData<CachingDisabled>> musicDataList = [];
-
-    try {
-      musicDataList.add(await MusicDataUtils.fetchFromUrl(url));
-    } on InvalidTypeOfMediaUrlException {
+      final isText = media.type == SharedMediaType.text;
+      if (media.type != SharedMediaType.url && !isText) continue;
       try {
-        await for (final musicData
-            in MusicDataUtils.fetchPlaylistFromUrl(url)) {
-          musicDataList.add(musicData);
-        }
+        // A text that is not a url is searched for, and a url that is not a
+        // song is tried as a playlist.
+        musicDataList.addAll(await MusicDataUtils.searchList(media.path));
       } catch (e) {
-        // TODO: handle exception
+        debugPrint("[Asterfox] failed to load the shared ${media.path}: $e");
       }
     }
 
-    return musicDataList;
+    if (musicDataList.isEmpty) {
+      if (mediaList.isNotEmpty && l10n.isInitialized) {
+        Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
+      }
+      return;
+    }
+    await HomeScreenMusicManager.addSongs(musicDataList: musicDataList);
   }
 }

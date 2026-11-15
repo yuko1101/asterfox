@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 import '../data/custom_colors.dart';
 import '../data/playlist_data.dart';
@@ -31,7 +30,7 @@ class PlaylistsScreen extends ScaffoldScreen {
             ),
             backgroundColor: value.isEmpty
                 ? null
-                : CustomColors.getColor("accent").withOpacity(0.8),
+                : CustomColors.getColor("accent").withValues(alpha: 0.8),
             leading: IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.arrow_back),
@@ -73,6 +72,8 @@ class PlaylistsScreen extends ScaffoldScreen {
                               TextButton(
                                 onPressed: () {
                                   Navigator.of(context).pop();
+                                  // Removed from the list at once; the
+                                  // database follows.
                                   PlaylistsData.removeMultiple(
                                       value.map((p) => p.id).toList());
                                   playlistsNotifier.value = [
@@ -135,12 +136,10 @@ class PlaylistDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            final playlist = AppPlaylist(
-              id: const Uuid().v4(),
-              name: controller.text,
-              songs: [],
-            );
-            Navigator.of(context).pop(playlist);
+            final name = controller.text.trim();
+            // A playlist with no name could not be told apart in the list.
+            if (name.isEmpty) return;
+            Navigator.of(context).pop(AppPlaylist.create(name));
           },
           child: Text(l10n.value.create),
         ),

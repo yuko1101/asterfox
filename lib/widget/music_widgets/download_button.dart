@@ -46,9 +46,10 @@ class DownloadButton extends StatelessWidget {
               );
             }
 
-            final medias = musicManager.audioStateManager.songsNotifier.value
-                .$medias[audioState.currentIndex!];
-            if (medias.uri.isUrl) {
+            // The song was downloaded while it was in the queue, so it still
+            // plays from the url until it is reloaded.
+            final media = audioState.$medias[audioState.currentIndex!];
+            if (media.uri.isUrl) {
               return IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () =>

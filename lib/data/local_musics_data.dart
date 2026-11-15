@@ -137,21 +137,18 @@ class LocalMusicsData {
 
   /// Throws [SongNotStoredException] if the song is not stored.
   static Future<void> uninstallSongs(List<String> audioIds) async {
-    final futures = audioIds.map((id) => uninstall(id));
-    await Future.wait(futures);
+    await Future.wait(audioIds.map(uninstall));
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.
   static Future<void> delete(String audioId, {bool saveDataFile = true}) async {
-    Future<void> deleteFromDataFile() async {
-      _data.remove(audioId);
-      if (saveDataFile) {
-        await _delete(audioId);
-        await CloudFirestoreManager.removeSongs([audioId]);
-      }
+    // Uninstalled first: it needs the song to still be stored.
+    await uninstall(audioId);
+    _data.remove(audioId);
+    if (saveDataFile) {
+      await _delete(audioId);
+      await CloudFirestoreManager.removeSongs([audioId]);
     }
-
-    await Future.wait([uninstall(audioId), deleteFromDataFile()]);
   }
 
   /// Throws [SongNotStoredException] if the song is not stored.
@@ -165,7 +162,8 @@ class LocalMusicsData {
     await CloudFirestoreManager.removeSongs(audioIds);
   }
 
-  static Future<void> _upsert(String audioId, Map<String, dynamic> entry) async {
+  static Future<void> _upsert(
+      String audioId, Map<String, dynamic> entry) async {
     await _db.documents.insertOnConflictUpdate(
       DocumentsCompanion.insert(
         scope: _scope,
@@ -177,7 +175,8 @@ class LocalMusicsData {
 
   static Future<void> _delete(String audioId) async {
     await (_db.delete(_db.documents)
-          ..where((table) => table.scope.equals(_scope) & table.id.equals(audioId)))
+          ..where(
+              (table) => table.scope.equals(_scope) & table.id.equals(audioId)))
         .go();
   }
 
@@ -189,14 +188,6 @@ class LocalMusicsData {
             ))
         .toList();
   }
-
-  // static List<String> getYouTubeIds() {
-  //   final data = musicData.getValue(null) as Map<String, dynamic>;
-  //   return data.values
-  //       .where((element) => element["type"] == MusicType.youtube.name)
-  //       .map((e) => e["id"] as String)
-  //       .toList();
-  // }
 
   static List<String> getStoredAudioIds() => _data.keys.toList();
 

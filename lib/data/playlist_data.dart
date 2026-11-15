@@ -102,9 +102,16 @@ class PlaylistsData {
         for (final entry in json.entries)
           entry.key: Map<String, dynamic>.from(entry.value as Map)
       });
-    for (final entry in _data.entries) {
-      await _upsert(entry.key, entry.value);
-    }
+    // The playlists that are not in [json] are removed from the database too,
+    // or they would come back the next time it is read.
+    await _db.transaction(() async {
+      await (_db.delete(_db.documents)
+            ..where((table) => table.scope.equals(_scope)))
+          .go();
+      for (final entry in _data.entries) {
+        await _upsert(entry.key, entry.value);
+      }
+    });
   }
 
   static Future<void> clear() async {

@@ -45,24 +45,27 @@ class _ThemeChoice extends StatefulWidget {
 class _ThemeChoiceState extends State<_ThemeChoice> {
   @override
   Widget build(BuildContext context) {
-    return SettingsList(
-      sections: [
-        SettingsSection(
-          title: Text(l10n.value.theme),
-          tiles: AppTheme.themes
-              .map((theme) => theme.themeDetails.name)
-              .map((name) => RadioListTile(
-                  title: Text(l10n.value.theme_names(name)),
-                  value: name,
-                  groupValue: AppTheme.themeNotifier.value.themeDetails.name,
-                  activeColor: CustomColors.getColor("accent"),
-                  onChanged: (value) {
-                    AppTheme.setTheme(value as String);
-                  }))
-              .map((radioListTile) => CustomSettingsTile(child: radioListTile))
-              .toList(),
-        ),
-      ],
+    return RadioGroup<String>(
+      groupValue: AppTheme.themeNotifier.value.themeDetails.name,
+      onChanged: (value) {
+        if (value != null) AppTheme.setTheme(value);
+      },
+      child: SettingsList(
+        sections: [
+          SettingsSection(
+            title: Text(l10n.value.theme),
+            tiles: AppTheme.themes
+                .map((theme) => theme.themeDetails.name)
+                .map((name) => RadioListTile(
+                    title: Text(l10n.value.theme_names(name)),
+                    value: name,
+                    activeColor: CustomColors.getColor("accent")))
+                .map(
+                    (radioListTile) => CustomSettingsTile(child: radioListTile))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -14,12 +14,16 @@ class AppPlaylist {
   String name;
   final List<String> songs;
 
-  List<MusicData<T>> getMusicDataList<T extends Caching>(T caching) => songs
-      .map((audioId) => LocalMusicsData.getByAudioId<T>(
-            audioId: audioId,
-            caching: caching.unique(),
-          ))
-      .toList();
+  /// The songs of this playlist that are stored. A song deleted from the
+  /// library after it was put in the playlist is left out.
+  List<MusicData<T>> getMusicDataList<T extends Caching>(T caching) => [
+        for (final audioId in songs)
+          if (LocalMusicsData.isStored(audioId: audioId))
+            LocalMusicsData.getByAudioId<T>(
+              audioId: audioId,
+              caching: caching.unique(),
+            ),
+      ];
 
   Map<String, dynamic> toJson() {
     return {

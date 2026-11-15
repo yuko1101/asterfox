@@ -33,7 +33,7 @@ class MusicCardWidget extends StatelessWidget {
     return Dismissible(
       key: ObjectKey(song),
       background: Container(
-        color: Theme.of(context).extraColors.primary.withOpacity(0.07),
+        color: Theme.of(context).extraColors.primary.withValues(alpha: 0.07),
       ),
       dismissThresholds: const {
         DismissDirection.endToStart: 0.6,

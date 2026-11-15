@@ -7,7 +7,9 @@ import 'app_scopes.dart';
 import 'database.dart';
 
 class CustomColors {
-  static final Map<String, int> defaultData = {"accent": Colors.orange.value};
+  static final Map<String, int> defaultData = {
+    "accent": Colors.orange.toARGB32()
+  };
 
   static const String _scope = AppScopes.customColors;
   static final Map<String, dynamic> _data = {};

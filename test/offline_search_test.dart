@@ -128,10 +128,8 @@ void main() {
     await LocalMusicsData.reloadDatabase();
     await PlaylistsData.reloadDatabase();
     final search = SongSearch();
-    await search.loadOfflineSongs(query);
-    return search.suggestionTiles.value
-        .map((tile) => tile.suggestion)
-        .toList();
+    search.loadOfflineSongs(query);
+    return search.suggestionTiles.value.map((tile) => tile.suggestion).toList();
   }
 
   test('the offline search finds the songs of the library', () async {
@@ -170,11 +168,10 @@ void main() {
     final search = SongSearch();
     search.searchOptions =
         const SearchOptions().copyWith(sort: SearchSort.shuffled);
-    await search.loadOfflineSongs("");
+    search.loadOfflineSongs("");
 
-    final shuffled = search.songGroups.value.single.suggestions
-        .map((s) => s.title)
-        .toList();
+    final shuffled =
+        search.songGroups.value.single.suggestions.map((s) => s.title).toList();
     expect(shuffled..sort(), ["A", "B", "C", "D", "E"]);
   });
 
@@ -196,7 +193,7 @@ void main() {
     search.random = () => Random(7);
     search.searchOptions =
         const SearchOptions().copyWith(sort: SearchSort.shuffled);
-    await search.loadOfflineSongs("");
+    search.loadOfflineSongs("");
 
     expect(
       search.songGroups.value.single.suggestions.map((s) => s.title).toList(),
@@ -232,7 +229,8 @@ void main() {
       ],
     );
 
-    expect(groups.map((group) => group.title).toList(), ["Chill", "No playlist"]);
+    expect(
+        groups.map((group) => group.title).toList(), ["Chill", "No playlist"]);
     expect(
       groups.first.suggestions.map((s) => s.title).toList(),
       ["In a playlist"],
@@ -273,7 +271,7 @@ void main() {
     final search = SongSearch();
     search.searchOptions =
         const SearchOptions().copyWith(grouping: SearchGrouping.playlist);
-    await search.loadOfflineSongs("");
+    search.loadOfflineSongs("");
 
     final groups = search.songGroups.value;
     expect(groups.map((group) => group.title).toList(), ["Chill", "Workout"]);
@@ -289,9 +287,10 @@ void main() {
     await storeSong(audioId: "song", title: "Song");
     await LocalMusicsData.reloadDatabase();
     final search = SongSearch();
-    await search.loadOfflineSongs("");
+    search.loadOfflineSongs("");
     expect(
-      search.tileFor(search.songGroups.value.single.suggestions.single)
+      search
+          .tileFor(search.songGroups.value.single.suggestions.single)
           .suggestion,
       isA<SongSuggestion>().having(
         (s) => s.tags.contains(SongTag.installed),
@@ -304,10 +303,11 @@ void main() {
     await File('${data.path}/music/song/info.json')
         .create(recursive: true)
         .then((file) => file.writeAsString('{}'));
-    await search.loadOfflineSongs("");
+    search.loadOfflineSongs("");
 
     expect(
-      search.tileFor(search.songGroups.value.single.suggestions.single)
+      search
+          .tileFor(search.songGroups.value.single.suggestions.single)
           .suggestion,
       isA<SongSuggestion>().having(
         (s) => s.tags.contains(SongTag.installed),

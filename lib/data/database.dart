@@ -156,7 +156,7 @@ class AppDatabase extends _$AppDatabase {
     try {
       decoded = jsonDecode(file.readAsStringSync());
     } catch (e) {
-      print('[Asterfox] failed to import ${file.path}: $e');
+      debugPrint('[Asterfox] failed to import ${file.path}: $e');
       return;
     }
 
@@ -175,8 +175,11 @@ class AppDatabase extends _$AppDatabase {
       };
     }
 
-    await _insertIfMissing(documents, entries, (key, json) =>
-        DocumentsCompanion.insert(scope: scope, id: key, json: json));
+    await _insertIfMissing(
+        documents,
+        entries,
+        (key, json) =>
+            DocumentsCompanion.insert(scope: scope, id: key, json: json));
   }
 
   /// Imports one of the single objects (`settings.json`, `device_settings.json`,
@@ -189,14 +192,17 @@ class AppDatabase extends _$AppDatabase {
       json =
           Map<String, dynamic>.from(jsonDecode(file.readAsStringSync()) as Map);
     } catch (e) {
-      print('[Asterfox] failed to import ${file.path}: $e');
+      debugPrint('[Asterfox] failed to import ${file.path}: $e');
       return;
     }
 
-    await _insertIfMissing(settingsEntries, json.map(
-      (key, value) => MapEntry(key, jsonEncode(value)),
-    ), (key, value) =>
-        SettingsEntriesCompanion.insert(scope: scope, key: key, value: value));
+    await _insertIfMissing(
+        settingsEntries,
+        json.map(
+          (key, value) => MapEntry(key, jsonEncode(value)),
+        ),
+        (key, value) => SettingsEntriesCompanion.insert(
+            scope: scope, key: key, value: value));
   }
 
   /// Inserts [entries] into [table], skipping the rows that are stored already.

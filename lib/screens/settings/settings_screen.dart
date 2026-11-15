@@ -150,8 +150,9 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
               tiles: [
                 SettingsTile(
                   title: Text(l10n.value.logout),
-                  description: Text(FirebaseAuth.instance.currentUser!.email ??
-                      FirebaseAuth.instance.currentUser!.displayName!),
+                  description: Text(FirebaseAuth.instance.currentUser?.email ??
+                      FirebaseAuth.instance.currentUser?.displayName ??
+                      ""),
                   leading: const Icon(Icons.logout),
                   onPressed: (context) async {
                     if (!NetworkUtils.networkConnected()) {
@@ -161,23 +162,24 @@ class _MainSettingsScreenState extends State<_MainSettingsScreen> {
                       return;
                     }
 
-                    final future = () async {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                      await CloudFirestoreManager.cancelListeners();
-                      await CloudFirestoreManager.waitForTasks();
-                      final signInState = GoogleSignInWidget.signInState.value;
-
-                      if (GoogleSignInWidget.isAvailable &&
-                          signInState
-                              is GoogleSignInAuthenticationEventSignIn) {
-                        GoogleSignIn.instance.disconnect();
-                      }
-                      FirebaseAuth.instance.signOut();
-                    }();
-
+                    // This screen is closed first, so the dialog is shown
+                    // from the first screen, which stays.
+                    final navigator = Navigator.of(context)
+                      ..popUntil((route) => route.isFirst);
                     await LoadingDialog.showLoading(
-                      context: context,
-                      future: future,
+                      context: navigator.context,
+                      future: () async {
+                        await CloudFirestoreManager.cancelListeners();
+                        await CloudFirestoreManager.waitForTasks();
+                        final signInState =
+                            GoogleSignInWidget.signInState.value;
+                        if (GoogleSignInWidget.isAvailable &&
+                            signInState
+                                is GoogleSignInAuthenticationEventSignIn) {
+                          await GoogleSignIn.instance.disconnect();
+                        }
+                        await FirebaseAuth.instance.signOut();
+                      }(),
                     );
                   },
                 ),

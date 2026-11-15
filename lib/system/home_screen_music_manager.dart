@@ -3,26 +3,25 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 
 import '../data/local_musics_data.dart';
 import '../data/settings_data.dart';
+import '../data/song_history_data.dart';
 import '../main.dart';
 import '../music/music_data/music_data.dart';
 import '../music/downloader/downloader_manager.dart';
 import '../music/utils/music_data_utils.dart';
 import '../screens/home_screen.dart';
-import '../music/utils/youtube_music_utils.dart';
 import '../utils/async_utils.dart';
 import '../utils/result.dart';
-import '../widget/notifiers_widget.dart';
 import '../widget/process_notifications/process_notification_widget.dart';
 import '../widget/toast/toast_manager.dart';
 import 'exceptions/network_exception.dart';
-import 'exceptions/unable_to_load_from_playlist_exception.dart';
 
 class HomeScreenMusicManager {
+  /// Loads a song and adds it to the queue, showing the progress of it. The
+  /// returned future ends when the song has been added or has failed to.
   static Future<void> addSong({
     required CachingEnabled caching,
     String? audioId,
@@ -38,12 +37,12 @@ class HomeScreenMusicManager {
     final bool autoDownload = SettingsData.getValue(key: "autoDownload") &&
         !LocalMusicsData.isInstalled(audioId: audioId);
 
-    final completer = Completer();
+    final songTitleNotifier = ValueNotifier<String?>(null);
+    final errorListNotifier = ValueNotifier<List<ResultFailedReason>>([]);
+    void addError(ResultFailedReason reason) =>
+        errorListNotifier.value = [...errorListNotifier.value, reason];
 
-    final ValueNotifier<String?> songTitleNotifier = ValueNotifier(null);
-    final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
-        ValueNotifier<List<ResultFailedReason>>([]);
-    HomeScreen.processNotificationList.push(
+    await HomeScreen.processNotificationList.push(
       ProcessNotificationData(
         title: Text(autoDownload
             ? l10n.value.downloading_automatically
@@ -53,9 +52,7 @@ class HomeScreenMusicManager {
           builder: (context, value, child) => SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            child: Text(
-              value ?? "",
-            ),
+            child: Text(value ?? ""),
           ),
         ),
         icon: const Icon(Icons.music_note),
@@ -64,105 +61,60 @@ class HomeScreenMusicManager {
         progressListenable: DownloadManager.getNotifiers(audioId).second,
         errorListNotifier: errorListNotifier,
         future: () async {
-          MusicData<CachingEnabled> song;
           try {
-            song = await MusicData.get(
-              musicData: musicData,
-              audioId: audioId,
-              caching: caching,
-            );
+            final MusicData<CachingEnabled> song = musicData != null
+                ? musicData.renew(caching: caching)
+                : await MusicData.getByAudioId(
+                    audioId: audioId!, caching: caching);
+            songTitleNotifier.value = song.title;
+
+            if (autoDownload) {
+              final result = await song.download();
+              if (result.status == ResultStatus.failed) {
+                addError(result.getReason());
+                ToastManager.showSimpleToast(
+                  msg: Text(l10n.value.song_unplayable),
+                  icon: const Icon(Icons.error_outline, color: Colors.red),
+                );
+              }
+            }
+            await musicManager.add(song);
           } on VideoUnplayableException {
             Fluttertoast.showToast(msg: l10n.value.song_unplayable);
-            return;
           } on NetworkException {
             Fluttertoast.showToast(msg: l10n.value.network_not_accessible);
-            return;
           } on Exception catch (e) {
-            errorListNotifier.value = errorListNotifier.value.toList()
-              ..add(
-                ResultFailedReason(
-                  cause: e,
-                  title: l10n.value.something_went_wrong,
-                  description: e.toString(),
-                ),
-              );
-            return;
+            addError(_reasonOf(e));
           }
-
-          songTitleNotifier.value = song.title;
-
-          if (autoDownload) {
-            final result = await song.download();
-            if (result.status == ResultStatus.failed) {
-              errorListNotifier.value = errorListNotifier.value.toList()
-                ..add(result.getReason());
-
-              // TODO: pass context
-              ToastManager.showSimpleToast(
-                msg: Text(l10n.value.song_unplayable),
-                icon: const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                ),
-              );
-            }
-          }
-          try {
-            await musicManager.add(song);
-          } on Exception catch (e) {
-            errorListNotifier.value = errorListNotifier.value.toList()
-              ..add(
-                ResultFailedReason(
-                  cause: e,
-                  title: l10n.value.something_went_wrong,
-                  description: e.toString(),
-                ),
-              );
-            return;
-          }
-          completer.complete();
         }(),
       ),
     );
-    return completer.future;
   }
 
+  /// Adds [musicDataList] to the queue, downloading them first when the auto
+  /// download is on.
   static Future<void> addSongs({
-    required int count,
-    List<MusicData<CachingDisabled>>? musicDataList,
-    List<String>? mediaUrlList,
-    String? youtubePlaylist,
+    required List<MusicData<CachingDisabled>> musicDataList,
   }) async {
-    assert(count > 0);
-    assert(musicDataList != null ||
-        mediaUrlList != null ||
-        youtubePlaylist != null);
+    if (musicDataList.isEmpty) return;
 
-    // playlist loading progress
-    final String playlistProcessId = const Uuid().v4();
-    YouTubeMusicUtils.playlistLoadingProgress[playlistProcessId] =
-        ValueNotifier(0);
-
-    // auto download
     final bool autoDownloadEnabled = SettingsData.getValue(key: "autoDownload");
 
-    // initialize notifiers
-    final ValueNotifier<bool> downloadModeNotifier = ValueNotifier<bool>(false);
-    final ValueNotifier<int> progressNotifier =
-        YouTubeMusicUtils.playlistLoadingProgress[playlistProcessId]!;
-    final ValueNotifier<int> maxProgressNotifier = ValueNotifier<int>(count);
-    final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
-        ValueNotifier([]);
+    final downloadModeNotifier = ValueNotifier<bool>(false);
+    final progressNotifier = ValueNotifier<int>(0);
+    final maxProgressNotifier = ValueNotifier<int>(musicDataList.length);
+    final errorListNotifier = ValueNotifier<List<ResultFailedReason>>([]);
+    void addError(ResultFailedReason reason) =>
+        errorListNotifier.value = [...errorListNotifier.value, reason];
 
     await HomeScreen.processNotificationList.push(
       ProcessNotificationData(
-        title: DoubleNotifierWidget<bool, int>(
-          notifier1: downloadModeNotifier,
-          notifier2: maxProgressNotifier,
-          builder: (context, isDownloadMode, max, child) => Text(
+        title: ValueListenableBuilder<bool>(
+          valueListenable: downloadModeNotifier,
+          builder: (context, isDownloadMode, child) => Text(
             isDownloadMode
                 ? l10n.value.downloading_automatically
-                : l10n.value.loading_songs(max),
+                : l10n.value.loading_songs(musicDataList.length),
           ),
         ),
         maxProgressListenable: maxProgressNotifier,
@@ -170,66 +122,31 @@ class HomeScreenMusicManager {
         errorListNotifier: errorListNotifier,
         icon: const Icon(Icons.queue_music),
         future: () async {
-          List<MusicData<CachingEnabled>> songs = [];
-
           try {
-            final songStream = MusicData.getList(
-              musicDataList: musicDataList,
-              mediaUrlList: mediaUrlList,
-              youtubePlaylist: youtubePlaylist,
-              caching: CachingEnabled.random(),
-            );
-
-            final completer = Completer();
-
-            songStream.listen((song) {
-              songs.add(song);
-              progressNotifier.value = songs.length;
-            }, onError: (e) {
-              e as UnableToLoadFromPlaylistException;
-              errorListNotifier.value = errorListNotifier.value.toList()
-                ..add(
-                  ResultFailedReason(
-                    cause: e,
-                    title: e.title,
-                    description: e.description,
-                  ),
-                );
-              maxProgressNotifier.value = maxProgressNotifier.value - 1;
-            }, onDone: completer.complete);
-
-            await completer.future;
+            final songs = [
+              for (final musicData in musicDataList)
+                musicData.renew(caching: CachingEnabled.random()),
+            ];
+            progressNotifier.value = songs.length;
 
             if (autoDownloadEnabled) {
+              final toDownload = songs.where((song) => !song.isInstalled);
               downloadModeNotifier.value = true;
               progressNotifier.value = 0;
-              maxProgressNotifier.value = songs.length;
+              maxProgressNotifier.value = toDownload.length;
 
               final asyncCore = AsyncCore<Result<void>>(limit: 10);
-
-              await Future.wait(songs.map((song) async {
-                if (song.isInstalled) {
-                  maxProgressNotifier.value = maxProgressNotifier.value - 1;
-                  return;
-                }
+              await Future.wait(toDownload.map((song) async {
                 final result = await asyncCore.run(song.download);
                 if (result.status == ResultStatus.failed) {
-                  errorListNotifier.value = errorListNotifier.value.toList()
-                    ..add(result.getReason());
+                  addError(result.getReason());
                 }
-                progressNotifier.value = progressNotifier.value + 1;
+                progressNotifier.value++;
               }));
             }
             await musicManager.addAll(songs);
           } on Exception catch (e) {
-            errorListNotifier.value = errorListNotifier.value.toList()
-              ..add(
-                ResultFailedReason(
-                  cause: e,
-                  title: l10n.value.something_went_wrong,
-                  description: e.toString(),
-                ),
-              );
+            addError(_reasonOf(e));
           }
         }(),
       ),
@@ -238,12 +155,9 @@ class HomeScreenMusicManager {
 
   /// Download a song with progress indicator notification
   static Future<void> download(MusicData song) async {
-    final completer = Completer();
+    final errorListNotifier = ValueNotifier<List<ResultFailedReason>>([]);
 
-    final ValueNotifier<List<ResultFailedReason>> errorListNotifier =
-        ValueNotifier([]);
-
-    HomeScreen.processNotificationList.push(
+    await HomeScreen.processNotificationList.push(
       ProcessNotificationData(
         title: Text(
           "${l10n.value.downloading}${song.size != null ? " - ${_formatBytes(song.size!, 1)}" : ""}",
@@ -257,15 +171,18 @@ class HomeScreenMusicManager {
         future: () async {
           final result = await song.download();
           if (result.status == ResultStatus.failed) {
-            errorListNotifier.value = errorListNotifier.value.toList()
-              ..add(result.getReason());
+            errorListNotifier.value = [result.getReason()];
           }
-          completer.complete();
         }(),
       ),
     );
-    return completer.future;
   }
+
+  static ResultFailedReason _reasonOf(Exception e) => ResultFailedReason(
+        cause: e,
+        title: l10n.value.something_went_wrong,
+        description: e.toString(),
+      );
 }
 
 String _formatBytes(int bytes, int decimals) {

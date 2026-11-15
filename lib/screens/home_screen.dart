@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../main.dart';
 import '../music/manager/audio_data_manager.dart';
@@ -45,12 +46,16 @@ class HomeScreen extends ScaffoldScreen {
                   },
                   onMovePre: (oldIndex, newIndex, song) async {
                     final medias = [...musicManager.state.$medias];
-                    final song = medias.removeAt(oldIndex);
-                    medias.insert(newIndex, song);
+                    medias.insert(newIndex, medias.removeAt(oldIndex));
+                    // The list shows the new order while the player moves the
+                    // song, rather than jumping back and forth.
                     musicManager.notifier.pauseChange(AudioRawData.medias,
                         faking: true, fakeValue: medias);
-                    await musicManager.move(oldIndex, newIndex);
-                    musicManager.notifier.resumeChange(AudioRawData.medias);
+                    try {
+                      await musicManager.move(oldIndex, newIndex);
+                    } finally {
+                      musicManager.notifier.resumeChange(AudioRawData.medias);
+                    }
                   },
                   onTap: (i, song) {
                     musicManager.seek(
@@ -134,13 +139,16 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
                   await showSearch(context: context, delegate: searchDelegate);
               _menuIconAnimationController?.reverse();
 
-              final songs = await result;
-              if (songs != null && songs.isNotEmpty) {
-                HomeScreenMusicManager.addSongs(
-                  count: songs.length,
-                  musicDataList: songs,
-                );
+              // The songs are fetched after the search has closed, so a failure
+              // is told here.
+              final List<MusicData<CachingDisabled>> songs;
+              try {
+                songs = await result ?? [];
+              } on Exception {
+                Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
+                return;
               }
+              await HomeScreenMusicManager.addSongs(musicDataList: songs);
             },
             icon: const Icon(Icons.search)),
       ],
@@ -154,7 +162,7 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       bottom: AppBarDivider(
         height: 1,
-        color: Theme.of(context).extraColors.primary.withOpacity(0.04),
+        color: Theme.of(context).extraColors.primary.withValues(alpha: 0.04),
       ),
     );
   }

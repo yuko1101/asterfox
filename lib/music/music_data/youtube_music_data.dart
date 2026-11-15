@@ -50,7 +50,6 @@ class YouTubeMusicData<T extends Caching> extends MusicData<T> {
   /// Throws [RefreshUrlFailedException] if failed to refresh the url.
   @override
   Future<String> refreshAudioUrl() async {
-    print("refreshing youtube audio url...");
     final yt = YoutubeExplode();
     try {
       final streamInfo = await refreshStreamInfo(yt);

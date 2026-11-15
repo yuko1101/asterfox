@@ -10,14 +10,16 @@ class ImageDownloader {
     String? customPath,
   }) async {
     final imageFile = File(customPath ?? song.imageSavePath);
-    if (imageFile.existsSync()) {
-      print("Image already saved");
-      return;
-    }
+    if (imageFile.existsSync()) return;
+
     final imageRes = await http.get(Uri.parse(song.remoteImageUrl));
-    if (!imageFile.parent.existsSync()) {
-      imageFile.parent.createSync(recursive: true);
+    if (imageRes.statusCode != 200) {
+      throw HttpException(
+        "Failed to download the image (${imageRes.statusCode})",
+        uri: Uri.parse(song.remoteImageUrl),
+      );
     }
-    imageFile.writeAsBytesSync(imageRes.bodyBytes);
+    await imageFile.parent.create(recursive: true);
+    await imageFile.writeAsBytes(imageRes.bodyBytes);
   }
 }

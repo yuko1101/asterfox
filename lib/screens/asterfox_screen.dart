@@ -67,9 +67,18 @@ class AsterfoxScreen extends StatelessWidget {
     );
   }
 
+  /// Whether the dialog asking to verify the email is open. The auth stream
+  /// rebuilds this screen more than once for the same user, and the dialog is
+  /// to be shown once.
+  static bool _verifyEmailDialogOpen = false;
+
   void showVerifyEmailDialog(BuildContext context) {
+    if (_verifyEmailDialogOpen) return;
+    _verifyEmailDialogOpen = true;
+
+    final navigator = Navigator.of(context);
     // TODO: better dialog
-    showDialog(
+    final route = DialogRoute<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => PopScope(
@@ -79,42 +88,49 @@ class AsterfoxScreen extends StatelessWidget {
           actions: [
             TextButton(
               child: Text(l10n.value.send),
-              onPressed: () {
-                FirebaseAuth.instance.currentUser!
-                    .sendEmailVerification()
-                    .catchError((e) {
+              onPressed: () async {
+                try {
+                  await FirebaseAuth.instance.currentUser
+                      ?.sendEmailVerification();
+                } on FirebaseAuthException catch (e) {
                   ToastManager.showSimpleToast(
                     // TODO: better message (such as "Too many request")
-                    msg: Text(e.toString()),
+                    msg: Text(e.message ?? e.code),
                     icon: const Icon(
                       Icons.error_outline,
                       color: Colors.red,
                     ),
                   );
-                });
+                }
               },
             ),
             TextButton(
               child: Text(l10n.value.logout),
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
+              onPressed: () => FirebaseAuth.instance.signOut(),
             )
           ],
         ),
       ),
     );
 
-    // check email verification every 2 seconds
-    Timer.periodic(const Duration(seconds: 2), (timer) {
-      Future.sync(() async {
-        final user = FirebaseAuth.instance.currentUser;
+    // check email verification every 2 seconds, until the email is verified or
+    // the user signed out.
+    final timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      final user = FirebaseAuth.instance.currentUser;
+      try {
         await user?.reload();
-        if (user != null && user.emailVerified) {
-          timer.cancel();
-          Navigator.of(context).pop();
-        }
-      });
+      } on FirebaseAuthException {
+        return; // tried again on the next tick
+      }
+      final current = FirebaseAuth.instance.currentUser;
+      if (current != null && !current.emailVerified) return;
+      timer.cancel();
+      if (route.isActive) navigator.removeRoute(route);
+    });
+
+    navigator.push(route).whenComplete(() {
+      timer.cancel();
+      _verifyEmailDialogOpen = false;
     });
   }
 }

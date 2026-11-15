@@ -9,17 +9,22 @@ class NetworkUtils {
   /// Stream of connectivity status.
   static late StreamSubscription connectivitySubscription;
 
-  /// Current network status
-  static late List<ConnectivityResult> connectivityResults;
+  /// Current network status. Until the first one is known, the network is
+  /// taken to be there, so that nothing is refused for a status not yet read.
+  static List<ConnectivityResult> connectivityResults = [
+    ConnectivityResult.other,
+  ];
 
   /// Minimum network level
-  static late ConnectivityResult minimum;
+  static ConnectivityResult minimum = ConnectivityResult.mobile;
 
   /// Initialize network utils
   static Future<void> init(ConnectivityResult minimumNetworkLevel) async {
     minimum = minimumNetworkLevel;
+    final connectivity = Connectivity();
+    connectivityResults = await connectivity.checkConnectivity();
     connectivitySubscription =
-        Connectivity().onConnectivityChanged.listen((data) {
+        connectivity.onConnectivityChanged.listen((data) {
       connectivityResults = data;
     });
   }

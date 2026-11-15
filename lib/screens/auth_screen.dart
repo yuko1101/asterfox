@@ -52,7 +52,7 @@ class AuthScreen extends StatefulWidget {
           passwordController.clear();
           Fluttertoast.showToast(msg: l10n.value.disabled_user);
         } else {
-          rethrow;
+          Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
         }
       }
     }();
@@ -86,7 +86,7 @@ class AuthScreen extends StatefulWidget {
           passwordController.clear();
           Fluttertoast.showToast(msg: l10n.value.weak_password);
         } else {
-          rethrow;
+          Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
         }
       }
     }();
@@ -513,7 +513,7 @@ class ForgotPassword extends StatelessWidget {
     final formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(l10n.value.reset_password),
         content: Form(
           key: formKey,
@@ -538,16 +538,20 @@ class ForgotPassword extends StatelessWidget {
             child: Text(l10n.value.send),
             onPressed: () async {
               if (!formKey.currentState!.validate()) return;
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
 
               final resetPasswordMsg = l10n.value.reset_password_email_sent;
 
               // TODO: handle [There is no user record corresponding to this identifier. The user may have been deleted.]
               final future = FirebaseAuth.instance
-                  .sendPasswordResetEmail(email: controller.text);
-              await LoadingDialog.showLoading(context: context, future: future);
-
-              Fluttertoast.showToast(msg: resetPasswordMsg);
+                  .sendPasswordResetEmail(email: controller.text.trim());
+              try {
+                await LoadingDialog.showLoading(
+                    context: context, future: future);
+                Fluttertoast.showToast(msg: resetPasswordMsg);
+              } on FirebaseAuthException catch (e) {
+                Fluttertoast.showToast(msg: e.message ?? e.code);
+              }
             },
           )
         ],
@@ -629,36 +633,32 @@ class GoogleSignInWidget extends StatelessWidget {
   static Future<void> googleLogin(BuildContext context) async {
     final future = () async {
       if (!_initialized) {
+        // Listened to only once it initialized, so that a failed attempt does
+        // not leave a second listener behind when it is tried again.
+        await GoogleSignIn.instance.initialize();
         GoogleSignIn.instance.authenticationEvents.listen((event) {
           signInState.value = event;
         });
-        await GoogleSignIn.instance.initialize();
         _initialized = true;
       }
 
-      GoogleSignInAccount? googleUser;
       try {
-        googleUser = await GoogleSignIn.instance.authenticate();
-      } on GoogleSignInException {
+        final googleUser = await GoogleSignIn.instance.authenticate();
+        final authz = await googleUser.authorizationClient
+            .authorizeScopes(["email", "profile"]);
+        final credential = GoogleAuthProvider.credential(
+          accessToken: authz.accessToken,
+          idToken: googleUser.authentication.idToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      } on GoogleSignInException catch (e) {
+        // The user closing the sign-in is not an error to tell about.
+        if (e.code != GoogleSignInExceptionCode.canceled) {
+          Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
+        }
+      } on FirebaseAuthException {
         Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
       }
-
-      if (googleUser == null) {
-        // The user canceled the sign-in
-        return;
-      }
-
-      final authzClient = googleUser.authorizationClient;
-      final scopes = ["email", "profile"];
-
-      final authz = await authzClient.authorizeScopes(scopes);
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: authz.accessToken,
-        idToken: googleUser.authentication.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
     }();
 
     await LoadingDialog.showLoading(context: context, future: future);

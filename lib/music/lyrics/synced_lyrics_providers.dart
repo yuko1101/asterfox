@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'lrc.dart';
@@ -59,7 +60,7 @@ class SyncedLyricsFinder {
     try {
       return await search();
     } catch (e) {
-      print("lyrics provider failed: $e");
+      debugPrint("lyrics provider failed: $e");
       return null;
     }
   }

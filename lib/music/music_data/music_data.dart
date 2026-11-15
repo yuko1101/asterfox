@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
@@ -6,9 +5,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import '../../data/song_history_data.dart';
 import '../../main.dart';
-import '../utils/music_data_utils.dart';
 import '../utils/youtube_music_utils.dart';
 import 'url_music_data.dart';
 import 'youtube_music_data.dart';
@@ -31,11 +28,10 @@ class MusicData<T extends Caching> {
     required this.size,
     required this.caching,
   }) {
-    print("MusicData created : caching = $caching");
-    if (!caching.enabled) return;
-    final key = (caching as CachingEnabled).key;
-    print("MusicData: {key: $key, title: $title}");
-    _created[key] = this as MusicData<CachingEnabled>;
+    final caching = this.caching;
+    if (caching is CachingEnabled) {
+      _created[caching.key] = this as MusicData<CachingEnabled>;
+    }
   }
   final MusicType type;
   final String title;
@@ -65,7 +61,7 @@ class MusicData<T extends Caching> {
   }
 
   Map<String, dynamic> toJson() {
-    final json = {
+    return {
       "type": type.name,
       "remoteAudioUrl": remoteAudioUrl,
       "remoteImageUrl": remoteImageUrl,
@@ -79,11 +75,8 @@ class MusicData<T extends Caching> {
       "lyrics": lyrics,
       "songStoredAt": songStoredAt,
       "size": size,
+      ...jsonExtras,
     };
-    jsonExtras.forEach((key, value) {
-      json[key] = value;
-    });
-    return json;
   }
 
   Map<String, dynamic> get jsonExtras => {};
@@ -92,36 +85,12 @@ class MusicData<T extends Caching> {
     required Map<String, dynamic> json,
     required T caching,
   }) {
-    final type = MusicType.values
-        .firstWhere((musicType) => musicType.name == json["type"] as String);
-    switch (type) {
-      case MusicType.youtube:
-        return YouTubeMusicData.fromJson(
-          json: json,
-          caching: caching,
-        );
-      case MusicType.url:
-        return UrlMusicData.fromJson(
-          json: json,
-          caching: caching,
-        );
-      // default:
-      //   return MusicData(
-      //     type: type,
-      //     remoteAudioUrl: json["remoteAudioUrl"] as String,
-      //     remoteImageUrl: json["remoteImageUrl"] as String,
-      //     title: json["title"] as String,
-      //     description: json["description"] as String,
-      //     author: json["author"] as String,
-      //     audioId: json["audioId"] as String,
-      //     duration: Duration(milliseconds: json["duration"] as int),
-      //     isDataStored: isLocal,
-      //     keywords: (json["keywords"] as List).cast<String>(),
-      //     volume: json["volume"] as double,
-      //     lyrics: json["lyrics"] as String,
-      //     caching: caching,
-      //   );
-    }
+    final type = MusicType.values.byName(json["type"] as String);
+    return switch (type) {
+      MusicType.youtube =>
+        YouTubeMusicData.fromJson(json: json, caching: caching),
+      MusicType.url => UrlMusicData.fromJson(json: json, caching: caching),
+    };
   }
 
   Future<String> refreshAudioUrl() async {
@@ -154,109 +123,19 @@ class MusicData<T extends Caching> {
     return _created;
   }
 
-  static void clearCreated() {
-    _created.clear();
-  }
-
-  static void deleteCreated(String key) {
-    _created.remove(key);
-  }
-
   /// Throws [VideoUnplayableException], [NetworkException]
   static Future<MusicData<T>> getByAudioId<T extends Caching>({
     required String audioId,
     required T caching,
-  }) async {
-    final yt = YoutubeExplode();
-    final video = await yt.videos.get(audioId);
-    final song = await YouTubeMusicUtils.getYouTubeMusicData(
-      video: video,
-      yt: yt,
-      caching: caching,
-    );
-    yt.close();
-    return song;
-  }
-
-  static Future<MusicData<T>> get<T extends Caching>({
-    String? audioId,
-    String? mediaUrl,
-    MusicData? musicData,
-    required T caching,
-  }) async {
-    assert(audioId != null || mediaUrl != null || musicData != null);
-
-    if (musicData != null) {
-      return musicData.renew(caching: caching);
-    }
-
-    final id = audioId ?? MusicDataUtils.getAudioIdFromUrl(mediaUrl!);
-
-    return await getByAudioId(audioId: id, caching: caching);
-  }
-
-  /// if renew is false, musicData in musicDataList won't be renewed by MusicData#renew().
-  static Stream<MusicData<T>> getList<T extends Caching>({
-    List<MusicData>? musicDataList,
-    List<String>? mediaUrlList,
-    String? youtubePlaylist,
-    required T caching,
   }) {
-    final controller = StreamController<MusicData<T>>();
-
-    int remaining = (musicDataList?.length ?? 0) + (mediaUrlList?.length ?? 0);
-    bool isYouTubePlaylistDone = youtubePlaylist == null;
-
-    if (remaining == 0 && isYouTubePlaylistDone) {
-      controller.sink.close();
-    }
-
-    void add(MusicData<T> event) {
-      controller.sink.add(event);
-      remaining--;
-      if (remaining == 0 && isYouTubePlaylistDone) {
-        controller.sink.close();
-      }
-    }
-
-    if (musicDataList != null) {
-      for (final musicData in musicDataList) {
-        add(
-          musicData.renew(caching: caching.unique()),
-        );
-      }
-    }
-    if (mediaUrlList != null) {
-      for (final mediaUrl in mediaUrlList) {
-        MusicData.get<T>(
-          mediaUrl: mediaUrl,
-          caching: caching.unique(),
-        ).then(add);
-      }
-    }
-    if (youtubePlaylist != null) {
-      final playlistStream = YouTubeMusicUtils.getMusicDataFromPlaylist(
-        playlistId: youtubePlaylist,
+    return YouTubeMusicUtils.withYT(null, (yt) async {
+      final video = await yt.videos.get(audioId);
+      return YouTubeMusicUtils.getYouTubeMusicData(
+        video: video,
+        yt: yt,
         caching: caching,
-        yt: null,
       );
-
-      playlistStream.listen(
-        controller.sink.add,
-        onError: (e) {
-          controller.sink.addError(e);
-        },
-        onDone: () {
-          if (remaining > 0) {
-            isYouTubePlaylistDone = true;
-          } else {
-            controller.sink.close();
-          }
-        },
-      );
-    }
-
-    return controller.stream;
+    });
   }
 }
 
@@ -295,7 +174,6 @@ extension MusicDataExtension on MusicData<CachingEnabled> {
 
   void destroy() {
     MusicData._created.remove(caching.key);
-    print("MusicData destroyed : remaining = ${MusicData._created.length}");
   }
 }
 

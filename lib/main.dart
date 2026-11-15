@@ -82,8 +82,6 @@ Future<void> main() async {
       isWearOS = false;
 
       if (OS.isAndroid) {
-        final modes = await FlutterDisplayMode.supported;
-        modes.forEach(print);
         await FlutterDisplayMode.setHighRefreshRate();
       }
 
@@ -107,11 +105,6 @@ Future<void> main() async {
 
       MediaKit.ensureInitialized();
 
-      // final player = Player();
-      // await player.open(
-      //   Playlist([Media("https://drive.google.com/uc?export=download&id=1IX4JIZSEN6ZiIHDo8U5JNkojfwzKBXp0")]),
-      // );
-
       // The database must be opened before the data classes read their data.
       await AppDatabase.open();
 
@@ -126,7 +119,7 @@ Future<void> main() async {
 
       await DeviceSettingsData.init();
 
-      NetworkUtils.init(ConnectivityResult.mobile);
+      await NetworkUtils.init(ConnectivityResult.mobile);
 
       await LocalMusicsData.init();
       await PlaylistsData.init();
@@ -149,7 +142,9 @@ Future<void> main() async {
 
       if (!OS.isWeb) {
         final shareFilesDir = Directory("$tempPath/share_files");
-        if (shareFilesDir.existsSync()) shareFilesDir.delete(recursive: true);
+        if (shareFilesDir.existsSync()) {
+          await shareFilesDir.delete(recursive: true);
+        }
       }
 
       SharingIntent.init();

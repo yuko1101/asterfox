@@ -4,98 +4,68 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../data/custom_colors.dart';
-import '../utils/async_utils.dart';
 import 'asterfox_dialog.dart';
 
-Future<bool> _defaultOnWillPop() async => false;
-
 class LoadingDialog extends StatelessWidget {
+  /// Shows a loading dialog until [future] has finished, and closes it whether
+  /// [future] succeeds or fails. What [future] throws is thrown from here.
+  ///
+  /// The dialog is not closed by the back button unless [barrierDismissible].
   static Future<void> showLoading({
     required BuildContext context,
     required Future future,
-    Future<bool> Function() onWillPop = _defaultOnWillPop,
     ValueListenable<int>? percentageNotifier,
     bool barrierDismissible = false,
   }) async {
-    final completer = Completer();
-    showDialog(
+    final navigator = Navigator.of(context);
+    final route = DialogRoute<void>(
       context: context,
       barrierDismissible: barrierDismissible,
-      builder: (context) {
-        () async {
-          await future;
-          Navigator.of(context).pop();
-          completer.complete();
-        }();
-        return LoadingDialog(
-          onWillPop: onWillPop,
-          percentageNotifier: percentageNotifier,
-        );
-      },
+      builder: (context) => LoadingDialog(
+        canPop: barrierDismissible,
+        percentageNotifier: percentageNotifier,
+      ),
     );
-    await completer.future;
-  }
-
-  static Future<void> showStreamLoading({
-    required BuildContext context,
-    required Stream<int> stream,
-    Future<bool> Function() onWillPop = _defaultOnWillPop,
-    bool barrierDismissible = false,
-  }) async {
-    final completer = Completer();
-    showDialog(
-      context: context,
-      barrierDismissible: barrierDismissible,
-      builder: (context) {
-        stream.listen((event) {}, onDone: () {
-          Navigator.of(context).pop();
-          completer.complete();
-        });
-        return LoadingDialog(
-          onWillPop: onWillPop,
-          percentageNotifier: stream.toValueNotifier(0),
-        );
-      },
-    );
-    await completer.future;
+    navigator.push(route);
+    try {
+      await future;
+    } finally {
+      // Only this dialog is closed, even if something was opened over it.
+      if (route.isCurrent) {
+        navigator.pop();
+      } else if (route.isActive) {
+        navigator.removeRoute(route);
+      }
+    }
   }
 
   const LoadingDialog({
-    this.onWillPop = _defaultOnWillPop,
+    this.canPop = false,
     this.percentageNotifier,
     super.key,
   });
 
-  final Future<bool> Function() onWillPop;
+  final bool canPop;
   final ValueListenable<int>? percentageNotifier;
 
   @override
   Widget build(BuildContext context) {
-    if (percentageNotifier != null) {
-      return AsterfoxDialog(
-        child: SizedBox(
-          height: 60,
-          width: 60,
-          child: Center(
-            child: ValueListenableBuilder<int>(
-              valueListenable: percentageNotifier!,
-              builder: (context, value, child) => CircularProgressIndicator(
-                color: CustomColors.getColor("accent"),
-                value: value.toDouble() / 100,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    final color = CustomColors.getColor("accent");
     return AsterfoxDialog(
+      canPop: canPop,
       child: SizedBox(
         height: 60,
         width: 60,
         child: Center(
-          child: CircularProgressIndicator(
-            color: CustomColors.getColor("accent"),
-          ),
+          child: percentageNotifier == null
+              ? CircularProgressIndicator(color: color)
+              : ValueListenableBuilder<int>(
+                  valueListenable: percentageNotifier!,
+                  builder: (context, value, child) => CircularProgressIndicator(
+                    color: color,
+                    value: value / 100,
+                  ),
+                ),
         ),
       ),
     );

@@ -8,13 +8,12 @@ import '../../data/database.dart';
 import '../../data/local_musics_data.dart';
 import '../../data/playlist_data.dart';
 import '../../data/settings_data.dart';
+import '../../data/song_history_data.dart';
 import '../../music/music_data/music_data.dart';
 import '../../music/playlist/playlist.dart';
 import '../../utils/map_utils.dart';
 
 class CloudFirestoreManager {
-  static Map<String, dynamic>? userData;
-
   static bool _isInitialized = false;
 
   /// Must run after initializing FirebaseAuth, LocalMusicsData, SettingsData,
@@ -24,13 +23,10 @@ class CloudFirestoreManager {
       persistenceEnabled: true,
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      _onUserUpdate();
-    }
-    FirebaseAuth.instance.authStateChanges().listen((user) async {
-      if (user == null) return;
-      _onUserUpdate();
+    // The stream starts with the current user, so a signed in user is handled
+    // here too, once.
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) _onUserUpdate();
     });
     _isInitialized = true;
   }
@@ -40,12 +36,21 @@ class CloudFirestoreManager {
     await LocalMusicsData.reloadDatabase();
     await SettingsData.reloadDatabase();
     await PlaylistsData.reloadDatabase();
-    final tasks = <Future>[
+    await SongHistoryData.reloadDatabase();
+    await Future.wait([
       _listenUserDataUpdate(),
       _listenSongsUpdate(),
       _listenPlaylistsUpdate(),
-    ];
-    await Future.wait(tasks);
+    ]);
+  }
+
+  /// The document of the signed in user, or null when the cloud is not used
+  /// right now (not initialized, or nobody is signed in).
+  static DocumentReference<Map<String, dynamic>>? get _userDoc {
+    if (!_isInitialized) return null;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    return FirebaseFirestore.instance.collection("users").doc(user.uid);
   }
 
   static Future<void> importData(Map<String, dynamic> data) async {
@@ -53,16 +58,15 @@ class CloudFirestoreManager {
       if (data.containsKey("songs")) {
         await LocalMusicsData.replaceAll(
             Map<String, dynamic>.from(data["songs"] as Map));
-        await CloudFirestoreManager.removeAllSongs();
-        await CloudFirestoreManager.addOrUpdateSongs(
+        await removeAllSongs();
+        await addOrUpdateSongs(
             LocalMusicsData.getAll(caching: CachingDisabled()));
       }
       if (data.containsKey("playlists")) {
         await PlaylistsData.replaceAll(
             Map<String, dynamic>.from(data["playlists"] as Map));
-        await CloudFirestoreManager.removeAllPlaylists();
-        await CloudFirestoreManager.addOrUpdatePlaylists(
-            PlaylistsData.getAll());
+        await removeAllPlaylists();
+        await addOrUpdatePlaylists(PlaylistsData.getAll());
       }
       if (data.containsKey("settings")) {
         await SettingsData.applyRemoteData(
@@ -81,147 +85,75 @@ class CloudFirestoreManager {
     };
   }
 
-  // add or update songs
-  static Future<void> addOrUpdateSongs(List<MusicData> songs) async {
-    if (!_isInitialized) return;
+  /// Writes [docs] (id to data) to [collection] of the user, and deletes the
+  /// ids mapped to null.
+  static Future<void> _write(
+      String collection, Map<String, Map<String, dynamic>?> docs) async {
+    final userDoc = _userDoc;
+    if (userDoc == null || docs.isEmpty) return;
     await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("songs");
-      final List<Future<void>> futures = [];
-      for (final song in songs) {
-        futures.add(collection.doc(song.audioId).set(song.toJson()));
-      }
-      await Future.wait(futures);
+      final ref = userDoc.collection(collection);
+      await Future.wait([
+        for (final MapEntry(key: id, value: data) in docs.entries)
+          data == null ? ref.doc(id).delete() : ref.doc(id).set(data),
+      ]);
     });
   }
 
-  static Future<void> removeSongs(List<String> audioIds) async {
-    if (!_isInitialized) return;
+  static Future<void> _removeAll(String collection) async {
+    final userDoc = _userDoc;
+    if (userDoc == null) return;
     await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("songs");
-      final List<Future<void>> futures = [];
-      for (final audioId in audioIds) {
-        futures.add(collection.doc(audioId).delete());
-      }
-      await Future.wait(futures);
+      final docs = await userDoc.collection(collection).get();
+      await Future.wait(docs.docs.map((doc) => doc.reference.delete()));
     });
   }
 
-  static Future<void> removeAllSongs() async {
-    if (!_isInitialized) return;
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("songs");
+  static Future<void> addOrUpdateSongs(List<MusicData> songs) =>
+      _write("songs", {for (final song in songs) song.audioId: song.toJson()});
 
-      final songs = await collection.get();
+  static Future<void> removeSongs(List<String> audioIds) =>
+      _write("songs", {for (final id in audioIds) id: null});
 
-      final List<Future<void>> futures = [];
-      for (final docId in songs.docs.map((doc) => doc.id)) {
-        futures.add(collection.doc(docId).delete());
-      }
-      await Future.wait(futures);
-    });
-  }
+  static Future<void> removeAllSongs() => _removeAll("songs");
 
-  // add or update playlists
-  static Future<void> addOrUpdatePlaylists(List<AppPlaylist> playlists) async {
-    if (!_isInitialized) return;
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("playlists");
-      final List<Future<void>> futures = [];
-      for (final playlist in playlists) {
-        futures.add(collection.doc(playlist.id).set(playlist.toJson()));
-      }
-      await Future.wait(futures);
-    });
-  }
+  static Future<void> addOrUpdatePlaylists(List<AppPlaylist> playlists) =>
+      _write("playlists", {
+        for (final playlist in playlists) playlist.id: playlist.toJson(),
+      });
 
-  static Future<void> removePlaylists(List<String> playlistIds) async {
-    if (!_isInitialized) return;
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("playlists");
-      final List<Future<void>> futures = [];
-      for (final playlistId in playlistIds) {
-        futures.add(collection.doc(playlistId).delete());
-      }
-      await Future.wait(futures);
-    });
-  }
+  static Future<void> removePlaylists(List<String> playlistIds) =>
+      _write("playlists", {for (final id in playlistIds) id: null});
 
-  static Future<void> removeAllPlaylists() async {
-    if (!_isInitialized) return;
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("playlists");
-
-      final playlists = await collection.get();
-
-      final List<Future<void>> futures = [];
-      for (final docId in playlists.docs.map((doc) => doc.id)) {
-        futures.add(collection.doc(docId).delete());
-      }
-      await Future.wait(futures);
-    });
-  }
+  static Future<void> removeAllPlaylists() => _removeAll("playlists");
 
   static Future<void> updateUserData() async {
-    if (!_isInitialized) return;
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
-
-      final Map<String, dynamic> data = {
-        "settings": SettingsData.data
-      };
-
-      await doc.set(data);
-    });
+    final userDoc = _userDoc;
+    if (userDoc == null) return;
+    await runTask(() => userDoc.set({"settings": SettingsData.data}));
   }
 
   static StreamSubscription? _userDataStreamSubscription;
   static Future<void> _listenUserDataUpdate() async {
-    if (_userDataStreamSubscription != null) {
-      await _userDataStreamSubscription!.cancel();
-    }
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final doc = FirebaseFirestore.instance.collection("users").doc(user.uid);
+    await _userDataStreamSubscription?.cancel();
+    _userDataStreamSubscription = null;
+    final userDoc = _userDoc;
+    if (userDoc == null) return;
 
-      final data = await doc.get();
+    await runTask(() async {
+      final data = await userDoc.get();
       if (data.data() == null) {
         await SettingsData.resetData();
         await updateUserData();
       }
 
       _userDataStreamSubscription =
-          doc.snapshots(includeMetadataChanges: true).listen((snapshot) {
+          userDoc.snapshots(includeMetadataChanges: true).listen((snapshot) {
         runTask(() async {
           final data = snapshot.data();
-          print("database update (cache: ${snapshot.metadata.isFromCache})");
           if (data == null) return;
-          await SettingsData.applyRemoteData(MapUtils.bindOptions(
-              SettingsData.defaultData, data["settings"]));
+          await SettingsData.applyRemoteData(
+              MapUtils.bindOptions(SettingsData.defaultData, data["settings"]));
           await SettingsData.applySettings();
         });
       });
@@ -230,96 +162,76 @@ class CloudFirestoreManager {
 
   static StreamSubscription? _songsStreamSubscription;
   static Future<void> _listenSongsUpdate() async {
-    if (_songsStreamSubscription != null) {
-      await _songsStreamSubscription!.cancel();
-    }
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("songs");
-
-      _songsStreamSubscription = collection.snapshots().listen((snapshot) {
-        runTask(() async {
-          final changes = snapshot.docChanges;
-          if (changes.isEmpty) return;
-          print(
-              "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} songs. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} songs. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} songs.");
-          for (final change in changes) {
-            final audioId = change.doc.id;
-            await LocalMusicsData.applyRemoteChange(
-              audioId: audioId,
-              json: change.type == DocumentChangeType.removed
-                  ? null
-                  : Map<String, dynamic>.from(change.doc.data()!),
-            );
-          }
-        });
-      });
-    });
+    await _songsStreamSubscription?.cancel();
+    _songsStreamSubscription = _listenCollection(
+      "songs",
+      (id, json) => LocalMusicsData.applyRemoteChange(audioId: id, json: json),
+    );
   }
 
   static StreamSubscription? _playlistsStreamSubscription;
   static Future<void> _listenPlaylistsUpdate() async {
-    if (_playlistsStreamSubscription != null) {
-      await _playlistsStreamSubscription!.cancel();
-    }
-    await runTask(() async {
-      final user = FirebaseAuth.instance.currentUser!;
-      final collection = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .collection("playlists");
+    await _playlistsStreamSubscription?.cancel();
+    _playlistsStreamSubscription = _listenCollection(
+      "playlists",
+      (id, json) => PlaylistsData.applyRemoteChange(playlistId: id, json: json),
+    );
+  }
 
-      _playlistsStreamSubscription = collection.snapshots().listen((snapshot) {
-        runTask(() async {
-          final changes = snapshot.docChanges;
-          if (changes.isEmpty) return;
-          print(
-              "[Asterfox Firestore] Added ${changes.where((change) => change.type == DocumentChangeType.added).length} playlists. Modified ${changes.where((change) => change.type == DocumentChangeType.modified).length} playlists. Removed ${changes.where((change) => change.type == DocumentChangeType.removed).length} playlists.");
-          for (final change in changes) {
-            final playlistId = change.doc.id;
-            await PlaylistsData.applyRemoteChange(
-              playlistId: playlistId,
-              json: change.type == DocumentChangeType.removed
-                  ? null
-                  : Map<String, dynamic>.from(change.doc.data()!),
-            );
-          }
-        });
+  /// Applies the changes of [collection] of the user as they come. A removed
+  /// document is applied as null.
+  static StreamSubscription? _listenCollection(
+    String collection,
+    Future<void> Function(String id, Map<String, dynamic>? json) apply,
+  ) {
+    final userDoc = _userDoc;
+    if (userDoc == null) return null;
+    return userDoc.collection(collection).snapshots().listen((snapshot) {
+      final changes = snapshot.docChanges;
+      if (changes.isEmpty) return;
+      runTask(() async {
+        for (final change in changes) {
+          await apply(
+            change.doc.id,
+            change.type == DocumentChangeType.removed
+                ? null
+                : Map<String, dynamic>.from(change.doc.data()!),
+          );
+        }
       });
     });
   }
 
   static Future<void> cancelListeners() async {
-    final List<Future> futures = [];
-    if (_userDataStreamSubscription != null) {
-      futures.add(_userDataStreamSubscription!.cancel());
-    }
-    if (_songsStreamSubscription != null) {
-      futures.add(_songsStreamSubscription!.cancel());
-    }
-    if (_playlistsStreamSubscription != null) {
-      futures.add(_playlistsStreamSubscription!.cancel());
-    }
-
-    await Future.wait(futures);
+    await Future.wait([
+      if (_userDataStreamSubscription != null)
+        _userDataStreamSubscription!.cancel(),
+      if (_songsStreamSubscription != null) _songsStreamSubscription!.cancel(),
+      if (_playlistsStreamSubscription != null)
+        _playlistsStreamSubscription!.cancel(),
+    ]);
+    _userDataStreamSubscription = null;
+    _songsStreamSubscription = null;
+    _playlistsStreamSubscription = null;
   }
 
   static ValueNotifier<int> runningTasks = ValueNotifier(0);
+
+  /// Runs [task], counted in [runningTasks] until it has finished or failed.
   static Future<T> runTask<T>(Future<T> Function() task) async {
-    runningTasks.value = runningTasks.value + 1;
-    final result = await task();
-    runningTasks.value = runningTasks.value - 1;
-    return result;
+    runningTasks.value++;
+    try {
+      return await task();
+    } finally {
+      runningTasks.value--;
+    }
   }
 
   static Future<void> waitForTasks() async {
     if (runningTasks.value == 0) return;
-    final completer = Completer();
+    final completer = Completer<void>();
     void listener() {
-      if (runningTasks.value == 0) {
+      if (runningTasks.value == 0 && !completer.isCompleted) {
         completer.complete();
       }
     }

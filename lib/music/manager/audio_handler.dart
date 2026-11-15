@@ -121,16 +121,7 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
-    if (shuffleMode == AudioServiceShuffleMode.none) {
-      await _audioPlayer.setShuffle(false);
-    } else {
-      await _audioPlayer.setShuffle(true);
-    }
-  }
-
-  @override
-  Future<void> onNotificationDeleted() async {
-    await super.onNotificationDeleted();
+    await _audioPlayer.setShuffle(shuffleMode != AudioServiceShuffleMode.none);
   }
 
   Media _createMedia(MediaItem mediaItem) {
@@ -208,14 +199,12 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   void _listenForDurationChanges() {
     _audioPlayer.stream.duration.listen((duration) {
-      var index = _audioPlayer.state.playlist.index;
-      final newQueue = queue.value;
+      final index = _audioPlayer.state.playlist.index;
+      if (index < 0 || index >= queue.value.length) return;
 
-      if (newQueue.isEmpty) return;
-      if (index >= newQueue.length) return;
-
-      final oldMediaItem = newQueue[index];
-      final newMediaItem = oldMediaItem.copyWith(duration: duration);
+      // A new list, so that a listener holding the old one sees the change.
+      final newQueue = [...queue.value];
+      final newMediaItem = newQueue[index].copyWith(duration: duration);
       newQueue[index] = newMediaItem;
       queue.add(newQueue);
       mediaItem.add(newMediaItem);
@@ -226,31 +215,23 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
     _audioPlayer.stream.playlist.listen((playlist) {
       final index = playlist.index;
       final q = queue.value;
-
-      if (q.isEmpty) return;
-      if (index >= q.length) return;
-
+      if (index < 0 || index >= q.length) return;
       mediaItem.add(q[index]);
     });
   }
 
   void _listenForPlaylistChanges() {
-    _audioPlayer.stream.playlist.listen((playlist) async {
-      final items = playlist.medias.map(_createMediaItem);
-      setQueueItems(items.toList());
+    _audioPlayer.stream.playlist.listen((playlist) {
+      setQueueItems(playlist.medias.map(_createMediaItem).toList());
     });
   }
 
   Future<void> setQueueItems(List<MediaItem> songs) async {
-    final preQueue = [...queue.value]; // make immutable (just in case)
+    final wasEmpty = queue.value.isEmpty;
 
     // notify system
-    final newQueue = queue.value
-      ..clear()
-      ..addAll(songs.toSet().toList());
-    queue.add(newQueue);
-    final songCount = queue.value.length;
-    if (songCount == 0 && preQueue.isNotEmpty) {
+    queue.add(songs.toSet().toList());
+    if (songs.isEmpty && !wasEmpty) {
       // remove music notification
       await _audioPlayer.stop();
       await _audioPlayer.seek(Duration.zero);
@@ -259,15 +240,12 @@ class SessionAudioHandler extends BaseAudioHandler with SeekHandler {
 
   Future<void> _activateAudioSession() async {
     final audioChannel = SettingsData.getValue(key: "audioChannel") as String;
-    final usage = audioChannel == "call"
-        ? AndroidAudioUsage.voiceCommunication
-        : audioChannel == "call_speaker"
-            ? AndroidAudioUsage.voiceCommunication
-            : audioChannel == "notification"
-                ? AndroidAudioUsage.notification
-                : audioChannel == "alarm"
-                    ? AndroidAudioUsage.alarm
-                    : AndroidAudioUsage.media;
+    final usage = switch (audioChannel) {
+      "call" || "call_speaker" => AndroidAudioUsage.voiceCommunication,
+      "notification" => AndroidAudioUsage.notification,
+      "alarm" => AndroidAudioUsage.alarm,
+      _ => AndroidAudioUsage.media,
+    };
 
     final isCallSpeaker = audioChannel == "call_speaker";
 

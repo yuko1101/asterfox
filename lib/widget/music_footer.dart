@@ -89,7 +89,7 @@ class MobileMusicFooter extends StatelessWidget {
       children: [
         Divider(
           height: 1,
-          color: Theme.of(context).extraColors.primary.withOpacity(0.04),
+          color: Theme.of(context).extraColors.primary.withValues(alpha: 0.04),
         ),
         Container(
           decoration: BoxDecoration(

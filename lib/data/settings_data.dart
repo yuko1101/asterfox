@@ -83,8 +83,7 @@ class SettingsData {
   }
 
   static Future<void> save() async {
-    if (shouldInitializeFirebase &&
-        FirebaseAuth.instance.currentUser != null) {
+    if (shouldInitializeFirebase && FirebaseAuth.instance.currentUser != null) {
       await CloudFirestoreManager.updateUserData();
     }
   }
@@ -97,15 +96,7 @@ class SettingsData {
     }
   }
 
-  static dynamic getValue({String? key, List<String>? keys}) {
-    if (key == null && keys == null) return _data;
-    if (key != null) return _data[key] ?? defaultData[key];
-    if (keys != null) {
-      var data = _data;
-      for (var key in keys) {
-        data = data[key] ?? defaultData[key];
-      }
-      return data;
-    }
-  }
+  /// The value of [key], or its default when it is not stored.
+  static dynamic getValue({required String key}) =>
+      _data[key] ?? defaultData[key];
 }

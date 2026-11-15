@@ -94,8 +94,10 @@ class SongSearch
               margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 100),
               child: Material(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
-                color:
-                    Theme.of(context).extraColors.themeColor.withOpacity(0.9),
+                color: Theme.of(context)
+                    .extraColors
+                    .themeColor
+                    .withValues(alpha: 0.9),
                 clipBehavior: Clip.antiAlias,
                 child: SingleChildScrollView(
                   child: SearchOptionsPanel(
@@ -119,17 +121,9 @@ class SongSearch
         color: Theme.of(context).extraColors.primary,
         tooltip: l10n.value.search,
         onPressed: () {
-          late final Future<List<MusicData<CachingDisabled>>> songs;
-          if (multiSelectMode.value) {
-            songs = Future.wait(selectedTiles
-                .where((tile) => tile.suggestion is SongSuggestion)
-                .map((tile) =>
-                    (tile.suggestion as SongSuggestion).fetchMusicData()));
-          } else {
-            if (query.isEmpty || query == "") return;
-            songs = MusicDataUtils.searchList(query);
+          if (multiSelectMode.value || query.isNotEmpty) {
+            close(context, _chosenSongs());
           }
-          close(context, songs);
         },
       ),
     ];
@@ -156,17 +150,20 @@ class SongSearch
   }
 
   @override
-  void showResults(BuildContext context) {
-    late final Future<List<MusicData<CachingDisabled>>> songs;
+  void showResults(BuildContext context) => close(context, _chosenSongs());
+
+  /// The songs the search ends with: the selected ones in the multi select
+  /// mode, or else what the query finds.
+  Future<List<MusicData<CachingDisabled>>> _chosenSongs() async {
     if (multiSelectMode.value) {
-      songs = Future.wait(selectedTiles
-          .where((tile) => tile.suggestion is SongSuggestion)
-          .map((tile) => (tile.suggestion as SongSuggestion).fetchMusicData()));
-    } else {
-      if (query.isEmpty || query == "") return close(context, Future.value([]));
-      songs = MusicDataUtils.searchList(query);
+      return Future.wait([
+        for (final tile in selectedTiles)
+          if (tile.suggestion case final SongSuggestion song)
+            song.fetchMusicData(),
+      ]);
     }
-    close(context, songs);
+    if (query.isEmpty) return [];
+    return MusicDataUtils.searchList(query);
   }
 
   final ValueNotifier<List<SongSearchTile>> suggestionTiles = ValueNotifier([]);
@@ -306,9 +303,7 @@ class SongSearch
   /// is no border between the two: YouTube is only worth asking when there is a
   /// query, and only when there is a network.
   void searchResults() {
-    if (timer != null && timer!.isActive) {
-      timer!.cancel();
-    }
+    timer?.cancel();
 
     loadOfflineSongs(query);
 
@@ -362,8 +357,8 @@ class SongSearch
         YouTubeMusicUtils.searchYouTubeVideo(text, yt),
         YouTubeMusicUtils.searchWords(text, yt),
       ]);
-      final List<Video> videos = fetched[0].map((e) => e as Video).toList();
-      final List<String> words = fetched[1].map((e) => e as String).toList();
+      final videos = fetched[0].cast<Video>();
+      final words = fetched[1].cast<String>();
 
       final videoSuggestions = videos.map((e) {
         final List<SongTag> tags = [SongTag.youtube];
@@ -393,7 +388,7 @@ class SongSearch
     }
   }
 
-  Future<void> loadOfflineSongs(String text) async {
+  void loadOfflineSongs(String text) {
     // The tiles of the previous search are dropped, so a song that changed
     // state (it was downloaded, say) is shown with its state now rather than
     // the one it had when the tile was made.
@@ -491,7 +486,7 @@ class SongSearch
   SongSearchTile tileFor(Suggestion suggestion) =>
       _getSongSearchTile(suggestion);
 
-  void setQuery(newQuery) => query = newQuery;
+  void setQuery(String newQuery) => query = newQuery;
 
   @override
   ThemeData appBarTheme(BuildContext context) {

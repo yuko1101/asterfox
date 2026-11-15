@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../data/custom_colors.dart';
 import '../data/local_musics_data.dart';
@@ -63,12 +64,16 @@ class _PlaylistInfoScreenState
                     context: context,
                     delegate: SongSearch(),
                   );
-                  final songs = await result;
-                  if (songs != null && songs.isNotEmpty) {
-                    setState(() {
-                      editingSongs.addAll(songs);
-                    });
+                  final List<MusicData> songs;
+                  try {
+                    songs = await result ?? [];
+                  } on Exception {
+                    Fluttertoast.showToast(
+                        msg: l10n.value.something_went_wrong);
+                    return;
                   }
+                  if (songs.isEmpty || !mounted) return;
+                  setState(() => editingSongs.addAll(songs));
                 },
               ),
               IconButton(
@@ -85,15 +90,15 @@ class _PlaylistInfoScreenState
                 onPressed: () async {
                   final notStoredSongs =
                       editingSongs.where((s) => !s.isStored).toList();
-                  bool cancel = false;
-                  if (notStoredSongs.isNotEmpty &&
-                      !await showDialog(
-                        context: context,
-                        builder: (context) => StoreSongsDialog(notStoredSongs),
-                      )) {
-                    cancel = true;
+                  // A playlist holds only stored songs, so the others are
+                  // stored first, or the changes are not applied.
+                  if (notStoredSongs.isNotEmpty) {
+                    final stored = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => StoreSongsDialog(notStoredSongs),
+                    );
+                    if (stored != true || !mounted) return;
                   }
-                  if (cancel) return;
                   setState(() {
                     editMode = false;
                     applyChanges();
@@ -116,7 +121,6 @@ class _PlaylistInfoScreenState
                 onPressed: widget.playlist.songs.isNotEmpty
                     ? () {
                         HomeScreenMusicManager.addSongs(
-                          count: widget.playlist.songs.length,
                           musicDataList: widget.playlist
                               .getMusicDataList(CachingDisabled()),
                         );
@@ -175,8 +179,9 @@ class StoreSongsDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () async {
-            Navigator.of(context).pop(true);
+            final navigator = Navigator.of(context);
             await LocalMusicsData.storeMultiple(songs);
+            navigator.pop(true);
           },
           child: Text(l10n.value.ok),
         ),

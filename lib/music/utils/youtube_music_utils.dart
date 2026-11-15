@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -33,29 +32,24 @@ class YouTubeMusicUtils {
     required T caching,
   }) async {
     final videoId = video.id.value;
-    bool local = LocalMusicsData.isStored(audioId: videoId);
-    if (local) {
-      // throws LocalSongNotFoundException
+    if (LocalMusicsData.isStored(audioId: videoId)) {
       return LocalMusicsData.getByAudioId(
         audioId: videoId,
         caching: caching,
       ) as YouTubeMusicData<T>;
-    } else {
-      NetworkUtils.check();
-
-      final streamInfo = await getStreamInfo(videoId, yt);
-
-      return getFromVideo(
-        video: video,
-        streamInfo: streamInfo,
-        caching: caching,
-      );
     }
+
+    final streamInfo = await getStreamInfo(videoId, yt);
+    return getFromVideo(
+      video: video,
+      streamInfo: streamInfo,
+      caching: caching,
+    );
   }
 
-  static Map<String, ValueNotifier<int>> playlistLoadingProgress = {};
-
-  /// Returns a pair of the successfully loaded YouTubeMusicData and the loading failed Videos.
+  /// The songs of the playlist [playlistId]. A video that could not be loaded
+  /// is reported as an [UnableToLoadFromPlaylistException] error, and the
+  /// stream goes on with the others.
   ///
   /// Throws [NetworkException] if the network is not accessible.
   static Stream<YouTubeMusicData<T>>
@@ -66,45 +60,43 @@ class YouTubeMusicUtils {
   }) {
     NetworkUtils.check();
 
-    final ytContainer = YTContainer(yt);
-
+    final client = yt ?? YoutubeExplode();
     final controller = StreamController<YouTubeMusicData<T>>();
-    final videoStream = ytContainer.get().playlists.getVideos(playlistId);
 
-    int processingCount = 0;
-    bool done = false;
-
-    void close() {
-      controller.sink.close();
-      ytContainer.close();
-    }
-
-    videoStream.listen((video) async {
-      processingCount++;
+    // Every video is loaded as soon as it is listed. The stream ends once the
+    // listing has ended (or failed) and the last of them has been loaded.
+    final loads = <Future<void>>[];
+    Future<void> load(Video video) async {
       try {
-        final musicData = await _getFromVideoWithoutStreamInfo(
+        controller.add(await _getFromVideoWithoutStreamInfo(
           video: video,
-          yt: ytContainer.get(),
-          caching: caching,
-        );
-        controller.sink.add(musicData);
+          yt: client,
+          // Each song of the playlist is a song of its own in the queue.
+          caching: caching.unique(),
+        ));
       } catch (e, stacktrace) {
-        controller.sink.addError(
+        controller.addError(
           UnableToLoadFromPlaylistException(video: video, cause: e),
           stacktrace,
         );
       }
-      processingCount--;
-      if (processingCount == 0 && done) {
-        close();
-      }
-    }, onDone: () {
-      if (processingCount > 0) {
-        done = true;
-      } else {
-        close();
-      }
-    });
+    }
+
+    Future<void> finish() async {
+      await Future.wait(loads);
+      if (yt == null) client.close();
+      await controller.close();
+    }
+
+    client.playlists.getVideos(playlistId).listen(
+      (video) => loads.add(load(video)),
+      onError: (Object e, StackTrace stacktrace) {
+        controller.addError(e, stacktrace);
+        finish();
+      },
+      onDone: finish,
+      cancelOnError: true,
+    );
 
     return controller.stream;
   }
@@ -139,9 +131,12 @@ class YouTubeMusicUtils {
     required StreamInfo streamInfo,
     required T caching,
   }) async {
-    String imageUrl = video.thumbnails.maxResUrl;
-    final imageRes = await http.get(Uri.parse(video.thumbnails.maxResUrl));
-    if (imageRes.statusCode != 200) {
+    // Not every video has a max resolution thumbnail.
+    var imageUrl = video.thumbnails.maxResUrl;
+    try {
+      final imageRes = await http.head(Uri.parse(imageUrl));
+      if (imageRes.statusCode != 200) imageUrl = video.thumbnails.highResUrl;
+    } on Exception {
       imageUrl = video.thumbnails.highResUrl;
     }
 
@@ -185,11 +180,7 @@ class YouTubeMusicUtils {
   ) async {
     NetworkUtils.check();
 
-    // The client is closed only when it was made here: a caller that passes its
-    // own wants to use it again. (Unlike [withYT], which closes a temporary one
-    // as soon as the call has been started.)
-    final client = yt ?? YoutubeExplode();
-    try {
+    return withYT(yt, (client) async {
       final video = await client.videos.get(videoId);
       final related = await client.videos.getRelatedVideos(video);
       final videos = related?.toList() ?? <Video>[];
@@ -199,9 +190,7 @@ class YouTubeMusicUtils {
         for (final video in videos)
           if (seen.add(video.id.value)) video,
       ];
-    } finally {
-      if (yt == null) client.close();
-    }
+    });
   }
 
   /// Throws [NetworkException] if the network is not accessible.
@@ -217,36 +206,20 @@ class YouTubeMusicUtils {
     });
   }
 
-  static T withYT<T>(YoutubeExplode? yt, T Function(YoutubeExplode yt) f) {
-    if (yt == null) {
-      final temp = YoutubeExplode();
-      final result = f(temp);
+  /// Runs [f] with [yt], or, when [yt] is null, with a client of its own that
+  /// is closed once [f] has finished. A client the caller passes is left open,
+  /// since the caller wants to use it again.
+  static Future<T> withYT<T>(
+    YoutubeExplode? yt,
+    Future<T> Function(YoutubeExplode yt) f,
+  ) async {
+    if (yt != null) return f(yt);
+    final temp = YoutubeExplode();
+    try {
+      return await f(temp);
+    } finally {
       temp.close();
-      return result;
-    } else {
-      return f(yt);
     }
-  }
-}
-
-class YTContainer {
-  final YoutubeExplode? yt;
-  late final YoutubeExplode? tempYT;
-  late final bool isTemp;
-
-  YTContainer(this.yt) {
-    if (yt == null) {
-      tempYT = YoutubeExplode();
-      isTemp = true;
-    } else {
-      isTemp = false;
-    }
-  }
-
-  YoutubeExplode get() => yt ?? tempYT!;
-
-  void close() {
-    tempYT?.close();
   }
 }
 

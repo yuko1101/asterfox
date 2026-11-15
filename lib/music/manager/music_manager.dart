@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../data/device_settings_data.dart';
-import '../../data/local_musics_data.dart';
 import '../../data/settings_data.dart';
 import '../../utils/os.dart';
 import '../../widget/music_widgets/repeat_button.dart';
@@ -25,7 +23,6 @@ class MusicManager {
 
   late final AudioPlayer _audioPlayer = AudioPlayer(this);
   late final SessionAudioHandler _audioHandler;
-  late final AudioSession _audioSession;
 
   // notifiers
   final audioStateManager = AudioStateManager();
@@ -79,22 +76,13 @@ class MusicManager {
   }
 
   Future<void> add(MusicData<CachingEnabled> song) async {
-    if (!song.isInstalled && !await song.isAudioUrlAvailable()) {
-      await song.refreshAudioUrl();
-    }
+    // `toMediaItem` refreshes an expired url of a song that is not installed.
     await _audioHandler.addQueueItem(await song.toMediaItem());
   }
 
   Future<void> addAll(List<MusicData<CachingEnabled>> songs) async {
     await _audioHandler.addQueueItems(
-      await Future.wait(
-        songs.map((e) => (MusicData<CachingEnabled> e) async {
-              if (!e.isInstalled && !await e.isAudioUrlAvailable()) {
-                await e.refreshAudioUrl();
-              }
-              return e.toMediaItem();
-            }(e)),
-      ),
+      await Future.wait(songs.map((song) => song.toMediaItem())),
     );
   }
 
@@ -139,18 +127,13 @@ class MusicManager {
   }
 
   Future<void> nextRepeatMode() async {
-    final repeatMode = state.repeatState;
-    final index = repeatModes.indexOf(repeatMode);
-    if (index == -1) {
-      return;
-    }
-    final nextIndex = (index + 1) % repeatModes.length;
-    await setRepeatMode(repeatModes[nextIndex]);
+    final index = repeatModes.indexOf(state.repeatState);
+    await setRepeatMode(repeatModes[(index + 1) % repeatModes.length]);
   }
 
   Future<void> toggleShuffle() async {
     final enable = !state.shuffled;
-    _audioHandler.setShuffleMode(
+    await _audioHandler.setShuffleMode(
         enable ? AudioServiceShuffleMode.all : AudioServiceShuffleMode.none);
   }
 
@@ -201,5 +184,4 @@ class MusicManager {
   }
 
   SessionAudioHandler get audioHandler => _audioHandler;
-  AudioSession get audioSession => _audioSession;
 }

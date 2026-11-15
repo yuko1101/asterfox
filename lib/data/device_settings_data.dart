@@ -56,20 +56,18 @@ class DeviceSettingsData {
     );
   }
 
-  static dynamic getValue({String? key, List<String>? keys}) {
-    if (key == null && keys == null) return _data;
-    if (key != null) return _data[key] ?? defaultData[key];
-    if (keys != null) {
-      var map = _data;
-      for (var key in keys) {
-        map = map[key] ?? defaultData[key];
-      }
-      return map;
-    }
-  }
+  /// The value of [key], or its default when it is not stored.
+  static dynamic getValue({required String key}) =>
+      _data[key] ?? defaultData[key];
 
   static bool _initializedRepeatListener = false;
   static Future<void> applyMusicManagerSettings() async {
+    // The stored mode is applied before the changes are listened to, so that
+    // the mode the player starts with is not stored over it.
+    final repeatMode = getValue(key: "repeatMode") as String;
+    if (repeatStateToString(musicManager.state.repeatState) != repeatMode) {
+      await musicManager.setRepeatMode(repeatStateFromString(repeatMode));
+    }
     if (!_initializedRepeatListener) {
       musicManager.audioStateManager.repeatStateNotifier.addListener(() {
         setValue(
@@ -79,13 +77,8 @@ class DeviceSettingsData {
       });
       _initializedRepeatListener = true;
     }
-    if (repeatStateToString(musicManager
-            .audioStateManager.repeatStateNotifier.value.repeatState) !=
-        getValue(key: "repeatMode") as String) {
-      musicManager.setRepeatMode(
-          repeatStateFromString(getValue(key: "repeatMode") as String));
-    }
 
-    await musicManager.setBaseVolume(getValue(key: "baseVolume") as double);
+    await musicManager
+        .setBaseVolume((getValue(key: "baseVolume") as num).toDouble());
   }
 }

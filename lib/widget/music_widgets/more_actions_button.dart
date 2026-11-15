@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,8 +9,8 @@ import '../../music/downloader/audio_downloader.dart';
 import '../../music/manager/audio_data_manager.dart';
 import '../../music/music_data/music_data.dart';
 import '../../music/music_data/youtube_music_data.dart';
-import '../../music/downloader/downloader_manager.dart';
 import '../../system/theme/theme.dart';
+import '../../utils/pair.dart';
 import '../loading_dialog.dart';
 import '../preview/related_videos_screen.dart';
 
@@ -28,12 +26,13 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.auto_awesome,
       title: (context) => l10n.value.related_videos,
       onTap: (song, context) {
-        Navigator.of(context).pop();
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => RelatedVideosScreen(song: song!),
-          ),
-        );
+        Navigator.of(context)
+          ..pop()
+          ..push(
+            MaterialPageRoute(
+              builder: (context) => RelatedVideosScreen(song: song!),
+            ),
+          );
       },
       songFilter: (MusicData? song) => song != null,
     ),
@@ -41,9 +40,10 @@ class MoreActionsButton extends StatelessWidget {
       id: "share",
       icon: Icons.share,
       title: (context) => l10n.value.share,
-      onTap: (song, context) async {
-        Share.share(song!.mediaURL, subject: song.title);
+      onTap: (song, context) {
         Navigator.of(context).pop();
+        SharePlus.instance.share(
+            ShareParams(uri: Uri.parse(song!.mediaURL), subject: song.title));
       },
       songFilter: (MusicData? song) => song != null,
     ),
@@ -52,24 +52,40 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.share,
       title: (context) => l10n.value.share_mp3,
       onTap: (song, context) async {
-        Navigator.of(context).pop();
-        if (!song!.isInstalled) {
-          final key = "share-${song.audioId}";
-          final downloadPath = File("$tempPath/share_files/${song.audioId}");
-          final downloadFuture = AudioDownloader.download(song, customPath: downloadPath.path);
-
-          await LoadingDialog.showLoading(
-            context: context,
-            future: () async {
-              await downloadFuture;
-            }(),
-            percentageNotifier: DownloadManager.getNotifiers(key).second,
-          );
-          // TODO: rename file
-          await Share.shareXFiles([XFile(downloadPath.path)]);
-        } else {
-          await Share.shareXFiles([XFile(song.audioSavePath)]);
+        // The sheet is closed first, so the dialog is shown from the screen
+        // under it.
+        final navigator = Navigator.of(context)..pop();
+        var path = song!.audioSavePath;
+        if (!song.isInstalled) {
+          path = "$tempPath/share_files/${song.audioId}";
+          final bytes = ValueNotifier(Pair(0, 1));
+          final percentage = ValueNotifier(0);
+          bytes.addListener(() {
+            final value = bytes.value;
+            if (value.second > 0) {
+              percentage.value = value.first * 100 ~/ value.second;
+            }
+          });
+          try {
+            await LoadingDialog.showLoading(
+              context: navigator.context,
+              future: AudioDownloader.download(
+                song,
+                customPath: path,
+                bytesNotifier: bytes,
+              ),
+              percentageNotifier: percentage,
+            );
+          } on Exception {
+            Fluttertoast.showToast(msg: l10n.value.something_went_wrong);
+            return;
+          } finally {
+            bytes.dispose();
+            percentage.dispose();
+          }
         }
+        // TODO: rename file
+        await SharePlus.instance.share(ShareParams(files: [XFile(path)]));
       },
       songFilter: (MusicData? song) => song != null,
     ),
@@ -78,12 +94,12 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.open_in_new,
       title: (context) => l10n.value.open_in_youtube,
       onTap: (song, context) async {
+        Navigator.of(context).pop();
         final launched = await launchUrl(Uri.parse(song!.mediaURL),
             mode: LaunchMode.externalNonBrowserApplication);
         if (!launched) {
           Fluttertoast.showToast(msg: l10n.value.launch_url_error);
         }
-        Navigator.of(context).pop();
       },
       songFilter: (MusicData? song) => song != null && song is YouTubeMusicData,
     ),
@@ -101,9 +117,9 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.delete_forever,
       title: (context) => l10n.value.delete_from_local,
       onTap: (song, context) {
-        Navigator.of(context).pop();
+        final navigator = Navigator.of(context)..pop();
         showDialog(
-          context: context,
+          context: navigator.context,
           builder: (context) => AlertDialog(
             title: Text(l10n.value.delete_from_local),
             content: Text(l10n.value.delete_from_local_confirm_message),
@@ -130,8 +146,8 @@ class MoreActionsButton extends StatelessWidget {
       icon: Icons.refresh,
       title: (context) => l10n.value.refresh_all,
       onTap: (song, context) {
-        musicManager.refreshSongs();
         Navigator.of(context).pop();
+        musicManager.refreshSongs();
       },
       songFilter: (MusicData? song) => song != null,
     )
@@ -177,7 +193,7 @@ class MoreActionsButton extends StatelessWidget {
                                 color: Theme.of(context)
                                     .extraColors
                                     .primary
-                                    .withOpacity(0.1),
+                                    .withValues(alpha: 0.1),
                               ),
                               margin: const EdgeInsets.only(
                                 top: 7,

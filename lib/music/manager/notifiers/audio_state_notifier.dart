@@ -16,40 +16,31 @@ class MainAudioStateNotifier extends ChangeNotifier
 
   void pauseChange(AudioRawData dataType,
       {bool faking = false, dynamic fakeValue}) {
-    var pausedState = _pausedChanges[dataType];
-    if (pausedState == null) {
-      _pausedChanges[dataType] = PausedState();
-      pausedState = _pausedChanges[dataType]!;
-    }
-
+    final pausedState = _pausedChanges.putIfAbsent(dataType, PausedState.new);
     pausedState.processCount++;
     if (faking) {
       pausedState.faking = true;
       pausedState.fakeValue = fakeValue;
     }
-
-    print("pausing $dataType");
   }
 
   void resumeChange(AudioRawData dataType) {
     final pausedState = _pausedChanges[dataType];
     if (pausedState == null) return;
-    if (pausedState.processCount == 1) {
-      // all processes have resumed
+    pausedState.processCount--;
+    if (pausedState.processCount > 0) return;
 
-      _pausedChanges.remove(dataType);
-
-      notifyListeners();
-    } else {
-      pausedState.processCount--;
-    }
-    print("resuming $dataType");
+    // All processes have resumed. The sub notifiers kept the paused (or fake)
+    // value, so the real one is handed to them as a change of its own.
+    _pausedChanges.remove(dataType);
+    lastChanges
+      ..clear()
+      ..add(dataType);
+    notifyListeners();
   }
 
-  bool isChangePaused(AudioRawData dataType) {
-    final pausingProcesses = _pausedChanges[dataType];
-    return pausingProcesses != null && pausingProcesses.processCount > 0;
-  }
+  bool isChangePaused(AudioRawData dataType) =>
+      (_pausedChanges[dataType]?.processCount ?? 0) > 0;
 
   AudioState getAppliedPausedState(
       AudioState oldAudioState, AudioState newAudioState) {
@@ -64,8 +55,9 @@ class MainAudioStateNotifier extends ChangeNotifier
   dynamic getAppliedPausedData(AudioRawData dataType, AudioState oldAudioState,
       AudioState newAudioState) {
     final pausedState = _pausedChanges[dataType];
-    final isPaused = pausedState != null && pausedState.processCount > 0;
-    if (!isPaused) return newAudioState.getRawData(dataType);
+    if (pausedState == null || pausedState.processCount <= 0) {
+      return newAudioState.getRawData(dataType);
+    }
 
     return pausedState.faking
         ? pausedState.fakeValue

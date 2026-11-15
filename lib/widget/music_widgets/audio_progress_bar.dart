@@ -18,8 +18,8 @@ class AudioProgressBar extends StatelessWidget {
         return ProgressBar(
           progressBarColor: color,
           thumbColor: color,
-          bufferedBarColor: color.withOpacity(0.2),
-          baseBarColor: color.withOpacity(0.15),
+          bufferedBarColor: color.withValues(alpha: 0.2),
+          baseBarColor: color.withValues(alpha: 0.15),
           thumbRadius: Responsive.isMobile(context) ? 10 : 5,
           progress: progress.position,
           buffered: progress.buffer,

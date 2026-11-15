@@ -70,36 +70,39 @@ final audioChannels = [
 class _AudioChannelChoiceState extends State<_AudioChannelChoice> {
   @override
   Widget build(BuildContext context) {
-    return SettingsList(
-      sections: [
-        SettingsSection(
-          title: Text(l10n.value.audio_channel),
-          tiles: audioChannels
-              .map((audioChannel) => RadioListTile<String>(
-                    title: Row(
-                      children: [
-                        Icon(audioChannel["icon"] as IconData),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(l10n.value
-                            .audio_channels(audioChannel["name"] as String)),
-                      ],
-                    ),
-                    value: audioChannel["name"] as String,
-                    groupValue: SettingsData.getValue(key: "audioChannel"),
-                    activeColor: CustomColors.getColor("accent"),
-                    onChanged: (value) async {
-                      await SettingsData.setValue(
-                        key: "audioChannel",
-                        value: audioChannel["name"],
-                      );
-                    },
-                  ))
-              .map((radioListTile) => CustomSettingsTile(child: radioListTile))
-              .toList(),
-        ),
-      ],
+    return RadioGroup<String>(
+      groupValue: SettingsData.getValue(key: "audioChannel") as String,
+      onChanged: (value) async {
+        if (value == null) return;
+        await SettingsData.setValue(key: "audioChannel", value: value);
+        await SettingsData.save();
+        if (mounted) setState(() {});
+      },
+      child: SettingsList(
+        sections: [
+          SettingsSection(
+            title: Text(l10n.value.audio_channel),
+            tiles: audioChannels
+                .map((audioChannel) => RadioListTile<String>(
+                      title: Row(
+                        children: [
+                          Icon(audioChannel["icon"] as IconData),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(l10n.value
+                              .audio_channels(audioChannel["name"] as String)),
+                        ],
+                      ),
+                      value: audioChannel["name"] as String,
+                      activeColor: CustomColors.getColor("accent"),
+                    ))
+                .map(
+                    (radioListTile) => CustomSettingsTile(child: radioListTile))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 }

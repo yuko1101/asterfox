@@ -6,10 +6,11 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 import '../../utils/pair.dart';
 import '../music_data/music_data.dart';
 import '../music_data/youtube_music_data.dart';
-import '../utils/youtube_music_utils.dart';
 import 'audio_info.dart';
 
 class AudioDownloader {
+  /// Downloads the audio of [song] to [customPath], or to the song's own
+  /// directory. [bytesNotifier] is given the downloaded and the total bytes.
   static Future<AudioInfo> download(
     MusicData song, {
     String? customPath,
@@ -18,7 +19,6 @@ class AudioDownloader {
     if (song is YouTubeMusicData) {
       return await _downloadYouTubeAudio(
         song,
-        null,
         customPath: customPath,
         bytesNotifier: bytesNotifier,
       );
@@ -29,39 +29,40 @@ class AudioDownloader {
   }
 
   static Future<AudioInfo> _downloadYouTubeAudio(
-    YouTubeMusicData song,
-    YoutubeExplode? yt, {
+    YouTubeMusicData song, {
     String? customPath,
     ValueNotifier<Pair<int, int>>? bytesNotifier,
   }) async {
-    final path = customPath ?? song.audioSavePath;
-    final file = File(path);
-    if (!file.parent.existsSync()) file.parent.createSync(recursive: true);
+    final file = File(customPath ?? song.audioSavePath);
+    await file.parent.create(recursive: true);
 
-    final ytContainer = YTContainer(yt);
-    final streamInfo =
-        (song.streamInfo == null || !await song.isAudioUrlAvailable())
-            ? await song.refreshStreamInfo(ytContainer.get())
-            : song.streamInfo!;
+    final yt = YoutubeExplode();
+    try {
+      final streamInfo =
+          (song.streamInfo == null || !await song.isAudioUrlAvailable())
+              ? await song.refreshStreamInfo(yt)
+              : song.streamInfo!;
 
-    final audioStream = ytContainer.get().videos.streamsClient.get(streamInfo);
-    if (bytesNotifier != null) {
-      bytesNotifier.value = Pair(0, streamInfo.size.totalBytes);
-    }
+      final total = streamInfo.size.totalBytes;
+      var received = 0;
+      bytesNotifier?.value = Pair(0, total);
 
-    final fileStream = file.openWrite(mode: FileMode.writeOnlyAppend);
-
-    await for (final data in audioStream) {
-      fileStream.add(data);
-      if (bytesNotifier != null) {
-        final preValue = bytesNotifier.value;
-        bytesNotifier.value =
-            Pair(preValue.first + data.length, preValue.second);
+      // The file is written from its start, so that what an earlier, broken
+      // download left behind is not kept in front of the audio.
+      final sink = file.openWrite();
+      try {
+        await for (final data in yt.videos.streamsClient.get(streamInfo)) {
+          sink.add(data);
+          received += data.length;
+          bytesNotifier?.value = Pair(received, total);
+        }
+      } finally {
+        await sink.close();
       }
-    }
-    await fileStream.close();
-    ytContainer.close();
 
-    return AudioInfo(extension: streamInfo.container.name);
+      return AudioInfo(extension: streamInfo.container.name);
+    } finally {
+      yt.close();
+    }
   }
 }

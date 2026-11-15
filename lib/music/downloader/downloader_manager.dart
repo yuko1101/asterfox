@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '../../data/local_musics_data.dart';
 import '../../system/exceptions/song_already_installed_exception.dart';
@@ -36,35 +34,42 @@ class DownloadManager {
     NetworkUtils.check();
 
     _downloadStarted(downloadId);
-    final notifiers = _getNotifiers(downloadId);
-
-    if (!await song.isAudioUrlAvailable()) await song.refreshAudioUrl();
-
-    // download
-    await ImageDownloader.download(song);
-
+    final percentage = _getNotifiers(downloadId).second;
     final bytesNotifier = ValueNotifier<Pair<int, int>>(Pair(0, 1));
     bytesNotifier.addListener(() {
-      notifiers.second.value =
-          bytesNotifier.value.first * 100 ~/ bytesNotifier.value.second;
+      final bytes = bytesNotifier.value;
+      if (bytes.second > 0) {
+        percentage.value = bytes.first * 100 ~/ bytes.second;
+      }
     });
-    final audioInfo = await AudioDownloader.download(
-      song,
-      bytesNotifier: bytesNotifier,
-    );
-    bytesNotifier.dispose();
 
-    audioInfo.save(song.audioInfoPath);
+    try {
+      if (!await song.isAudioUrlAvailable()) await song.refreshAudioUrl();
 
-    // save file size
+      await ImageDownloader.download(song);
+      final audioInfo = await AudioDownloader.download(
+        song,
+        bytesNotifier: bytesNotifier,
+      );
+      // The info file marks the song as installed, so it is written last.
+      await audioInfo.save(song.audioInfoPath);
+    } catch (_) {
+      // A half-written audio would otherwise be played as if it were complete
+      // the next time, and be in the way of downloading it again.
+      final audio = File(song.audioSavePath);
+      if (audio.existsSync()) await audio.delete();
+      rethrow;
+    } finally {
+      bytesNotifier.dispose();
+      _downloadFinished(downloadId);
+    }
+
     song.size = await Directory(song.directoryPath).length;
     // if the song has already stored, update file size property and save.
     if (song.isStored) {
       await LocalMusicsData.save(song);
       await CloudFirestoreManager.addOrUpdateSongs([song]);
     }
-
-    _downloadFinished(downloadId);
   }
 
   static Pair<ReadonlyValueNotifier<bool>, ReadonlyValueNotifier<int>>
@@ -75,37 +80,31 @@ class DownloadManager {
 
   static Pair<ValueNotifier<bool>, ValueNotifier<int>> _getNotifiers(
       String key) {
-    if (!_downloadingState.containsKey(key)) {
-      _downloadingState
-          .addAll({key: Pair(ValueNotifier(false), ValueNotifier(0))});
-    }
-    return _downloadingState[key]!;
+    return _downloadingState.putIfAbsent(
+        key, () => Pair(ValueNotifier(false), ValueNotifier(0)));
   }
 
-  static bool isDownloading(String key) {
-    return _downloadingState.containsKey(key) &&
-        _downloadingState[key]!.first.value;
-  }
+  static bool isDownloading(String key) =>
+      _downloadingState[key]?.first.value ?? false;
 
   static void _downloadStarted(String key) {
-    final notifiers = _getNotifiers(key);
-    notifiers.first.value = true;
-
-    downloadingNotifier.value = downloadingNotifier.value.toList()..add(key);
+    _getNotifiers(key).first.value = true;
+    downloadingNotifier.value = [...downloadingNotifier.value, key];
   }
 
   static void _downloadFinished(String key) {
     _downloadingState.remove(key);
-
-    downloadingNotifier.value = downloadingNotifier.value.toList()..remove(key);
+    downloadingNotifier.value = [...downloadingNotifier.value]..remove(key);
   }
 }
 
 extension DirectoryLengthExtension on Directory {
+  /// The total size of the files directly in this directory, in bytes.
   Future<int> get length async {
-    final files = listSync();
-    final lengthList =
-        await Future.wait(files.map((file) => File(file.path).length()));
-    return lengthList.reduce((a, b) => a + b);
+    var total = 0;
+    await for (final entity in list()) {
+      if (entity is File) total += await entity.length();
+    }
+    return total;
   }
 }

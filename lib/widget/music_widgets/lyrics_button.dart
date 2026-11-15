@@ -8,6 +8,7 @@ import '../../music/music_data/music_data.dart';
 import '../../music/lyrics/lrc.dart';
 import '../../music/lyrics_finder.dart';
 import '../../system/theme/theme.dart';
+import '../loading_dialog.dart';
 import 'synced_lyrics_view.dart';
 
 class LyricsButton extends StatelessWidget {
@@ -37,10 +38,7 @@ class LyricsButton extends StatelessWidget {
                       showLyrics(song, context);
                       return;
                     }
-                    final FindLyricsDialog findLyricsDialog =
-                        FindLyricsDialog(song);
-                    showDialog(
-                        context: context, builder: findLyricsDialog.pages[0]);
+                    FindLyricsDialog(song).show(context);
                   },
           );
         });
@@ -75,11 +73,8 @@ class LyricsButton extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.edit_note),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    final FindLyricsDialog findLyricsDialog =
-                        FindLyricsDialog(song);
-                    showDialog(
-                        context: context, builder: findLyricsDialog.pages[0]);
+                    final navigator = Navigator.of(context)..pop();
+                    FindLyricsDialog(song).show(navigator.context);
                   },
                 )
               ],
@@ -207,26 +202,61 @@ class FindLyricsDialog {
   String songArtist = "";
   String? lyrics;
 
-  void goTo(int page, BuildContext context) {
-    if (page > pages.length - 1 || page < 0) {
-      throw Exception("Page index out of range");
-    }
-    currentPage = page;
-    Navigator.of(context).pop();
-    showDialog(context: context, builder: pages[page]);
+  /// The navigator the pages are shown on. A page is replaced by the next one,
+  /// so the context of a page is gone once it has been left, and this is what
+  /// stays.
+  late NavigatorState _navigator;
+
+  void show(BuildContext context) {
+    _navigator = Navigator.of(context);
+    currentPage = 0;
+    showDialog(context: context, builder: pages[0]);
   }
 
+  void goTo(int page, BuildContext context) {
+    if (page < 0 || page >= pages.length) return;
+    currentPage = page;
+    _navigator.pop();
+    showDialog(context: _navigator.context, builder: pages[page]);
+  }
+
+  bool _finishing = false;
+
   Future<void> finish(BuildContext context) async {
-    // TODO: make better (like progress indicator)
-    lyrics ??= await LyricsFinder.search(songTitle, songArtist, song: song);
-    if (lyrics == null || lyrics!.isEmpty) {
+    if (_finishing) return;
+    _finishing = true;
+    final page = ModalRoute.of(context);
+    try {
+      var found = lyrics;
+      if (found == null) {
+        final search = LyricsFinder.search(songTitle, songArtist, song: song);
+        await LoadingDialog.showLoading(
+            context: _navigator.context, future: search);
+        found = await search;
+      }
+      if (found.isEmpty) {
+        Fluttertoast.showToast(msg: l10n.value.lyrics_not_found);
+        return;
+      }
+      await LyricsFinder.applyLyrics(song, found, true);
+      _close(page);
+      if (_navigator.mounted) LyricsButton.showLyrics(song, _navigator.context);
+    } on Exception {
       Fluttertoast.showToast(msg: l10n.value.lyrics_not_found);
-      Navigator.of(context).pop();
-      return;
+    } finally {
+      _close(page);
+      _finishing = false;
     }
-    await LyricsFinder.applyLyrics(song, lyrics!, true);
-    Navigator.of(context).pop();
-    LyricsButton.showLyrics(song, context);
+  }
+
+  /// Closes [page] if it is still open, and nothing else.
+  void _close(Route? page) {
+    if (page == null || !page.isActive) return;
+    if (page.isCurrent) {
+      _navigator.pop();
+    } else {
+      _navigator.removeRoute(page);
+    }
   }
 
   TextButton cancelButton(BuildContext context) => TextButton(
@@ -262,7 +292,7 @@ class FindLyricsDialog {
             return;
           }
           lyrics = text;
-          finish(context);
+          if (context.mounted) finish(context);
         },
       );
 }

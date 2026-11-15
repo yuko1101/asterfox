@@ -100,7 +100,7 @@ class VolumeWidgetState extends State<VolumeWidget>
                   borderRadius: BorderRadius.circular(40),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -115,8 +115,8 @@ class VolumeWidgetState extends State<VolumeWidget>
                           min: VolumeWidget.min,
                           thumbColor: CustomColors.getColor("accent"),
                           activeColor: CustomColors.getColor("accent"),
-                          inactiveColor:
-                              CustomColors.getColor("accent").withOpacity(0.2),
+                          inactiveColor: CustomColors.getColor("accent")
+                              .withValues(alpha: 0.2),
                           onChanged: (value) {
                             setState(() {
                               _sliderValue = value;

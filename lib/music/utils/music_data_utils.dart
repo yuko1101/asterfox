@@ -1,5 +1,6 @@
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide MusicData;
 
+import '../../system/exceptions/asterfox_exception.dart';
 import '../../system/exceptions/invalid_type_of_media_url_exception.dart';
 import '../music_data/music_data.dart';
 import 'youtube_music_utils.dart';
@@ -29,15 +30,14 @@ class MusicDataUtils {
     if (query.isUrl) {
       return fetchFromUrl(query);
     }
-    final yt = YoutubeExplode();
-    final videos = await YouTubeMusicUtils.searchYouTubeVideo(query, yt);
-
-    final song = await videos.first.fetchMusicData(
-      caching: CachingDisabled(),
-      yt: yt,
-    );
-    yt.close();
-    return song;
+    return YouTubeMusicUtils.withYT(null, (yt) async {
+      final videos = await YouTubeMusicUtils.searchYouTubeVideo(query, yt);
+      if (videos.isEmpty) {
+        throw AsterfoxException(
+            title: "No video found", description: "Nothing matched \"$query\"");
+      }
+      return videos.first.fetchMusicData(caching: CachingDisabled(), yt: yt);
+    });
   }
 
   static Future<MusicData<CachingDisabled>> fetchFromUrl(String url) {

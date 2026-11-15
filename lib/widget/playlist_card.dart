@@ -59,7 +59,9 @@ class PlaylistCard extends StatelessWidget {
             child: Container(
               height: 30,
               width: double.infinity,
-              color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+              color: Theme.of(context)
+                  .scaffoldBackgroundColor
+                  .withValues(alpha: 0.5),
               child: Text(
                 playlist.name,
                 style: const TextStyle(fontSize: 20),

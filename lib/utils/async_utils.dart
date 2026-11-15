@@ -2,78 +2,56 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'pair.dart';
-
-/// `limit` - Maximum number of futures to be executed at the same time
+/// Runs futures with at most [limit] of them at the same time (no limit when
+/// null). A future that fails frees its slot like one that succeeds.
 class AsyncCore<T> {
   AsyncCore({
     this.limit,
   });
   final int? limit;
 
-  final List<Future<T>> _running = [];
-  final List<Pair<Future<T> Function(), Completer<T>>> _queue = [];
+  int _running = 0;
+  final List<Completer<void>> _waiting = [];
 
   Future<T> run(Future<T> Function() func) async {
-    final completer = Completer<T>();
-    if (limit == null || _running.length < limit!) {
-      _execute(func, completer);
+    if (limit != null && _running >= limit!) {
+      // The slot is handed over by the run that frees it, still counted.
+      final slot = Completer<void>();
+      _waiting.add(slot);
+      await slot.future;
     } else {
-      _queue.add(Pair(func, completer));
+      _running++;
     }
-    return completer.future;
-  }
-
-  Future<void> _execute(
-      Future<T> Function() func, Completer<T> completer) async {
-    final future = func();
-    future.then((_) {
-      if (_queue.isEmpty) return;
-      final nextFunc = _queue.removeAt(0);
-      _execute(nextFunc.first, nextFunc.second);
-    });
-    _running.add(future);
-    completer.complete(await future);
+    try {
+      return await func();
+    } finally {
+      if (_waiting.isNotEmpty) {
+        _waiting.removeAt(0).complete();
+      } else {
+        _running--;
+      }
+    }
   }
 }
 
-class ReadonlyValueNotifier<T> extends ChangeNotifier
-    implements ValueListenable<T> {
-  ReadonlyValueNotifier(
-    this._notifier,
-  ) {
-    _updateValue();
+/// A read-only view of a [ValueNotifier]. Listeners are added to the notifier
+/// itself, so the view holds nothing of its own and needs no disposing.
+class ReadonlyValueNotifier<T> implements ValueListenable<T> {
+  ReadonlyValueNotifier(this._notifier);
 
-    _notifier.addListener(_updateValue);
-  }
-
-  final ValueNotifier _notifier;
-  late T _value;
+  final ValueNotifier<T> _notifier;
 
   @override
-  T get value => _value;
+  T get value => _notifier.value;
 
-  void _updateValue() {
-    _value = _notifier.value;
-    notifyListeners();
-  }
-}
+  @override
+  void addListener(VoidCallback listener) => _notifier.addListener(listener);
 
-extension StreamToValueNotifier<T> on Stream<T> {
-  ValueNotifier<T> toValueNotifier(T initialValue) {
-    final valueNotifier = ValueNotifier<T>(initialValue);
-    listen((event) {
-      valueNotifier.value = event;
-    }, onDone: () {
-      valueNotifier.dispose();
-    });
-
-    return valueNotifier;
-  }
+  @override
+  void removeListener(VoidCallback listener) =>
+      _notifier.removeListener(listener);
 }
 
 extension ValueNotifierToReadonly<T> on ValueNotifier<T> {
-  ReadonlyValueNotifier<T> toReadonly() {
-    return ReadonlyValueNotifier(this);
-  }
+  ReadonlyValueNotifier<T> toReadonly() => ReadonlyValueNotifier(this);
 }
