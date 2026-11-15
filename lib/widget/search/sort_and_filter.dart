@@ -69,18 +69,21 @@ class RelevanceSorting extends FilterSorting {
   }
 }
 
+/// How well [suggestion] matches [query]: one point for each of the title,
+/// the artist, the keywords and the lyrics that contain it.
+///
+/// Every field is compared without regard to case, so "beatles" finds a song
+/// by "The Beatles" as well as one titled "BEATLES".
 int _getScore(Suggestion suggestion, String query) {
+  final needle = query.toLowerCase();
+  bool matches(String? text) =>
+      text != null && text.toLowerCase().contains(needle);
+
   int score = 0;
-  if (suggestion.title.toLowerCase().contains(query.toLowerCase())) score += 1;
-  if (suggestion.keywords
-      .any((e) => e.toLowerCase().contains(query.toLowerCase()))) {
-    score += 1;
-  }
-  if (suggestion is SongSuggestion &&
-      suggestion.lyrics != null &&
-      suggestion.lyrics!.contains(query)) {
-    score += 1;
-  }
+  if (matches(suggestion.title)) score += 1;
+  if (matches(suggestion.subtitle)) score += 1;
+  if (suggestion.keywords.any(matches)) score += 1;
+  if (suggestion is SongSuggestion && matches(suggestion.lyrics)) score += 1;
   return score;
 }
 

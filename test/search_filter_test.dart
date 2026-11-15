@@ -291,4 +291,30 @@ void main() {
       );
     });
   });
+
+  group('searching for text', () {
+    test('matches the title, artist and lyrics without regard to case', () {
+      final list = <Suggestion>[
+        song(title: "Hello World"),
+        song(title: "by artist", author: "The HELLO Band"),
+        song(title: "in lyrics", lyrics: "say Hello to me"),
+        song(title: "unrelated", author: "Someone", lyrics: "la la"),
+      ];
+
+      final result = RelatedFilter("hELLo").apply(list);
+
+      expect(titlesOf(result), ["Hello World", "by artist", "in lyrics"]);
+    });
+
+    test('ranks a song that matches in more places first', () {
+      final list = <Suggestion>[
+        song(title: "lyrics only", lyrics: "LOVE"),
+        song(title: "Love Song", author: "love", lyrics: "Love"),
+      ];
+
+      final result = RelevanceSorting("love").apply(list);
+
+      expect(titlesOf(result), ["Love Song", "lyrics only"]);
+    });
+  });
 }
