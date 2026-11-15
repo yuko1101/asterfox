@@ -5,8 +5,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../main.dart';
 import '../../music/manager/audio_data_manager.dart';
 import '../../music/music_data/music_data.dart';
+import '../../music/lyrics/lrc.dart';
 import '../../music/lyrics_finder.dart';
 import '../../system/theme/theme.dart';
+import 'synced_lyrics_view.dart';
 
 class LyricsButton extends StatelessWidget {
   const LyricsButton({super.key});
@@ -45,6 +47,7 @@ class LyricsButton extends StatelessWidget {
   }
 
   static void showLyrics(MusicData song, BuildContext context) {
+    final syncedLines = Lrc.parse(song.lyrics);
     showModalBottomSheet(
       context: context,
       builder: (context) => Material(
@@ -82,15 +85,17 @@ class LyricsButton extends StatelessWidget {
               ],
             ),
             Flexible(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: Text(
-                    song.lyrics,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: syncedLines.isNotEmpty
+                    ? SyncedLyricsView(song: song, lines: syncedLines)
+                    : SingleChildScrollView(
+                        child: Text(
+                          song.lyrics,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
               ),
             )
           ],
@@ -213,7 +218,7 @@ class FindLyricsDialog {
 
   Future<void> finish(BuildContext context) async {
     // TODO: make better (like progress indicator)
-    lyrics ??= await LyricsFinder.search(songTitle, songArtist);
+    lyrics ??= await LyricsFinder.search(songTitle, songArtist, song: song);
     if (lyrics == null || lyrics!.isEmpty) {
       Fluttertoast.showToast(msg: l10n.value.lyrics_not_found);
       Navigator.of(context).pop();

@@ -9,6 +9,7 @@ import '../../data/custom_colors.dart';
 import '../../data/local_musics_data.dart';
 import '../../data/playlist_data.dart';
 import '../../main.dart';
+import '../../music/lyrics/lrc.dart';
 import '../../music/music_data/music_data.dart';
 import '../../music/music_data/youtube_music_data.dart';
 import '../../music/utils/music_data_utils.dart';
@@ -411,7 +412,7 @@ class SongSearch
         subtitle: e.author,
         musicData: e,
         keywords: e.keywords,
-        lyrics: e.lyrics,
+        lyrics: Lrc.toPlainText(e.lyrics),
       );
     }));
 
@@ -487,7 +488,8 @@ class SongSearch
   /// per group, and comes back as the same tile each time: selecting it in one
   /// group has to be the same selection as in the other, or it ends up in the
   /// queue twice.
-  SongSearchTile tileFor(Suggestion suggestion) => _getSongSearchTile(suggestion);
+  SongSearchTile tileFor(Suggestion suggestion) =>
+      _getSongSearchTile(suggestion);
 
   void setQuery(newQuery) => query = newQuery;
 

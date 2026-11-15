@@ -3,15 +3,31 @@ import 'package:html/parser.dart' show parse;
 
 import '../data/local_musics_data.dart';
 import '../system/firebase/cloud_firestore.dart';
+import 'lyrics/synced_lyrics_providers.dart';
 import 'music_data/music_data.dart';
+import 'music_data/youtube_music_data.dart';
 
 class LyricsFinder {
-  static Future<String> search(String title, String artist) async {
+  /// Lyrics for the song titled [title] by [artist], as stored on a song:
+  /// LRC when they come with timing, else plain text, or "" when none.
+  ///
+  /// Timed lyrics are looked for first, the way pear-desktop does (YouTube
+  /// Music for [song]'s video, then LRCLIB), then plain ones.
+  static Future<String> search(String title, String artist,
+      {MusicData? song}) async {
+    final found = await SyncedLyricsFinder().search(
+      title: title,
+      artist: artist,
+      duration: song?.duration ?? Duration.zero,
+      videoId: song is YouTubeMusicData ? song.id : null,
+    );
+    if (found != null && found.isSynced) return found.asStoredText;
+
     final google = await getFromGoogle(title, artist);
     if (google.isNotEmpty) return google;
     final utaNet = await getFromUtaNet(title, artist);
     if (utaNet.isNotEmpty) return utaNet;
-    return "";
+    return found?.asStoredText ?? "";
   }
 
   static Future<void> applyLyrics(MusicData song, String lyrics,
