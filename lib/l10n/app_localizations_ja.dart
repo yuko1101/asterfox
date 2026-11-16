@@ -449,4 +449,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get lyrics_timing_reset => '取得したままに戻す';
+
+  @override
+  String get search_lyrics => '歌詞を検索';
 }

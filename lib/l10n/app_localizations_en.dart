@@ -449,4 +449,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lyrics_timing_reset => 'Back to as fetched';
+
+  @override
+  String get search_lyrics => 'Search lyrics';
 }

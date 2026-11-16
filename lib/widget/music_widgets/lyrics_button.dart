@@ -46,20 +46,91 @@ class LyricsButton extends StatelessWidget {
         });
   }
 
+  /// Opens the lyrics panel. It shows the lyrics of the song that is playing,
+  /// which [song] is when the lyrics are opened from the player.
   static void showLyrics(MusicData song, BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => LyricsSheet(song: song),
+    LyricsPanel.open();
+  }
+}
+
+/// The lyrics of the song that is playing, laid over the playlist rather than
+/// over the whole screen, so that the player below them can still be used.
+///
+/// It follows the song: playing the next one shows that one's lyrics.
+class LyricsPanel extends StatelessWidget {
+  const LyricsPanel({super.key});
+
+  /// Whether the panel is shown.
+  static final ValueNotifier<bool> shown = ValueNotifier(false);
+
+  /// Counts the openings, so that lyrics found or edited since the panel was
+  /// built are read again.
+  static final ValueNotifier<int> _openings = ValueNotifier(0);
+
+  static void open() {
+    _openings.value++;
+    shown.value = true;
+  }
+
+  static void close() => shown.value = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: shown,
+      builder: (context, isShown, _) {
+        if (!isShown) return const SizedBox.shrink();
+        return ValueListenableBuilder<AudioState>(
+          valueListenable: musicManager.audioStateManager.currentSongNotifier,
+          builder: (context, state, _) =>
+              LyricsPanelBody(song: state.currentSong),
+        );
+      },
+    );
+  }
+}
+
+/// The open lyrics panel for [song]. The back button closes it.
+class LyricsPanelBody extends StatelessWidget {
+  const LyricsPanelBody({super.key, required this.song});
+
+  final MusicData? song;
+
+  @override
+  Widget build(BuildContext context) {
+    final song = this.song;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) LyricsPanel.close();
+      },
+      child: ValueListenableBuilder<int>(
+        valueListenable: LyricsPanel._openings,
+        builder: (context, openings, _) => song == null
+            ? LyricsSheet.empty(onClose: LyricsPanel.close)
+            : LyricsSheet(
+                // A new song, or lyrics found since, start a new sheet.
+                key: ValueKey("${song.audioId}#$openings"),
+                song: song,
+                onClose: LyricsPanel.close,
+              ),
+      ),
     );
   }
 }
 
 /// A song's lyrics. Timed ones follow playback, and their timing can be
-/// shifted by hand from the button in the app bar.
+/// shifted by hand from the button in the app bar. A song without lyrics
+/// offers to search for them.
 class LyricsSheet extends StatefulWidget {
-  const LyricsSheet({super.key, required this.song});
+  const LyricsSheet(
+      {super.key, required MusicData this.song, required this.onClose});
 
-  final MusicData song;
+  /// The sheet when no song is playing.
+  const LyricsSheet.empty({super.key, required this.onClose}) : song = null;
+
+  final MusicData? song;
+  final VoidCallback onClose;
 
   /// How long the timing waits to be saved after the last change, so that
   /// tapping a step button several times saves once.
@@ -70,9 +141,9 @@ class LyricsSheet extends StatefulWidget {
 }
 
 class _LyricsSheetState extends State<LyricsSheet> {
-  MusicData get song => widget.song;
+  MusicData? get song => widget.song;
 
-  late String _lyrics = song.lyrics;
+  late String _lyrics = song?.lyrics ?? "";
   late List<SyncedLyricLine> _lines = Lrc.parse(_lyrics);
   bool _adjusting = false;
   Timer? _saveTimer;
@@ -95,20 +166,46 @@ class _LyricsSheetState extends State<LyricsSheet> {
     _saveTimer = Timer(LyricsSheet.saveDelay, _save);
   }
 
-  void _save() => LyricsFinder.applyLyrics(song, _lyrics, true);
+  void _save() => LyricsFinder.applyLyrics(song!, _lyrics, true);
+
+  void _search() => FindLyricsDialog(song!).show(context);
 
   @override
   Widget build(BuildContext context) {
+    final song = this.song;
     final synced = _lines.isNotEmpty;
+    final Widget body;
+    if (synced) {
+      body = SyncedLyricsView(song: song!, lines: _lines);
+    } else if (_lyrics.trim().isNotEmpty) {
+      body = SingleChildScrollView(
+        child: Text(
+          _lyrics,
+          textAlign: TextAlign.center,
+        ),
+      );
+    } else {
+      body = Center(
+        child: song == null
+            ? null
+            : TextButton.icon(
+                icon: const Icon(Icons.search),
+                label: Text(l10n.value.search_lyrics),
+                onPressed: _search,
+              ),
+      );
+    }
+
     return Material(
       child: Column(
         children: [
           AppBar(
+            automaticallyImplyLeading: false,
             title: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
               child: Text(
-                song.title,
+                song?.title ?? "",
                 style: TextStyle(
                   color: Theme.of(context).extraColors.secondary,
                 ),
@@ -116,9 +213,7 @@ class _LyricsSheetState extends State<LyricsSheet> {
             ),
             leading: IconButton(
               icon: const Icon(Icons.expand_more),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: widget.onClose,
               tooltip: l10n.value.close,
             ),
             actions: [
@@ -129,27 +224,19 @@ class _LyricsSheetState extends State<LyricsSheet> {
                   isSelected: _adjusting,
                   onPressed: () => setState(() => _adjusting = !_adjusting),
                 ),
-              IconButton(
-                icon: const Icon(Icons.edit_note),
-                onPressed: () {
-                  final navigator = Navigator.of(context)..pop();
-                  FindLyricsDialog(song).show(navigator.context);
-                },
-              )
+              if (song != null)
+                IconButton(
+                  icon: const Icon(Icons.edit_note),
+                  tooltip: l10n.value.search_lyrics,
+                  onPressed: _search,
+                )
             ],
           ),
-          Flexible(
+          Expanded(
             child: Container(
-              width: MediaQuery.of(context).size.width,
+              width: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: synced
-                  ? SyncedLyricsView(song: song, lines: _lines)
-                  : SingleChildScrollView(
-                      child: Text(
-                        _lyrics,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+              child: body,
             ),
           ),
           if (synced && _adjusting)

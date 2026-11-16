@@ -311,5 +311,7 @@
         }
     },
     "lyrics_timing_reset": "Back to as fetched",
-    "@lyrics_timing_reset": {}
+    "@lyrics_timing_reset": {},
+    "search_lyrics": "Search lyrics",
+    "@search_lyrics": {}
 }

@@ -312,5 +312,7 @@
         }
     },
     "lyrics_timing_reset": "取得したままに戻す",
-    "@lyrics_timing_reset": {}
+    "@lyrics_timing_reset": {},
+    "search_lyrics": "歌詞を検索",
+    "@search_lyrics": {}
 }

@@ -69,6 +69,8 @@ class HomeScreen extends ScaffoldScreen {
                 alignment: Alignment.bottomRight,
                 child: LyricsButton(),
               ),
+              // Over the playlist only, so the footer's player stays usable.
+              const Positioned.fill(child: LyricsPanel()),
 
               // <------ Volume Button ------>
               if (Responsive.isMobile(context))

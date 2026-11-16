@@ -916,6 +916,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to as fetched'**
   String get lyrics_timing_reset;
+
+  /// No description provided for @search_lyrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Search lyrics'**
+  String get search_lyrics;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
